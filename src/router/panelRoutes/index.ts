@@ -5,6 +5,11 @@ import gradeRoutes from './grade'
 import quizRoutes from './quiz'
 import homeworkRoutes from './homework'
 import messageRoutes from './message'
+import examSessionRoutes from './examSession'
+import disciplinaryRoutes from './disciplinary'
+import studentPortalRoutes from './studentPortal'
+import calendarRoutes from './calendar'
+import studyHoursRoutes from './studyHours'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
@@ -33,6 +38,11 @@ export const index: RouteRecordRaw[] = [
       ...quizRoutes,
       ...homeworkRoutes,
       ...messageRoutes,
+      ...examSessionRoutes,
+      ...disciplinaryRoutes,
+      ...studentPortalRoutes,
+      ...calendarRoutes,
+      ...studyHoursRoutes,
     ]
   },
 

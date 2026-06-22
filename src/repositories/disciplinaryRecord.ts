@@ -30,3 +30,5 @@ export default class DisciplinaryRecordAPI extends BaseAPI<DisciplinaryRecordTyp
     }
   }
 }
+
+export const disciplinaryRecord = new DisciplinaryRecordAPI()

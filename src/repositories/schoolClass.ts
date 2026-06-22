@@ -26,3 +26,5 @@ export default class SchoolClassAPI extends BaseAPI<SchoolClassType> {
     }
   }
 }
+
+export const schoolClass = new SchoolClassAPI()

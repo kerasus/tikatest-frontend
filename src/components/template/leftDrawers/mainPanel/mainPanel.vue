@@ -4,10 +4,12 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
+import { useAppConfig } from 'stores/appConfig'
 import ListItem from './components/listItem.vue'
-import { computed, ref, type Ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { UserRolesType } from 'src/repositories/user'
 import { useAppConfig } from 'stores/appConfig'
+import { useUser } from 'src/stores/user'
 
 const $q = useQuasar()
 const route = useRoute()
@@ -58,45 +60,164 @@ type ListItemType = {
 const topLinks = ref<ListItemType[]>([
   {
     icon: 'dashboard',
-    title: 'داشبورد',
+    title: 'پیشخوان',
+    forRoles: [ 'Student' ],
+    route: { name: 'Student.Dashboard' }
+  },
+  {
+    icon: 'grading',
+    title: 'نمرات',
+    forRoles: [ 'Student' ],
+    child: [
+      {
+        title: 'مشاهده نمرات',
+        route: { name: 'Student.Grade.List' }
+      },
+      {
+        title: 'کارنامه',
+        route: { name: 'Student.ReportCard' }
+      }
+    ]
+  },
+  {
+    icon: 'gavel',
+    title: 'موارد انضباطی',
+    forRoles: [ 'Student' ],
+    child: [
+      {
+        title: 'مشاهده غیبت‌ها',
+        route: { name: 'Student.Absences' }
+      },
+      {
+        title: 'مشاهده موارد انضباطی',
+        route: { name: 'Student.Disciplinary.List' }
+      }
+    ]
+  },
+  {
+    icon: 'sms',
+    title: 'مدیریت پیام',
+    forRoles: [ 'Student' ],
+    child: [
+      {
+        title: 'ارسال پیام',
+        route: { name: 'Student.Message.Create' }
+      },
+      {
+        title: 'مشاهده پیام‌ها',
+        route: { name: 'Student.Message.List' }
+      }
+    ]
+  },
+  {
+    icon: 'quiz',
+    title: 'آزمون آنلاین',
+    forRoles: [ 'Student' ],
+    route: { name: 'Student.Quiz.List' }
+  },
+  {
+    icon: 'assignment',
+    title: 'ساعت مطالعه و تکالیف',
+    forRoles: [ 'Student' ],
+    child: [
+      {
+        title: 'مشاهده تکالیف',
+        route: { name: 'Student.Homework.List' }
+      },
+      {
+        title: 'ثبت ساعت مطالعه',
+        route: { name: 'Student.StudySessions.Create' }
+      },
+      {
+        title: 'مشاهده ساعات ثبت شده',
+        route: { name: 'Student.StudySessions.List' }
+      }
+    ]
+  },
+  {
+    icon: 'calendar_today',
+    title: 'تقویم اجرایی',
+    forRoles: [ 'Student' ],
+    route: { name: 'Student.Calendar' }
+  },
+  {
+    icon: 'dashboard',
+    title: 'پیشخوان',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     route: { name: 'Panel.Dashboard' }
   },
   {
     icon: 'school',
-    title: 'مدیریت دانش آموزان',
+    title: 'دانش آموزان',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     route: { name: 'Panel.Student.List' }
   },
   {
-    icon: 'groups',
-    title: 'مدیریت کلاس‌ها',
+    icon: 'grading',
+    title: 'نمرات',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Class.List' }
+    child: [
+      { title: 'ثبت نمره', route: { name: 'Panel.Grade.Create' } },
+      { title: 'مشاهده نمرات', route: { name: 'Panel.Grade.List' } },
+      { title: 'کارنامه', route: { name: 'Panel.ReportCard' } },
+      { title: 'گزارش نمرات تک درس', route: { name: 'Panel.GradeReport.Lesson' } },
+      { title: 'گزارش نمرات چند درس', route: { name: 'Panel.GradeReport.Multiple' } }
+    ]
   },
   {
-    icon: 'grading',
-    title: 'مدیریت نمرات',
+    icon: 'sms',
+    title: 'مدیریت پیام',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Grade.List' }
+    child: [
+      { title: 'ارسال پیام', route: { name: 'Panel.Message.Create' } },
+      { title: 'مشاهده پیام های ارسالی', route: { name: 'Panel.Message.Sent' } },
+      { title: 'مشاهده پیام های دریافتی', route: { name: 'Panel.Message.Received' } }
+    ]
+  },
+  {
+    icon: 'gavel',
+    title: 'موارد انضباطی',
+    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    child: [
+      { title: 'ثبت غیبت', route: { name: 'Panel.Disciplinary.Absence.Create' } },
+      { title: 'مشاهده غیبت های ثبت شده', route: { name: 'Panel.Disciplinary.Absence.List' } },
+      { title: 'تعریف مورد انضباطی', route: { name: 'Panel.DisciplinaryCase.Create' } },
+      { title: 'ثبت مورد انضباطی', route: { name: 'Panel.Disciplinary.Create' } },
+      { title: 'مشاهده موارد انضباطی ثبت شده', route: { name: 'Panel.Disciplinary.List' } }
+    ]
   },
   {
     icon: 'quiz',
-    title: 'آزمون‌های آنلاین',
+    title: 'آزمون آنلاین',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Quiz.List' }
+    child: [
+      { title: 'ثبت آزمون', route: { name: 'Panel.Quiz.Create' } },
+      { title: 'مشاهده آزمون ها', route: { name: 'Panel.Quiz.List' } }
+    ]
+  },
+  {
+    icon: 'calendar_today',
+    title: 'تقویم اجرایی',
+    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    route: { name: 'Panel.Calendar' }
   },
   {
     icon: 'assignment',
     title: 'تکالیف',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Homework.List' }
+    child: [
+      { title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
+      { title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
+    ]
   },
   {
-    icon: 'sms',
-    title: 'پیام‌ها',
+    icon: 'menu_book',
+    title: 'ساعت مطالعه دانش آموزان',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Message.List' }
+    child: [
+      { title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
+      { title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
+    ]
   }
 ])
 

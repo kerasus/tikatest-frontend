@@ -70,7 +70,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import QuizAPI from 'src/repositories/quiz'
+import { quiz } from 'src/repositories/quiz'
 
 const router = useRouter()
 const $q = useQuasar()
@@ -101,7 +101,7 @@ const saving = ref(false)
 async function onSubmit () {
   saving.value = true
   try {
-    await QuizAPI.prototype.create(form as any)
+    await quiz.create(form as any)
     $q.notify({
       icon: 'check',
       message: 'آزمون با موفقیت ایجاد شد.',

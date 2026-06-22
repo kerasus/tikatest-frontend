@@ -66,5 +66,44 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      dashboard: '/student-portal/dashboard',
+      myGrades: '/student-portal/grades',
+      reportCard: '/student-portal/report-card',
+      absences: '/student-portal/absences',
+      disciplinary: '/student-portal/disciplinary',
+      studySessions: '/student-portal/study-sessions',
+    }
+  }
+
+  async dashboard (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
+  }
+
+  async myGrades (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.myGrades!, { params })
+  }
+
+  async reportCard (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.reportCard!, { params })
+  }
+
+  async absences (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.absences!, { params })
+  }
+
+  async disciplinary (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.disciplinary!, { params })
+  }
+
+  async studySessions (params?: any) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.studySessions!, { params })
+  }
+
+  async createStudySession (data: any) {
+    return this.getAxiosInstanceWithToken().post(this.endpoints.studySessions!, data)
   }
 }
+
+export const student = new StudentAPI()

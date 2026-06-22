@@ -1,95 +1,128 @@
 <template>
-  <div class="student-show-page">
-    <q-card>
-      <q-card-section>
-        <div class="row items-center">
-          <q-avatar size="80px" class="q-ml-md">
-            <img :src="student.picture || 'https://cdn.quasar.dev/img/avatar.png'" />
-          </q-avatar>
-          <div>
-            <div class="text-h5">{{ student.full_name || `${student.name} ${student.lastname}` }}</div>
-            <div class="text-grey-7">کد ملی: {{ student.melli_code || '-' }}</div>
+  <q-page class="q-pa-md">
+    <div class="row items-center q-mb-lg">
+      <div class="col">
+        <h4 class="q-ma-none">جزئیات دانش آموز</h4>
+      </div>
+      <div class="col-auto">
+        <q-btn color="primary" label="ویرایش" :to="{ name: 'Panel.Student.Edit', params: { id: student?.id } }" />
+      </div>
+    </div>
+
+    <div v-if="loading" class="text-center q-pa-lg">
+      <q-spinner color="primary" size="100px" />
+    </div>
+
+    <template v-else-if="student">
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">نام و نام خانوادگی:</div>
+              <div class="text-body1">{{ student.full_name }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">نام کاربری:</div>
+              <div class="text-body1">{{ student.username }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">شماره تماس:</div>
+              <div class="text-body1">{{ student.student_phone || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">کد ملی:</div>
+              <div class="text-body1">{{ student.melli_code || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">تاریخ تولد:</div>
+              <div class="text-body1">{{ student.birth_date || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">کلاس:</div>
+              <div class="text-body1">{{ getClassName() }}</div>
+            </div>
           </div>
-        </div>
-      </q-card-section>
+        </q-card-section>
+      </q-card>
 
-      <q-separator />
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="text-h6">نمرات</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <q-btn flat color="primary" label="مشاهده همه نمرات" :to="{ name: 'Student.Grade.List', params: { studentId: student.id } }" />
+        </q-card-section>
+      </q-card>
 
-      <q-card-section>
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <q-list>
-              <q-item>
-                <q-item-section>
-                  <q-item-label caption>نام کاربری</q-item-label>
-                  <q-item-label>{{ student.username || '-' }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section>
-                  <q-item-label caption>تلفن همراه</q-item-label>
-                  <q-item-label>{{ student.student_phone || '-' }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section>
-                  <q-item-label caption>ایمیل</q-item-label>
-                  <q-item-label>{{ student.student_email || '-' }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section>
-                  <q-item-label caption>تاریخ تولد</q-item-label>
-                  <q-item-label>{{ student.birth_date || '-' }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="text-h6">تکالیف</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <q-btn flat color="primary" label="مشاهده تکالیف" :to="{ name: 'Student.Homework.List', params: { studentId: student.id } }" />
+        </q-card-section>
+      </q-card>
+
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">مشخصات والدین</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">نام پدر:</div>
+              <div class="text-body1">{{ student.father_name || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">شماره تماس پدر:</div>
+              <div class="text-body1">{{ student.father_phone || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">نام مادر:</div>
+              <div class="text-body1">{{ student.mother_name || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">شماره تماس مادر:</div>
+              <div class="text-body1">{{ student.mother_phone || '-' }}</div>
+            </div>
           </div>
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section v-if="student.studentClassRegistrations && student.studentClassRegistrations.length">
-        <div class="text-h6 q-mb-md">کلاس‌های ثبت شده</div>
-        <q-table
-          :rows="student.studentClassRegistrations"
-          :columns="classColumns"
-          row-key="id"
-          flat
-          bordered />
-      </q-card-section>
-    </q-card>
-  </div>
+        </q-card-section>
+      </q-card>
+    </template>
+  </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import StudentAPI from 'src/repositories/student'
-import type { StudentType } from 'src/repositories/student'
+import { student } from 'src/repositories/student'
 
 const route = useRoute()
 const $q = useQuasar()
-const student = ref<Partial<StudentType>>({})
 
-const classColumns = [
-  { name: 'name', label: 'نام کلاس', field: 'schoolClass.name' },
-  { name: 'field', label: 'رشته', field: 'schoolClass.academicField.name' },
-  { name: 'level', label: 'پایه', field: 'schoolClass.academicLevel.name' }
-]
+const loading = ref(true)
+const studentData = ref<any>(null)
+
+const getClassName = (): string => {
+  if (!studentData.value?.studentClassRegistrations?.length) return '-'
+  const reg = studentData.value.studentClassRegistrations[0]
+  return reg?.schoolClass?.name || '-'
+}
 
 onMounted(async () => {
+  loading.value = true
   try {
-    const result = await StudentAPI.prototype.get(Number(route.params.id))
-    student.value = result
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در بارگذاری اطلاعات دانش آموز.',
-      color: 'negative'
-    })
+    const id = parseInt(route.params.id as string)
+    const response = await student.get(id)
+    studentData.value = response.data
+  } catch (error: any) {
+    $q.notify({ type: 'negative', message: 'خطا در بارگذاری اطلاعات دانش آموز' })
+  } finally {
+    loading.value = false
   }
 })
 </script>

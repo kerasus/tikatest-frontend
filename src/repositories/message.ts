@@ -30,5 +30,22 @@ export default class MessageAPI extends BaseAPI<MessageType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      sent: '/messages/sent',
+      received: '/messages/received'
+    }
+  }
+
+  async sentMessages(params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.sent, { params })
+    return response.data
+  }
+
+  async receivedMessages(params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.received, { params })
+    return response.data
   }
 }
+
+export const message = new MessageAPI()

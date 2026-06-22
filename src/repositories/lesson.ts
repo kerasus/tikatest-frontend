@@ -30,3 +30,5 @@ export default class LessonAPI extends BaseAPI<LessonType> {
     }
   }
 }
+
+export const lesson = new LessonAPI()

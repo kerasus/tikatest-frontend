@@ -24,3 +24,5 @@ export default class DisciplinaryCaseAPI extends BaseAPI<DisciplinaryCaseType> {
     }
   }
 }
+
+export const disciplinaryCase = new DisciplinaryCaseAPI()

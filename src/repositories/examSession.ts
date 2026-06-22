@@ -38,3 +38,5 @@ export default class ExamSessionAPI extends BaseAPI<ExamSessionType> {
     }
   }
 }
+
+export const examSession = new ExamSessionAPI()

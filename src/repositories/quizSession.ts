@@ -1,20 +1,26 @@
-import { BaseAPI } from 'src/repositories/BaseAPI'
+import { appApi } from 'src/boot/axios'
 
 export const quizSession = {
   startSession: (quizId: number, attemptNumber = 1) =>
-    BaseAPI.post(`/quizzes/${quizId}/start-session`, { attempt_number: attemptNumber }),
+    appApi.post(`/quiz-sessions/${quizId}/start`, { attempt_number: attemptNumber }),
 
   getSession: (sessionId: number) =>
-    BaseAPI.get(`/quiz-sessions/${sessionId}`),
+    appApi.get(`/quiz-sessions/${sessionId}`),
 
   submitAnswer: (sessionId: number, data: any) =>
-    BaseAPI.post(`/quiz-sessions/${sessionId}/submit-answer`, data),
+    appApi.post(`/quiz-sessions/${sessionId}/answer`, data),
 
   submitQuiz: (sessionId: number) =>
-    BaseAPI.post(`/quiz-sessions/${sessionId}/submit`, {}),
+    appApi.post(`/quiz-sessions/${sessionId}/submit`, {}),
 
   getMyAttempts: () =>
-    BaseAPI.get(`/my-quiz-attempts`),
+    appApi.get(`/quiz-sessions/my-attempts`),
+
+  reportAntiCheatEvent: (sessionId: number, eventType: string, eventData?: any) =>
+    appApi.post(`/quiz-sessions/${sessionId}/anti-cheat`, {
+      event_type: eventType,
+      event_data: eventData
+    }),
 }
 
 export default quizSession

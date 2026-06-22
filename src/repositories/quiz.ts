@@ -48,5 +48,21 @@ export default class QuizAPI extends BaseAPI<QuizType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      resultsWithRank: (quizId: number) => `${this.baseEndpoint}/${quizId}/results-with-rank`,
+      assignParticipants: (quizId: number) => `${this.baseEndpoint}/${quizId}/participants`,
+    }
+  }
+
+  async resultsWithRank (quizId: number) {
+    return this.getAxiosInstanceWithToken().get(this.endpoints.resultsWithRank!(quizId))
+  }
+
+  async assignParticipants (quizId: number, classIds: number[]) {
+    return this.getAxiosInstanceWithToken().post(this.endpoints.assignParticipants!(quizId), { class_ids: classIds })
   }
 }
+
+export const quiz = new QuizAPI()
+

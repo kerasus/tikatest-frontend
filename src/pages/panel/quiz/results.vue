@@ -1,83 +1,130 @@
 <template>
-  <div class="quiz-results-page">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">نتایج آزمون: {{ quiz.name }}</div>
-      </q-card-section>
+  <q-page class="q-pa-md">
+    <div class="row items-center q-mb-lg">
+      <div class="col">
+        <h4 class="q-ma-none">نتایج آزمون: {{ quiz?.name }}</h4>
+      </div>
+      <div class="col-auto">
+        <q-btn flat label="بازگشت" :to="{ name: 'Panel.Quiz.List' }" />
+      </div>
+    </div>
 
-      <q-separator />
+    <div v-if="loading" class="text-center q-pa-lg">
+      <q-spinner color="primary" size="100px" />
+    </div>
 
-      <q-card-section>
-        <q-table
-          :rows="attempts"
-          :columns="columns"
-          row-key="id"
-          :loading="loading">
-          <template #body-cell-student="props">
-            <q-td :props="props">
-              {{ props.row.student?.name }} {{ props.row.student?.lastname }}
-            </q-td>
-          </template>
-          <template #body-cell-percent="props">
-            <q-td :props="props">
-              <q-badge :color="getPercentColor(props.row.percent)" :label="props.row.percent ? `${props.row.percent}%` : '-'" />
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-  </div>
+    <template v-else-if="results">
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-3">
+              <div class="text-subtitle2">تعداد شرکت‌کنندگان:</div>
+              <div class="text-h5 text-primary">{{ results.results?.length || 0 }}</div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="text-subtitle2">میانگین درصد:</div>
+              <div class="text-h5 text-primary">{{ averagePercent }}</div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="text-subtitle2">بیشترین درصد:</div>
+              <div class="text-h5 text-positive">{{ highestPercent }}</div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="text-subtitle2">کمترین درصد:</div>
+              <div class="text-h5 text-negative">{{ lowestPercent }}</div>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">رتبه‌بندی دانش آموزان</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <q-table
+            v-if="results.results && results.results.length > 0"
+            :rows="results.results"
+            :columns="columns"
+            row-key="student_id"
+            :pagination="{ rowsPerPage: 20 }"
+          >
+            <template #body-cell-rank="{ props }">
+              <q-td :props="props">
+                <q-chip :color="getRankColor(props.row.rank)" text-color="white" :label="props.row.rank" />
+              </q-td>
+            </template>
+            <template #body-cell-percent="{ props }">
+              <q-td :props="props">
+                {{ props.row.percent?.toFixed(2) }} %
+              </q-td>
+            </template>
+          </q-table>
+          <div v-else class="text-center q-pa-lg">
+            <p>هنوز نتیجه‌ای ثبت نشده است</p>
+          </div>
+        </q-card-section>
+      </q-card>
+    </template>
+  </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import QuizAPI from 'src/repositories/quiz'
-import QuizAttemptAPI from 'src/repositories/quizAttempt'
-import type { QuizType, QuizAttemptType } from 'src/repositories/quiz'
+import { quiz } from 'src/repositories/quiz'
 
 const route = useRoute()
 const $q = useQuasar()
 
-const quiz = ref<Partial<QuizType>>({})
-const attempts = ref<QuizAttemptType[]>([])
-const loading = ref(false)
+const loading = ref(true)
+const results = ref<any>(null)
 
 const columns = [
-  { name: 'student', label: 'دانش آموز', align: 'right' as const },
-  { name: 'started_at', label: 'زمان شروع', align: 'center' as const, field: 'started_at' },
-  { name: 'ended_at', label: 'زمان پایان', align: 'center' as const, field: 'ended_at' },
-  { name: 'answer_status', label: 'وضعیت پاسخ', align: 'center' as const, field: 'answer_status' },
-  { name: 'percent', label: 'درصد', align: 'center' as const, field: 'percent' },
-  { name: 'is_locked', label: 'قفل', align: 'center' as const, field: 'is_locked' }
+  { name: 'rank', label: 'رتبه', field: 'rank', align: 'center' as const },
+  { name: 'student_name', label: 'نام دانش آموز', field: 'student_name', align: 'center' as const },
+  { name: 'percent', label: 'درصد', field: 'percent', align: 'center' as const },
+  { name: 'started_at', label: 'زمان شروع', field: 'started_at', align: 'center' as const },
+  { name: 'ended_at', label: 'زمان پایان', field: 'ended_at', align: 'center' as const },
 ]
 
-function getPercentColor (percent: number | null) {
-  if (percent == null) return 'grey'
-  if (percent >= 70) return 'positive'
-  if (percent >= 50) return 'warning'
-  return 'negative'
+const getRankColor = (rank: number): string => {
+  if (rank === 1) return 'amber-5'
+  if (rank === 2) return 'grey-4'
+  if (rank === 3) return 'brown-5'
+  return 'primary'
 }
+
+const averagePercent = computed(() => {
+  if (!results.value?.results?.length) return '-'
+  const sum = results.value.results.reduce((acc: number, r: any) => acc + (r.percent || 0), 0)
+  return (sum / results.value.results.length).toFixed(2) + ' %'
+})
+
+const highestPercent = computed(() => {
+  if (!results.value?.results?.length) return '-'
+  const max = Math.max(...results.value.results.map((r: any) => r.percent || 0))
+  return max.toFixed(2) + ' %'
+})
+
+const lowestPercent = computed(() => {
+  if (!results.value?.results?.length) return '-'
+  const min = Math.min(...results.value.results.map((r: any) => r.percent || 0))
+  return min.toFixed(2) + ' %'
+})
 
 onMounted(async () => {
   loading.value = true
   try {
-    const quizId = Number(route.params.id)
-    quiz.value = await QuizAPI.prototype.get(quizId)
-    const result = await QuizAttemptAPI.prototype.index({ quiz_ids: [quizId], length: 100 })
-    attempts.value = result.data
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در بارگذاری نتایج آزمون.',
-      color: 'negative'
-    })
+    const quizId = parseInt(route.params.id as string)
+    const response = await (quiz as any).resultsWithRank(quizId)
+    results.value = response.data
+  } catch (error: any) {
+    $q.notify({ type: 'negative', message: 'خطا در بارگذاری نتایج آزمون' })
   } finally {
     loading.value = false
   }
 })
 </script>
-
-<style lang="scss" scoped>
-</style>

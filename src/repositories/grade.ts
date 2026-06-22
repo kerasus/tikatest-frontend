@@ -50,5 +50,34 @@ export default class GradeAPI extends BaseAPI<GradeType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      lessonReport: (lessonId: number) => `/grades/report/lesson/${lessonId}`,
+      multipleLessonsReport: '/grades/report/multiple-lessons',
+      studentReport: (studentId: number) => `/grades/report/student/${studentId}`
+    }
+  }
+
+  async lessonReport(lessonId: number, params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.lessonReport(lessonId), {
+      params
+    })
+    return response.data
+  }
+
+  async multipleLessonsReport(params: { lesson_ids: number[], class_id?: number }): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.multipleLessonsReport, {
+      params
+    })
+    return response.data
+  }
+
+  async studentReport(studentId: number, params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentReport(studentId), {
+      params
+    })
+    return response.data
   }
 }
+
+export const grade = new GradeAPI()

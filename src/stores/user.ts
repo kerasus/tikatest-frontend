@@ -29,67 +29,37 @@ export const useUser = defineStore('user', () => {
   const refreshTokenValue = computed(() => state.refresh)
   const me = computed(() => state.user ?? null)
   const isManager = computed(() => hasRole(state.user, 'Manager'))
-  const isAccountant = computed(() => hasRole(state.user, 'Accountant'))
-  const isMoldingWorker = computed(() => hasRole(state.user, 'MoldingWorker'))
-  const isColoringWorker = computed(() => hasRole(state.user, 'ColoringWorker'))
-  const isFabricCutter = computed(() => hasRole(state.user, 'FabricCutter'))
-  const isAssembler = computed(() => hasRole(state.user, 'Assembler'))
-  const isMiddleWorker = computed(() => hasRole(state.user, 'MiddleWorker'))
-  const isWarehouseKeeper = computed(() => hasRole(state.user, 'WarehouseKeeper'))
+  const isAdmin = computed(() => hasRole(state.user, 'Admin'))
+  const isTeacher = computed(() => hasRole(state.user, 'Teacher'))
+  const isStudent = computed(() => hasRole(state.user, 'Student'))
   const mainRole = computed<UserRolesType | null>(() => {
+    if (isAdmin.value) {
+      return 'Admin'
+    }
     if (isManager.value) {
       return 'Manager'
     }
-    if (isAccountant.value) {
-      return 'Accountant'
+    if (isTeacher.value) {
+      return 'Teacher'
     }
-    if (isWarehouseKeeper.value) {
-      return 'WarehouseKeeper'
+    if (isStudent.value) {
+      return 'Student'
     }
-    if (isMiddleWorker.value) {
-      return 'MiddleWorker'
-    }
-    if (isAssembler.value) {
-      return 'Assembler'
-    }
-    if (isFabricCutter.value) {
-      return 'FabricCutter'
-    }
-    if (isMoldingWorker.value) {
-      return 'MoldingWorker'
-    }
-    if (isColoringWorker.value) {
-      return 'ColoringWorker'
-    }
-
     return null
   })
   const mainRoleForPath = computed<UserRolesForPathType | null>(() => {
+    if (isAdmin.value) {
+      return 'admin'
+    }
     if (isManager.value) {
       return 'manager'
     }
-    if (isAccountant.value) {
-      return 'accountant'
+    if (isTeacher.value) {
+      return 'teacher'
     }
-    if (isWarehouseKeeper.value) {
-      return 'warehouse-keeper'
+    if (isStudent.value) {
+      return 'student'
     }
-    if (isMiddleWorker.value) {
-      return 'middle'
-    }
-    if (isAssembler.value) {
-      return 'assembler'
-    }
-    if (isFabricCutter.value) {
-      return 'fabric-cutter'
-    }
-    if (isMoldingWorker.value) {
-      return 'molding'
-    }
-    if (isColoringWorker.value) {
-      return 'coloring'
-    }
-
     return null
   })
 
@@ -137,15 +107,11 @@ export const useUser = defineStore('user', () => {
     token,
     hasRole,
     mainRole,
+    isAdmin,
     isManager,
-    isAssembler,
-    isAccountant,
-    isMiddleWorker,
-    isFabricCutter,
+    isTeacher,
+    isStudent,
     mainRoleForPath,
-    isMoldingWorker,
-    isColoringWorker,
-    isWarehouseKeeper,
     refreshTokenValue,
 
     // Mutations
