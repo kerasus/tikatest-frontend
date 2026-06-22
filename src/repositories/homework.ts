@@ -34,3 +34,6 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     }
   }
 }
+
+export const homework = new HomeworkAPI()
+export const homeworkRepository = homework

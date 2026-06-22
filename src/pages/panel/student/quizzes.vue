@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { quizRepository } from 'src/repositories/quiz'
+import { appApi } from 'src/boot/axios'
 import { useQuasar } from 'quasar'
 
 const router = useRouter()
@@ -108,7 +108,7 @@ const navigateTo = (quiz: any) => {
 const loadQuizzes = async () => {
   loading.value = true
   try {
-    const response = await quizRepository.list({ is_visible: true })
+    const response = await appApi.get('/student-portal/quizzes', { params: { length: 100 } })
     quizzes.value = response.data.data || []
   } catch (error: any) {
     $q.notify({

@@ -65,4 +65,4 @@ export default class QuizAPI extends BaseAPI<QuizType> {
 }
 
 export const quiz = new QuizAPI()
-
+export const quizRepository = quiz

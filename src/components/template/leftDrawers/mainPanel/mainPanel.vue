@@ -8,8 +8,6 @@ import { useAppConfig } from 'stores/appConfig'
 import ListItem from './components/listItem.vue'
 import { computed, ref, watch } from 'vue'
 import { UserRolesType } from 'src/repositories/user'
-import { useAppConfig } from 'stores/appConfig'
-import { useUser } from 'src/stores/user'
 
 const $q = useQuasar()
 const route = useRoute()
@@ -129,7 +127,7 @@ const topLinks = ref<ListItemType[]>([
         route: { name: 'Student.StudySessions.Create' }
       },
       {
-        title: 'مشاهده ساعات ثبت شده',
+        title: 'مشاهده ساعات مطالعه ثبت شده',
         route: { name: 'Student.StudySessions.List' }
       }
     ]

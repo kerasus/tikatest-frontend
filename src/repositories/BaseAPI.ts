@@ -145,6 +145,10 @@ export default class BaseAPI<T> {
     })
   }
 
+  async list (filters: any = { length: 10 }): Promise<ListType<T>> {
+    return this.index(filters)
+  }
+
   getNormalizedListType (response: AxiosResponse<ListType<T>>): ListType<T> {
     return {
       data: response.data.data,

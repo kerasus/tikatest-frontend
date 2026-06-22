@@ -101,3 +101,5 @@ export default class UserAPI extends BaseAPI<UserType> {
   }
 
 }
+
+export const user = new UserAPI()

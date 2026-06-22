@@ -63,10 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { grade } from 'src/repositories/grade'
-import { user } from 'src/repositories/user'
+import { student } from 'src/repositories/student'
 
 const $q = useQuasar()
 
@@ -84,10 +84,10 @@ const columns = [
 
 const loadStudents = async () => {
   try {
-    const result = await user.index({ length: 100 })
+    const result = await student.index({ length: 100 })
     studentOptions.value = result.data.map((s: any) => ({
       id: s.id,
-      full_name: s.full_name || `${s.name} ${s.lastname}`,
+      full_name: s.full_name || `${s.firstname} ${s.lastname}`,
       ...s
     }))
   } catch (error) {
@@ -111,6 +111,10 @@ const loadReportCard = async () => {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  loadStudents()
+})
 </script>
 
 <style scoped>

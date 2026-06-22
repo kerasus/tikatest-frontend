@@ -172,8 +172,7 @@ const startAttempt = async () => {
 const loadQuizDetails = async () => {
   loading.value = true
   try {
-    const quizRes = await quizRepository.get(quizId)
-    quiz.value = quizRes.data
+    quiz.value = await quizRepository.get(quizId)
 
     const attemptsRes = await quizSession.getMyAttempts()
     attempts.value = attemptsRes.data.filter((a: any) => a.quiz_id === quizId)

@@ -70,7 +70,7 @@
                   { label: 'غلط', value: 'false' }
                 ]"
                 color="primary"
-                @update:model-value="(val) => setAnswer(question.id, { answer: val })"
+                @update:model-value="(val) => setAnswer(question.id, { answer: val, answer_text: val })"
               />
             </div>
 
@@ -120,12 +120,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { quizSession } from 'src/repositories/quizSession'
 import { useQuasar } from 'quasar'
 
 const route = useRoute()
+const router = useRouter()
 const $q = useQuasar()
 
 const quizId = parseInt(route.params.id as string)
@@ -138,7 +139,8 @@ const remainingTime = ref(0)
 const totalTime = ref(3600)
 const answers = ref<Map<number, any>>(new Map())
 
-let timerInterval: NodeJS.Timeout | null = null
+let timerInterval: ReturnType<typeof setInterval> | null = null
+let isSubmitted = false
 
 const formatTime = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600)
@@ -171,7 +173,7 @@ const startSession = async () => {
 
 const startTimer = () => {
   timerInterval = setInterval(() => {
-    remainingTime.value--
+    remainingTime.value = Math.max(0, remainingTime.value - 1)
 
     if (remainingTime.value <= 0) {
       clearInterval(timerInterval!)
@@ -203,7 +205,7 @@ const saveAnswer = async (questionId: number, answerData: any) => {
     await quizSession.submitAnswer(sessionId.value, {
       quiz_question_id: questionId,
       quiz_question_option_id: answerData.option_id || null,
-      answer_text: answerData.answer_text || null
+      answer_text: answerData.answer_text || answerData.answer || null
     })
   } catch (error: any) {
     console.error('Error saving answer:', error)
@@ -211,21 +213,23 @@ const saveAnswer = async (questionId: number, answerData: any) => {
 }
 
 const submitQuiz = async () => {
-  if (!sessionId.value) return
+  if (!sessionId.value || isSubmitted) return
 
+  isSubmitted = true
   submitting.value = true
 
   try {
-    const response = await quizSession.submitQuiz(sessionId.value)
+    await quizSession.submitQuiz(sessionId.value)
     $q.notify({
       type: 'positive',
       message: 'آزمون با موفقیت ثبت شد'
     })
 
     setTimeout(() => {
-      window.location.href = `/panel/quizzes/${quizId}/results`
+      router.push({ name: 'Student.Quiz.Show', params: { id: quizId } })
     }, 1500)
   } catch (error: any) {
+    isSubmitted = false
     $q.notify({
       type: 'negative',
       message: error.response?.data?.message || 'خطا در ثبت آزمون'
@@ -235,14 +239,50 @@ const submitQuiz = async () => {
   }
 }
 
+const reportEvent = (eventType: string, eventData: Record<string, unknown> = {}) => {
+  if (!sessionId.value || isSubmitted) return
+  quizSession.reportAntiCheatEvent(sessionId.value, eventType, {
+    ...eventData,
+    remaining_time: remainingTime.value,
+    at: new Date().toISOString()
+  }).catch(() => undefined)
+}
+
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    reportEvent('tab_hidden')
+  }
+}
+
+const handleWindowBlur = () => reportEvent('window_blur')
+const handleCopyPaste = (event: ClipboardEvent) => {
+  reportEvent(event.type)
+}
+const handleContextMenu = (event: MouseEvent) => {
+  event.preventDefault()
+  reportEvent('context_menu')
+}
+
 onMounted(() => {
   startSession()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  window.addEventListener('blur', handleWindowBlur)
+  document.addEventListener('copy', handleCopyPaste)
+  document.addEventListener('paste', handleCopyPaste)
+  document.addEventListener('cut', handleCopyPaste)
+  document.addEventListener('contextmenu', handleContextMenu)
 })
 
 onBeforeUnmount(() => {
   if (timerInterval) {
     clearInterval(timerInterval)
   }
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  window.removeEventListener('blur', handleWindowBlur)
+  document.removeEventListener('copy', handleCopyPaste)
+  document.removeEventListener('paste', handleCopyPaste)
+  document.removeEventListener('cut', handleCopyPaste)
+  document.removeEventListener('contextmenu', handleContextMenu)
 })
 </script>
 

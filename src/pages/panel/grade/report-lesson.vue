@@ -89,7 +89,7 @@
           row-key="id"
           :loading="loading"
           flat>
-          <template #body-cell-student="{ props }">
+          <template #body-cell-student="props">
             <q-td :props="props">
               {{ props.row.student?.name }} {{ props.row.student?.lastname }}
             </q-td>
@@ -110,7 +110,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { grade } from 'src/repositories/grade'
-import LessonAPI from 'src/repositories/lesson'
+import { lesson } from 'src/repositories/lesson'
 
 const route = useRoute()
 const $q = useQuasar()
@@ -131,7 +131,7 @@ const columns = [
 
 const loadLessons = async () => {
   try {
-    const result = await LessonAPI.prototype.index({ length: 100 })
+    const result = await lesson.index({ length: 100 })
     lessonOptions.value = result.data
   } catch (error) {
     $q.notify({ color: 'negative', message: 'خطا در بارگذاری دروس' })

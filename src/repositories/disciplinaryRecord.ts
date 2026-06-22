@@ -28,6 +28,26 @@ export default class DisciplinaryRecordAPI extends BaseAPI<DisciplinaryRecordTyp
       updated_at: null,
       deleted_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      registerAbsenteeism: '/disciplinary/absenteeism',
+      viewAbsences: '/disciplinary/absences'
+    }
+  }
+
+  async registerAbsenteeism(data: { student_ids: number[], date: string, description?: string, case_id: number }): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.registerAbsenteeism, {
+      student_ids: data.student_ids,
+      date: data.date,
+      description: data.description,
+      case_id: data.case_id
+    })
+    return response.data
+  }
+
+  async viewAbsences(params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.viewAbsences, { params })
+    return response.data
   }
 }
 

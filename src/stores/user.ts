@@ -68,7 +68,9 @@ export const useUser = defineStore('user', () => {
       return false
     }
 
-    return user.roles_list.includes(role)
+    return user.roles_list
+      .map((item) => item.toLowerCase())
+      .includes(role.toLowerCase())
   }
 
   // Mutations
