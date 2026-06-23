@@ -19,9 +19,9 @@
         <q-card class="quiz-card cursor-pointer" @click="navigateTo(quiz)">
           <q-card-section>
             <div class="text-h6">{{ quiz.name }}</div>
-            <div class="text-caption text-grey q-mt-sm">
-              مدت زمان: {{ formatTime(quiz.timer) }}
-            </div>
+<div class="text-caption text-grey q-mt-sm">
+               مدت زمان: {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
+             </div>
           </q-card-section>
 
           <q-separator />

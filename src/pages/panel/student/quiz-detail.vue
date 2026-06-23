@@ -18,7 +18,7 @@
           <div class="row q-col-gutter-lg">
             <div class="col-12 col-md-6">
               <div class="q-mb-md">
-                <strong>مدت زمان:</strong> {{ formatTime(quiz.timer) }}
+                <strong>مدت زمان:</strong> {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
               </div>
               <div class="q-mb-md">
                 <strong>شروع:</strong> {{ formatDateTime(quiz.start_time) }}
@@ -53,9 +53,9 @@
           </div>
 
           <!-- Description -->
-          <div v-if="quiz.explanation" class="q-mt-lg">
+          <div v-if="quiz.description" class="q-mt-lg">
             <strong>توضیحات:</strong>
-            <p>{{ quiz.explanation }}</p>
+            <p>{{ quiz.description }}</p>
           </div>
         </q-card-section>
       </q-card>
