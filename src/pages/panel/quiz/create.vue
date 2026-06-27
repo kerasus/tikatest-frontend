@@ -1,8 +1,13 @@
 <template>
   <div class="quiz-form-page">
-    <q-card>
+    <q-card v-if="loading" class="q-pa-lg text-center">
+      <q-spinner color="primary" size="80px" />
+      <div class="q-mt-md">در حال بارگذاری...</div>
+    </q-card>
+
+    <q-card v-else>
       <q-card-section>
-        <div class="text-h6">ایجاد آزمون آنلاین</div>
+        <div class="text-h6">{{ isEdit ? 'ویرایش آزمون' : 'ایجاد آزمون آنلاین' }}</div>
       </q-card-section>
 
       <q-separator />
@@ -230,8 +235,8 @@
             <q-btn
               type="submit"
               color="primary"
-              label="ایجاد آزمون"
-              :loading="saving" />
+              :label="isEdit ? 'به‌روزرسانی' : 'ایجاد آزمون'"
+              :loading="saving || loading" />
             <q-btn
               flat
               label="انصراف"
@@ -245,8 +250,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { quiz } from 'src/repositories/quiz'
 import type { QuizContentType } from 'src/repositories/quiz'
@@ -260,8 +265,13 @@ type QuizContentField = QuizContentType & {
 type QuizBlockKey = 'content' | 'solution'
 
 const router = useRouter()
+const route = useRoute()
 const $q = useQuasar()
 const saving = ref(false)
+const loading = ref(false)
+
+const quizId = route.params.id ? parseInt(route.params.id as string) : null
+const isEdit = !!quizId
 
 const form = reactive({
   name: null as string | null,
@@ -339,27 +349,67 @@ function buildPayload () {
   }
 }
 
+const loadQuiz = async () => {
+  if (!quizId) return
+  loading.value = true
+  try {
+    const response = await quiz.get(quizId)
+    form.name = response.name
+    form.time_limit = response.time_limit
+    form.starts_at = response.starts_at
+    form.ends_at = response.ends_at
+    form.description = response.description
+    form.is_visible = response.is_visible
+    form.quiz_type = response.quiz_type
+    form.content = response.content || []
+    form.solution = response.solution || []
+    form.show_answer_date = response.show_answer_date
+    form.no_score_questions = response.no_score_questions
+  } catch (error: any) {
+    $q.notify({
+      icon: 'error',
+      message: 'خطا در بارگذاری اطلاعات آزمون',
+      color: 'negative'
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
 async function onSubmit () {
   saving.value = true
 
   try {
-    await quiz.create(buildPayload() as any)
-    $q.notify({
-      icon: 'check',
-      message: 'آزمون با موفقیت ایجاد شد.',
-      color: 'positive'
-    })
+    if (isEdit && quizId) {
+      await quiz.update(quizId, buildPayload() as any)
+      $q.notify({
+        icon: 'check',
+        message: 'آزمون با موفقیت بروزرسانی شد.',
+        color: 'positive'
+      })
+    } else {
+      await quiz.create(buildPayload() as any)
+      $q.notify({
+        icon: 'check',
+        message: 'آزمون با موفقیت ایجاد شد.',
+        color: 'positive'
+      })
+    }
     router.push({ name: 'Panel.Quiz.List' })
   } catch (error) {
     $q.notify({
       icon: 'error',
-      message: 'خطا در ایجاد آزمون.',
+      message: 'خطا در ذخیره آزمون.',
       color: 'negative'
     })
   } finally {
     saving.value = false
   }
 }
+
+onMounted(() => {
+  loadQuiz()
+})
 </script>
 
 <style lang="scss" scoped>

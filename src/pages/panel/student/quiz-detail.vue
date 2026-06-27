@@ -46,7 +46,6 @@
                   label="شرکت در آزمون"
                   size="lg"
                   @click="startAttempt"
-                  :loading="attempting"
                 />
               </div>
             </div>
@@ -103,7 +102,6 @@ const quizId = parseInt(route.params.id as string)
 const quiz = ref<any>(null)
 const attempts = ref<any[]>([])
 const loading = ref(true)
-const attempting = ref(false)
 
 const formatTime = (timeString: string | null): string => {
   if (!timeString) return '-'
@@ -155,18 +153,7 @@ const canAttemptQuiz = computed(() => {
 })
 
 const startAttempt = async () => {
-  attempting.value = true
-  try {
-    await quizSession.startSession(quizId)
-    router.push({ name: 'Student.Quiz.Attempt', params: { id: quizId } })
-  } catch (error: any) {
-    $q.notify({
-      type: 'negative',
-      message: error.response?.data?.message || 'خطا در شروع آزمون'
-    })
-  } finally {
-    attempting.value = false
-  }
+  router.push({ name: 'Student.Quiz.Attempt', params: { id: quizId } })
 }
 
 const loadQuizDetails = async () => {

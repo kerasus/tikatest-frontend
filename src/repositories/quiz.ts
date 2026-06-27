@@ -7,26 +7,47 @@ export type QuizContentType = {
 }
 
 export type QuizType = {
-  id: number | null
-  school_id: number | null
-  name: string | null
-  time_limit: number | null
-  starts_at: string | null
-  ends_at: string | null
-  start_time: string | null
-  end_time: string | null
-  description: string | null
-  is_visible: boolean
-  quiz_type: string | null
-  content: QuizContentType[] | null
-  solution: QuizContentType[] | null
-  show_answer_date: string | null
-  no_score_questions: string | null
-  answer_keys?: QuizAnswerKeyType[]
-  responses?: QuizResponseType[]
-  created_at: string | null
-  updated_at: string | null
-}
+   id: number | null
+   school_id: number | null
+   name: string | null
+   time_limit: number | null
+   starts_at: string | null
+   ends_at: string | null
+   start_time: string | null
+   end_time: string | null
+   description: string | null
+   is_visible: boolean
+   quiz_type: string | null
+   content: QuizContentType[] | null
+   solution: QuizContentType[] | null
+   show_answer_date: string | null
+   no_score_questions: string | null
+   timer: string | null
+   questions?: QuizQuestionType[]
+   answer_keys?: QuizAnswerKeyType[]
+   responses?: QuizResponseType[]
+   created_at: string | null
+   updated_at: string | null
+ }
+
+ export type QuizQuestionType = {
+   id: number
+   question_text: string
+   question_type: string
+   points: number
+   has_negative_marking: boolean
+   negative_marks: number | null
+   question_image_url: string | null
+   options?: QuizQuestionOptionType[]
+ }
+
+ export type QuizQuestionOptionType = {
+   id: number
+   option_number: number
+   option_text: string
+   option_image_url: string | null
+   is_correct_answer: boolean
+ }
 
 export type QuizAnswerKeyType = {
   id: number | null
@@ -49,25 +70,26 @@ export type QuizResponseType = {
 export default class QuizAPI extends BaseAPI<QuizType> {
   constructor () {
     super('/quizzes')
-    this.defaultObject = {
-      id: null,
-      school_id: null,
-      name: null,
-      time_limit: null,
-      starts_at: null,
-      ends_at: null,
-      start_time: null,
-      end_time: null,
-      description: null,
-      is_visible: true,
-      quiz_type: null,
-      content: null,
-      solution: null,
-      show_answer_date: null,
-      no_score_questions: null,
-      created_at: null,
-      updated_at: null
-    }
+this.defaultObject = {
+       id: null,
+       school_id: null,
+       name: null,
+       time_limit: null,
+       starts_at: null,
+       ends_at: null,
+       start_time: null,
+       end_time: null,
+       description: null,
+       is_visible: true,
+       quiz_type: null,
+       content: null,
+       solution: null,
+       show_answer_date: null,
+       no_score_questions: null,
+       timer: null,
+       created_at: null,
+       updated_at: null
+     }
     this.endpoints = {
       ...this.endpoints,
       resultsWithRank: (quizId: number) => `${this.baseEndpoint}/${quizId}/results-with-rank`,

@@ -16,6 +16,9 @@ export const quizSession = {
   getMyAttempts: () =>
     appApi.get(`/quiz-sessions/my-attempts`),
 
+  getQuizAttempts: (quizId: number) =>
+    appApi.get(`/quiz-sessions/${quizId}/attempts`),
+
   reportAntiCheatEvent: (sessionId: number, eventType: string, eventData?: any) =>
     appApi.post(`/quiz-sessions/${sessionId}/anti-cheat`, {
       event_type: eventType,
