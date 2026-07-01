@@ -14,7 +14,7 @@ export const quizSession = {
     appApi.post(`/quiz-sessions/${sessionId}/submit`, {}),
 
   getMyAttempts: () =>
-    appApi.get(`/quiz-sessions/my-attempts`),
+    appApi.get(`/quiz-sessions/my-sessions`),
 
   getQuizAttempts: (quizId: number) =>
     appApi.get(`/quiz-sessions/${quizId}/attempts`),

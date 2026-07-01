@@ -80,6 +80,14 @@ export const index = [
     component: () => import('src/pages/panel/quiz/attempt.vue')
   },
   {
+    path: 'quizzes/:id/result',
+    name: 'Student.Quiz.Result',
+    meta: {
+      pageCategory: 'نتیجه آزمون'
+    },
+    component: () => import('src/pages/panel/student/quiz-result.vue')
+  },
+  {
     path: 'homework',
     name: 'Student.Homework.List',
     meta: {
