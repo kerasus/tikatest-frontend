@@ -31,17 +31,23 @@
                 :options="classOptions"
                 option-value="id"
                 option-label="name"
-                label="کلاس *"
+                label="کلاس (اختیاری)"
                 outlined
                 emit-value
                 map-options
-                required />
+                clearable />
             </div>
             <div class="col-12">
               <q-input v-model="form.description" label="توضیحات تکلیف" outlined type="textarea" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.due_date" label="موعد تحویل" outlined type="datetime-local" />
+              <q-input v-model="form.due_date" label="موعد تحویل" outlined type="date" />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input v-model="form.attachment" label="ضمیمه ۱ (URL)" outlined placeholder="https://..." />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input v-model="form.attachment_2" label="ضمیمه ۲ (URL)" outlined placeholder="https://..." />
             </div>
           </div>
 
@@ -72,7 +78,8 @@ const form = reactive({
   lesson_id: null,
   class_id: null,
   due_date: null,
-  attachment: null
+  attachment: null,
+  attachment_2: null
 })
 
 const lessonOptions = ref<any[]>([])

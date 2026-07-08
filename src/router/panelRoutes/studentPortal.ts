@@ -96,6 +96,30 @@ export const index = [
     component: () => import('src/pages/panel/student/homework.vue')
   },
   {
+    path: 'homework/:id',
+    name: 'Student.Homework.Show',
+    meta: {
+      pageCategory: 'مشاهده تکلیف'
+    },
+    component: () => import('src/pages/panel/student/homework-view.vue')
+  },
+  {
+    path: 'homework/:id/submit',
+    name: 'Student.Homework.Submit',
+    meta: {
+      pageCategory: 'ارسال تکلیف'
+    },
+    component: () => import('src/pages/panel/student/homework-submit.vue')
+  },
+  {
+    path: 'homework/submissions',
+    name: 'Student.Homework.Submissions',
+    meta: {
+      pageCategory: 'تکالیف ارسال شده'
+    },
+    component: () => import('src/pages/panel/student/homework-submissions.vue')
+  },
+  {
     path: 'study-sessions',
     name: 'Student.StudySessions.List',
     meta: {

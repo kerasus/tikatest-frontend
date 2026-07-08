@@ -37,27 +37,34 @@
                 <q-chip
                   :color="getStatusColor(homework)"
                   text-color="white"
-                  :label="getStatusLabel(homework)"
-                />
+                  :label="getStatusLabel(homework)" />
+                <div class="q-mt-sm">
+                  <q-btn
+                    flat
+                    dense
+                    icon="visibility"
+                    color="primary"
+                    :to="{ name: 'Student.Homework.Show', params: { id: homework.id } }" />
+                </div>
               </div>
             </div>
           </q-card-section>
 
-          <q-separator v-if="homework.submissions?.length > 0" />
+          <q-separator v-if="homework.owners?.length > 0" />
 
-          <q-card-section v-if="homework.submissions?.length > 0">
-            <strong>تکالیف ارسال‌شده:</strong>
-            <q-list v-for="submission in homework.submissions" :key="submission.id" class="q-mt-md">
+          <q-card-section v-if="homework.owners?.length > 0">
+            <strong>وضعیت تکلیف:</strong>
+            <q-list v-for="owner in homework.owners" :key="owner.id" class="q-mt-md">
               <q-item>
                 <q-item-section>
-                  <q-item-label>{{ formatDate(submission.submitted_at) }}</q-item-label>
-                  <q-item-label caption>
+                  <q-item-label>
                     <q-chip
-                      v-if="submission.grade"
-                      color="positive"
+                      :color="owner.submitted_at ? 'positive' : 'info'"
                       text-color="white"
-                      :label="`نمره: ${submission.grade}`"
-                    />
+                      :label="owner.submitted_at ? 'ارسال شده' : 'در انتظار ارسال'" />
+                  </q-item-label>
+                  <q-item-label caption v-if="owner.submitted_at">
+                    زمان ارسال: {{ formatDate(owner.submitted_at) }}
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -66,17 +73,25 @@
         </q-card>
       </div>
     </div>
+
+    <div class="q-mt-md text-center">
+      <q-btn
+        label="تکالیف ارسال شده"
+        color="secondary"
+        :to="{ name: 'Student.Homework.Submissions' }" />
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { homeworkRepository } from 'src/repositories/homework'
 import { useQuasar } from 'quasar'
+import HomeworkAPI from 'src/repositories/homework'
+import type { HomeworkType, HomeworkOwnerType } from 'src/repositories/homework'
 
 const $q = useQuasar()
 
-const homeworks = ref<any[]>([])
+const homeworks = ref<(HomeworkType & { owners?: HomeworkOwnerType[] })[]>([])
 const loading = ref(true)
 
 const formatDate = (dateString: string): string => {
@@ -90,26 +105,23 @@ const formatDate = (dateString: string): string => {
 }
 
 const getStatusColor = (homework: any): string => {
-  const now = new Date()
-  const dueDate = new Date(homework.due_date)
-
-  if (homework.submissions?.length > 0) return 'positive'
-  if (now > dueDate) return 'negative'
+  if (!homework.owners?.length) return 'info'
+  const owner = homework.owners[0]
+  if (owner.submitted_at) return 'positive'
   return 'info'
 }
 
 const getStatusLabel = (homework: any): string => {
-  if (homework.submissions?.length > 0) return 'ارسال‌شده'
-  const now = new Date()
-  const dueDate = new Date(homework.due_date)
-  if (now > dueDate) return 'مهلت تمام‌شده'
+  if (!homework.owners?.length) return 'در انتظار ارسال'
+  const owner = homework.owners[0]
+  if (owner.submitted_at) return 'ارسال شده'
   return 'در انتظار ارسال'
 }
 
 const loadHomeworks = async () => {
   loading.value = true
   try {
-    const response = await homeworkRepository.list()
+    const response = await HomeworkAPI.prototype.myHomework({ length: 100 })
     homeworks.value = response.data.data || []
   } catch (error: any) {
     $q.notify({
@@ -125,3 +137,6 @@ onMounted(() => {
   loadHomeworks()
 })
 </script>
+
+<style lang="scss" scoped>
+</style>

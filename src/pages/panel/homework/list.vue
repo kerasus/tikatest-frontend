@@ -3,7 +3,7 @@
     <q-card>
       <q-card-section>
         <div class="row q-col-gutter-md items-end">
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
             <q-input
               v-model="filters.search"
               label="جستجو در عنوان تکلیف"
@@ -12,7 +12,7 @@
               clearable
               @update:model-value="loadHomework" />
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
             <q-select
               v-model="filters.lesson_id"
               :options="lessonOptions"
@@ -26,7 +26,21 @@
               map-options
               @update:model-value="loadHomework" />
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
+            <q-select
+              v-model="filters.class_id"
+              :options="classOptions"
+              option-value="id"
+              option-label="name"
+              label="کلاس"
+              outlined
+              dense
+              clearable
+              emit-value
+              map-options
+              @update:model-value="loadHomework" />
+          </div>
+          <div class="col-12 col-md-3">
             <q-btn
               color="primary"
               icon="add"
@@ -63,18 +77,26 @@ import { ref, onMounted, reactive } from 'vue'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import LessonAPI from 'src/repositories/lesson'
+import SchoolClassAPI from 'src/repositories/schoolClass'
+import AcademicFieldAPI from 'src/repositories/academicField'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
 import type { ListType, HomeworkType } from 'src/repositories/homework'
 
 const $q = useQuasar()
 
 const homework = ref<HomeworkType[]>([])
 const lessonOptions = ref<any[]>([])
+const classOptions = ref<any[]>([])
+const fieldOptions = ref<any[]>([])
+const levelOptions = ref<any[]>([])
 const loading = ref(false)
 
 const filters = reactive({
   search: '',
   lesson_id: null,
   class_id: null,
+  field_id: null,
+  level_id: null,
   length: 10,
   page: 1
 })
@@ -104,6 +126,8 @@ async function loadHomework () {
     }
     if (filters.lesson_id) params.lesson_id = filters.lesson_id
     if (filters.class_id) params.class_id = filters.class_id
+    if (filters.field_id) params.field_id = filters.field_id
+    if (filters.level_id) params.level_id = filters.level_id
     if (filters.search) params.title = filters.search
 
     const result = await HomeworkAPI.prototype.index(params)
@@ -125,6 +149,21 @@ async function loadLessons () {
   lessonOptions.value = result.data
 }
 
+async function loadClasses () {
+  const result = await SchoolClassAPI.prototype.index({ length: 100 })
+  classOptions.value = result.data
+}
+
+async function loadFields () {
+  const result = await AcademicFieldAPI.prototype.index({ length: 100 })
+  fieldOptions.value = result.data
+}
+
+async function loadLevels () {
+  const result = await AcademicLevelAPI.prototype.index({ length: 100 })
+  levelOptions.value = result.data
+}
+
 function onRequest (props: any) {
   pagination.value.page = props.pagination.page
   pagination.value.rowsPerPage = props.pagination.rowsPerPage
@@ -133,6 +172,9 @@ function onRequest (props: any) {
 
 onMounted(() => {
   loadLessons()
+  loadClasses()
+  loadFields()
+  loadLevels()
   loadHomework()
 })
 </script>
