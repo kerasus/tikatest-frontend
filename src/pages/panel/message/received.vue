@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h4 class="q-ma-none">پیام های دریافتی</h4>
+        <h4 class="q-ma-none">پیام‌های دریافتی</h4>
       </div>
       <div class="col-auto">
         <q-btn color="primary" icon="add" label="ارسال پیام جدید" :to="{ name: 'Panel.Message.Create' }" />
@@ -61,7 +61,7 @@ const loadMessages = async () => {
     messages.value = result.data || result
     pagination.value.rowsNumber = result.total || result.length
   } catch (error: any) {
-    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری پیام های دریافتی' })
+    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری پیام‌های دریافتی' })
   } finally {
     loading.value = false
   }

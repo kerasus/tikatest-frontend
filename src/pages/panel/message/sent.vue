@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h4 class="q-ma-none">پیام های ارسالی</h4>
+        <h4 class="q-ma-none">پیام‌های ارسالی</h4>
       </div>
       <div class="col-auto">
         <q-btn color="primary" icon="add" label="ارسال پیام جدید" :to="{ name: 'Panel.Message.Create' }" />
@@ -18,9 +18,15 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-receiver="{ props }">
+          <template #body-cell-receivers="{ props }">
             <q-td :props="props">
-              {{ props.row.receiver?.full_name || '-' }}
+              <q-chip
+                v-for="owner in props.row.owners"
+                :key="owner.id"
+                :color="owner.is_read ? 'positive' : 'grey'"
+                text-color="white"
+                :label="owner.user?.full_name || '-'"
+                class="q-ml-xs" />
             </q-td>
           </template>
         </q-table>
@@ -47,7 +53,7 @@ const pagination = ref({
 
 const columns = [
   { name: 'subject', label: 'موضوع', align: 'right' as const, field: 'subject' },
-  { name: 'receiver', label: 'دریافت کننده', align: 'center' as const, field: 'receiver' },
+  { name: 'receivers', label: 'گیرندگان', align: 'center' as const, field: 'owners' },
   { name: 'sent_at', label: 'تاریخ ارسال', align: 'center' as const, field: 'sent_at' }
 ]
 
@@ -61,7 +67,7 @@ const loadMessages = async () => {
     messages.value = result.data || result
     pagination.value.rowsNumber = result.total || result.length
   } catch (error: any) {
-    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری پیام های ارسالی' })
+    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری پیام‌های ارسالی' })
   } finally {
     loading.value = false
   }

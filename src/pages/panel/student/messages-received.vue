@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <h4 class="q-ma-none q-mb-lg">پیام‌های من</h4>
+    <h4 class="q-ma-none q-mb-lg">پیام‌های دریافتی</h4>
 
     <!-- Loading State -->
     <div v-if="loading" class="text-center q-pa-lg">
@@ -10,7 +10,7 @@
     <!-- Empty State -->
     <div v-else-if="messages.length === 0" class="text-center q-pa-lg">
       <q-icon name="mail" size="100px" color="primary" />
-      <p class="text-subtitle1 q-mt-md">هیچ پیامی برای شما موجود نیست</p>
+      <p class="text-subtitle1 q-mt-md">هیچ پیامی دریافت نشده است</p>
     </div>
 
     <!-- Messages List -->
@@ -47,18 +47,6 @@
         </q-card>
       </div>
     </div>
-
-    <div class="q-mt-md text-center">
-      <q-btn
-        label="ارسال پیام"
-        color="primary"
-        :to="{ name: 'Student.Message.Create' }"
-        class="q-mr-sm" />
-      <q-btn
-        label="پیام‌های ارسال شده"
-        color="secondary"
-        :to="{ name: 'Student.Message.Sent' }" />
-    </div>
   </q-page>
 </template>
 
@@ -85,12 +73,12 @@ const formatDate = (dateString: string): string => {
 const loadMessages = async () => {
   loading.value = true
   try {
-    const response = await message.myMessages({ length: 100 })
+    const response = await message.receivedMessages({ length: 100 })
     messages.value = response.data?.data || response.data || []
   } catch (error: any) {
     $q.notify({
       type: 'negative',
-      message: 'خطا در بارگذاری پیام‌ها'
+      message: 'خطا در بارگذاری پیام‌های دریافتی'
     })
   } finally {
     loading.value = false

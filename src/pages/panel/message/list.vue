@@ -46,7 +46,7 @@
             :key="msg.id"
             clickable
             :to="{ name: 'Panel.Message.Show', params: { id: msg.id } }"
-            :class="{ 'bg-blue-1': !msg.read_at }">
+            :class="{ 'bg-blue-1': !msg.owners?.some((o: any) => o.is_read) }">
             <q-item-section avatar>
               <q-avatar color="primary" text-color="white">
                 {{ getInitials(msg.sender) }}
@@ -64,7 +64,7 @@
               </q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-badge v-if="!msg.read_at" color="orange" label="جدید" />
+              <q-badge v-if="!msg.owners?.some((o: any) => o.is_read)" color="orange" label="جدید" />
             </q-item-section>
           </q-item>
         </q-list>
