@@ -63,6 +63,37 @@
         </q-card-section>
       </q-card>
 
+      <q-card v-if="quiz.booklets?.length" class="q-mb-lg">
+        <q-card-section>
+          <div class="row items-center justify-between q-mb-md">
+            <div class="text-h6">دفترچه‌های آزمون ({{ quiz.booklets.length }})</div>
+          </div>
+
+          <div class="row q-col-gutter-md">
+            <div
+              v-for="booklet in quiz.booklets"
+              :key="booklet.id"
+              class="col-12 col-md-4">
+              <q-card bordered flat class="bg-grey-2">
+                <q-card-section>
+                  <div class="text-subtitle1">{{ booklet.title }}</div>
+                  <div class="text-caption text-grey-8 q-mt-xs">
+                    از سوال {{ booklet.from_question }} تا سوال {{ booklet.to_question }}
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <q-card v-else-if="quiz.booklets" class="q-mb-lg">
+        <q-card-section>
+          <div class="text-subtitle1 q-mb-sm">دفترچه‌های آزمون</div>
+          <div class="text-grey-7">این آزمون فاقد دفترچه است.</div>
+        </q-card-section>
+      </q-card>
+
       <q-card v-if="quiz.questions?.length" class="q-mb-lg">
         <q-card-section>
           <div class="row items-center justify-between q-mb-md">

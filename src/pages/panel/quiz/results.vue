@@ -108,6 +108,20 @@
                       <span dir="ltr">{{ formatDateTime(props.row.ended_at) }}</span>
                     </q-td>
                   </template>
+                  <template #body-cell-booklet_scores="{ props }">
+                    <q-td :props="props">
+                      <div v-if="props.row.booklet_scores?.length">
+                        <div
+                          v-for="bs in props.row.booklet_scores"
+                          :key="bs.id"
+                          dir="ltr"
+                          class="text-caption q-mb-xs">
+                          {{ bs.title }}: {{ bs.percent }}%
+                        </div>
+                      </div>
+                      <span v-else class="text-grey-6">-</span>
+                    </q-td>
+                  </template>
                 </q-table>
                 <div v-else class="text-center q-pa-lg text-grey-7">
                   هنوز نتیجه‌ای ثبت نشده است
@@ -140,7 +154,8 @@ const columns = [
   { name: 'student_name', label: 'نام دانش‌آموز', field: 'student_name', align: 'center' as const },
   { name: 'percent', label: 'درصد', field: 'percent', align: 'center' as const },
   { name: 'started_at', label: 'زمان شروع', field: 'started_at', align: 'center' as const },
-  { name: 'ended_at', label: 'زمان ارسال پاسخنامه', field: 'ended_at', align: 'center' as const }
+  { name: 'ended_at', label: 'زمان ارسال پاسخنامه', field: 'ended_at', align: 'center' as const },
+  { name: 'booklet_scores', label: 'درصد دفترچه‌ها', field: 'booklet_scores', align: 'center' as const }
 ]
 
 const quiz = computed(() => quizData.value)

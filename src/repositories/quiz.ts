@@ -1,4 +1,5 @@
 import BaseAPI from './BaseAPI'
+import type { QuizBookletType } from './quizBooklet'
 
 export type QuizContentType = {
   type: 'image' | 'text'
@@ -21,14 +22,15 @@ export type QuizType = {
    content: QuizContentType[] | null
    solution: QuizContentType[] | null
    show_answer_date: string | null
-   no_score_questions: string | null
-   timer: string | null
-   questions?: QuizQuestionType[]
-   answer_keys?: QuizAnswerKeyType[]
-   responses?: QuizResponseType[]
-   created_at: string | null
-   updated_at: string | null
- }
+    no_score_questions: string | null
+    timer: string | null
+    questions?: QuizQuestionType[]
+    answer_keys?: QuizAnswerKeyType[]
+    responses?: QuizResponseType[]
+    booklets?: QuizBookletType[]
+    created_at: string | null
+    updated_at: string | null
+  }
 
  export type QuizQuestionType = {
    id: number

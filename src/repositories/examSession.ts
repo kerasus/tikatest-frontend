@@ -11,6 +11,7 @@ export type ExamSessionType = {
   grade_name_for_other_type: string | null
   is_descriptive: boolean
   is_report_card: boolean
+  quiz_session_id: number | null
   min_grade: number | null
   created_by: number | null
   created_at: string | null
@@ -31,6 +32,7 @@ export default class ExamSessionAPI extends BaseAPI<ExamSessionType> {
       grade_name_for_other_type: null,
       is_descriptive: false,
       is_report_card: false,
+      quiz_session_id: null,
       min_grade: null,
       created_by: null,
       created_at: null,

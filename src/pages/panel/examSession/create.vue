@@ -81,6 +81,19 @@
                 default-value="false"
               />
             </div>
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="form.quiz_session_id"
+                :options="quizSessionOptions"
+                option-value="id"
+                option-label="label"
+                label="آزمون آنلاین (منشأ نمره)"
+                outlined
+                emit-value
+                map-options
+                clearable
+              />
+            </div>
           </div>
 
           <div class="q-mt-lg">
@@ -100,6 +113,7 @@ import { useQuasar } from 'quasar'
 import { examSession } from 'src/repositories/examSession'
 import { lesson } from 'src/repositories/lesson'
 import { schoolClass } from 'src/repositories/schoolClass'
+import { quizSession } from 'src/repositories/quizSession'
 
 const router = useRouter()
 const $q = useQuasar()
@@ -108,6 +122,7 @@ const saving = ref(false)
 
 const lessonOptions = ref<any[]>([])
 const classOptions = ref<any[]>([])
+const quizSessionOptions = ref<any[]>([])
 
 const gradeTypeOptions = [
   { label: 'آزمون کلاسی', value: 'class_quiz' },
@@ -131,6 +146,7 @@ const form = reactive({
   min_grade: null as number | null,
   is_report_card: false,
   is_descriptive: false,
+  quiz_session_id: null as number | null,
 })
 
 const loadLessons = async () => {
@@ -148,6 +164,19 @@ const loadClasses = async () => {
     classOptions.value = response.data.data || []
   } catch (error: any) {
     console.error('Error loading classes:', error)
+  }
+}
+
+const loadQuizSessions = async () => {
+  try {
+    const response = await quizSession.list({ length: 100 })
+    const items = (response as any).data?.data || (response as any).data || []
+    quizSessionOptions.value = items.map((item: any) => ({
+      id: item.id,
+      label: `جلسه آزمون ${item.id}` + (item.lesson_id ? ` - درس ${item.lesson_id}` : '')
+    }))
+  } catch (error: any) {
+    console.error('Error loading quiz sessions:', error)
   }
 }
 
@@ -175,5 +204,6 @@ const onSubmit = async () => {
 onMounted(() => {
   loadLessons()
   loadClasses()
+  loadQuizSessions()
 })
 </script>

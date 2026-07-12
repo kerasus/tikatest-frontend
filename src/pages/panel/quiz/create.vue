@@ -97,6 +97,77 @@
                 <q-card-section>
                   <div class="row items-center justify-between q-mb-md">
                     <div>
+                      <div class="text-subtitle1">دفترچه‌های آزمون</div>
+                      <div class="text-caption text-grey-7">
+                        هر دفترچه شامل بازه‌ای از شماره سوالات است. درصد هر دفترچه جداگانه محاسبه می‌شود.
+                      </div>
+                    </div>
+                    <q-btn
+                      color="primary"
+                      icon="add"
+                      label="افزودن دفترچه"
+                      @click="addBooklet" />
+                  </div>
+
+                  <div
+                    v-if="form.booklets.length === 0"
+                    class="text-grey-7 text-center q-pa-md">
+                    آزمون فاقد دفترچه است (تمام سوالات در یک کارنامه محاسبه می‌شوند).
+                  </div>
+
+                  <q-card
+                    v-for="(booklet, index) in form.booklets"
+                    :key="`booklet-${index}`"
+                    bordered
+                    flat
+                    class="q-mb-md">
+                    <q-card-section>
+                      <div class="row q-col-gutter-md items-end">
+                        <div class="col-12 col-md-6">
+                          <q-input
+                            v-model="booklet.title"
+                            label="عنوان دفترچه *"
+                            outlined
+                            :rules="[value => !!value || 'عنوان الزامی است']" />
+                        </div>
+                        <div class="col-12 col-md-3">
+                          <q-input
+                            v-model.number="booklet.from_question"
+                            label="از سوال *"
+                            outlined
+                            type="number"
+                            min="1"
+                            :rules="[value => !!value || 'الزامی است']" />
+                        </div>
+                        <div class="col-12 col-md-3">
+                          <q-input
+                            v-model.number="booklet.to_question"
+                            label="تا سوال *"
+                            outlined
+                            type="number"
+                            min="1"
+                            :rules="[value => !!value || 'الزامی است']" />
+                        </div>
+                        <div class="col-12 col-md-12 text-right">
+                          <q-btn
+                            flat
+                            round
+                            color="negative"
+                            icon="delete"
+                            @click="removeBooklet(index)" />
+                        </div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </q-card-section>
+              </q-card>
+            </div>
+
+            <div class="col-12">
+              <q-card bordered flat>
+                <q-card-section>
+                  <div class="row items-center justify-between q-mb-md">
+                    <div>
                       <div class="text-subtitle1">سؤالات</div>
                       <div class="text-caption text-grey-7">برای تصویر، مسیر فایل آپلودشده را وارد کنید.</div>
                     </div>
@@ -255,6 +326,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { quiz } from 'src/repositories/quiz'
 import type { QuizContentType } from 'src/repositories/quiz'
+import { quizBooklet } from 'src/repositories/quizBooklet'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
 
 type QuizContentField = QuizContentType & {
@@ -284,7 +356,8 @@ const form = reactive({
   content: [] as QuizContentField[],
   solution: [] as QuizContentField[],
   show_answer_date: null as string | null,
-  no_score_questions: null as string | null
+  no_score_questions: null as string | null,
+  booklets: [] as any[]
 })
 
 const quizTypeOptions = [
@@ -313,6 +386,30 @@ function addBlock (key: QuizBlockKey) {
 
 function removeBlock (key: QuizBlockKey, index: number) {
   form[key].splice(index, 1)
+}
+
+function addBooklet () {
+  form.booklets.push({
+    id: null,
+    title: '',
+    from_question: null,
+    to_question: null
+  })
+}
+
+function removeBooklet (index: number) {
+  form.booklets.splice(index, 1)
+}
+
+function normalizeBooklets () {
+  return form.booklets
+    .filter((booklet) => booklet.title && booklet.from_question && booklet.to_question)
+    .map((booklet) => ({
+      id: booklet.id || undefined,
+      title: booklet.title,
+      from_question: Number(booklet.from_question),
+      to_question: Number(booklet.to_question)
+    }))
 }
 
 function normalizeBlocks (items: QuizContentField[]): QuizContentType[] | null {
@@ -365,6 +462,12 @@ const loadQuiz = async () => {
     form.solution = response.solution || []
     form.show_answer_date = response.show_answer_date
     form.no_score_questions = response.no_score_questions
+    form.booklets = (response.booklets || []).map((booklet: any) => ({
+      id: booklet.id,
+      title: booklet.title,
+      from_question: booklet.from_question,
+      to_question: booklet.to_question
+    }))
   } catch (error: any) {
     $q.notify({
       icon: 'error',
@@ -380,15 +483,22 @@ async function onSubmit () {
   saving.value = true
 
   try {
+    const booklets = normalizeBooklets()
+
     if (isEdit && quizId) {
       await quiz.update(quizId, buildPayload() as any)
+      await quizBooklet.sync(quizId, booklets)
       $q.notify({
         icon: 'check',
         message: 'آزمون با موفقیت بروزرسانی شد.',
         color: 'positive'
       })
     } else {
-      await quiz.create(buildPayload() as any)
+      const created = await quiz.create(buildPayload() as any)
+      const newQuizId = (created && typeof created === 'object') ? created.id : created
+      if (newQuizId) {
+        await quizBooklet.sync(newQuizId, booklets)
+      }
       $q.notify({
         icon: 'check',
         message: 'آزمون با موفقیت ایجاد شد.',

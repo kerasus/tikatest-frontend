@@ -144,6 +144,18 @@
                   <q-item-label caption class="text-left" dir="ltr">{{ submittedPercent }}%</q-item-label>
                 </q-item-section>
               </q-item>
+
+              <template v-if="session?.booklet_scores?.length">
+                <q-item-label header class="q-px-none">درصد دفترچه‌ها</q-item-label>
+                <q-item v-for="bs in session.booklet_scores" :key="bs.id">
+                  <q-item-section>
+                    <q-item-label>{{ bs.title }}</q-item-label>
+                    <q-item-label caption class="text-left" dir="ltr">
+                      سؤالات {{ bs.from_question }} تا {{ bs.to_question }} - {{ bs.percent }}%
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
               <q-item>
                 <q-item-section>
                   <q-item-label>تاریخ و زمان شرکت در آزمون</q-item-label>
