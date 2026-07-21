@@ -5,7 +5,11 @@
         <h4 class="q-ma-none">موارد انضباطی تعریف شده</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" icon="add" label="تعریف مورد جدید" :to="{ name: 'Panel.DisciplinaryCase.Create' }" />
+        <q-btn
+          color="primary"
+          icon="add"
+          label="تعریف مورد جدید"
+          :to="{ name: 'Panel.DisciplinaryCase.Create' }" />
       </div>
     </div>
 
@@ -18,10 +22,25 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-actions="{ props }">
+          <template #body-cell-actions="props">
             <q-td :props="props">
-              <q-btn flat round dense icon="edit" color="primary" size="sm" @click="editCase(props.row)" class="q-mr-xs" />
-              <q-btn flat round dense icon="delete" color="negative" size="sm" @click="deleteCase(props.row)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="edit"
+                color="primary"
+                size="sm"
+                class="q-mr-xs"
+                @click="editCase(props.row)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="delete"
+                color="negative"
+                size="sm"
+                @click="deleteCase(props.row)" />
             </q-td>
           </template>
         </q-table>
@@ -85,7 +104,7 @@ const editCase = (item: any) => {
     persistent: true
   }).onOk(async (data: string) => {
     try {
-      await disciplinaryCase.update(item.id, { name: data })
+      await disciplinaryCase.update(item.id, { name: data } as any)
       $q.notify({ color: 'positive', message: 'مورد انضباطی با موفقیت ویرایش شد' })
       loadCases()
     } catch (error: any) {

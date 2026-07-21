@@ -33,14 +33,14 @@ export default class StudySessionAPI extends BaseAPI<StudySessionType> {
     }
   }
 
-  async generalReport(params: any = {}): Promise<any> {
+  async generalReport (params: any = {}): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.generalReport, {
       params
     })
     return response.data
   }
 
-  async studentReport(studentId: number, params: any = {}): Promise<any> {
+  async studentReport (studentId: number, params: any = {}): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentReport(studentId), {
       params
     })

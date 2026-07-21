@@ -6,10 +6,10 @@
           <div class="col-md-8">
             <div class="auth-page__login__head">
               <q-img
-                src="/panel/images/logo.png"
+                src="/images/logo.png"
                 @click="goToHomePage" />
             </div>
-            <div class="auth-page__login__title">تینا رز</div>
+            <div class="auth-page__login__title">تیکا تست</div>
             <auth-component class="auth-component" />
           </div>
         </div>

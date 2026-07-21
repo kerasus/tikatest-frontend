@@ -64,8 +64,10 @@
           <template #body-cell-name="props">
             <q-td :props="props">
               <div class="row items-center">
-                <q-avatar size="40px" class="q-ml-sm">
-                  <img :src="props.row.picture || 'https://cdn.quasar.dev/img/avatar.png'" />
+                <q-avatar
+                  size="40px"
+                  class="q-ml-sm">
+                  <q-img :src="props.row.picture || '/images/blankProfile.png'" />
                 </q-avatar>
                 <span>{{ props.row.name }}</span>
               </div>
@@ -99,7 +101,11 @@ import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import AcademicFieldAPI from 'src/repositories/academicField'
-import type { ListType, StudentType } from 'src/repositories/student'
+import type { StudentType } from 'src/repositories/student'
+
+const studentAPI = new StudentAPI()
+const schoolClassAPI = new SchoolClassAPI()
+const academicFieldAPI = new AcademicFieldAPI()
 
 const $q = useQuasar()
 
@@ -125,11 +131,18 @@ const pagination = ref({
 })
 
 const columns = [
-  { name: 'name', required: true, label: 'نام و نام خانوادگی', align: 'right' as const, field: 'name', sortable: true },
+  {
+    name: 'name',
+    required: true,
+    label: 'نام و نام خانوادگی',
+    align: 'right' as const,
+    field: 'name',
+    sortable: true
+  },
   { name: 'username', label: 'نام کاربری', align: 'right' as const, field: 'username' },
   { name: 'student_phone', label: 'تلفن', align: 'right' as const, field: 'student_phone' },
   { name: 'melli_code', label: 'کد ملی', align: 'right' as const, field: 'melli_code' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const }
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
 ]
 
 async function loadStudents () {
@@ -145,7 +158,7 @@ async function loadStudents () {
       params.full_name_search = filters.search
     }
 
-    const result = await StudentAPI.prototype.index(params)
+    const result = await studentAPI.index(params)
     students.value = result.data
     pagination.value.rowsNumber = result.total
   } catch (error) {
@@ -161,7 +174,7 @@ async function loadStudents () {
 
 async function loadFields () {
   try {
-    const result = await AcademicFieldAPI.prototype.index({ length: 100 })
+    const result = await academicFieldAPI.index({ length: 100 })
     fieldOptions.value = result.data
   } catch (error) {
     console.error('Error loading fields:', error)
@@ -170,7 +183,7 @@ async function loadFields () {
 
 async function loadClasses () {
   try {
-    const result = await SchoolClassAPI.prototype.index({ length: 100 })
+    const result = await schoolClassAPI.index({ length: 100 })
     classOptions.value = result.data
   } catch (error) {
     console.error('Error loading classes:', error)
@@ -192,8 +205,5 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .student-list-page {
-  .q-avatar {
-    border: 2px solid $primary;
-  }
 }
 </style>

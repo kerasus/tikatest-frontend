@@ -185,6 +185,11 @@ export const useDate = () => {
     miladiToShamsi,
     validationTime,
     validationShamsiDate,
-    getDateTimeFromIso8601DateString
+    getDateTimeFromIso8601DateString,
+    isValidDate: (date: string | undefined) => {
+      if (!date) return false
+      const parsed = new Date(date)
+      return !isNaN(parsed.getTime())
+    }
   }
 }

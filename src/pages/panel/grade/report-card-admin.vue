@@ -26,9 +26,9 @@
             <q-btn
               color="primary"
               label="مشاهده کارنامه"
-              @click="loadReportCard"
               :loading="loading"
-              class="full-height" />
+              class="full-height"
+              @click="loadReportCard" />
           </div>
         </div>
       </q-card-section>
@@ -41,7 +41,7 @@
           :columns="columns"
           row-key="id"
           flat>
-          <template #body-cell-lesson="{ props }">
+          <template #body-cell-lesson="props">
             <q-td :props="props">
               {{ props.row.lesson?.name || '-' }}
             </q-td>
@@ -50,13 +50,23 @@
       </q-card-section>
     </q-card>
 
-    <div v-if="!reportCard.length && !loading && selectedStudent" class="text-center q-pa-lg">
-      <q-icon name="grading" size="100px" color="grey-5" />
+    <div
+      v-if="!reportCard.length && !loading && selectedStudent"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="grading"
+        size="100px"
+        color="grey-5" />
       <p class="text-subtitle1 q-mt-md">کارنامه ای برای این دانش آموز یافت نشد</p>
     </div>
 
-    <div v-if="!selectedStudent && !loading" class="text-center q-pa-lg">
-      <q-icon name="person" size="100px" color="grey-5" />
+    <div
+      v-if="!selectedStudent && !loading"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="person"
+        size="100px"
+        color="grey-5" />
       <p class="text-subtitle1 q-mt-md">دانش آموزی را انتخاب کنید تا کارنامه نمایش داده شود</p>
     </div>
   </q-page>

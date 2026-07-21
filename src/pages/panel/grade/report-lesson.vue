@@ -26,9 +26,9 @@
             <q-btn
               color="primary"
               label="مشاهده گزارش"
-              @click="loadReport"
               :loading="loading"
-              class="full-height" />
+              class="full-height"
+              @click="loadReport" />
           </div>
         </div>
       </q-card-section>
@@ -38,7 +38,10 @@
       <q-card-section>
         <div class="row q-col-gutter-md text-center">
           <div class="col-6 col-md-2">
-            <q-chip color="primary" text-color="white" class="full-width">
+            <q-chip
+              color="primary"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ stats.count }}</span>
                 <span class="text-caption">تعداد نمره</span>
@@ -46,7 +49,10 @@
             </q-chip>
           </div>
           <div class="col-6 col-md-2">
-            <q-chip color="green" text-color="white" class="full-width">
+            <q-chip
+              color="green"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ stats.average }}</span>
                 <span class="text-caption">میانگین</span>
@@ -54,7 +60,10 @@
             </q-chip>
           </div>
           <div class="col-6 col-md-2">
-            <q-chip color="blue" text-color="white" class="full-width">
+            <q-chip
+              color="blue"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ stats.highest }}</span>
                 <span class="text-caption">بالاترین</span>
@@ -62,7 +71,10 @@
             </q-chip>
           </div>
           <div class="col-6 col-md-2">
-            <q-chip color="orange" text-color="white" class="full-width">
+            <q-chip
+              color="orange"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ stats.lowest }}</span>
                 <span class="text-caption">پایین ترین</span>
@@ -70,7 +82,10 @@
             </q-chip>
           </div>
           <div class="col-6 col-md-2">
-            <q-chip color="purple" text-color="white" class="full-width">
+            <q-chip
+              color="purple"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ stats.pass_rate }}%</span>
                 <span class="text-caption">درصد قبولی</span>
@@ -98,8 +113,13 @@
       </q-card-section>
     </q-card>
 
-    <div v-if="!reportData && !loading" class="text-center q-pa-lg">
-      <q-icon name="grading" size="100px" color="grey-5" />
+    <div
+      v-if="!reportData && !loading"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="grading"
+        size="100px"
+        color="grey-5" />
       <p class="text-subtitle1 q-mt-md">درسی را انتخاب کنید تا گزارش نمایش داده شود</p>
     </div>
   </q-page>

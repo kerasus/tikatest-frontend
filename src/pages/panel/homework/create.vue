@@ -11,7 +11,11 @@
         <q-form @submit.prevent="onSubmit">
           <div class="row q-col-gutter-md">
             <div class="col-12">
-              <q-input v-model="form.title" label="عنوان تکلیف *" outlined required />
+              <q-input
+                v-model="form.title"
+                label="عنوان تکلیف *"
+                outlined
+                required />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -38,22 +42,46 @@
                 clearable />
             </div>
             <div class="col-12">
-              <q-input v-model="form.description" label="توضیحات تکلیف" outlined type="textarea" />
+              <q-input
+                v-model="form.description"
+                label="توضیحات تکلیف"
+                outlined
+                type="textarea" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.due_date" label="موعد تحویل" outlined type="date" />
+              <q-input
+                v-model="form.due_date"
+                label="موعد تحویل"
+                outlined
+                type="date" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.attachment" label="ضمیمه ۱ (URL)" outlined placeholder="https://..." />
+              <q-input
+                v-model="form.attachment"
+                label="ضمیمه ۱ (URL)"
+                outlined
+                placeholder="https://..." />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.attachment_2" label="ضمیمه ۲ (URL)" outlined placeholder="https://..." />
+              <q-input
+                v-model="form.attachment_2"
+                label="ضمیمه ۲ (URL)"
+                outlined
+                placeholder="https://..." />
             </div>
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ایجاد تکلیف" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Homework.List' }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ایجاد تکلیف"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Homework.List' }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -68,6 +96,10 @@ import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import LessonAPI from 'src/repositories/lesson'
 import SchoolClassAPI from 'src/repositories/schoolClass'
+
+const homeworkApi = new HomeworkAPI()
+const lessonApi = new LessonAPI()
+const schoolClassApi = new SchoolClassAPI()
 
 const router = useRouter()
 const $q = useQuasar()
@@ -87,19 +119,19 @@ const classOptions = ref<any[]>([])
 const saving = ref(false)
 
 async function loadLessons () {
-  const result = await LessonAPI.prototype.index({ length: 100 })
+  const result = await lessonApi.index({ length: 100 })
   lessonOptions.value = result.data
 }
 
 async function loadClasses () {
-  const result = await SchoolClassAPI.prototype.index({ length: 100 })
+  const result = await schoolClassApi.index({ length: 100 })
   classOptions.value = result.data
 }
 
 async function onSubmit () {
   saving.value = true
   try {
-    await HomeworkAPI.prototype.create(form as any)
+    await homeworkApi.create(form as any)
     $q.notify({
       icon: 'check',
       message: 'تکلیف با موفقیت ایجاد شد.',

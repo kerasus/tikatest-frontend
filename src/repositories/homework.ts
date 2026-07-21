@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 
+export type { ListType } from './BaseAPI'
 export type HomeworkType = {
   id: number | null
   school_id: number | null
@@ -16,6 +17,14 @@ export type HomeworkType = {
   deleted_at: string | null
   owners?: HomeworkOwnerType[]
   submissions?: HomeworkSubmissionType[]
+  lesson?: {
+    id: number | null
+    name: string | null
+  } | null
+  schoolClass?: {
+    id: number | null
+    name: string | null
+  } | null
 }
 
 export type HomeworkOwnerType = {
@@ -83,14 +92,14 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
   }
 
   async myHomework (filters: any = { length: 10 }) {
-    const response = await this.getAxiosInstanceWithToken().get(`/student-portal/homework`, {
+    const response = await this.getAxiosInstanceWithToken().get('/student-portal/homework', {
       params: filters
     })
     return response.data
   }
 
   async mySubmissions (filters: any = { length: 10 }) {
-    const response = await this.getAxiosInstanceWithToken().get(`/student-portal/homework/my-submissions`, {
+    const response = await this.getAxiosInstanceWithToken().get('/student-portal/homework/my-submissions', {
       params: filters
     })
     return response.data

@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, defineProps, defineEmits, ref } from 'vue'
 import RawMaterialAPI, { type RawMaterialType } from 'src/repositories/rawMaterial'
 

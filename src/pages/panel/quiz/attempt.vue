@@ -1,24 +1,43 @@
 <template>
   <q-page class="quiz-attempt-page">
-    <div v-if="loading" class="text-center q-pa-xl">
-      <q-spinner color="primary" size="80px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-xl">
+      <q-spinner
+        color="primary"
+        size="80px" />
       <div class="q-mt-md">در حال آماده‌سازی آزمون...</div>
     </div>
 
-    <q-card v-else-if="loadError" class="q-pa-lg text-center">
-      <q-icon name="error_outline" color="negative" size="64px" />
+    <q-card
+      v-else-if="loadError"
+      class="q-pa-lg text-center">
+      <q-icon
+        name="error_outline"
+        color="negative"
+        size="64px" />
       <div class="text-h6 q-mt-md">{{ loadError }}</div>
-      <q-btn class="q-mt-lg" color="primary" label="بازگشت" @click="goBack" />
+      <q-btn
+        class="q-mt-lg"
+        color="primary"
+        label="بازگشت"
+        @click="goBack" />
     </q-card>
 
     <!-- Pre-start confirmation (Quiz.Confirm) -->
-    <q-card v-else-if="quiz && !attemptStarted" class="confirm-card q-ma-md">
+    <q-card
+      v-else-if="quiz && !attemptStarted"
+      class="confirm-card q-ma-md">
       <q-card-section>
         <div class="text-h5 q-mb-md">تایید اطلاعات آزمون</div>
         <div class="text-h6 q-mb-sm">{{ quiz.name }}</div>
-        <p v-if="quiz.description" class="text-body1 text-grey-8">{{ quiz.description }}</p>
+        <p
+          v-if="quiz.description"
+          class="text-body1 text-grey-8">{{ quiz.description }}</p>
 
-        <q-list bordered class="rounded-borders q-mt-md">
+        <q-list
+          bordered
+          class="rounded-borders q-mt-md">
           <q-item>
             <q-item-section>
               <q-item-label caption>زمان آزمون</q-item-label>
@@ -49,32 +68,54 @@
       <q-separator />
 
       <q-card-section>
-        <q-banner rounded class="bg-orange-1 text-orange-10 q-mb-md">
+        <q-banner
+          rounded
+          class="bg-orange-1 text-orange-10 q-mb-md">
           بعد از شروع آزمون، خروج از صفحه، تغییر تب، کپی/پیست و کلیک راست به عنوان رویداد ضدتقلب ثبت می‌شود.
         </q-banner>
-        <q-checkbox v-model="confirmedInfo" label="اطلاعات آزمون را بررسی کردم و آماده شروع هستم." />
+        <q-checkbox
+          v-model="confirmedInfo"
+          label="اطلاعات آزمون را بررسی کردم و آماده شروع هستم." />
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="انصراف" @click="goBack" />
+        <q-btn
+          flat
+          label="انصراف"
+          @click="goBack" />
         <q-btn
           color="primary"
           label="تایید"
           icon="play_arrow"
           :disable="!confirmedInfo"
           :loading="starting"
-          @click="startSession"
-        />
+          @click="startSession" />
       </q-card-actions>
     </q-card>
 
     <!-- During / after attempt -->
-    <q-layout v-else-if="quiz && attemptStarted" view="lHh Lpr lFf" container class="quiz-layout-container">
-      <q-header elevated class="bg-white text-dark">
+    <q-layout
+      v-else-if="quiz && attemptStarted"
+      view="lHh Lpr lFf"
+      container
+      class="quiz-layout-container">
+      <q-header
+        elevated
+        class="bg-white text-dark">
         <q-toolbar>
-          <q-btn flat dense round icon="menu" aria-label="Menu" @click="drawerOpen = !drawerOpen" />
+          <q-btn
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="drawerOpen = !drawerOpen" />
           <q-toolbar-title class="text-subtitle1">{{ quiz.name }}</q-toolbar-title>
-          <q-chip v-if="!isFinalized" color="primary" text-color="white" icon="timer">
+          <q-chip
+            v-if="!isFinalized"
+            color="primary"
+            text-color="white"
+            icon="timer">
             {{ formatTime(remainingTime) }}
           </q-chip>
         </q-toolbar>
@@ -83,8 +124,7 @@
           :value="totalTime > 0 ? remainingTime / totalTime : 0"
           color="info"
           size="12px"
-          class="timer-progress"
-        />
+          class="timer-progress" />
       </q-header>
 
       <q-drawer
@@ -92,10 +132,11 @@
         show-if-above
         bordered
         :width="340"
-        class="sidebar-drawer"
-      >
+        class="sidebar-drawer">
         <div class="sidebar-content q-pa-sm">
-          <div v-if="isFinalized && canShowSolutionToggle" class="row q-col-gutter-sm q-mb-sm">
+          <div
+            v-if="isFinalized && canShowSolutionToggle"
+            class="row q-col-gutter-sm q-mb-sm">
             <div class="col-6">
               <q-btn
                 flat
@@ -103,8 +144,7 @@
                 color="primary"
                 class="full-width"
                 label="مشاهده سؤالات"
-                @click="showSolution = false"
-              />
+                @click="showSolution = false" />
             </div>
             <div class="col-6">
               <q-btn
@@ -113,12 +153,11 @@
                 color="primary"
                 class="full-width"
                 label="مشاهده پاسخنامه"
-                @click="showSolution = true"
-              />
+                @click="showSolution = true" />
             </div>
           </div>
 
-          <QuizBubbleSheet
+          <quiz-bubble-sheet
             :question-count="questionCount"
             :choices="choices"
             :save-status="saveStatusMap"
@@ -127,30 +166,51 @@
             :readonly="isFinalized || submitDialogOpen"
             :disabled="isFinalized || submitDialogOpen"
             :show-comparison="isFinalized && canShowCorrectAnswers"
-            @select="selectOption"
-          />
+            @select="selectOption" />
 
           <div class="row q-mt-sm color-palette-set">
-            <div class="col text-center"><q-badge color="yellow-8" label="در حال ارسال" /></div>
-            <div class="col text-center"><q-badge color="positive" label="ارسال شده" /></div>
-            <div class="col text-center"><q-badge color="negative" label="اشکال در ارسال" /></div>
+            <div class="col text-center"><q-badge
+              color="yellow-8"
+              label="در حال ارسال" /></div>
+            <div class="col text-center"><q-badge
+              color="positive"
+              label="ارسال شده" /></div>
+            <div class="col text-center"><q-badge
+              color="negative"
+              label="اشکال در ارسال" /></div>
           </div>
 
-          <div v-if="isFinalized" class="result-report q-mt-md">
-            <q-list dense bordered separator class="rounded-borders">
+          <div
+            v-if="isFinalized"
+            class="result-report q-mt-md">
+            <q-list
+              dense
+              bordered
+              separator
+              class="rounded-borders">
               <q-item>
                 <q-item-section>
                   <q-item-label>درصد داوطلب</q-item-label>
-                  <q-item-label caption class="text-left" dir="ltr">{{ submittedPercent }}%</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-left"
+                    dir="ltr">{{ submittedPercent }}%</q-item-label>
                 </q-item-section>
               </q-item>
 
               <template v-if="session?.booklet_scores?.length">
-                <q-item-label header class="q-px-none">درصد دفترچه‌ها</q-item-label>
-                <q-item v-for="bs in session.booklet_scores" :key="bs.id">
+                <q-item-label
+                  header
+                  class="q-px-none">درصد دفترچه‌ها</q-item-label>
+                <q-item
+                  v-for="bs in session.booklet_scores"
+                  :key="bs.id">
                   <q-item-section>
                     <q-item-label>{{ bs.title }}</q-item-label>
-                    <q-item-label caption class="text-left" dir="ltr">
+                    <q-item-label
+                      caption
+                      class="text-left"
+                      dir="ltr">
                       سؤالات {{ bs.from_question }} تا {{ bs.to_question }} - {{ bs.percent }}%
                     </q-item-label>
                   </q-item-section>
@@ -159,13 +219,19 @@
               <q-item>
                 <q-item-section>
                   <q-item-label>تاریخ و زمان شرکت در آزمون</q-item-label>
-                  <q-item-label caption class="text-left" dir="ltr">{{ formatDateTime(session?.session_started_at) }}</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-left"
+                    dir="ltr">{{ formatDateTime(session?.session_started_at) }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item>
                 <q-item-section>
                   <q-item-label>تاریخ و زمان ارسال پاسخنامه</q-item-label>
-                  <q-item-label caption class="text-left" dir="ltr">{{ formatDateTime(session?.submitted_at) }}</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-left"
+                    dir="ltr">{{ formatDateTime(session?.submitted_at) }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-if="resultReport?.field_rank">
@@ -188,30 +254,41 @@
               class="full-width q-mt-sm"
               flat
               :label="showSolution ? 'مشاهده سؤالات' : 'مشاهده پاسخنامه تشریحی'"
-              @click="toggleSolution"
-            />
+              @click="toggleSolution" />
             <q-btn
               color="primary"
               class="full-width q-mt-sm"
               label="مشاهده گزارش آزمون"
-              @click="resultReportDialog = true"
-            />
+              @click="resultReportDialog = true" />
           </div>
 
-          <div v-else class="q-mt-md">
+          <div
+            v-else
+            class="q-mt-md">
             <q-btn
               color="primary"
               class="full-width"
               icon="send"
               label="ارسال پاسخنامه"
               :disable="hasPendingSaves"
-              @click="openSubmitDialog"
-            />
+              @click="openSubmitDialog" />
           </div>
 
           <div class="scroll-controls q-mt-sm">
-            <q-btn flat dense round icon="keyboard_arrow_up" color="info" @click="scrollAnswerSheet(-120)" />
-            <q-btn flat dense round icon="keyboard_arrow_down" color="info" @click="scrollAnswerSheet(120)" />
+            <q-btn
+              flat
+              dense
+              round
+              icon="keyboard_arrow_up"
+              color="info"
+              @click="scrollAnswerSheet(-120)" />
+            <q-btn
+              flat
+              dense
+              round
+              icon="keyboard_arrow_down"
+              color="info"
+              @click="scrollAnswerSheet(120)" />
           </div>
 
           <q-btn
@@ -219,15 +296,18 @@
             color="primary"
             class="full-width q-mt-sm"
             label="بازگشت به صفحه اصلی"
-            @click="goBack"
-          />
+            @click="goBack" />
         </div>
       </q-drawer>
 
       <q-page-container>
         <q-page class="content-page">
-          <div v-if="!showSolution" class="content-viewer">
-            <template v-for="(item, index) in quizContentItems" :key="index">
+          <div
+            v-if="!showSolution"
+            class="content-viewer">
+            <template
+              v-for="(item, index) in quizContentItems"
+              :key="index">
               <div class="question-item q-mb-lg">
                 <div class="text-subtitle1 q-mb-sm">سؤال {{ index + 1 }}</div>
                 <q-img
@@ -235,23 +315,27 @@
                   :src="getStorageUrl(item.path)"
                   class="rounded-borders"
                   fit="contain"
-                  style="max-width: 100%; max-height: calc(100vh - 145px)"
-                />
+                  style="max-width: 100%; max-height: calc(100vh - 145px)" />
                 <embed
                   v-else-if="item.type === 'pdf' && item.path"
                   :src="getStorageUrl(item.path) + '#view=Fit'"
                   type="application/pdf"
-                  class="pdf-viewer"
-                />
-                <div v-else-if="item.type === 'text'" class="text-content q-pa-md bg-white">
+                  class="pdf-viewer">
+                <div
+                  v-else-if="item.type === 'text'"
+                  class="text-content q-pa-md bg-white">
                   {{ item.body }}
                 </div>
               </div>
             </template>
           </div>
 
-          <div v-else-if="canShowSolutionContent" class="content-viewer">
-            <template v-for="(item, index) in quizSolutionItems" :key="'sol-' + index">
+          <div
+            v-else-if="canShowSolutionContent"
+            class="content-viewer">
+            <template
+              v-for="(item, index) in quizSolutionItems"
+              :key="'sol-' + index">
               <div class="solution-item q-mb-lg">
                 <div class="text-subtitle1 q-mb-sm">راه‌حل {{ index + 1 }}</div>
                 <q-img
@@ -259,22 +343,24 @@
                   :src="getStorageUrl(item.path)"
                   class="rounded-borders"
                   fit="contain"
-                  style="max-width: 100%; max-height: calc(100vh - 145px)"
-                />
+                  style="max-width: 100%; max-height: calc(100vh - 145px)" />
                 <embed
                   v-else-if="item.type === 'pdf' && item.path"
                   :src="getStorageUrl(item.path) + '#view=Fit'"
                   type="application/pdf"
-                  class="pdf-viewer"
-                />
-                <div v-else-if="item.type === 'text'" class="text-content q-pa-md bg-white">
+                  class="pdf-viewer">
+                <div
+                  v-else-if="item.type === 'text'"
+                  class="text-content q-pa-md bg-white">
                   {{ item.body }}
                 </div>
               </div>
             </template>
           </div>
 
-          <div v-else class="q-pa-lg text-grey-7 text-center">
+          <div
+            v-else
+            class="q-pa-lg text-grey-7 text-center">
             در حال حاضر امکان مشاهده پاسخنامه وجود ندارد.
           </div>
         </q-page>
@@ -282,64 +368,115 @@
     </q-layout>
 
     <!-- Submit confirmation dialog -->
-    <q-dialog v-model="submitDialogOpen" persistent>
+    <q-dialog
+      v-model="submitDialogOpen"
+      persistent>
       <q-card style="min-width: 320px; max-width: 720px; width: 90vw">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">توجه</div>
           <q-space />
-          <q-btn v-if="!submitting && !submitCompleted" flat round dense icon="close" @click="cancelSubmitDialog" />
+          <q-btn
+            v-if="!submitting && !submitCompleted"
+            flat
+            round
+            dense
+            icon="close"
+            @click="cancelSubmitDialog" />
         </q-card-section>
 
         <q-card-section>
-          <p v-if="!submitCompleted" class="text-body1">
+          <p
+            v-if="!submitCompleted"
+            class="text-body1">
             شما در حال ارسال پاسخنامه آزمون هستید. آیا اطمینان دارید؟
           </p>
-          <p v-else class="text-body1 text-positive">پاسخنامه با موفقیت ارسال شد</p>
+          <p
+            v-else
+            class="text-body1 text-positive">پاسخنامه با موفقیت ارسال شد</p>
 
-          <div v-if="submitDialogLoading" class="text-center q-pa-md">کمی صبر کنید...</div>
+          <div
+            v-if="submitDialogLoading"
+            class="text-center q-pa-md">کمی صبر کنید...</div>
 
-          <QuizBubbleSheet
+          <quiz-bubble-sheet
             v-else-if="!submitCompleted"
             :question-count="questionCount"
             :choices="choices"
             readonly
             disabled
-            class="q-mt-md confirmation-sheet"
-          />
+            class="q-mt-md confirmation-sheet" />
 
-          <div v-if="submitCompleted" class="q-mt-md text-center">
+          <div
+            v-if="submitCompleted"
+            class="q-mt-md text-center">
             <div>درصد شما در این آزمون:</div>
-            <div class="text-h5 text-primary" dir="ltr">{{ submittedPercent }}%</div>
+            <div
+              class="text-h5 text-primary"
+              dir="ltr">{{ submittedPercent }}%</div>
           </div>
 
-          <q-banner v-if="submitDialogError" class="bg-red-1 text-red-10 q-mt-md" rounded>
+          <q-banner
+            v-if="submitDialogError"
+            class="bg-red-1 text-red-10 q-mt-md"
+            rounded>
             {{ submitDialogError }}
           </q-banner>
         </q-card-section>
 
-        <q-card-actions align="center" class="q-pb-md">
+        <q-card-actions
+          align="center"
+          class="q-pb-md">
           <template v-if="submitCompleted">
-            <q-btn color="primary" label="بازگشت به پنل کاربری" @click="goBack" />
-            <q-btn flat color="primary" label="مشاهده نتیجه" :to="{ name: 'Student.Quiz.Result', params: { id: quizId } }" />
+            <q-btn
+              color="primary"
+              label="بازگشت به پنل کاربری"
+              @click="goBack" />
+            <q-btn
+              flat
+              color="primary"
+              label="مشاهده نتیجه"
+              :to="{ name: 'Student.Quiz.Result', params: { id: quizId } }" />
           </template>
           <template v-else-if="!submitting">
-            <q-btn flat color="negative" label="خیر" style="min-width: 80px" @click="cancelSubmitDialog" />
-            <q-btn color="positive" label="بله" style="min-width: 80px" @click="confirmSubmit" />
+            <q-btn
+              flat
+              color="negative"
+              label="خیر"
+              style="min-width: 80px"
+              @click="cancelSubmitDialog" />
+            <q-btn
+              color="positive"
+              label="بله"
+              style="min-width: 80px"
+              @click="confirmSubmit" />
           </template>
-          <q-spinner v-else color="primary" size="32px" />
+          <q-spinner
+            v-else
+            color="primary"
+            size="32px" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- Time expired dialog -->
-    <q-dialog v-model="timeExpiredDialog" persistent>
+    <q-dialog
+      v-model="timeExpiredDialog"
+      persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <q-icon name="timer_off" color="negative" size="md" class="q-mr-sm" />
+          <q-icon
+            name="timer_off"
+            color="negative"
+            size="md"
+            class="q-mr-sm" />
           <span>زمان شما به اتمام رسید.</span>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn color="primary" label="پایان آزمون" :loading="submitting" @click="submitQuiz(true)" />
+          <q-btn
+            color="primary"
+            label="پایان آزمون"
+            :loading="submitting"
+            @click="submitQuiz(true)" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -349,23 +486,32 @@
       <q-card style="min-width: 320px">
         <q-card-section class="text-h6">گزارش آزمون</q-card-section>
         <q-card-section class="q-pt-none">
-          <q-list dense bordered separator>
+          <q-list
+            dense
+            bordered
+            separator>
             <q-item>
               <q-item-section>
                 <q-item-label>درصد داوطلب</q-item-label>
-                <q-item-label caption dir="ltr">{{ submittedPercent }}%</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr">{{ submittedPercent }}%</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label>تاریخ و زمان شرکت در آزمون</q-item-label>
-                <q-item-label caption dir="ltr">{{ formatDateTime(session?.session_started_at) }}</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr">{{ formatDateTime(session?.session_started_at) }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label>تاریخ و زمان ارسال پاسخنامه</q-item-label>
-                <q-item-label caption dir="ltr">{{ formatDateTime(session?.submitted_at) }}</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr">{{ formatDateTime(session?.submitted_at) }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item v-if="resultReport?.field_rank">
@@ -383,7 +529,11 @@
           </q-list>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="بستن" color="primary" v-close-popup />
+          <q-btn
+            v-close-popup
+            flat
+            label="بستن"
+            color="primary" />
         </q-card-actions>
       </q-card>
     </q-dialog>

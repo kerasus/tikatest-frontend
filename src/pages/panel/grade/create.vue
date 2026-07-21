@@ -23,7 +23,12 @@
                 required />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.raw_grade" label="نمره خام *" outlined type="number" step="0.01" />
+              <q-input
+                v-model="form.raw_grade"
+                label="نمره خام *"
+                outlined
+                type="number"
+                step="0.01" />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -47,13 +52,25 @@
                 map-options />
             </div>
             <div class="col-12">
-              <q-input v-model="form.explanation" label="توضیحات" outlined type="textarea" />
+              <q-input
+                v-model="form.explanation"
+                label="توضیحات"
+                outlined
+                type="textarea" />
             </div>
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ثبت نمره" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Grade.List' }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت نمره"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Grade.List' }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -69,6 +86,10 @@ import GradeAPI from 'src/repositories/grade'
 import ExamSessionAPI from 'src/repositories/examSession'
 import StudentAPI from 'src/repositories/student'
 import type { GradeType } from 'src/repositories/grade'
+
+const gradeApi = new GradeAPI()
+const examSessionApi = new ExamSessionAPI()
+const studentApi = new StudentAPI()
 
 const router = useRouter()
 const $q = useQuasar()
@@ -87,7 +108,7 @@ const studentOptions = ref<any[]>([])
 const saving = ref(false)
 
 async function loadSessions () {
-  const result = await ExamSessionAPI.prototype.index({ length: 100 })
+  const result = await examSessionApi.index({ length: 100 })
   sessionOptions.value = result.data.map((item: any) => ({
     id: item.id,
     label: `${item.lesson?.name || ''} - ${item.schoolClass?.name || ''} (${item.persian_date || item.gregorian_date})`,
@@ -96,7 +117,7 @@ async function loadSessions () {
 }
 
 async function loadStudents () {
-  const result = await StudentAPI.prototype.index({ length: 100 })
+  const result = await studentApi.index({ length: 100 })
   studentOptions.value = result.data.map((item: any) => ({
     id: item.id,
     full_name: item.full_name || `${item.firstname} ${item.lastname}`,
@@ -107,7 +128,7 @@ async function loadStudents () {
 async function onSubmit () {
   saving.value = true
   try {
-    await GradeAPI.prototype.create(form as any)
+    await gradeApi.create(form as any)
     $q.notify({
       icon: 'check',
       message: 'نمره با موفقیت ثبت شد.',

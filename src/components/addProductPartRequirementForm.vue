@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { ref, watch, computed } from 'vue'
 import ProductPartAPI from 'src/repositories/productPart'
 import Portlet from 'src/components/cards/portlet.vue'

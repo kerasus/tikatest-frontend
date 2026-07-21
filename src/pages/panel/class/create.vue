@@ -36,7 +36,11 @@
                 required />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.name" label="نام کلاس *" outlined required />
+              <q-input
+                v-model="form.name"
+                label="نام کلاس *"
+                outlined
+                required />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -53,8 +57,16 @@
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ثبت کلاس" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Class.List' }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت کلاس"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Class.List' }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -70,6 +82,11 @@ import SchoolClassAPI from 'src/repositories/schoolClass'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import SchoolAPI from 'src/repositories/school'
+
+const schoolClassApi = new SchoolClassAPI()
+const academicFieldApi = new AcademicFieldAPI()
+const academicLevelApi = new AcademicLevelAPI()
+const schoolApi = new SchoolAPI()
 
 const router = useRouter()
 const $q = useQuasar()
@@ -87,13 +104,13 @@ const schoolOptions = ref<any[]>([])
 const saving = ref(false)
 
 async function loadFields () {
-  const result = await AcademicFieldAPI.prototype.index({ length: 100 })
+  const result = await academicFieldApi.index({ length: 100 })
   fieldOptions.value = result.data
 }
 
 async function loadLevels () {
   if (form.field_id) {
-    const result = await AcademicLevelAPI.prototype.index({ field_id: form.field_id, length: 100 })
+    const result = await academicLevelApi.index({ field_id: form.field_id, length: 100 })
     levelOptions.value = result.data
   } else {
     levelOptions.value = []
@@ -101,14 +118,14 @@ async function loadLevels () {
 }
 
 async function loadSchools () {
-  const result = await SchoolAPI.prototype.index({ length: 100 })
+  const result = await schoolApi.index({ length: 100 })
   schoolOptions.value = result.data
 }
 
 async function onSubmit () {
   saving.value = true
   try {
-    await SchoolClassAPI.prototype.create(form as any)
+    await schoolClassApi.create(form as any)
     $q.notify({
       icon: 'check',
       message: 'کلاس با موفقیت ثبت شد.',

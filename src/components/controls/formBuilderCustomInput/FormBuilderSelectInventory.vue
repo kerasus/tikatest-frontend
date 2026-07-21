@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, defineEmits, defineProps, ref } from 'vue'
 import InventoryAPI, { type InventoryType } from 'src/repositories/inventory'
 

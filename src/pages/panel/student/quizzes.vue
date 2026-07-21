@@ -3,25 +3,41 @@
     <h4 class="q-ma-none q-mb-lg">آزمون‌های آنلاین من</h4>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="quizzes.length === 0" class="text-center q-pa-lg">
-      <q-icon name="assignment" size="100px" color="primary" />
+    <div
+      v-else-if="quizzes.length === 0"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="assignment"
+        size="100px"
+        color="primary" />
       <p class="text-subtitle1 q-mt-md">هیچ آزمونی برای شما موجود نیست</p>
     </div>
 
     <!-- Quizzes List -->
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="quiz in quizzes" :key="quiz.id" class="col-12 col-md-6">
-        <q-card class="quiz-card cursor-pointer" @click="navigateTo(quiz)">
+    <div
+      v-else
+      class="row q-col-gutter-md">
+      <div
+        v-for="quiz in quizzes"
+        :key="quiz.id"
+        class="col-12 col-md-6">
+        <q-card
+          class="quiz-card cursor-pointer"
+          @click="navigateTo(quiz)">
           <q-card-section>
             <div class="text-h6">{{ quiz.name }}</div>
-<div class="text-caption text-grey q-mt-sm">
-               مدت زمان: {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
-             </div>
+            <div class="text-caption text-grey q-mt-sm">
+              مدت زمان: {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
+            </div>
           </q-card-section>
 
           <q-separator />
@@ -34,16 +50,14 @@
                   :color="getStatusColor(quiz)"
                   text-color="white"
                   :label="getStatusLabel(quiz)"
-                  size="sm"
-                />
+                  size="sm" />
               </div>
               <q-btn
                 flat
                 round
                 dense
                 icon="arrow_forward"
-                color="primary"
-              />
+                color="primary" />
             </div>
           </q-card-section>
         </q-card>

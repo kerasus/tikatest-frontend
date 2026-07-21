@@ -17,9 +17,16 @@
               dense
               mask="date">
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="filters.date_from" color="primary" />
+                <q-icon
+                  name="event"
+                  class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale">
+                    <q-date
+                      v-model="filters.date_from"
+                      color="primary" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -33,16 +40,28 @@
               dense
               mask="date">
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="filters.date_to" color="primary" />
+                <q-icon
+                  name="event"
+                  class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale">
+                    <q-date
+                      v-model="filters.date_to"
+                      color="primary" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
             </q-input>
           </div>
           <div class="col-12 col-md-4">
-            <q-btn color="primary" label="فیلتر" @click="loadAbsences" :loading="loading" class="full-height" />
+            <q-btn
+              color="primary"
+              label="فیلتر"
+              :loading="loading"
+              class="full-height"
+              @click="loadAbsences" />
           </div>
         </div>
       </q-card-section>
@@ -57,12 +76,12 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-student="{ props }">
+          <template #body-cell-student="props">
             <q-td :props="props">
               {{ props.row.student?.name }} {{ props.row.student?.lastname }}
             </q-td>
           </template>
-          <template #body-cell-case="{ props }">
+          <template #body-cell-case="props">
             <q-td :props="props">
               {{ props.row.disciplinaryCase?.name || '-' }}
             </q-td>

@@ -1,7 +1,11 @@
 <template>
   <div class="quiz-form-page">
-    <q-card v-if="loading" class="q-pa-lg text-center">
-      <q-spinner color="primary" size="80px" />
+    <q-card
+      v-if="loading"
+      class="q-pa-lg text-center">
+      <q-spinner
+        color="primary"
+        size="80px" />
       <div class="q-mt-md">در حال بارگذاری...</div>
     </q-card>
 
@@ -24,6 +28,19 @@
             </div>
 
             <div class="col-12 col-md-4">
+              <q-select
+                v-model="form.school_id"
+                :options="schoolOptions"
+                option-value="id"
+                option-label="name"
+                label="مدرسه"
+                outlined
+                emit-value
+                map-options
+                clearable />
+            </div>
+
+            <div class="col-12 col-md-4">
               <q-input
                 v-model.number="form.time_limit"
                 label="مدت زمان (دقیقه) *"
@@ -34,21 +51,21 @@
             </div>
 
             <div class="col-12 col-md-4">
-              <FormBuilderDateTime
+              <form-builder-date-time
                 v-model:value="form.starts_at"
                 label="تاریخ شروع"
                 outlined />
             </div>
 
             <div class="col-12 col-md-4">
-              <FormBuilderDateTime
+              <form-builder-date-time
                 v-model:value="form.ends_at"
                 label="تاریخ پایان"
                 outlined />
             </div>
 
             <div class="col-12 col-md-4">
-              <FormBuilderDateTime
+              <form-builder-date-time
                 v-model:value="form.show_answer_date"
                 label="تاریخ نمایش پاسخ"
                 outlined />
@@ -93,7 +110,9 @@
             </div>
 
             <div class="col-12">
-              <q-card bordered flat>
+              <q-card
+                bordered
+                flat>
                 <q-card-section>
                   <div class="row items-center justify-between q-mb-md">
                     <div>
@@ -164,139 +183,159 @@
             </div>
 
             <div class="col-12">
-              <q-card bordered flat>
+              <q-card
+                bordered
+                flat>
                 <q-card-section>
                   <div class="row items-center justify-between q-mb-md">
                     <div>
-                      <div class="text-subtitle1">سؤالات</div>
-                      <div class="text-caption text-grey-7">برای تصویر، مسیر فایل آپلودشده را وارد کنید.</div>
+                      <div class="text-subtitle1">نوع سؤالات</div>
+                      <div class="text-caption text-grey-7">تمام سوالات این آزمون باید از یک نوع باشند.</div>
                     </div>
-                    <q-btn
-                      color="primary"
-                      icon="add"
-                      label="افزودن سؤال"
-                      @click="addBlock('content')" />
                   </div>
 
-                  <div
-                    v-if="form.content.length === 0"
-                    class="text-grey-7 text-center q-pa-md">
-                    هنوز سؤالی اضافه نشده است.
+                  <div class="row q-col-gutter-md items-center">
+                    <div class="col-12 col-md-4">
+                      <q-select
+                        v-model="form.question_type"
+                        :options="questionTypeOptions"
+                        label="نوع سؤالات"
+                        outlined
+                        emit-value
+                        map-options
+                        clearable />
+                    </div>
                   </div>
+                </q-card-section>
+              </q-card>
+            </div>
 
-                  <q-card
-                    v-for="(item, index) in form.content"
-                    :key="`content-${index}`"
-                    bordered
-                    flat
-                    class="q-mb-md">
-                    <q-card-section>
-                      <div class="row q-col-gutter-md items-start">
-                        <div class="col-12 col-md-3">
-                          <q-select
-                            v-model="item.type"
-                            :options="contentTypeOptions"
-                            label="نوع محتوا"
-                            outlined
-                            dense
-                            emit-value
-                            map-options />
-                        </div>
-                        <div class="col-12 col-md-8">
-                          <q-input
-                            v-if="item.type === 'text'"
-                            v-model="item.body"
-                            label="متن سؤال"
-                            outlined
-                            type="textarea"
-                            autogrow />
-                          <q-input
-                            v-else
-                            v-model="item.path"
-                            label="مسیر تصویر"
-                            outlined
-                            placeholder="/uploads/exams/quiz1.png" />
-                        </div>
-                        <div class="col-12 col-md-1 text-right">
-                          <q-btn
+            <div
+              v-if="form.question_type === 'text'"
+              class="col-12">
+              <q-card
+                bordered
+                flat>
+                <q-card-section>
+                  <div class="text-subtitle1 q-mb-md">سؤالات (متنی)</div>
+                  <q-input
+                    v-model="form.questions_text"
+                    label="متن سؤالات"
+                    outlined
+                    type="textarea"
+                    autogrow
+                    :rules="[value => !!value || 'متن سؤالات الزامی است']" />
+                </q-card-section>
+              </q-card>
+            </div>
+
+            <div
+              v-if="form.question_type === 'image'"
+              class="col-12">
+              <q-card
+                bordered
+                flat>
+                <q-card-section>
+                  <div class="text-subtitle1 q-mb-md">فایل‌های تصویری سؤالات</div>
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12">
+                      <input
+                        ref="questionFileInput"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        @change="onQuestionFilesSelected">
+                    </div>
+                    <div
+                      v-if="form.questions_images.length > 0"
+                      class="col-12">
+                      <div class="text-caption text-grey-7 q-mb-sm">
+                        {{ form.questions_images.length }} فایل انتخاب شده
+                      </div>
+                      <div class="row q-col-gutter-sm">
+                        <div
+                          v-for="(file, index) in form.questions_images"
+                          :key="index"
+                          class="col-12 col-md-3">
+                          <q-card
                             flat
-                            round
-                            color="negative"
-                            icon="delete"
-                            @click="removeBlock('content', index)" />
+                            bordered>
+                            <q-card-section class="q-pa-sm">
+                              <div class="text-caption">{{ file.name }}</div>
+                              <div class="text-caption text-grey-7">{{ formatFileSize(file.size) }}</div>
+                            </q-card-section>
+                            <q-card-actions align="right">
+                              <q-btn
+                                flat
+                                round
+                                dense
+                                color="negative"
+                                icon="delete"
+                                @click="removeQuestionFile(index)" />
+                            </q-card-actions>
+                          </q-card>
                         </div>
                       </div>
-                    </q-card-section>
-                  </q-card>
+                    </div>
+                  </div>
                 </q-card-section>
               </q-card>
             </div>
 
             <div class="col-12">
-              <q-card bordered flat>
+              <q-card
+                bordered
+                flat>
                 <q-card-section>
                   <div class="row items-center justify-between q-mb-md">
                     <div>
                       <div class="text-subtitle1">پاسخ تشریحی / راه‌حل</div>
-                      <div class="text-caption text-grey-7">فرمت ذخیره‌سازی مانند سوالات است: متن یا تصویر.</div>
+                      <div class="text-caption text-grey-7">نوع محتوای پاسخ را انتخاب و داده‌های آن را وارد کنید.</div>
                     </div>
-                    <q-btn
-                      color="secondary"
-                      icon="add"
-                      label="افزودن پاسخ"
-                      @click="addBlock('solution')" />
+                  </div>
+
+                  <div class="row q-col-gutter-md items-center">
+                    <div class="col-12 col-md-4">
+                      <q-select
+                        v-model="form.solution_type"
+                        :options="contentTypeOptions"
+                        label="نوع پاسخ"
+                        outlined
+                        emit-value
+                        map-options
+                        clearable />
+                    </div>
                   </div>
 
                   <div
-                    v-if="form.solution.length === 0"
-                    class="text-grey-7 text-center q-pa-md">
-                    هنوز پاسخی اضافه نشده است.
+                    v-if="form.solution_type === 'text'"
+                    class="row q-col-gutter-md q-mt-md">
+                    <div class="col-12">
+                      <q-input
+                        v-model="form.solution_text"
+                        label="متن پاسخ"
+                        outlined
+                        type="textarea"
+                        autogrow />
+                    </div>
                   </div>
 
-                  <q-card
-                    v-for="(item, index) in form.solution"
-                    :key="`solution-${index}`"
-                    bordered
-                    flat
-                    class="q-mb-md">
-                    <q-card-section>
-                      <div class="row q-col-gutter-md items-start">
-                        <div class="col-12 col-md-3">
-                          <q-select
-                            v-model="item.type"
-                            :options="contentTypeOptions"
-                            label="نوع محتوا"
-                            outlined
-                            dense
-                            emit-value
-                            map-options />
-                        </div>
-                        <div class="col-12 col-md-8">
-                          <q-input
-                            v-if="item.type === 'text'"
-                            v-model="item.body"
-                            label="متن پاسخ"
-                            outlined
-                            type="textarea"
-                            autogrow />
-                          <q-input
-                            v-else
-                            v-model="item.path"
-                            label="مسیر تصویر پاسخ"
-                            outlined
-                            placeholder="/uploads/exams/quiz1-solution.png" />
-                        </div>
-                        <div class="col-12 col-md-1 text-right">
-                          <q-btn
-                            flat
-                            round
-                            color="negative"
-                            icon="delete"
-                            @click="removeBlock('solution', index)" />
-                        </div>
+                  <div
+                    v-if="form.solution_type === 'image'"
+                    class="row q-col-gutter-md q-mt-md">
+                    <div class="col-12">
+                      <input
+                        ref="solutionFileInput"
+                        type="file"
+                        accept="image/*"
+                        @change="onSolutionFileSelected">
+                      <div
+                        v-if="form.solution_image"
+                        class="q-mt-sm text-caption">
+                        فایل انتخاب شده: {{ form.solution_image.name }} ({{ formatFileSize(form.solution_image.size) }})
                       </div>
-                    </q-card-section>
-                  </q-card>
+                    </div>
+                  </div>
                 </q-card-section>
               </q-card>
             </div>
@@ -325,16 +364,11 @@ import { reactive, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { quiz } from 'src/repositories/quiz'
-import type { QuizContentType } from 'src/repositories/quiz'
 import { quizBooklet } from 'src/repositories/quizBooklet'
+import SchoolAPI from 'src/repositories/school'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
 
-type QuizContentField = QuizContentType & {
-  body?: string
-  path?: string
-}
-
-type QuizBlockKey = 'content' | 'solution'
+const schoolApi = new SchoolAPI()
 
 const router = useRouter()
 const route = useRoute()
@@ -347,18 +381,25 @@ const isEdit = !!quizId
 
 const form = reactive({
   name: null as string | null,
+  school_id: null as number | null,
   time_limit: null as number | null,
   starts_at: null as string | null,
   ends_at: null as string | null,
   description: null as string | null,
   is_visible: true,
   quiz_type: null as string | null,
-  content: [] as QuizContentField[],
-  solution: [] as QuizContentField[],
+  question_type: null as 'text' | 'image' | null,
+  questions_text: null as string | null,
+  questions_images: [] as File[],
+  solution_type: null as 'text' | 'image' | null,
+  solution_text: null as string | null,
+  solution_image: null as File | null,
   show_answer_date: null as string | null,
   no_score_questions: null as string | null,
   booklets: [] as any[]
 })
+
+const schoolOptions = ref<any[]>([])
 
 const quizTypeOptions = [
   { label: 'آزمون متنی', value: 'text' },
@@ -371,21 +412,46 @@ const visibilityOptions = [
   { label: 'غیرفعال', value: false }
 ]
 
+const questionTypeOptions = [
+  { label: 'متن', value: 'text' },
+  { label: 'تصویر', value: 'image' }
+]
+
 const contentTypeOptions = [
   { label: 'متن', value: 'text' },
   { label: 'تصویر', value: 'image' }
 ]
 
-function addBlock (key: QuizBlockKey) {
-  form[key].push({
-    type: 'text',
-    body: '',
-    path: ''
-  })
+const questionFileInput = ref<HTMLInputElement | null>(null)
+const solutionFileInput = ref<HTMLInputElement | null>(null)
+
+function formatFileSize (bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-function removeBlock (key: QuizBlockKey, index: number) {
-  form[key].splice(index, 1)
+function onQuestionFilesSelected (event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files) {
+    form.questions_images = Array.from(target.files)
+  }
+}
+
+function removeQuestionFile (index: number) {
+  form.questions_images.splice(index, 1)
+  if (questionFileInput.value) {
+    questionFileInput.value.value = ''
+  }
+}
+
+function onSolutionFileSelected (event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    form.solution_image = target.files[0]
+  }
 }
 
 function addBooklet () {
@@ -412,38 +478,89 @@ function normalizeBooklets () {
     }))
 }
 
-function normalizeBlocks (items: QuizContentField[]): QuizContentType[] | null {
-  const normalizedItems = items
-    .map((item) => {
-      if (item.type === 'image') {
-        return item.path?.trim()
-          ? { type: 'image' as const, path: item.path.trim() }
-          : null
-      }
+function buildContentPayload (): any[] | null {
+  if (form.question_type === 'text' && form.questions_text?.trim()) {
+    return [{
+      type: 'text' as const,
+      body: form.questions_text.trim()
+    }]
+  }
 
-      return item.body?.trim()
-        ? { type: 'text' as const, body: item.body.trim() }
-        : null
-    })
-    .filter((item): item is QuizContentType => item !== null)
+  if (form.question_type === 'image' && form.questions_images.length > 0) {
+    return form.questions_images.map((file) => ({
+      type: 'image' as const,
+      body: file
+    }))
+  }
 
-  return normalizedItems.length > 0 ? normalizedItems : null
+  return null
 }
 
-function buildPayload () {
-  return {
-    name: form.name,
-    time_limit: form.time_limit,
-    starts_at: form.starts_at,
-    ends_at: form.ends_at,
-    description: form.description,
-    is_visible: form.is_visible,
-    quiz_type: form.quiz_type,
-    content: normalizeBlocks(form.content),
-    solution: normalizeBlocks(form.solution),
-    show_answer_date: form.show_answer_date,
-    no_score_questions: form.no_score_questions
+function buildSolutionPayload (): any[] | null {
+  if (form.solution_type === 'text' && form.solution_text?.trim()) {
+    return [{
+      type: 'text' as const,
+      body: form.solution_text.trim()
+    }]
   }
+
+  if (form.solution_type === 'image' && form.solution_image) {
+    return [{
+      type: 'image' as const,
+      body: form.solution_image
+    }]
+  }
+
+  return null
+}
+
+function buildFormData (): FormData {
+  const fd = new FormData()
+
+  fd.append('name', form.name || '')
+  fd.append('time_limit', String(form.time_limit || ''))
+  fd.append('starts_at', form.starts_at || '')
+  fd.append('ends_at', form.ends_at || '')
+  fd.append('description', form.description || '')
+  fd.append('is_visible', form.is_visible ? '1' : '0')
+  fd.append('quiz_type', form.quiz_type || '')
+  fd.append('show_answer_date', form.show_answer_date || '')
+  fd.append('no_score_questions', form.no_score_questions || '')
+  if (form.school_id) {
+    fd.append('school_id', String(form.school_id))
+  }
+
+  if (form.question_type) {
+    fd.append('question_type', form.question_type)
+  }
+
+  if (form.question_type === 'text' && form.questions_text) {
+    fd.append('questions_text', form.questions_text)
+  }
+
+  if (form.question_type === 'image') {
+    form.questions_images.forEach((file) => {
+      fd.append('questions_images[]', file)
+    })
+  }
+
+  if (form.solution_type) {
+    fd.append('solution_type', form.solution_type)
+  }
+
+  if (form.solution_type === 'text' && form.solution_text) {
+    fd.append('solution_text', form.solution_text)
+  }
+
+  if (form.solution_type === 'image' && form.solution_image) {
+    fd.append('solution_image', form.solution_image)
+  }
+
+  if (form.booklets.length > 0) {
+    fd.append('booklets', JSON.stringify(normalizeBooklets()))
+  }
+
+  return fd
 }
 
 const loadQuiz = async () => {
@@ -458,10 +575,29 @@ const loadQuiz = async () => {
     form.description = response.description
     form.is_visible = response.is_visible
     form.quiz_type = response.quiz_type
-    form.content = response.content || []
-    form.solution = response.solution || []
     form.show_answer_date = response.show_answer_date
     form.no_score_questions = response.no_score_questions
+
+    if (response.content && response.content.length > 0) {
+      const firstContent = response.content[0]
+      if (firstContent.type === 'text') {
+        form.question_type = 'text'
+        form.questions_text = firstContent.body || null
+      } else if (firstContent.type === 'image') {
+        form.question_type = 'image'
+      }
+    }
+
+    if (response.solution && response.solution.length > 0) {
+      const firstSolution = response.solution[0]
+      if (firstSolution.type === 'text') {
+        form.solution_type = 'text'
+        form.solution_text = firstSolution.body || null
+      } else if (firstSolution.type === 'image') {
+        form.solution_type = 'image'
+      }
+    }
+
     form.booklets = (response.booklets || []).map((booklet: any) => ({
       id: booklet.id,
       title: booklet.title,
@@ -479,14 +615,24 @@ const loadQuiz = async () => {
   }
 }
 
+async function loadSchools () {
+  try {
+    const result = await schoolApi.index({ length: 100 })
+    schoolOptions.value = result.data
+  } catch (error: any) {
+    console.error('Error loading schools:', error)
+  }
+}
+
 async function onSubmit () {
   saving.value = true
 
   try {
     const booklets = normalizeBooklets()
+    const formData = buildFormData()
 
     if (isEdit && quizId) {
-      await quiz.update(quizId, buildPayload() as any)
+      await quiz.update(quizId, formData)
       await quizBooklet.sync(quizId, booklets)
       $q.notify({
         icon: 'check',
@@ -494,8 +640,8 @@ async function onSubmit () {
         color: 'positive'
       })
     } else {
-      const created = await quiz.create(buildPayload() as any)
-      const newQuizId = (created && typeof created === 'object') ? created.id : created
+      const created = await quiz.create(formData)
+      const newQuizId = typeof created === 'object' && created !== null ? (created as any).id : created
       if (newQuizId) {
         await quizBooklet.sync(newQuizId, booklets)
       }
@@ -517,7 +663,8 @@ async function onSubmit () {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadSchools()
   loadQuiz()
 })
 </script>

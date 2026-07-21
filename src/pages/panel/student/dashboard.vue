@@ -2,8 +2,12 @@
   <q-page class="q-pa-md">
     <h4 class="q-ma-none q-mb-lg">پیشخوان</h4>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <template v-else>
@@ -55,12 +59,11 @@
                 :rows="stats.recent_grades"
                 :columns="gradeColumns"
                 row-key="id"
-                :pagination="{ rowsPerPage: 5 }"
-              >
-                <template #body-cell-lesson="{ props }">
+                :pagination="{ rowsPerPage: 5 }">
+                <template #body-cell-lesson="props">
                   <q-td :props="props">{{ props.row.lesson?.name || '-' }}</q-td>
                 </template>
-                <template #body-cell-raw_grade="{ props }">
+                <template #body-cell-raw_grade="props">
                   <q-td :props="props">
                     <span :class="props.row.raw_grade >= (props.row.min_grade || 10) ? 'text-positive' : 'text-negative'">
                       {{ props.row.raw_grade }}
@@ -68,7 +71,9 @@
                   </q-td>
                 </template>
               </q-table>
-              <div v-else class="text-center q-pa-lg">
+              <div
+                v-else
+                class="text-center q-pa-lg">
                 <p>هنوز نمره‌ای ثبت نشده است</p>
               </div>
             </q-card-section>
@@ -87,16 +92,17 @@
                 :rows="stats.recent_study_sessions"
                 :columns="studyColumns"
                 row-key="id"
-                :pagination="{ rowsPerPage: 5 }"
-              >
-                <template #body-cell-lesson="{ props }">
+                :pagination="{ rowsPerPage: 5 }">
+                <template #body-cell-lesson="props">
                   <q-td :props="props">{{ props.row.lesson?.name || '-' }}</q-td>
                 </template>
-                <template #body-cell-duration="{ props }">
+                <template #body-cell-duration="props">
                   <q-td :props="props">{{ props.row.duration_minutes || 0 }} دقیقه</q-td>
                 </template>
               </q-table>
-              <div v-else class="text-center q-pa-lg">
+              <div
+                v-else
+                class="text-center q-pa-lg">
                 <p>هنوز جلسه‌ای ثبت نشده است</p>
               </div>
             </q-card-section>
@@ -119,13 +125,13 @@ const stats = ref<any>({})
 const gradeColumns = [
   { name: 'lesson', label: 'درس', field: 'lesson', align: 'center' as const },
   { name: 'raw_grade', label: 'نمره', field: 'raw_grade', align: 'center' as const },
-  { name: 'grade_type', label: 'نوع', field: 'grade_type', align: 'center' as const },
+  { name: 'grade_type', label: 'نوع', field: 'grade_type', align: 'center' as const }
 ]
 
 const studyColumns = [
   { name: 'lesson', label: 'درس', field: 'lesson', align: 'center' as const },
   { name: 'started_at', label: 'تاریخ', field: 'started_at', align: 'center' as const },
-  { name: 'duration', label: 'مدت', field: 'duration', align: 'center' as const },
+  { name: 'duration', label: 'مدت', field: 'duration', align: 'center' as const }
 ]
 
 onMounted(async () => {

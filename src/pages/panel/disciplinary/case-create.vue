@@ -15,22 +15,28 @@
                 v-model="form.name"
                 label="نام مورد انضباطی *"
                 outlined
-                :rules="[val => !!val || 'نام مورد انضباطی الزامی است']"
-              />
+                :rules="[val => !!val || 'نام مورد انضباطی الزامی است']" />
             </div>
             <div class="col-12">
               <q-input
                 v-model="form.description"
                 label="توضیحات"
                 outlined
-                type="textarea"
-              />
+                type="textarea" />
             </div>
           </div>
 
           <div class="q-mt-lg">
-            <q-btn type="submit" color="primary" label="ثبت مورد" :loading="saving" class="q-ml-sm" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.DisciplinaryCase.List' }" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت مورد"
+              :loading="saving"
+              class="q-ml-sm" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.DisciplinaryCase.List' }" />
           </div>
         </q-form>
       </q-card-section>

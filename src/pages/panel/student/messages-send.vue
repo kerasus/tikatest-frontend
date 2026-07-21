@@ -21,16 +21,33 @@
                     type="number" />
                 </div>
                 <div class="col-12">
-                  <q-input v-model="form.subject" label="موضوع" outlined />
+                  <q-input
+                    v-model="form.subject"
+                    label="موضوع"
+                    outlined />
                 </div>
                 <div class="col-12">
-                  <q-input v-model="form.body" label="متن پیام *" outlined type="textarea" rows="5" required />
+                  <q-input
+                    v-model="form.body"
+                    label="متن پیام *"
+                    outlined
+                    type="textarea"
+                    rows="5"
+                    required />
                 </div>
               </div>
 
               <div class="q-mt-md">
-                <q-btn type="submit" color="primary" label="ارسال پیام" :loading="saving" />
-                <q-btn flat label="انصراف" :to="{ name: 'Student.Message.List' }" class="q-ml-sm" />
+                <q-btn
+                  type="submit"
+                  color="primary"
+                  label="ارسال پیام"
+                  :loading="saving" />
+                <q-btn
+                  flat
+                  label="انصراف"
+                  :to="{ name: 'Student.Message.List' }"
+                  class="q-ml-sm" />
               </div>
             </q-form>
           </q-card-section>

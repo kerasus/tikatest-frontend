@@ -3,13 +3,22 @@
     <h4 class="q-ma-none q-mb-lg">نمرات من</h4>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="grades.length === 0" class="text-center q-pa-lg">
-      <q-icon name="grade" size="100px" color="primary" />
+    <div
+      v-else-if="grades.length === 0"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="grade"
+        size="100px"
+        color="primary" />
       <p class="text-subtitle1 q-mt-md">هیچ نمره‌ای ثبت نشده</p>
     </div>
 
@@ -22,8 +31,7 @@
       :columns="columns"
       row-key="id"
       class="grades-table"
-      pagination.sync="pagination"
-    >
+      pagination.sync="pagination">
       <template #body-cell-lesson_name="props">
         <q-td :props="props">
           {{ props.row.lesson?.name || '-' }}
@@ -35,8 +43,7 @@
           <q-chip
             :color="getGradeColor(props.row.grade_value)"
             text-color="white"
-            :label="`${props.row.grade_value.toFixed(2)}`"
-          />
+            :label="`${props.row.grade_value.toFixed(2)}`" />
         </q-td>
       </template>
 
@@ -87,7 +94,7 @@ const loadGrades = async () => {
   loading.value = true
   try {
     const response = await gradeRepository.list()
-    grades.value = response.data.data || []
+    grades.value = response.data || []
   } catch (error: any) {
     $q.notify({
       type: 'negative',

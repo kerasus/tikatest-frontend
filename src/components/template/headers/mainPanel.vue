@@ -123,7 +123,7 @@ function logout () {
               <div class="profile-menu q-pa-md">
                 <q-avatar size="72px">
                   <img
-                    src="/panel/images/blankProfile.png"
+                    src="/images/blankProfile.png"
                     alt="avatar">
                 </q-avatar>
 

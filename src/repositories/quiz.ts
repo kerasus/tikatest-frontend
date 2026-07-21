@@ -1,4 +1,6 @@
 import BaseAPI from './BaseAPI'
+
+export type { ListType } from './BaseAPI'
 import type { QuizBookletType } from './quizBooklet'
 
 export type QuizContentType = {
@@ -32,7 +34,7 @@ export type QuizType = {
     updated_at: string | null
   }
 
- export type QuizQuestionType = {
+export type QuizQuestionType = {
    id: number
    question_text: string
    question_type: string
@@ -43,7 +45,7 @@ export type QuizType = {
    options?: QuizQuestionOptionType[]
  }
 
- export type QuizQuestionOptionType = {
+export type QuizQuestionOptionType = {
    id: number
    option_number: number
    option_text: string
@@ -72,30 +74,30 @@ export type QuizResponseType = {
 export default class QuizAPI extends BaseAPI<QuizType> {
   constructor () {
     super('/quizzes')
-this.defaultObject = {
-       id: null,
-       school_id: null,
-       name: null,
-       time_limit: null,
-       starts_at: null,
-       ends_at: null,
-       start_time: null,
-       end_time: null,
-       description: null,
-       is_visible: true,
-       quiz_type: null,
-       content: null,
-       solution: null,
-       show_answer_date: null,
-       no_score_questions: null,
-       timer: null,
-       created_at: null,
-       updated_at: null
-     }
+    this.defaultObject = {
+      id: null,
+      school_id: null,
+      name: null,
+      time_limit: null,
+      starts_at: null,
+      ends_at: null,
+      start_time: null,
+      end_time: null,
+      description: null,
+      is_visible: true,
+      quiz_type: null,
+      content: null,
+      solution: null,
+      show_answer_date: null,
+      no_score_questions: null,
+      timer: null,
+      created_at: null,
+      updated_at: null
+    }
     this.endpoints = {
       ...this.endpoints,
       resultsWithRank: (quizId: number) => `${this.baseEndpoint}/${quizId}/results-with-rank`,
-      assignParticipants: (quizId: number) => `${this.baseEndpoint}/${quizId}/participants`,
+      assignParticipants: (quizId: number) => `${this.baseEndpoint}/${quizId}/participants`
     }
   }
 
@@ -107,7 +109,7 @@ this.defaultObject = {
     return this.getAxiosInstanceWithToken().post(this.endpoints.assignParticipants!(quizId), { class_ids: classIds })
   }
 
-  getNormalizedItem (item: QuizType) {
+  override getNormalizedItem (item: QuizType) {
     item = super.getNormalizedItem(item)
     item.starts_at = item.starts_at ?? item.start_time
     item.ends_at = item.ends_at ?? item.end_time

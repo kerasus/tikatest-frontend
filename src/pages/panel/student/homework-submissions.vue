@@ -3,19 +3,33 @@
     <h4 class="q-ma-none q-mb-lg">تکالیف ارسال شده</h4>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="submissions.length === 0" class="text-center q-pa-lg">
-      <q-icon name="assignment_turned_in" size="100px" color="primary" />
+    <div
+      v-else-if="submissions.length === 0"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="assignment_turned_in"
+        size="100px"
+        color="primary" />
       <p class="text-subtitle1 q-mt-md">هیچ تکلیفی ارسال نشده است</p>
     </div>
 
     <!-- Submissions List -->
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="item in submissions" :key="item.id" class="col-12">
+    <div
+      v-else
+      class="row q-col-gutter-md">
+      <div
+        v-for="item in submissions"
+        :key="item.id"
+        class="col-12">
         <q-card>
           <q-card-section>
             <div class="row items-start q-col-gutter-md">
@@ -61,6 +75,8 @@ import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import type { HomeworkOwnerType } from 'src/repositories/homework'
 
+const homeworkApi = new HomeworkAPI()
+
 const $q = useQuasar()
 
 const submissions = ref<HomeworkOwnerType[]>([])
@@ -79,7 +95,7 @@ const formatDate = (dateString: string): string => {
 const loadSubmissions = async () => {
   loading.value = true
   try {
-    const response = await HomeworkAPI.prototype.mySubmissions({ length: 100 })
+    const response = await homeworkApi.mySubmissions({ length: 100 })
     submissions.value = response.data.data || []
   } catch (error: any) {
     $q.notify({

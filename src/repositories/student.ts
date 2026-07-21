@@ -7,6 +7,8 @@ export type StudentType = {
   full_name: string | null
   email: string | null
   username: string | null
+  password: string | null
+  class_id: number | null
   student_phone: string | null
   melli_code: string | null
   student_code: string | null
@@ -42,6 +44,8 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       full_name: null,
       email: null,
       username: null,
+      password: null,
+      class_id: null,
       student_phone: null,
       melli_code: null,
       student_code: null,
@@ -73,7 +77,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       reportCard: '/student-portal/report-card',
       absences: '/student-portal/absences',
       disciplinary: '/student-portal/disciplinary',
-      studySessions: '/student-portal/study-sessions',
+      studySessions: '/student-portal/study-sessions'
     }
   }
 

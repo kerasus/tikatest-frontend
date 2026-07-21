@@ -81,6 +81,10 @@ import LessonAPI from 'src/repositories/lesson'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { ListType, GradeType } from 'src/repositories/grade'
 
+const gradeApi = new GradeAPI()
+const lessonApi = new LessonAPI()
+const schoolClassApi = new SchoolClassAPI()
+
 const $q = useQuasar()
 
 const grades = ref<GradeType[]>([])
@@ -136,7 +140,7 @@ async function loadGrades () {
     if (filters.class_id) params.class_ids = [filters.class_id]
     if (filters.grade_type) params.grade_type = filters.grade_type
 
-    const result = await GradeAPI.prototype.index(params)
+    const result = await gradeApi.index(params)
     grades.value = result.data
     pagination.value.rowsNumber = result.total
   } catch (error) {
@@ -151,12 +155,12 @@ async function loadGrades () {
 }
 
 async function loadLessons () {
-  const result = await LessonAPI.prototype.index({ length: 100 })
+  const result = await lessonApi.index({ length: 100 })
   lessonOptions.value = result.data
 }
 
 async function loadClasses () {
-  const result = await SchoolClassAPI.prototype.index({ length: 100 })
+  const result = await schoolClassApi.index({ length: 100 })
   classOptions.value = result.data
 }
 

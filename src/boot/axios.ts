@@ -33,8 +33,8 @@ function getAxiosInstanceManager (apiServer: string) {
   // const envStore = useEnvStore()
   // const frontendApiBase: string = envStore.frontendApiBase
   const frontendApiBase: string = apiServer
-  const getMainTokenAddress: string = `${frontendApiBase}/login`
-  const getRefreshTokenAddress: string = `${frontendApiBase}/refresh-token`
+  const getMainTokenAddress: string = `${frontendApiBase}/auth/login`
+  const getRefreshTokenAddress: string = `${frontendApiBase}/auth/refresh-token`
 
   const token = ref<TokenData>({
     accessToken: null,

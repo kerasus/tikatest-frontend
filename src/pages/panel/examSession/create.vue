@@ -20,8 +20,7 @@
                 outlined
                 emit-value
                 map-options
-                :rules="[val => !!val || 'درس را انتخاب کنید']"
-              />
+                :rules="[val => !!val || 'درس را انتخاب کنید']" />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -33,14 +32,22 @@
                 outlined
                 emit-value
                 map-options
-                :rules="[val => !!val || 'کلاس را انتخاب کنید']"
-              />
+                :rules="[val => !!val || 'کلاس را انتخاب کنید']" />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="form.gregorian_date" label="تاریخ Exam *" outlined type="date" :rules="[val => !!val || 'تاریخ را وارد کنید']" />
+              <q-input
+                v-model="form.gregorian_date"
+                label="تاریخ Exam *"
+                outlined
+                type="date"
+                :rules="[val => !!val || 'تاریخ را وارد کنید']" />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="form.persian_date" label="تاریخ شمسی" outlined dir="ltr" />
+              <q-input
+                v-model="form.persian_date"
+                label="تاریخ شمسی"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-4">
               <q-select
@@ -50,14 +57,20 @@
                 outlined
                 emit-value
                 map-options
-                :rules="[val => !!val || 'نوع نمره را انتخاب کنید']"
-              />
+                :rules="[val => !!val || 'نوع نمره را انتخاب کنید']" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.grade_name_for_other_type" label="نام نوع نمره (برای سایر)" outlined />
+              <q-input
+                v-model="form.grade_name_for_other_type"
+                label="نام نوع نمره (برای سایر)"
+                outlined />
             </div>
             <div class="col-12 col-md-3">
-              <q-input v-model="form.min_grade" label="حداقل نمره قبولی" outlined type="number" />
+              <q-input
+                v-model="form.min_grade"
+                label="حداقل نمره قبولی"
+                outlined
+                type="number" />
             </div>
             <div class="col-12 col-md-3">
               <q-select
@@ -67,8 +80,7 @@
                 outlined
                 emit-value
                 map-options
-                default-value="false"
-              />
+                default-value="false" />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -78,8 +90,7 @@
                 outlined
                 emit-value
                 map-options
-                default-value="false"
-              />
+                default-value="false" />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -91,14 +102,21 @@
                 outlined
                 emit-value
                 map-options
-                clearable
-              />
+                clearable />
             </div>
           </div>
 
           <div class="q-mt-lg">
-            <q-btn type="submit" color="primary" label="ثبت آزمون" :loading="saving" class="q-ml-sm" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.ExamSession.List' }" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت آزمون"
+              :loading="saving"
+              class="q-ml-sm" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.ExamSession.List' }" />
           </div>
         </q-form>
       </q-card-section>
@@ -133,7 +151,7 @@ const gradeTypeOptions = [
   { label: 'میان ترم دوم', value: 'mid_term_2' },
   { label: 'مستمر دوم', value: 'continuous_2' },
   { label: 'پایان ترم دوم', value: 'final_2' },
-  { label: 'سایر', value: 'other' },
+  { label: 'سایر', value: 'other' }
 ]
 
 const form = reactive({
@@ -146,13 +164,13 @@ const form = reactive({
   min_grade: null as number | null,
   is_report_card: false,
   is_descriptive: false,
-  quiz_session_id: null as number | null,
+  quiz_session_id: null as number | null
 })
 
 const loadLessons = async () => {
   try {
     const response = await lesson.index({ length: 100 })
-    lessonOptions.value = response.data.data || []
+    lessonOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading lessons:', error)
   }
@@ -161,7 +179,7 @@ const loadLessons = async () => {
 const loadClasses = async () => {
   try {
     const response = await schoolClass.index({ length: 100 })
-    classOptions.value = response.data.data || []
+    classOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading classes:', error)
   }

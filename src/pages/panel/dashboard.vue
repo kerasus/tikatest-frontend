@@ -52,6 +52,11 @@ import SchoolClassAPI from 'src/repositories/schoolClass'
 import QuizAPI from 'src/repositories/quiz'
 import HomeworkAPI from 'src/repositories/homework'
 
+const studentAPI = new StudentAPI()
+const schoolClassAPI = new SchoolClassAPI()
+const quizAPI = new QuizAPI()
+const homeworkAPI = new HomeworkAPI()
+
 const $q = useQuasar()
 
 const stats = ref({
@@ -64,10 +69,10 @@ const stats = ref({
 onMounted(async () => {
   try {
     const [studentsRes, classesRes, quizzesRes, homeworkRes] = await Promise.all([
-      StudentAPI.prototype.index({ length: 1 }),
-      SchoolClassAPI.prototype.index({ length: 1 }),
-      QuizAPI.prototype.index({ length: 1 }),
-      HomeworkAPI.prototype.index({ length: 1 })
+      studentAPI.index({ length: 1 }),
+      schoolClassAPI.index({ length: 1 }),
+      quizAPI.index({ length: 1 }),
+      homeworkAPI.index({ length: 1 })
     ])
     stats.value.students = studentsRes.total
     stats.value.classes = classesRes.total

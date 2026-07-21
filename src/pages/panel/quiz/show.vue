@@ -2,15 +2,29 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <q-btn flat icon="arrow_back" color="primary" @click="$router.back()" label="بازگشت" />
+        <q-btn
+          flat
+          icon="arrow_back"
+          color="primary"
+          label="بازگشت"
+          @click="$router.back()" />
       </div>
       <div class="col-auto">
-        <q-btn flat icon="edit" color="secondary" :to="{ name: 'Panel.Quiz.Create', params: { id: quizId } }" label="ویرایش" />
+        <q-btn
+          flat
+          icon="edit"
+          color="secondary"
+          :to="{ name: 'Panel.Quiz.Create', params: { id: quizId } }"
+          label="ویرایش" />
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <div v-else-if="quiz">
@@ -39,8 +53,7 @@
                 <q-chip
                   :color="quiz.is_visible ? 'positive' : 'grey-5'"
                   text-color="white"
-                  :label="quiz.is_visible ? 'فعال' : 'غیرفعال'"
-                />
+                  :label="quiz.is_visible ? 'فعال' : 'غیرفعال'" />
               </div>
               <div v-if="quiz.quiz_class_assignments?.length">
                 <strong>کلاس‌ها:</strong>
@@ -48,22 +61,25 @@
                   v-for="assignment in quiz.quiz_class_assignments"
                   :key="assignment.id"
                   dense
-                  class="q-ml-xs"
-                >
+                  class="q-ml-xs">
                   {{ assignment.school_class?.name || assignment.academic_level?.title }}
                 </q-chip>
               </div>
             </div>
           </div>
 
-          <div v-if="quiz.description" class="q-mt-lg">
+          <div
+            v-if="quiz.description"
+            class="q-mt-lg">
             <strong>توضیحات:</strong>
             <p>{{ quiz.description }}</p>
           </div>
         </q-card-section>
       </q-card>
 
-      <q-card v-if="quiz.booklets?.length" class="q-mb-lg">
+      <q-card
+        v-if="quiz.booklets?.length"
+        class="q-mb-lg">
         <q-card-section>
           <div class="row items-center justify-between q-mb-md">
             <div class="text-h6">دفترچه‌های آزمون ({{ quiz.booklets.length }})</div>
@@ -74,7 +90,10 @@
               v-for="booklet in quiz.booklets"
               :key="booklet.id"
               class="col-12 col-md-4">
-              <q-card bordered flat class="bg-grey-2">
+              <q-card
+                bordered
+                flat
+                class="bg-grey-2">
                 <q-card-section>
                   <div class="text-subtitle1">{{ booklet.title }}</div>
                   <div class="text-caption text-grey-8 q-mt-xs">
@@ -87,36 +106,45 @@
         </q-card-section>
       </q-card>
 
-      <q-card v-else-if="quiz.booklets" class="q-mb-lg">
+      <q-card
+        v-else-if="quiz.booklets"
+        class="q-mb-lg">
         <q-card-section>
           <div class="text-subtitle1 q-mb-sm">دفترچه‌های آزمون</div>
           <div class="text-grey-7">این آزمون فاقد دفترچه است.</div>
         </q-card-section>
       </q-card>
 
-      <q-card v-if="quiz.questions?.length" class="q-mb-lg">
+      <q-card
+        v-if="quiz.questions?.length"
+        class="q-mb-lg">
         <q-card-section>
           <div class="row items-center justify-between q-mb-md">
             <div class="text-h6">سؤالات ({{ quiz.questions.length }})</div>
           </div>
 
           <q-list separator>
-            <q-item v-for="(question, index) in quiz.questions" :key="question.id">
+            <q-item
+              v-for="(question, index) in quiz.questions"
+              :key="question.id">
               <q-item-section>
                 <q-item-label class="text-weight-medium">
                   سؤال {{ index + 1 }}: {{ question.question_text }}
                 </q-item-label>
-                <q-item-label caption class="q-mt-xs">
+                <q-item-label
+                  caption
+                  class="q-mt-xs">
                   نوع: {{ getQuestionTypeLabel(question.question_type) }} | امتیاز: {{ question.points }}
                 </q-item-label>
-                <div v-if="question.options?.length" class="q-mt-sm">
+                <div
+                  v-if="question.options?.length"
+                  class="q-mt-sm">
                   <div class="text-caption">گزینه‌ها:</div>
                   <q-list dense>
                     <q-item
                       v-for="option in question.options"
                       :key="option.id"
-                      :class="option.is_correct_answer ? 'bg-green-1' : ''"
-                    >
+                      :class="option.is_correct_answer ? 'bg-green-1' : ''">
                       <q-item-section>
                         <q-item-label>
                           {{ option.option_text }}
@@ -125,8 +153,7 @@
                             name="check_circle"
                             color="positive"
                             size="xs"
-                            class="q-ml-xs"
-                          />
+                            class="q-ml-xs" />
                         </q-item-label>
                       </q-item-section>
                     </q-item>
@@ -146,38 +173,37 @@
               flat
               icon="refresh"
               label="بروزرسانی"
-              @click="loadAttempts"
               :loading="attemptsLoading"
-            />
+              @click="loadAttempts" />
           </div>
 
-          <q-spinner v-if="attemptsLoading" color="primary" />
+          <q-spinner
+            v-if="attemptsLoading"
+            color="primary" />
 
           <q-table
             v-else
             :rows="attempts"
             :columns="attemptColumns"
             row-key="id"
-            :pagination="{ rowsPerPage: 20 }"
-          >
-            <template #body-cell-student_name="{ props }">
+            :pagination="{ rowsPerPage: 20 }">
+            <template #body-cell-student_name="props">
               <q-td :props="props">
                 {{ getStudentName(props.row) }}
               </q-td>
             </template>
-            <template #body-cell-percent="{ props }">
+            <template #body-cell-percent="props">
               <q-td :props="props">
                 {{ props.row.percent ? props.row.percent + '%' : '-' }}
               </q-td>
             </template>
-            <template #body-cell-answer_status="{ props }">
+            <template #body-cell-answer_status="props">
               <q-td :props="props">
                 <q-chip
                   :color="getStatusColor(props.row.answer_status)"
                   text-color="white"
                   :label="getStatusLabel(props.row.answer_status)"
-                  dense
-                />
+                  dense />
               </q-td>
             </template>
           </q-table>
@@ -185,7 +211,9 @@
       </q-card>
     </div>
 
-    <div v-else class="text-center q-pa-lg">
+    <div
+      v-else
+      class="text-center q-pa-lg">
       <p>آزمون یافت نشد</p>
     </div>
   </q-page>

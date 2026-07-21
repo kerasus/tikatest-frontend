@@ -35,7 +35,7 @@ export default class DisciplinaryRecordAPI extends BaseAPI<DisciplinaryRecordTyp
     }
   }
 
-  async registerAbsenteeism(data: { student_ids: number[], date: string, description?: string, case_id: number }): Promise<any> {
+  async registerAbsenteeism (data: { student_ids: number[], date: string, description?: string, case_id: number }): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.registerAbsenteeism, {
       student_ids: data.student_ids,
       date: data.date,
@@ -45,7 +45,7 @@ export default class DisciplinaryRecordAPI extends BaseAPI<DisciplinaryRecordTyp
     return response.data
   }
 
-  async viewAbsences(params: any = {}): Promise<any> {
+  async viewAbsences (params: any = {}): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.viewAbsences, { params })
     return response.data
   }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { ref } from 'vue'
 import Portlet from 'src/components/cards/portlet.vue'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'

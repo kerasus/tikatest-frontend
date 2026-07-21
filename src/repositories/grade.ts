@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 
+export type { ListType } from './BaseAPI'
 export type GradeType = {
   id: number | null
   school_id: number | null
@@ -22,6 +23,20 @@ export type GradeType = {
   explanation: string | null
   created_at: string | null
   updated_at: string | null
+  lesson?: {
+    id: number | null
+    name: string | null
+  } | null
+  student?: {
+    id: number | null
+    full_name: string | null
+    firstname?: string | null
+    lastname?: string | null
+  } | null
+  schoolClass?: {
+    id: number | null
+    name: string | null
+  } | null
 }
 
 export default class GradeAPI extends BaseAPI<GradeType> {
@@ -58,21 +73,21 @@ export default class GradeAPI extends BaseAPI<GradeType> {
     }
   }
 
-  async lessonReport(lessonId: number, params: any = {}): Promise<any> {
+  async lessonReport (lessonId: number, params: any = {}): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.lessonReport(lessonId), {
       params
     })
     return response.data
   }
 
-  async multipleLessonsReport(params: { lesson_ids: number[], class_id?: number }): Promise<any> {
+  async multipleLessonsReport (params: { lesson_ids: number[], class_id?: number }): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.multipleLessonsReport, {
       params
     })
     return response.data
   }
 
-  async studentReport(studentId: number, params: any = {}): Promise<any> {
+  async studentReport (studentId: number, params: any = {}): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentReport(studentId), {
       params
     })
@@ -81,3 +96,4 @@ export default class GradeAPI extends BaseAPI<GradeType> {
 }
 
 export const grade = new GradeAPI()
+export const gradeRepository = grade

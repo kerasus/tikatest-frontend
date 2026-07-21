@@ -2,8 +2,12 @@
   <q-page class="q-pa-md">
     <h4 class="q-ma-none q-mb-lg">کارنامه</h4>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <template v-else>
@@ -17,8 +21,7 @@
             clearable
             emit-value
             map-options
-            @update:model-value="loadReportCard"
-          />
+            @update:model-value="loadReportCard" />
         </div>
       </div>
 
@@ -29,21 +32,25 @@
             :rows="grades"
             :columns="columns"
             row-key="id"
-            :pagination="{ rowsPerPage: 20 }"
-          >
-            <template #body-cell-lesson="{ props }">
-              <q-td :props="props">{{ props.row.lesson?.name || '-' }}</q-td>
+            :pagination="{ rowsPerPage: 20 }">
+            <template #body-cell-lesson="{ row }">
+              <q-td>{{ row.lesson?.name || '-' }}</q-td>
             </template>
-            <template #body-cell-class="{ props }">
-              <q-td :props="props">{{ props.row.schoolClass?.name || '-' }}</q-td>
+            <template #body-cell-class="{ row }">
+              <q-td>{{ row.schoolClass?.name || '-' }}</q-td>
             </template>
-            <template #body-cell-raw_grade="{ props }">
-              <q-td :props="props">
-                <q-chip :color="getGradeColor(props.row)" text-color="white" :label="props.row.raw_grade" />
+            <template #body-cell-raw_grade="{ row }">
+              <q-td>
+                <q-chip
+                  :color="getGradeColor(row)"
+                  text-color="white"
+                  :label="row.raw_grade" />
               </q-td>
             </template>
           </q-table>
-          <div v-else class="text-center q-pa-lg">
+          <div
+            v-else
+            class="text-center q-pa-lg">
             <p>هیچ کارنامه‌ای یافت نشد</p>
           </div>
         </q-card-section>
@@ -62,7 +69,7 @@ const loading = ref(false)
 const grades = ref<any[]>([])
 
 const filters = reactive({
-  grade_type: null as string | null,
+  grade_type: null as string | null
 })
 
 const gradeTypeOptions = [
@@ -74,16 +81,21 @@ const gradeTypeOptions = [
   { label: 'میان ترم دوم', value: 'mid_term_2' },
   { label: 'مستمر دوم', value: 'continuous_2' },
   { label: 'پایان ترم دوم', value: 'final_2' },
-  { label: 'سایر', value: 'other' },
+  { label: 'سایر', value: 'other' }
 ]
 
 const columns = [
   { name: 'lesson', label: 'درس', field: 'lesson', align: 'center' as const },
   { name: 'class', label: 'کلاس', field: 'class', align: 'center' as const },
   { name: 'raw_grade', label: 'نمره', field: 'raw_grade', align: 'center' as const },
-  { name: 'calculated_grade', label: 'نمره محاسبه', field: 'calculated_grade', align: 'center' as const },
+  {
+    name: 'calculated_grade',
+    label: 'نمره محاسبه',
+    field: 'calculated_grade',
+    align: 'center' as const
+  },
   { name: 'grade_type', label: 'نوع', field: 'grade_type', align: 'center' as const },
-  { name: 'gregorian_date', label: 'تاریخ', field: 'gregorian_date', align: 'center' as const },
+  { name: 'gregorian_date', label: 'تاریخ', field: 'gregorian_date', align: 'center' as const }
 ]
 
 const getGradeColor = (grade: any): string => {

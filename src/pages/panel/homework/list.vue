@@ -63,7 +63,12 @@
           @request="onRequest">
           <template #body-cell-actions="props">
             <q-td :props="props">
-              <q-btn flat dense icon="visibility" color="primary" :to="{ name: 'Panel.Homework.Show', params: { id: props.row.id } }" />
+              <q-btn
+                flat
+                dense
+                icon="visibility"
+                color="primary"
+                :to="{ name: 'Panel.Homework.Show', params: { id: props.row.id } }" />
             </q-td>
           </template>
         </q-table>
@@ -81,6 +86,12 @@ import SchoolClassAPI from 'src/repositories/schoolClass'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import type { ListType, HomeworkType } from 'src/repositories/homework'
+
+const homeworkApi = new HomeworkAPI()
+const lessonApi = new LessonAPI()
+const schoolClassApi = new SchoolClassAPI()
+const academicFieldApi = new AcademicFieldAPI()
+const academicLevelApi = new AcademicLevelAPI()
 
 const $q = useQuasar()
 
@@ -114,7 +125,7 @@ const columns = [
   { name: 'lesson', label: 'درس', align: 'right' as const, field: 'lesson.name' },
   { name: 'schoolClass', label: 'کلاس', align: 'right' as const, field: 'schoolClass.name' },
   { name: 'due_date', label: 'موعد تحویل', align: 'center' as const, field: 'due_date' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const }
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
 ]
 
 async function loadHomework () {
@@ -130,7 +141,7 @@ async function loadHomework () {
     if (filters.level_id) params.level_id = filters.level_id
     if (filters.search) params.title = filters.search
 
-    const result = await HomeworkAPI.prototype.index(params)
+    const result = await homeworkApi.index(params)
     homework.value = result.data
     pagination.value.rowsNumber = result.total
   } catch (error) {
@@ -145,22 +156,22 @@ async function loadHomework () {
 }
 
 async function loadLessons () {
-  const result = await LessonAPI.prototype.index({ length: 100 })
+  const result = await lessonApi.index({ length: 100 })
   lessonOptions.value = result.data
 }
 
 async function loadClasses () {
-  const result = await SchoolClassAPI.prototype.index({ length: 100 })
+  const result = await schoolClassApi.index({ length: 100 })
   classOptions.value = result.data
 }
 
 async function loadFields () {
-  const result = await AcademicFieldAPI.prototype.index({ length: 100 })
+  const result = await academicFieldApi.index({ length: 100 })
   fieldOptions.value = result.data
 }
 
 async function loadLevels () {
-  const result = await AcademicLevelAPI.prototype.index({ length: 100 })
+  const result = await academicLevelApi.index({ length: 100 })
   levelOptions.value = result.data
 }
 

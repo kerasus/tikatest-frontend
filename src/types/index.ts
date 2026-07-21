@@ -30,8 +30,8 @@ export type QTableColumnItem = {
 }
 
 export type FormBuilderInputType = {
-  type: string | Component;
-  name: string;
+  type?: string | Component;
+  name?: string;
   value?: any;
   responseKey?: string;
   tabindex?: number;
@@ -44,6 +44,37 @@ export type FormBuilderInputType = {
   clearable?: boolean;
   class?: string;
   hint?: string
+  placeholder?: string;
+  filled?: boolean;
+  fillMask?: string;
+  reverseFillMask?: boolean;
+  lazyRules?: boolean;
+  outlined?: boolean;
+  readonly?: boolean;
+  dense?: boolean;
+  rounded?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+  title?: string;
+  color?: string | boolean;
+
+  // date/time
+  calendar?: 'persian' | 'gregorian';
+  range?: boolean;
+  defaultYearMonth?: string;
+  todayBtn?: boolean;
+  closeColorBtn?: string;
+  mask?: string;
+  persistentMenu?: boolean;
+  daysOptions?: number[];
+  displayDateTime?: string;
+  toggleMenu?: boolean;
+  calendarIcon?: string;
+  clockIcon?: string;
+  withTime?: boolean;
+  limitPast?: boolean;
+  convertToZone?: boolean;
+  iso8601?: boolean;
 
   // select inputs
   options?: any[];
@@ -62,5 +93,4 @@ export type FormBuilderInputType = {
   limitFuture?: boolean;
 
   // checkbox
-  color?: string;
 }

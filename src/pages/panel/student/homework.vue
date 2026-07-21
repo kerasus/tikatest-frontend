@@ -3,19 +3,33 @@
     <h4 class="q-ma-none q-mb-lg">تکالیف من</h4>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="homeworks.length === 0" class="text-center q-pa-lg">
-      <q-icon name="assignment" size="100px" color="primary" />
+    <div
+      v-else-if="homeworks.length === 0"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="assignment"
+        size="100px"
+        color="primary" />
       <p class="text-subtitle1 q-mt-md">هیچ تکلیفی برای شما موجود نیست</p>
     </div>
 
     <!-- Homeworks List -->
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="homework in homeworks" :key="homework.id" class="col-12">
+    <div
+      v-else
+      class="row q-col-gutter-md">
+      <div
+        v-for="homework in homeworks"
+        :key="homework.id"
+        class="col-12">
         <q-card>
           <q-card-section>
             <div class="row items-start q-col-gutter-md">
@@ -54,7 +68,10 @@
 
           <q-card-section v-if="homework.owners?.length > 0">
             <strong>وضعیت تکلیف:</strong>
-            <q-list v-for="owner in homework.owners" :key="owner.id" class="q-mt-md">
+            <q-list
+              v-for="owner in homework.owners"
+              :key="owner.id"
+              class="q-mt-md">
               <q-item>
                 <q-item-section>
                   <q-item-label>
@@ -63,7 +80,9 @@
                       text-color="white"
                       :label="owner.submitted_at ? 'ارسال شده' : 'در انتظار ارسال'" />
                   </q-item-label>
-                  <q-item-label caption v-if="owner.submitted_at">
+                  <q-item-label
+                    v-if="owner.submitted_at"
+                    caption>
                     زمان ارسال: {{ formatDate(owner.submitted_at) }}
                   </q-item-label>
                 </q-item-section>
@@ -121,8 +140,8 @@ const getStatusLabel = (homework: any): string => {
 const loadHomeworks = async () => {
   loading.value = true
   try {
-    const response = await HomeworkAPI.prototype.myHomework({ length: 100 })
-    homeworks.value = response.data.data || []
+    const response = await new HomeworkAPI().myHomework({ length: 100 })
+    homeworks.value = response.data || []
   } catch (error: any) {
     $q.notify({
       type: 'negative',
@@ -138,5 +157,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

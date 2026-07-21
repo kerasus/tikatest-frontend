@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 
+export type { ListType } from './BaseAPI'
 export type SchoolClassType = {
   id: number | null
   school_id: number | null

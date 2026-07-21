@@ -30,16 +30,27 @@
               mask="date"
               :rules="['date']">
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="form.date" color="primary" />
+                <q-icon
+                  name="event"
+                  class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale">
+                    <q-date
+                      v-model="form.date"
+                      color="primary" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
             </q-input>
           </div>
           <div class="col-12 col-md-4">
-            <q-input v-model="form.description" label="توضیحات" outlined dense />
+            <q-input
+              v-model="form.description"
+              label="توضیحات"
+              outlined
+              dense />
           </div>
         </div>
 
@@ -61,7 +72,11 @@
         </div>
 
         <div class="text-center q-mt-lg">
-          <q-btn color="primary" label="ثبت غیبت" @click="submitForm" :loading="loading" />
+          <q-btn
+            color="primary"
+            label="ثبت غیبت"
+            :loading="loading"
+            @click="submitForm" />
         </div>
       </q-card-section>
     </q-card>

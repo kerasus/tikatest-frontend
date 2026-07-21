@@ -16,6 +16,15 @@ export type ExamSessionType = {
   created_by: number | null
   created_at: string | null
   updated_at: string | null
+  grades?: any[]
+  lesson?: {
+    id: number | null
+    name: string | null
+  } | null
+  schoolClass?: {
+    id: number | null
+    name: string | null
+  } | null
 }
 
 export default class ExamSessionAPI extends BaseAPI<ExamSessionType> {

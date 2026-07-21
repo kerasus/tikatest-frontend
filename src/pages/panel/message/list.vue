@@ -40,7 +40,9 @@
       <q-separator />
 
       <q-card-section>
-        <q-list bordered separator>
+        <q-list
+          bordered
+          separator>
           <q-item
             v-for="msg in messages"
             :key="msg.id"
@@ -48,7 +50,9 @@
             :to="{ name: 'Panel.Message.Show', params: { id: msg.id } }"
             :class="{ 'bg-blue-1': !msg.owners?.some((o: any) => o.is_read) }">
             <q-item-section avatar>
-              <q-avatar color="primary" text-color="white">
+              <q-avatar
+                color="primary"
+                text-color="white">
                 {{ getInitials(msg.sender) }}
               </q-avatar>
             </q-item-section>
@@ -56,15 +60,22 @@
               <q-item-label class="text-weight-medium">
                 {{ msg.subject || '(بدون موضوع)' }}
               </q-item-label>
-              <q-item-label caption lines="2">
+              <q-item-label
+                caption
+                lines="2">
                 {{ msg.body }}
               </q-item-label>
-              <q-item-label caption class="text-grey-7">
+              <q-item-label
+                caption
+                class="text-grey-7">
                 {{ formatDate(msg.sent_at) }}
               </q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-badge v-if="!msg.owners?.some((o: any) => o.is_read)" color="orange" label="جدید" />
+              <q-badge
+                v-if="!msg.owners?.some((o: any) => o.is_read)"
+                color="orange"
+                label="جدید" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -79,6 +90,9 @@ import { useQuasar } from 'quasar'
 import MessageAPI from 'src/repositories/message'
 import UserAPI from 'src/repositories/user'
 import type { ListType, MessageType } from 'src/repositories/message'
+
+const messageApi = new MessageAPI()
+const userApi = new UserAPI()
 
 const $q = useQuasar()
 
@@ -117,7 +131,7 @@ async function loadMessages () {
     if (filters.receiver_id) params.receiver_ids = [filters.receiver_id]
     if (filters.search) params.subject = filters.search
 
-    const result = await MessageAPI.prototype.index(params)
+    const result = await messageApi.index(params)
     messages.value = result.data
   } catch (error) {
     $q.notify({
@@ -132,7 +146,7 @@ async function loadMessages () {
 
 async function loadUsers () {
   try {
-    const result = await UserAPI.prototype.index({ length: 100 })
+    const result = await userApi.index({ length: 100 })
     userOptions.value = result.data.map((item: any) => ({
       id: item.id,
       full_name: item.full_name || `${item.firstname} ${item.lastname}`,

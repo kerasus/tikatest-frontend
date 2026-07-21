@@ -5,12 +5,19 @@
         <h4 class="q-ma-none">جزئیات آزمون</h4>
       </div>
       <div class="col-auto">
-        <q-btn flat label="بازگشت" :to="{ name: 'Panel.ExamSession.List' }" />
+        <q-btn
+          flat
+          label="بازگشت"
+          :to="{ name: 'Panel.ExamSession.List' }" />
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <template v-else-if="session">
@@ -51,14 +58,13 @@
             :rows="grades"
             :columns="gradeColumns"
             row-key="id"
-            :pagination="{ rowsPerPage: 10 }"
-          >
-            <template #body-cell-student="{ props }">
+            :pagination="{ rowsPerPage: 10 }">
+            <template #body-cell-student="props">
               <q-td :props="props">
                 {{ props.row.student?.full_name || '-' }}
               </q-td>
             </template>
-            <template #body-cell-raw_grade="{ props }">
+            <template #body-cell-raw_grade="props">
               <q-td :props="props">
                 <span :class="getGradeColor(props.row)">
                   {{ props.row.raw_grade ?? '-' }}
@@ -94,14 +100,14 @@ const gradeTypeMap: Record<string, string> = {
   mid_term_2: 'میان ترم دوم',
   continuous_2: 'مستمر دوم',
   final_2: 'پایان ترم دوم',
-  other: 'سایر',
+  other: 'سایر'
 }
 
 const gradeColumns = [
   { name: 'student', label: 'دانش آموز', field: 'student', align: 'center' as const },
   { name: 'raw_grade', label: 'نمره', field: 'raw_grade', align: 'center' as const },
   { name: 'calculated_grade', label: 'نمره محاسبه شده', field: 'calculated_grade', align: 'center' as const },
-  { name: 'z_score', label: 'Z نمره', field: 'z_score', align: 'center' as const },
+  { name: 'z_score', label: 'Z نمره', field: 'z_score', align: 'center' as const }
 ]
 
 const getGradeTypeLabel = (value: string | null): string => {
@@ -118,8 +124,8 @@ onMounted(async () => {
   try {
     const id = parseInt(route.params.id as string)
     const response = await examSession.get(id)
-    session.value = response.data
-    grades.value = response.data.grades || []
+    session.value = response
+    grades.value = response.grades || []
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری اطلاعات آزمون' })
   } finally {

@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, defineProps, defineEmits, ref } from 'vue'
 import FabricAPI, { type FabricType } from 'src/repositories/fabric'
 

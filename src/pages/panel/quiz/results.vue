@@ -1,21 +1,43 @@
 <template>
   <q-page class="quiz-results-page">
-    <q-layout view="lHh Lpr lFf" container class="results-layout">
-      <q-header elevated class="bg-white text-dark">
+    <q-layout
+      view="lHh Lpr lFf"
+      container
+      class="results-layout">
+      <q-header
+        elevated
+        class="bg-white text-dark">
         <q-toolbar>
-          <q-btn flat dense round icon="menu" aria-label="Menu" @click="drawerOpen = !drawerOpen" />
+          <q-btn
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="drawerOpen = !drawerOpen" />
           <q-toolbar-title class="text-subtitle1">
-            نتایج آزمون: {{ quiz?.name || '...' }}
+            نتایج آزمون: {{ quizData?.name || '...' }}
           </q-toolbar-title>
-          <q-btn flat label="بازگشت" :to="{ name: 'Panel.Quiz.List' }" />
+          <q-btn
+            flat
+            label="بازگشت"
+            :to="{ name: 'Panel.Quiz.List' }" />
         </q-toolbar>
       </q-header>
 
-      <q-drawer v-model="drawerOpen" show-if-above bordered :width="320" class="results-drawer">
+      <q-drawer
+        v-model="drawerOpen"
+        show-if-above
+        bordered
+        :width="320"
+        class="results-drawer">
         <div class="q-pa-md">
           <div class="text-subtitle1 q-mb-md">گزارش آزمون</div>
 
-          <q-list bordered separator class="rounded-borders">
+          <q-list
+            bordered
+            separator
+            class="rounded-borders">
             <q-item>
               <q-item-section>
                 <q-item-label>تعداد شرکت‌کنندگان</q-item-label>
@@ -25,19 +47,31 @@
             <q-item>
               <q-item-section>
                 <q-item-label>میانگین پاسخ‌گویی</q-item-label>
-                <q-item-label caption dir="ltr">{{ averagePercent }}</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr">{{ averagePercent }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label>بیشترین درصد</q-item-label>
-                <q-item-label caption dir="ltr" class="text-positive">{{ highestPercent }}</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr"
+                  class="text-positive">{{
+                    highestPercent
+                  }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label>کمترین درصد</q-item-label>
-                <q-item-label caption dir="ltr" class="text-negative">{{ lowestPercent }}</q-item-label>
+                <q-item-label
+                  caption
+                  dir="ltr"
+                  class="text-negative">{{
+                    lowestPercent
+                  }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -47,7 +81,12 @@
           <div class="legend-block q-mb-md">
             <div class="row items-center q-mb-xs">
               <div class="col">پاسخ داوطلب:</div>
-              <div class="col-auto"><q-icon name="check_circle_outline" color="primary" size="18px" /></div>
+              <div class="col-auto">
+                <q-icon
+                  name="check_circle_outline"
+                  color="primary"
+                  size="18px" />
+              </div>
             </div>
             <div class="row items-center q-mb-xs">
               <div class="col">پاسخ صحیح:</div>
@@ -60,20 +99,25 @@
             class="full-width"
             flat
             label="بازگشت به لیست آزمون‌ها"
-            :to="{ name: 'Panel.Quiz.List' }"
-          />
+            :to="{ name: 'Panel.Quiz.List' }" />
         </div>
       </q-drawer>
 
       <q-page-container>
         <q-page class="q-pa-md">
-          <div v-if="loading" class="text-center q-pa-xl">
-            <q-spinner color="primary" size="100px" />
+          <div
+            v-if="loading"
+            class="text-center q-pa-xl">
+            <q-spinner
+              color="primary"
+              size="100px" />
             <div class="q-mt-md">در حال بارگذاری نتایج...</div>
           </div>
 
           <template v-else-if="results">
-            <q-card flat bordered>
+            <q-card
+              flat
+              bordered>
               <q-card-section>
                 <div class="text-h6">رتبه‌بندی دانش‌آموزان</div>
               </q-card-section>
@@ -86,46 +130,50 @@
                   row-key="student_id"
                   flat
                   bordered
-                  :pagination="{ rowsPerPage: 20 }"
-                >
-                  <template #body-cell-rank="{ props }">
-                    <q-td :props="props">
-                      <q-chip :color="getRankColor(props.row.rank)" text-color="white" :label="String(props.row.rank)" />
+                  :pagination="{ rowsPerPage: 20 }">
+                  <template #body-cell-rank="{ row }">
+                    <q-td>
+                      <q-chip
+                        :color="getRankColor(row.rank)"
+                        text-color="white"
+                        :label="String(row.rank)" />
                     </q-td>
                   </template>
-                  <template #body-cell-percent="{ props }">
-                    <q-td :props="props">
-                      <span dir="ltr">{{ formatPercent(props.row.percent) }}</span>
+                  <template #body-cell-percent="{ row }">
+                    <q-td>
+                      <span dir="ltr">{{ formatPercent(row.percent) }}</span>
                     </q-td>
                   </template>
-                  <template #body-cell-started_at="{ props }">
-                    <q-td :props="props">
-                      <span dir="ltr">{{ formatDateTime(props.row.started_at) }}</span>
+                  <template #body-cell-started_at="{ row }">
+                    <q-td>
+                      <span dir="ltr">{{ formatDateTime(row.started_at) }}</span>
                     </q-td>
                   </template>
-                  <template #body-cell-ended_at="{ props }">
-                    <q-td :props="props">
-                      <span dir="ltr">{{ formatDateTime(props.row.ended_at) }}</span>
+                  <template #body-cell-ended_at="{ row }">
+                    <q-td>
+                      <span dir="ltr">{{ formatDateTime(row.ended_at) }}</span>
                     </q-td>
                   </template>
-                  <template #body-cell-booklet_scores="{ props }">
-                    <q-td :props="props">
-                      <div v-if="props.row.booklet_scores?.length">
+                  <template #body-cell-booklet_scores="{ row }">
+                    <q-td>
+                      <div v-if="row.booklet_scores?.length">
                         <div
-                          v-for="bs in props.row.booklet_scores"
+                          v-for="bs in row.booklet_scores"
                           :key="bs.id"
                           dir="ltr"
                           class="text-caption q-mb-xs">
                           {{ bs.title }}: {{ bs.percent }}%
                         </div>
                       </div>
-                      <span v-else class="text-grey-6">-</span>
+                      <span
+                        v-else
+                        class="text-grey-6">-</span>
                     </q-td>
                   </template>
                 </q-table>
-                <div v-else class="text-center q-pa-lg text-grey-7">
-                  هنوز نتیجه‌ای ثبت نشده است
-                </div>
+                <div
+                  v-else
+                  class="text-center q-pa-lg text-grey-7">هنوز نتیجه‌ای ثبت نشده است</div>
               </q-card-section>
             </q-card>
           </template>
@@ -155,10 +203,13 @@ const columns = [
   { name: 'percent', label: 'درصد', field: 'percent', align: 'center' as const },
   { name: 'started_at', label: 'زمان شروع', field: 'started_at', align: 'center' as const },
   { name: 'ended_at', label: 'زمان ارسال پاسخنامه', field: 'ended_at', align: 'center' as const },
-  { name: 'booklet_scores', label: 'درصد دفترچه‌ها', field: 'booklet_scores', align: 'center' as const }
+  {
+    name: 'booklet_scores',
+    label: 'درصد دفترچه‌ها',
+    field: 'booklet_scores',
+    align: 'center' as const
+  }
 ]
-
-const quiz = computed(() => quizData.value)
 
 const getRankColor = (rank: number): string => {
   if (rank === 1) return 'amber-5'

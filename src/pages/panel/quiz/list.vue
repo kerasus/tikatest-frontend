@@ -45,8 +45,18 @@
           @request="onRequest">
           <template #body-cell-actions="props">
             <q-td :props="props">
-              <q-btn flat dense icon="visibility" color="primary" :to="{ name: 'Panel.Quiz.Show', params: { id: props.row.id } }" />
-              <q-btn flat dense icon="assignment" color="secondary" :to="{ name: 'Panel.Quiz.Results', params: { id: props.row.id } }" />
+              <q-btn
+                flat
+                dense
+                icon="visibility"
+                color="primary"
+                :to="{ name: 'Panel.Quiz.Show', params: { id: props.row.id } }" />
+              <q-btn
+                flat
+                dense
+                icon="assignment"
+                color="secondary"
+                :to="{ name: 'Panel.Quiz.Results', params: { id: props.row.id } }" />
             </q-td>
           </template>
         </q-table>
@@ -60,6 +70,8 @@ import { ref, onMounted, reactive } from 'vue'
 import { useQuasar } from 'quasar'
 import QuizAPI from 'src/repositories/quiz'
 import type { ListType, QuizType } from 'src/repositories/quiz'
+
+const quizApi = new QuizAPI()
 
 const $q = useQuasar()
 
@@ -94,7 +106,7 @@ const columns = [
   { name: 'start_time', label: 'شروع', align: 'center' as const, field: 'start_time' },
   { name: 'end_time', label: 'پایان', align: 'center' as const, field: 'end_time' },
   { name: 'timer', label: 'زمان (ثانیه)', align: 'center' as const, field: 'timer' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const }
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
 ]
 
 async function loadQuizzes () {
@@ -108,7 +120,7 @@ async function loadQuizzes () {
     if (filters.search) params.name = filters.search
     if (filters.is_visible !== null) params.is_visible = filters.is_visible
 
-    const result = await QuizAPI.prototype.index(params)
+    const result = await quizApi.index(params)
     quizzes.value = result.data
     pagination.value.rowsNumber = result.total
   } catch (error) {

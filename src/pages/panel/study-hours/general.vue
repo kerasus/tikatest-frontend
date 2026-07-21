@@ -17,9 +17,16 @@
               dense
               mask="date">
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="filters.date_from" color="primary" />
+                <q-icon
+                  name="event"
+                  class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale">
+                    <q-date
+                      v-model="filters.date_from"
+                      color="primary" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -33,26 +40,43 @@
               dense
               mask="date">
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="filters.date_to" color="primary" />
+                <q-icon
+                  name="event"
+                  class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale">
+                    <q-date
+                      v-model="filters.date_to"
+                      color="primary" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
             </q-input>
           </div>
           <div class="col-12 col-md-4">
-            <q-btn color="primary" label="فیلتر" @click="loadReport" :loading="loading" class="full-height" />
+            <q-btn
+              color="primary"
+              label="فیلتر"
+              :loading="loading"
+              class="full-height"
+              @click="loadReport" />
           </div>
         </div>
       </q-card-section>
     </q-card>
 
-    <q-card v-if="totalMinutes !== null" class="q-mb-md">
+    <q-card
+      v-if="totalMinutes !== null"
+      class="q-mb-md">
       <q-card-section>
         <div class="row q-col-gutter-md text-center">
           <div class="col-6 col-md-4">
-            <q-chip color="primary" text-color="white" class="full-width">
+            <q-chip
+              color="primary"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ totalMinutes }}</span>
                 <span class="text-caption">کل دقیقه</span>
@@ -60,7 +84,10 @@
             </q-chip>
           </div>
           <div class="col-6 col-md-4">
-            <q-chip color="green" text-color="white" class="full-width">
+            <q-chip
+              color="green"
+              text-color="white"
+              class="full-width">
               <div class="column">
                 <span class="text-h6">{{ totalHours }}</span>
                 <span class="text-caption">کل ساعت</span>
@@ -80,12 +107,12 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-student="{ props }">
+          <template #body-cell-student="props">
             <q-td :props="props">
               {{ props.row.student?.name }} {{ props.row.student?.lastname }}
             </q-td>
           </template>
-          <template #body-cell-lesson="{ props }">
+          <template #body-cell-lesson="props">
             <q-td :props="props">
               {{ props.row.lesson?.name || '-' }}
             </q-td>

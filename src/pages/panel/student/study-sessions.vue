@@ -5,12 +5,19 @@
         <h4 class="q-ma-none">ساعات مطالعه</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" label="ثبت ساعت جدید" :to="{ name: 'Student.StudySessions.Create' }" />
+        <q-btn
+          color="primary"
+          label="ثبت ساعت جدید"
+          :to="{ name: 'Student.StudySessions.Create' }" />
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <template v-else>
@@ -21,17 +28,21 @@
             :rows="sessions"
             :columns="columns"
             row-key="id"
-            :pagination="{ rowsPerPage: 10 }"
-          >
-            <template #body-cell-lesson="{ props }">
+            :pagination="{ rowsPerPage: 10 }">
+            <template #body-cell-lesson="props">
               <q-td :props="props">{{ props.row.lesson?.name || '-' }}</q-td>
             </template>
-            <template #body-cell-duration="{ props }">
+            <template #body-cell-duration="props">
               <q-td :props="props">{{ props.row.duration_minutes || 0 }} دقیقه</q-td>
             </template>
           </q-table>
-          <div v-else class="text-center q-pa-lg">
-            <q-icon name="menu_book" size="100px" color="primary" />
+          <div
+            v-else
+            class="text-center q-pa-lg">
+            <q-icon
+              name="menu_book"
+              size="100px"
+              color="primary" />
             <p class="text-subtitle1 q-mt-md">هنوز ساعت مطالعه‌ای ثبت نشده است</p>
           </div>
         </q-card-section>
@@ -54,7 +65,7 @@ const columns = [
   { name: 'started_at', label: 'شروع', field: 'started_at', align: 'center' as const },
   { name: 'ended_at', label: 'پایان', field: 'ended_at', align: 'center' as const },
   { name: 'duration', label: 'مدت (دقیقه)', field: 'duration', align: 'center' as const },
-  { name: 'notes', label: 'یادداشت', field: 'notes', align: 'center' as const },
+  { name: 'notes', label: 'یادداشت', field: 'notes', align: 'center' as const }
 ]
 
 onMounted(async () => {

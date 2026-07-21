@@ -1,12 +1,21 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-lg">
-      <q-btn flat icon="arrow_back" color="primary" @click="$router.back()" label="بازگشت" />
+      <q-btn
+        flat
+        icon="arrow_back"
+        color="primary"
+        label="بازگشت"
+        @click="$router.back()" />
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Quiz Details -->
@@ -36,23 +45,25 @@
                 <q-chip
                   :color="getStatusColor(quiz)"
                   text-color="white"
-                  :label="getStatusLabel(quiz)"
-                />
+                  :label="getStatusLabel(quiz)" />
               </div>
 
-              <div v-if="canAttemptQuiz" class="q-mb-md">
+              <div
+                v-if="canAttemptQuiz"
+                class="q-mb-md">
                 <q-btn
                   color="primary"
                   label="شرکت در آزمون"
                   size="lg"
-                  @click="startAttempt"
-                />
+                  @click="startAttempt" />
               </div>
             </div>
           </div>
 
           <!-- Description -->
-          <div v-if="quiz.description" class="q-mt-lg">
+          <div
+            v-if="quiz.description"
+            class="q-mt-lg">
             <strong>توضیحات:</strong>
             <p>{{ quiz.description }}</p>
           </div>
@@ -65,7 +76,9 @@
           <h6 class="q-ma-none q-mb-md">تلاش‌های قبلی</h6>
 
           <q-list>
-            <q-item v-for="attempt in attempts" :key="attempt.id">
+            <q-item
+              v-for="attempt in attempts"
+              :key="attempt.id">
               <q-item-section>
                 <q-item-label>
                   <strong>نمره:</strong> {{ attempt.percent }}%
@@ -81,7 +94,9 @@
     </div>
 
     <!-- Not Found -->
-    <div v-else class="text-center q-pa-lg">
+    <div
+      v-else
+      class="text-center q-pa-lg">
       <p>آزمون یافت نشد</p>
     </div>
   </q-page>

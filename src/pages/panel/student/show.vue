@@ -5,37 +5,45 @@
         <h4 class="q-ma-none">جزئیات دانش آموز</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" label="ویرایش" :to="{ name: 'Panel.Student.Edit', params: { id: student?.id } }" />
+        <q-btn
+          v-if="studentData"
+          color="primary"
+          label="ویرایش"
+          :to="{ name: 'Panel.Student.Edit', params: { id: studentData.id } }" />
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
-    <template v-else-if="student">
+    <template v-else-if="studentData">
       <q-card class="q-mb-md">
         <q-card-section>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام و نام خانوادگی:</div>
-              <div class="text-body1">{{ student.full_name }}</div>
+              <div class="text-body1">{{ studentData.full_name }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام کاربری:</div>
-              <div class="text-body1">{{ student.username }}</div>
+              <div class="text-body1">{{ studentData.username }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس:</div>
-              <div class="text-body1">{{ student.student_phone || '-' }}</div>
+              <div class="text-body1">{{ studentData.student_phone || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کد ملی:</div>
-              <div class="text-body1">{{ student.melli_code || '-' }}</div>
+              <div class="text-body1">{{ studentData.melli_code || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">تاریخ تولد:</div>
-              <div class="text-body1">{{ student.birth_date || '-' }}</div>
+              <div class="text-body1">{{ studentData.birth_date || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کلاس:</div>
@@ -51,7 +59,11 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <q-btn flat color="primary" label="مشاهده همه نمرات" :to="{ name: 'Student.Grade.List', params: { studentId: student.id } }" />
+          <q-btn
+            flat
+            color="primary"
+            label="مشاهده همه نمرات"
+            :to="{ name: 'Student.Grade.List', params: { studentId: studentData.id } }" />
         </q-card-section>
       </q-card>
 
@@ -61,7 +73,11 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <q-btn flat color="primary" label="مشاهده تکالیف" :to="{ name: 'Student.Homework.List', params: { studentId: student.id } }" />
+          <q-btn
+            flat
+            color="primary"
+            label="مشاهده تکالیف"
+            :to="{ name: 'Student.Homework.List', params: { studentId: studentData.id } }" />
         </q-card-section>
       </q-card>
 
@@ -74,19 +90,19 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام پدر:</div>
-              <div class="text-body1">{{ student.father_name || '-' }}</div>
+              <div class="text-body1">{{ studentData?.father_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس پدر:</div>
-              <div class="text-body1">{{ student.father_phone || '-' }}</div>
+              <div class="text-body1">{{ studentData?.father_phone || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام مادر:</div>
-              <div class="text-body1">{{ student.mother_name || '-' }}</div>
+              <div class="text-body1">{{ studentData?.mother_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس مادر:</div>
-              <div class="text-body1">{{ student.mother_phone || '-' }}</div>
+              <div class="text-body1">{{ studentData?.mother_phone || '-' }}</div>
             </div>
           </div>
         </q-card-section>
@@ -118,7 +134,7 @@ onMounted(async () => {
   try {
     const id = parseInt(route.params.id as string)
     const response = await student.get(id)
-    studentData.value = response.data
+    studentData.value = response
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری اطلاعات دانش آموز' })
   } finally {

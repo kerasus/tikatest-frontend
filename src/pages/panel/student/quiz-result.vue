@@ -1,11 +1,20 @@
 <template>
   <q-page class="quiz-result-page">
     <div class="q-mb-lg">
-      <q-btn flat icon="arrow_back" color="primary" @click="$router.back()" label="بازگشت" />
+      <q-btn
+        flat
+        icon="arrow_back"
+        color="primary"
+        label="بازگشت"
+        @click="$router.back()" />
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <div v-else-if="result">
@@ -20,7 +29,9 @@
                 <strong>درصد پاسخ‌گویی:</strong>
                 <span class="text-h5 text-positive q-ml-sm">{{ result.percent }}%</span>
               </div>
-              <div class="q-mb-md" v-if="result.total_marks !== undefined">
+              <div
+                v-if="result.total_marks !== undefined"
+                class="q-mb-md">
                 <strong>نمره کسب شده:</strong>
                 <span class="q-ml-sm">{{ result.obtained_marks }}/{{ result.total_marks }}</span>
               </div>
@@ -34,31 +45,49 @@
               </div>
             </div>
 
-            <div class="col-12 col-md-4" v-if="result.class_rank">
+            <div
+              v-if="result.class_rank"
+              class="col-12 col-md-4">
               <div class="q-mb-md">
                 <strong>رتبه در کلاس:</strong>
-                <q-chip :color="getRankColor(result.class_rank)" text-color="white" :label="result.class_rank" />
+                <q-chip
+                  :color="getRankColor(result.class_rank)"
+                  text-color="white"
+                  :label="result.class_rank" />
               </div>
-              <div class="q-mb-md" v-if="result.class_count">
+              <div
+                v-if="result.class_count"
+                class="q-mb-md">
                 <strong>تعداد شرکت‌کنندگان کلاس:</strong>
                 <span class="q-ml-sm">{{ result.class_count }}</span>
               </div>
-              <div class="q-mb-md" v-if="result.class_avg_percent">
+              <div
+                v-if="result.class_avg_percent"
+                class="q-mb-md">
                 <strong>میانگین کلاس:</strong>
                 <span class="q-ml-sm">{{ result.class_avg_percent }}%</span>
               </div>
             </div>
 
-            <div class="col-12 col-md-4" v-if="result.field_rank">
+            <div
+              v-if="result.field_rank"
+              class="col-12 col-md-4">
               <div class="q-mb-md">
                 <strong>رتبه در پایه:</strong>
-                <q-chip :color="getRankColor(result.field_rank)" text-color="white" :label="result.field_rank" />
+                <q-chip
+                  :color="getRankColor(result.field_rank)"
+                  text-color="white"
+                  :label="result.field_rank" />
               </div>
-              <div class="q-mb-md" v-if="result.field_count">
+              <div
+                v-if="result.field_count"
+                class="q-mb-md">
                 <strong>تعداد شرکت‌کنندگان پایه:</strong>
                 <span class="q-ml-sm">{{ result.field_count }}</span>
               </div>
-              <div class="q-mb-md" v-if="result.field_avg_percent">
+              <div
+                v-if="result.field_avg_percent"
+                class="q-mb-md">
                 <strong>میانگین پایه:</strong>
                 <span class="q-ml-sm">{{ result.field_avg_percent }}%</span>
               </div>
@@ -75,7 +104,11 @@
             <div class="row items-center justify-between q-mb-md">
               <div class="text-subtitle1">پاسخنامه شما</div>
               <div v-if="quiz?.solution?.length">
-                <q-btn flat dense :label="showSolution ? 'نمایش سؤالات' : 'نمایش پاسخنامه'" @click="toggleSolution" />
+                <q-btn
+                  flat
+                  dense
+                  :label="showSolution ? 'نمایش سؤالات' : 'نمایش پاسخنامه'"
+                  @click="toggleSolution" />
               </div>
             </div>
 
@@ -86,16 +119,14 @@
               dense
               hide-header
               hide-bottom
-              class="answer-table"
-            >
+              class="answer-table">
               <template #body-cell-question_number="props">
                 <q-td :props="props">
                   <q-btn
                     :color="getAnswerStatusColor(props.row.question_number)"
                     :icon="getAnswerStatusIcon(props.row.question_number)"
                     size="sm"
-                    round
-                  />
+                    round />
                 </q-td>
               </template>
               <template #body-cell-user_answer="props">
@@ -103,8 +134,7 @@
                   <q-chip
                     :color="getUserAnswerColor(props.row.question_number, props.row.user_answer)"
                     :label="props.row.user_answer || '-'"
-                    size="sm"
-                  />
+                    size="sm" />
                 </q-td>
               </template>
               <template #body-cell-correct_answer="props">
@@ -113,8 +143,7 @@
                     v-if="props.row.correct_answer"
                     color="positive"
                     :label="props.row.correct_answer"
-                    size="sm"
-                  />
+                    size="sm" />
                 </q-td>
               </template>
             </q-table>
@@ -129,8 +158,12 @@
 
           <q-card-section class="content-section">
             <!-- Question content -->
-            <div v-if="!showSolution" class="content-viewer">
-              <template v-for="(item, index) in quizContentItems" :key="'result-q-' + index">
+            <div
+              v-if="!showSolution"
+              class="content-viewer">
+              <template
+                v-for="(item, index) in quizContentItems"
+                :key="'result-q-' + index">
                 <div class="question-item q-mb-lg">
                   <div class="text-subtitle1 q-mb-sm">سؤال {{ index + 1 }}</div>
                   <q-img
@@ -138,15 +171,15 @@
                     :src="getStorageUrl(item.path)"
                     class="q-mb-md rounded-borders"
                     fit="contain"
-                    style="max-width: 100%; max-height: 400px"
-                  />
+                    style="max-width: 100%; max-height: 400px" />
                   <embed
                     v-else-if="item.type === 'pdf' && item.path"
                     :src="getStorageUrl(item.path) + '#view=Fit'"
                     type="application/pdf"
-                    style="width: 100%; height: calc(100vh - 200px)"
-                  />
-                  <div v-else-if="item.type === 'text'" class="text-content q-pa-md bg-white">
+                    style="width: 100%; height: calc(100vh - 200px)">
+                  <div
+                    v-else-if="item.type === 'text'"
+                    class="text-content q-pa-md bg-white">
                     {{ item.body }}
                   </div>
                 </div>
@@ -154,8 +187,12 @@
             </div>
 
             <!-- Solution content -->
-            <div v-else class="solution-viewer">
-              <template v-for="(item, index) in quizSolutionItems" :key="'result-s-' + index">
+            <div
+              v-else
+              class="solution-viewer">
+              <template
+                v-for="(item, index) in quizSolutionItems"
+                :key="'result-s-' + index">
                 <div class="solution-item q-mb-lg">
                   <div class="text-subtitle1 q-mb-sm">راه‌حل {{ index + 1 }}</div>
                   <q-img
@@ -163,15 +200,15 @@
                     :src="getStorageUrl(item.path)"
                     class="q-mb-md rounded-borders"
                     fit="contain"
-                    style="max-width: 100%; max-height: 400px"
-                  />
+                    style="max-width: 100%; max-height: 400px" />
                   <embed
                     v-else-if="item.type === 'pdf' && item.path"
                     :src="getStorageUrl(item.path) + '#view=Fit'"
                     type="application/pdf"
-                    style="width: 100%; height: calc(100vh - 200px)"
-                  />
-                  <div v-else-if="item.type === 'text'" class="text-content q-pa-md bg-white">
+                    style="width: 100%; height: calc(100vh - 200px)">
+                  <div
+                    v-else-if="item.type === 'text'"
+                    class="text-content q-pa-md bg-white">
                     {{ item.body }}
                   </div>
                 </div>
@@ -182,7 +219,9 @@
       </div>
     </div>
 
-    <div v-else class="text-center q-pa-lg">
+    <div
+      v-else
+      class="text-center q-pa-lg">
       <p>نتیجه‌ای برای این آزمون یافت نشد</p>
     </div>
   </q-page>
@@ -222,13 +261,13 @@ const quizSolutionItems = computed<QuizContentItem[]>(() => quiz.value?.solution
 
 const answerRows = computed<AnswerRow[]>(() => {
   if (!result.value?.responses) return []
-  
-  const noScoreQuestions = result.value.no_score_questions ? 
+
+  const noScoreQuestions = result.value.no_score_questions ?
     result.value.no_score_questions.split(',').map((n: string) => parseInt(n.trim())).filter((n: number) => !isNaN(n)) : []
-  
+
   const responses = result.value.responses as any[]
   const maxQuestion = quizContentItems.value.length || 100
-  
+
   return Array.from({ length: maxQuestion }, (_, i) => {
     const qNum = i + 1
     const response = responses.find((r: any) => r.question_number === qNum)
@@ -243,7 +282,9 @@ const answerRows = computed<AnswerRow[]>(() => {
 const getStorageUrl = (path: string): string => {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  const api = import.meta.env.VITE_API_BASE_URL || '/api'
+  // const api = import.meta.env.VITE_API_BASE_URL || '/api'
+  // ToDo: use env
+  const api = '/api'
   return `${api.replace('/api', '')}/storage/${path}`
 }
 
@@ -266,19 +307,19 @@ const getRankColor = (rank: number): string => {
 }
 
 const getAnswerStatusColor = (questionNumber: number): string => {
-  const response = answerRows.value.find(r => r.question_number === questionNumber)
+  const response = answerRows.value.find((r) => r.question_number === questionNumber)
   if (!response?.user_answer) return 'grey-5'
   return response.user_answer === response.correct_answer ? 'positive' : 'negative'
 }
 
 const getAnswerStatusIcon = (questionNumber: number): string => {
-  const response = answerRows.value.find(r => r.question_number === questionNumber)
+  const response = answerRows.value.find((r) => r.question_number === questionNumber)
   if (!response?.user_answer) return 'radio_button_unchecked'
   return response.user_answer === response.correct_answer ? 'check' : 'close'
 }
 
 const getUserAnswerColor = (questionNumber: number, answer: string): string => {
-  const response = answerRows.value.find(r => r.question_number === questionNumber)
+  const response = answerRows.value.find((r) => r.question_number === questionNumber)
   if (!response?.correct_answer) return 'grey-5'
   return answer === response.correct_answer ? 'positive' : 'negative'
 }
@@ -292,10 +333,10 @@ const loadResult = async () => {
   try {
     const quizData = await quizRepository.get(quizId)
     quiz.value = quizData
-    
+
     const attemptsRes = await quizSession.getMyAttempts()
     const session = attemptsRes.data?.find((a: any) => a.quiz_id === quizId && a.answer_status === 'sent')
-    
+
     if (session) {
       result.value = {
         quiz_id: quizId,

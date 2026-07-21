@@ -15,7 +15,7 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-lesson="{ props }">
+          <template #body-cell-lesson="props">
             <q-td :props="props">
               {{ props.row.lesson?.name || '-' }}
             </q-td>

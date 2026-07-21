@@ -3,19 +3,33 @@
     <h4 class="q-ma-none q-mb-lg">پیام‌های ارسال شده</h4>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="messages.length === 0" class="text-center q-pa-lg">
-      <q-icon name="send" size="100px" color="primary" />
+    <div
+      v-else-if="messages.length === 0"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="send"
+        size="100px"
+        color="primary" />
       <p class="text-subtitle1 q-mt-md">هنوز پیامی ارسال نکرده‌اید</p>
     </div>
 
     <!-- Messages List -->
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="msg in messages" :key="msg.id" class="col-12">
+    <div
+      v-else
+      class="row q-col-gutter-md">
+      <div
+        v-for="msg in messages"
+        :key="msg.id"
+        class="col-12">
         <q-card>
           <q-card-section>
             <div class="row items-start q-col-gutter-md">

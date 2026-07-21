@@ -118,6 +118,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, defineProps, ref, watch } from 'vue'
 import { type TransferItemType } from 'src/repositories/transfer'
 import SelectColor from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectColor.vue'

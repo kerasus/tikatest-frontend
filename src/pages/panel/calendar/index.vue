@@ -9,7 +9,10 @@
     <q-card>
       <q-card-section>
         <div class="text-center q-pa-xl">
-          <q-icon name="calendar_today" size="100px" color="primary" />
+          <q-icon
+            name="calendar_today"
+            size="100px"
+            color="primary" />
           <p class="text-subtitle1 q-mt-md">تقویم اجرایی - در حال توسعه</p>
         </div>
       </q-card-section>

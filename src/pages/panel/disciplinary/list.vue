@@ -5,18 +5,30 @@
         <h4 class="q-ma-none">امور انضباطی</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" label="ثبت مورد جدید" :to="{ name: 'Panel.Disciplinary.Create' }" />
+        <q-btn
+          color="primary"
+          label="ثبت مورد جدید"
+          :to="{ name: 'Panel.Disciplinary.Create' }" />
       </div>
     </div>
 
     <q-card>
       <q-card-section>
-        <div v-if="loading" class="text-center q-pa-lg">
-          <q-spinner color="primary" size="100px" />
+        <div
+          v-if="loading"
+          class="text-center q-pa-lg">
+          <q-spinner
+            color="primary"
+            size="100px" />
         </div>
 
-        <div v-else-if="records.data.length === 0" class="text-center q-pa-lg">
-          <q-icon name="gavel" size="100px" color="primary" />
+        <div
+          v-else-if="records.data.length === 0"
+          class="text-center q-pa-lg">
+          <q-icon
+            name="gavel"
+            size="100px"
+            color="primary" />
           <p class="text-subtitle1 q-mt-md">هیچ مورد انضباطی ثبت نشده است</p>
         </div>
 
@@ -26,22 +38,35 @@
           :columns="columns"
           row-key="id"
           :pagination="pagination"
-          @request="onTableRequest"
-        >
-          <template #body-cell-student="{ props }">
+          @request="onTableRequest">
+          <template #body-cell-student="props">
             <q-td :props="props">
               {{ props.row.student?.full_name || '-' }}
             </q-td>
           </template>
-          <template #body-cell-case="{ props }">
+          <template #body-cell-case="props">
             <q-td :props="props">
               {{ props.row.disciplinaryCase?.name || '-' }}
             </q-td>
           </template>
-          <template #body-cell-actions="{ props }">
+          <template #body-cell-actions="props">
             <q-td :props="props">
-              <q-btn flat round dense icon="visibility" color="info" size="sm" @click="viewRecord(props.row.id)" />
-              <q-btn flat round dense icon="delete" color="negative" size="sm" @click="deleteRecord(props.row)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="visibility"
+                color="info"
+                size="sm"
+                @click="viewRecord(props.row.id)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="delete"
+                color="negative"
+                size="sm"
+                @click="deleteRecord(props.row)" />
             </q-td>
           </template>
         </q-table>
@@ -67,7 +92,7 @@ const columns = [
   { name: 'case', label: 'نوع مورد', field: 'case', align: 'center' as const },
   { name: 'incident_date', label: 'تاریخ واقعه', field: 'incident_date', align: 'center' as const },
   { name: 'description', label: 'توضیحات', field: 'description', align: 'center' as const },
-  { name: 'actions', label: 'عملیات', field: 'actions', align: 'center' as const },
+  { name: 'actions', label: 'عملیات', field: 'actions', align: 'center' as const }
 ]
 
 const pagination = ref({
@@ -75,7 +100,7 @@ const pagination = ref({
   descending: true,
   page: 1,
   rowsPerPage: 10,
-  rowsNumber: 0,
+  rowsNumber: 0
 })
 
 const loadRecords = async () => {
@@ -85,7 +110,7 @@ const loadRecords = async () => {
       length: pagination.value.rowsPerPage,
       page: pagination.value.page,
       sortation_field: 'incident_date',
-      sortation_order: 'desc',
+      sortation_order: 'desc'
     }
     const response = await disciplinaryRecord.index(params)
     records.value = response.data
@@ -113,7 +138,7 @@ const deleteRecord = async (record: any) => {
     title: 'تایید حذف',
     message: 'مورد انضباطی حذف شود؟',
     cancel: true,
-    persistent: true,
+    persistent: true
   }).onOk(async () => {
     try {
       await disciplinaryRecord.delete(record.id)

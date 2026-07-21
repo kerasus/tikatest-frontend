@@ -6,8 +6,12 @@
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
     <template v-else-if="record">
@@ -26,7 +30,9 @@
               <div class="text-subtitle2">تاریخ واقعه:</div>
               <div class="text-body1">{{ record.incident_date || '-' }}</div>
             </div>
-            <div class="col-12" v-if="record.description">
+            <div
+              v-if="record.description"
+              class="col-12">
               <div class="text-subtitle2">توضیحات:</div>
               <div class="text-body1">{{ record.description }}</div>
             </div>
@@ -54,7 +60,7 @@ onMounted(async () => {
   try {
     const id = parseInt(route.params.id as string)
     const response = await disciplinaryRecord.get(id)
-    record.value = response.data
+    record.value = response
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری اطلاعات مورد انضباطی' })
   } finally {

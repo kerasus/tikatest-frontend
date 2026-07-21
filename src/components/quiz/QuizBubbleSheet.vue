@@ -5,23 +5,23 @@
       <div
         v-for="option in optionLabels"
         :key="option.value"
-        class="col table-label"
-      >
+        class="col table-label">
         {{ option.label }}
       </div>
       <div class="col table-label">بی‌پاسخ</div>
     </div>
 
-    <q-scroll-area class="bubble-sheet-scroll" :thumb-style="thumbStyle" :bar-style="barStyle">
+    <q-scroll-area
+      class="bubble-sheet-scroll"
+      :thumb-style="thumbStyle"
+      :bar-style="barStyle">
       <div
         v-for="questionNumber in questionNumbers"
         :key="questionNumber"
-        class="bubble-sheet-row"
-      >
+        class="bubble-sheet-row">
         <div
           class="bubble-sheet-col question-number-col"
-          :class="statusClass(questionNumber)"
-        >
+          :class="statusClass(questionNumber)">
           {{ questionNumber }}
         </div>
 
@@ -29,15 +29,13 @@
           v-for="option in optionLabels"
           :key="`${questionNumber}-${option.value}`"
           class="bubble-sheet-col choice-col"
-          :class="resultCellClass(questionNumber, option.value)"
-        >
+          :class="resultCellClass(questionNumber, option.value)">
           <template v-if="readonly && showComparison">
             <q-icon
               v-if="isMarkedChoice(questionNumber, option.value)"
               :name="comparisonIcon(questionNumber, option.value)"
               :color="comparisonColor(questionNumber, option.value)"
-              size="28px"
-            />
+              size="28px" />
           </template>
           <input
             v-else
@@ -46,21 +44,18 @@
             :value="option.value"
             :checked="getChoice(questionNumber) === option.value"
             :disabled="disabled"
-            @change="onChoiceChange(questionNumber, option.value)"
-          />
+            @change="onChoiceChange(questionNumber, option.value)">
         </div>
 
         <div
           class="bubble-sheet-col choice-col"
-          :class="resultCellClass(questionNumber, NO_ANSWER_VALUE)"
-        >
+          :class="resultCellClass(questionNumber, NO_ANSWER_VALUE)">
           <template v-if="readonly && showComparison">
             <q-icon
               v-if="isMarkedChoice(questionNumber, NO_ANSWER_VALUE)"
               :name="comparisonIcon(questionNumber, NO_ANSWER_VALUE)"
               :color="comparisonColor(questionNumber, NO_ANSWER_VALUE)"
-              size="28px"
-            />
+              size="28px" />
           </template>
           <input
             v-else
@@ -69,8 +64,7 @@
             :value="NO_ANSWER_VALUE"
             :checked="getChoice(questionNumber) === NO_ANSWER_VALUE"
             :disabled="disabled"
-            @change="onChoiceChange(questionNumber, NO_ANSWER_VALUE)"
-          />
+            @change="onChoiceChange(questionNumber, NO_ANSWER_VALUE)">
         </div>
       </div>
     </q-scroll-area>
@@ -117,14 +111,14 @@ const thumbStyle = {
   backgroundColor: '#027be3',
   width: '9px',
   opacity: 0.75
-}
+} as any
 
 const barStyle = {
   borderRadius: '9px',
   backgroundColor: '#027be3',
   width: '9px',
   opacity: 0.2
-}
+} as any
 
 const questionNumbers = computed(() =>
   Array.from({ length: props.questionCount }, (_, index) => index + 1)

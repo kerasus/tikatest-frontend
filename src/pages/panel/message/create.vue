@@ -36,22 +36,45 @@
                 multiple />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.subject" label="موضوع" outlined />
+              <q-input
+                v-model="form.subject"
+                label="موضوع"
+                outlined />
             </div>
             <div class="col-12">
-              <q-input v-model="form.body" label="متن پیام *" outlined type="textarea" rows="5" required />
+              <q-input
+                v-model="form.body"
+                label="متن پیام *"
+                outlined
+                type="textarea"
+                rows="5"
+                required />
             </div>
             <div class="col-12 col-md-6">
-              <q-checkbox v-model="form.is_sms" label="ارسال به صورت پیامک" />
+              <q-checkbox
+                v-model="form.is_sms"
+                label="ارسال به صورت پیامک" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.message_type" label="نوع پیام" outlined placeholder="inner, sms, inner-sms" />
+              <q-input
+                v-model="form.message_type"
+                label="نوع پیام"
+                outlined
+                placeholder="inner, sms, inner-sms" />
             </div>
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ارسال پیام" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Message.List' }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ارسال پیام"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Message.List' }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -63,8 +86,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import MessageAPI from 'src/repositories/message'
+import { message } from 'src/repositories/message'
 import UserAPI from 'src/repositories/user'
+
+const userApi = new UserAPI()
 
 const router = useRouter()
 const $q = useQuasar()
@@ -88,7 +113,7 @@ const recipientTypeOptions = [
 
 async function loadUsers () {
   try {
-    const result = await UserAPI.prototype.index({ length: 100 })
+    const result = await userApi.index({ length: 100 })
     userOptions.value = result.data.map((item: any) => ({
       id: item.id,
       full_name: item.full_name || `${item.firstname} ${item.lastname}`,
@@ -109,11 +134,11 @@ async function onSubmit () {
       is_mother: form.recipient_types.includes('mother')
     }))
 
-    await MessageAPI.prototype.store({
+    await message.create({
       ...form,
       receiver_ids: form.receiver_ids,
       recipient_types: recipientTypes
-    })
+    } as any)
     $q.notify({
       icon: 'check',
       message: 'پیام با موفقیت ارسال شد.',

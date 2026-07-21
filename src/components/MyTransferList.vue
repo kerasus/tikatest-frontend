@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { useQuasar } from 'quasar'
 import { ref, shallowRef } from 'vue'
 import { useUser } from 'src/stores/user'

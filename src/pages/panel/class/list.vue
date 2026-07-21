@@ -70,6 +70,9 @@ import SchoolClassAPI from 'src/repositories/schoolClass'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import type { ListType, SchoolClassType } from 'src/repositories/schoolClass'
 
+const schoolClassApi = new SchoolClassAPI()
+const academicFieldApi = new AcademicFieldAPI()
+
 const $q = useQuasar()
 
 const classes = ref<SchoolClassType[]>([])
@@ -96,7 +99,7 @@ const columns = [
   { name: 'name', required: true, label: 'نام کلاس', align: 'right' as const, field: 'name', sortable: true },
   { name: 'field', label: 'رشته', align: 'right' as const, field: 'academicField.name' },
   { name: 'level', label: 'پایه', align: 'right' as const, field: 'academicLevel.name' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const }
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
 ]
 
 async function loadClasses () {
@@ -109,7 +112,7 @@ async function loadClasses () {
     if (filters.field_id) params.field_id = filters.field_id
     if (filters.search) params.name = filters.search
 
-    const result = await SchoolClassAPI.prototype.index(params)
+    const result = await schoolClassApi.index(params)
     classes.value = result.data
     pagination.value.rowsNumber = result.total
   } catch (error) {
@@ -125,7 +128,7 @@ async function loadClasses () {
 
 async function loadFields () {
   try {
-    const result = await AcademicFieldAPI.prototype.index({ length: 100 })
+    const result = await academicFieldApi.index({ length: 100 })
     fieldOptions.value = result.data
   } catch (error) {
     console.error('Error loading fields:', error)

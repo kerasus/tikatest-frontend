@@ -11,60 +11,130 @@
         <q-form @submit.prevent="onSubmit">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input v-model="form.firstname" label="نام *" outlined required />
+              <q-input
+                v-model="form.firstname"
+                label="نام *"
+                outlined
+                required />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.lastname" label="نام خانوادگی *" outlined required />
+              <q-input
+                v-model="form.lastname"
+                label="نام خانوادگی *"
+                outlined
+                required />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.username" label="نام کاربری *" outlined required dir="ltr" />
+              <q-input
+                v-model="form.username"
+                label="نام کاربری *"
+                outlined
+                required
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.password" label="کلمه عبور *" type="password" outlined required />
+              <q-input
+                v-model="form.password"
+                label="کلمه عبور *"
+                type="password"
+                outlined
+                required />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.student_phone" label="تلفن همراه" outlined dir="ltr" />
+              <q-input
+                v-model="form.student_phone"
+                label="تلفن همراه"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.melli_code" label="کد ملی" outlined dir="ltr" />
+              <q-input
+                v-model="form.melli_code"
+                label="کد ملی"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.student_code" label="کد دانش آموزی" outlined dir="ltr" />
+              <q-input
+                v-model="form.student_code"
+                label="کد دانش آموزی"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.student_email" label="ایمیل" outlined dir="ltr" />
+              <q-input
+                v-model="form.student_email"
+                label="ایمیل"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.birth_date" label="تاریخ تولد" outlined mask="####/##/##" />
+              <q-input
+                v-model="form.birth_date"
+                label="تاریخ تولد"
+                outlined
+                mask="####/##/##" />
             </div>
             <div class="col-12">
-              <q-input v-model="form.address" label="آدرس" outlined type="textarea" />
+              <q-input
+                v-model="form.address"
+                label="آدرس"
+                outlined
+                type="textarea" />
             </div>
 
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_name" label="نام پدر" outlined />
+              <q-input
+                v-model="form.father_name"
+                label="نام پدر"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_phone" label="تلفن پدر" outlined dir="ltr" />
+              <q-input
+                v-model="form.father_phone"
+                label="تلفن پدر"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_email" label="ایمیل پدر" outlined dir="ltr" />
+              <q-input
+                v-model="form.father_email"
+                label="ایمیل پدر"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_job" label="شغل پدر" outlined />
+              <q-input
+                v-model="form.father_job"
+                label="شغل پدر"
+                outlined />
             </div>
 
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_name" label="نام مادر" outlined />
+              <q-input
+                v-model="form.mother_name"
+                label="نام مادر"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_lastname" label="نام خانوادگی مادر" outlined />
+              <q-input
+                v-model="form.mother_lastname"
+                label="نام خانوادگی مادر"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_phone" label="تلفن مادر" outlined dir="ltr" />
+              <q-input
+                v-model="form.mother_phone"
+                label="تلفن مادر"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_email" label="ایمیل مادر" outlined dir="ltr" />
+              <q-input
+                v-model="form.mother_email"
+                label="ایمیل مادر"
+                outlined
+                dir="ltr" />
             </div>
 
             <div class="col-12 col-md-6">
@@ -82,8 +152,16 @@
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ثبت دانش آموز" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Student.List' }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت دانش آموز"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Student.List' }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -98,6 +176,9 @@ import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { StudentType } from 'src/repositories/student'
+
+const studentApi = new StudentAPI()
+const schoolClassApi = new SchoolClassAPI()
 
 const router = useRouter()
 const $q = useQuasar()
@@ -130,7 +211,7 @@ const saving = ref(false)
 async function onSubmit () {
   saving.value = true
   try {
-    await StudentAPI.prototype.create(form as any)
+    await studentApi.create(form as any)
     $q.notify({
       icon: 'check',
       message: 'دانش آموز با موفقیت ثبت شد.',
@@ -149,7 +230,7 @@ async function onSubmit () {
 }
 
 onMounted(async () => {
-  const result = await SchoolClassAPI.prototype.index({ length: 100 })
+  const result = await schoolClassApi.index({ length: 100 })
   classOptions.value = result.data
 })
 </script>

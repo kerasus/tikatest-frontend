@@ -20,23 +20,42 @@
                 outlined
                 clearable
                 emit-value
-                map-options
-              />
+                map-options />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.started_at" label="زمان شروع" outlined type="datetime-local" />
+              <q-input
+                v-model="form.started_at"
+                label="زمان شروع"
+                outlined
+                type="datetime-local" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.ended_at" label="زمان پایان" outlined type="datetime-local" />
+              <q-input
+                v-model="form.ended_at"
+                label="زمان پایان"
+                outlined
+                type="datetime-local" />
             </div>
             <div class="col-12">
-              <q-input v-model="form.notes" label="یادداشت" outlined type="textarea" />
+              <q-input
+                v-model="form.notes"
+                label="یادداشت"
+                outlined
+                type="textarea" />
             </div>
           </div>
 
           <div class="q-mt-lg">
-            <q-btn type="submit" color="primary" label="ثبت" :loading="saving" class="q-ml-sm" />
-            <q-btn flat label="انصراف" :to="{ name: 'Student.StudySessions.List' }" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت"
+              :loading="saving"
+              class="q-ml-sm" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Student.StudySessions.List' }" />
           </div>
         </q-form>
       </q-card-section>
@@ -60,7 +79,7 @@ const form = reactive({
   lesson_id: null as number | null,
   started_at: new Date().toISOString().slice(0, 16),
   ended_at: null as string | null,
-  notes: null as string | null,
+  notes: null as string | null
 })
 
 const onSubmit = async () => {
@@ -87,7 +106,7 @@ const onSubmit = async () => {
 onMounted(async () => {
   try {
     const response = await lesson.index({ length: 100 })
-    lessonOptions.value = response.data.data || []
+    lessonOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading lessons:', error)
   }

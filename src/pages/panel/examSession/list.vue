@@ -5,7 +5,10 @@
         <h4 class="q-ma-none">مدیریت آزمون‌های کلاسی</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" label="ثبت آزمون جدید" :to="{ name: 'Panel.ExamSession.Create' }" />
+        <q-btn
+          color="primary"
+          label="ثبت آزمون جدید"
+          :to="{ name: 'Panel.ExamSession.Create' }" />
       </div>
     </div>
 
@@ -23,8 +26,7 @@
               clearable
               emit-value
               map-options
-              @update:model-value="loadSessions"
-            />
+              @update:model-value="loadSessions" />
           </div>
           <div class="col-12 col-md-3">
             <q-select
@@ -37,8 +39,7 @@
               clearable
               emit-value
               map-options
-              @update:model-value="loadSessions"
-            />
+              @update:model-value="loadSessions" />
           </div>
           <div class="col-12 col-md-3">
             <q-select
@@ -49,11 +50,15 @@
               clearable
               emit-value
               map-options
-              @update:model-value="loadSessions"
-            />
+              @update:model-value="loadSessions" />
           </div>
           <div class="col-12 col-md-3">
-            <q-input v-model="filters.date" label="تاریخ" outlined type="date" @update:model-value="loadSessions" />
+            <q-input
+              v-model="filters.date"
+              label="تاریخ"
+              outlined
+              type="date"
+              @update:model-value="loadSessions" />
           </div>
         </div>
       </q-card-section>
@@ -61,12 +66,21 @@
       <q-separator />
 
       <q-card-section>
-        <div v-if="loading" class="text-center q-pa-lg">
-          <q-spinner color="primary" size="100px" />
+        <div
+          v-if="loading"
+          class="text-center q-pa-lg">
+          <q-spinner
+            color="primary"
+            size="100px" />
         </div>
 
-        <div v-else-if="sessions.data.length === 0" class="text-center q-pa-lg">
-          <q-icon name="assignment" size="100px" color="primary" />
+        <div
+          v-else-if="sessions.data.length === 0"
+          class="text-center q-pa-lg">
+          <q-icon
+            name="assignment"
+            size="100px"
+            color="primary" />
           <p class="text-subtitle1 q-mt-md">هیچ آزمونی ثبت نشده است</p>
         </div>
 
@@ -76,27 +90,40 @@
           :columns="columns"
           row-key="id"
           :pagination="pagination"
-          @request="onTableRequest"
-        >
-          <template #body-cell-lesson="{ props }">
+          @request="onTableRequest">
+          <template #body-cell-lesson="props">
             <q-td :props="props">
               {{ props.row.lesson?.name || '-' }}
             </q-td>
           </template>
-          <template #body-cell-class="{ props }">
+          <template #body-cell-class="props">
             <q-td :props="props">
               {{ props.row.schoolClass?.name || '-' }}
             </q-td>
           </template>
-          <template #body-cell-grade_type="{ props }">
+          <template #body-cell-grade_type="props">
             <q-td :props="props">
               {{ getGradeTypeLabel(props.row.grade_type) }}
             </q-td>
           </template>
-          <template #body-cell-actions="{ props }">
+          <template #body-cell-actions="props">
             <q-td :props="props">
-              <q-btn flat round dense icon="visibility" color="info" size="sm" @click="viewParticipants(props.row.id)" />
-              <q-btn flat round dense icon="delete" color="negative" size="sm" @click="deleteSession(props.row)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="visibility"
+                color="info"
+                size="sm"
+                @click="viewParticipants(props.row.id)" />
+              <q-btn
+                flat
+                round
+                dense
+                icon="delete"
+                color="negative"
+                size="sm"
+                @click="deleteSession(props.row)" />
             </q-td>
           </template>
         </q-table>
@@ -125,7 +152,7 @@ const filters = reactive({
   lesson_id: null as number | null,
   class_id: null as number | null,
   grade_type: null as string | null,
-  date: null as string | null,
+  date: null as string | null
 })
 
 const lessonOptions = ref<any[]>([])
@@ -140,7 +167,7 @@ const gradeTypeOptions = [
   { label: 'میان ترم دوم', value: 'mid_term_2' },
   { label: 'مستمر دوم', value: 'continuous_2' },
   { label: 'پایان ترم دوم', value: 'final_2' },
-  { label: 'سایر', value: 'other' },
+  { label: 'سایر', value: 'other' }
 ]
 
 const columns = [
@@ -149,7 +176,7 @@ const columns = [
   { name: 'gregorian_date', label: 'تاریخ', field: 'gregorian_date', align: 'center' as const },
   { name: 'grade_type', label: 'نوع نمره', field: 'grade_type', align: 'center' as const },
   { name: 'is_report_card', label: 'کارنامه', field: 'is_report_card', align: 'center' as const },
-  { name: 'actions', label: 'عملیات', field: 'actions', align: 'center' as const },
+  { name: 'actions', label: 'عملیات', field: 'actions', align: 'center' as const }
 ]
 
 const pagination = ref({
@@ -157,11 +184,11 @@ const pagination = ref({
   descending: true,
   page: 1,
   rowsPerPage: 10,
-  rowsNumber: 0,
+  rowsNumber: 0
 })
 
 const getGradeTypeLabel = (value: string | null): string => {
-  const option = gradeTypeOptions.find(o => o.value === value)
+  const option = gradeTypeOptions.find((o) => o.value === value)
   return option ? option.label : '-'
 }
 
@@ -195,7 +222,7 @@ const onTableRequest = (props: any) => {
 const loadLessons = async () => {
   try {
     const response = await lesson.index({ length: 100 })
-    lessonOptions.value = response.data.data || []
+    lessonOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading lessons:', error)
   }
@@ -204,7 +231,7 @@ const loadLessons = async () => {
 const loadClasses = async () => {
   try {
     const response = await schoolClass.index({ length: 100 })
-    classOptions.value = response.data.data || []
+    classOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading classes:', error)
   }
@@ -219,7 +246,7 @@ const deleteSession = async (session: any) => {
     title: 'تایید حذف',
     message: `آزمون ${session.lesson?.name} برای کلاس ${session.schoolClass?.name} حذف شود؟`,
     cancel: true,
-    persistent: true,
+    persistent: true
   }).onOk(async () => {
     try {
       await examSession.delete(session.id)

@@ -22,8 +22,7 @@
                 emit-value
                 map-options
                 :rules="[val => !!val || 'دانش آموز را انتخاب کنید']"
-                @filter="filterStudents"
-              />
+                @filter="filterStudents" />
             </div>
             <div class="col-12">
               <q-select
@@ -35,20 +34,35 @@
                 outlined
                 emit-value
                 map-options
-                :rules="[val => !!val || 'نوع مورد را انتخاب کنید']"
-              />
+                :rules="[val => !!val || 'نوع مورد را انتخاب کنید']" />
             </div>
             <div class="col-12">
-              <q-input v-model="form.incident_date" label="تاریخ واقعه" outlined type="date" />
+              <q-input
+                v-model="form.incident_date"
+                label="تاریخ واقعه"
+                outlined
+                type="date" />
             </div>
             <div class="col-12">
-              <q-input v-model="form.description" label="توضیحات" outlined type="textarea" />
+              <q-input
+                v-model="form.description"
+                label="توضیحات"
+                outlined
+                type="textarea" />
             </div>
           </div>
 
           <div class="q-mt-lg">
-            <q-btn type="submit" color="primary" label="ثبت مورد" :loading="saving" class="q-ml-sm" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Disciplinary.List' }" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ثبت مورد"
+              :loading="saving"
+              class="q-ml-sm" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Disciplinary.List' }" />
           </div>
         </q-form>
       </q-card-section>
@@ -78,7 +92,7 @@ const form = reactive({
   student_id: null as number | null,
   case_id: null as number | null,
   incident_date: new Date().toISOString().split('T')[0],
-  description: null as string | null,
+  description: null as string | null
 })
 
 const filterStudents = (val: string, update: any) => {
@@ -118,10 +132,10 @@ onMounted(async () => {
   try {
     const [studentsRes, casesRes] = await Promise.all([
       student.index({ length: 200 }),
-      disciplinaryCase.index({ length: 100 }),
+      disciplinaryCase.index({ length: 100 })
     ])
-    allStudents.value = studentsRes.data.data || []
-    caseOptions.value = casesRes.data.data || []
+    allStudents.value = studentsRes.data || []
+    caseOptions.value = casesRes.data || []
     studentOptions.value = allStudents.value
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری داده‌ها' })

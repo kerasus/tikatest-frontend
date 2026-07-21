@@ -5,53 +5,62 @@
         <h4 class="q-ma-none">جزئیات نمره</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" label="ویرایش" :to="{ name: 'Panel.Grade.Edit', params: { id: grade?.id } }" />
+        <q-btn
+          color="primary"
+          label="ویرایش"
+          :to="{ name: 'Panel.Grade.Edit', params: { id: gradeData?.id } }" />
       </div>
     </div>
 
-    <div v-if="loading" class="text-center q-pa-lg">
-      <q-spinner color="primary" size="100px" />
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
     </div>
 
-    <template v-else-if="grade">
+    <template v-else-if="gradeData">
       <q-card>
         <q-card-section>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">دانش آموز:</div>
-              <div class="text-body1">{{ grade.student?.full_name || '-' }}</div>
+              <div class="text-body1">{{ gradeData.student?.full_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">درس:</div>
-              <div class="text-body1">{{ grade.lesson?.name || '-' }}</div>
+              <div class="text-body1">{{ gradeData.lesson?.name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کلاس:</div>
-              <div class="text-body1">{{ grade.schoolClass?.name || '-' }}</div>
+              <div class="text-body1">{{ gradeData.schoolClass?.name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">تاریخ:</div>
-              <div class="text-body1">{{ grade.gregorian_date || '-' }}</div>
+              <div class="text-body1">{{ gradeData?.gregorian_date || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نوع نمره:</div>
-              <div class="text-body1">{{ getGradeTypeLabel(grade.grade_type) }}</div>
+              <div class="text-body1">{{ getGradeTypeLabel(gradeData?.grade_type) }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره خام:</div>
-              <div class="text-body1">{{ grade.raw_grade ?? '-' }}</div>
+              <div class="text-body1">{{ gradeData?.raw_grade ?? '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره محاسبه شده:</div>
-              <div class="text-body1">{{ grade.calculated_grade ?? '-' }}</div>
+              <div class="text-body1">{{ gradeData?.calculated_grade ?? '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره Z:</div>
-              <div class="text-body1">{{ grade.z_score ?? '-' }}</div>
+              <div class="text-body1">{{ gradeData?.z_score ?? '-' }}</div>
             </div>
-            <div class="col-12 col-md-6" v-if="grade.explanation">
+            <div
+              v-if="gradeData?.explanation"
+              class="col-12 col-md-6">
               <div class="text-subtitle2">توضیحات:</div>
-              <div class="text-body1">{{ grade.explanation }}</div>
+              <div class="text-body1">{{ gradeData?.explanation }}</div>
             </div>
           </div>
         </q-card-section>
@@ -81,7 +90,7 @@ const gradeTypeMap: Record<string, string> = {
   mid_term_2: 'میان ترم دوم',
   continuous_2: 'مستمر دوم',
   final_2: 'پایان ترم دوم',
-  other: 'سایر',
+  other: 'سایر'
 }
 
 const getGradeTypeLabel = (value: string | null): string => {
@@ -93,7 +102,7 @@ onMounted(async () => {
   try {
     const id = parseInt(route.params.id as string)
     const response = await grade.get(id)
-    gradeData.value = response.data
+    gradeData.value = response
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری جزئیات نمره' })
   } finally {

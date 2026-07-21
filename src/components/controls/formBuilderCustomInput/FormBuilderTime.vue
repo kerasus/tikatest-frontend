@@ -107,7 +107,6 @@ import type { ComputedRef } from 'vue'
 import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
 import { type FormBuilderInputType } from 'src/types'
-import { createPrefixedT } from 'src/services/i18nWrapper'
 import { type LocalErrorDataType } from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 import { type ComponentPublicInstance, computed, type ModelRef, nextTick, reactive, ref, type Ref, watch } from 'vue'
 
@@ -116,8 +115,7 @@ defineOptions({
 })
 
 const { t: rawT } = useI18n()
-const i18nPrefixedT = createPrefixedT(rawT)
-const dateManager = useDate(i18nPrefixedT)
+const dateManager = useDate()
 
 
 interface DateTimeObject {
@@ -204,7 +202,7 @@ const localRules = computed(() =>
       const ruleParams = rule.ruleParams
       rule = (): boolean | string => {
         if (displayDateTime.value === '__:__:__') {
-          return i18nPrefixedT('error.validation.required', { field: props.label })
+          return rawT('error.validation.required', { field: props.label })
         } else return !localErrorMessage.value
       }
 

@@ -14,19 +14,19 @@ export const quizSession = {
     appApi.post(`/quiz-sessions/${sessionId}/submit`, {}),
 
   getMyAttempts: () =>
-    appApi.get(`/quiz-sessions/my-sessions`),
+    appApi.get('/quiz-sessions/my-sessions'),
 
   getQuizAttempts: (quizId: number) =>
     appApi.get(`/quiz-sessions/${quizId}/attempts`),
 
   list: (filters: any = { length: 100 }) =>
-    appApi.get(`/quiz-sessions`, { params: filters }),
+    appApi.get('/quiz-sessions', { params: filters }),
 
   reportAntiCheatEvent: (sessionId: number, eventType: string, eventData?: any) =>
     appApi.post(`/quiz-sessions/${sessionId}/anti-cheat`, {
       event_type: eventType,
       event_data: eventData
-    }),
+    })
 }
 
 export default quizSession

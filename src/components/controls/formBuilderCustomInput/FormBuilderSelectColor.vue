@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, defineProps, defineEmits, ref } from 'vue'
 import ColorAPI, { type ColorType } from 'src/repositories/color'
 

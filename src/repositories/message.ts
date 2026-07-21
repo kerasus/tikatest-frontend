@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 
+export type { ListType } from './BaseAPI'
 export type MessageType = {
   id: number | null
   school_id: number | null
@@ -14,6 +15,8 @@ export type MessageType = {
   updated_at: string | null
   sender?: any
   owners?: MessageOwnerType[]
+  receiver_ids?: number[]
+  recipient_types?: any[]
 }
 
 export type MessageOwnerType = {
@@ -73,6 +76,11 @@ export default class MessageAPI extends BaseAPI<MessageType> {
 
   async sendToClass (data: any): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.sendToClass, data)
+    return response.data
+  }
+
+  async myMessages (params: any = {}): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.received, { params })
     return response.data
   }
 }

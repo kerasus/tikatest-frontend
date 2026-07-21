@@ -27,23 +27,29 @@
             <q-btn
               color="primary"
               label="مشاهده گزارش"
-              @click="loadReport"
               :loading="loading"
-              class="full-height" />
+              class="full-height"
+              @click="loadReport" />
           </div>
         </div>
       </q-card-section>
     </q-card>
 
     <div v-if="reports.length > 0">
-      <div v-for="(report, index) in reports" :key="report.lesson_id" class="q-mb-md">
+      <div
+        v-for="(report, index) in reports"
+        :key="report.lesson_id.toString() + index.toString()"
+        class="q-mb-md">
         <q-card>
           <q-card-section>
             <div class="text-h6 q-mb-md">{{ report.lesson_name }}</div>
 
             <div class="row q-col-gutter-md q-mb-md text-center">
               <div class="col-6 col-md-2">
-                <q-chip color="primary" text-color="white" class="full-width">
+                <q-chip
+                  color="primary"
+                  text-color="white"
+                  class="full-width">
                   <div class="column">
                     <span class="text-h6">{{ report.stats?.count }}</span>
                     <span class="text-caption">تعداد نمره</span>
@@ -51,7 +57,10 @@
                 </q-chip>
               </div>
               <div class="col-6 col-md-2">
-                <q-chip color="green" text-color="white" class="full-width">
+                <q-chip
+                  color="green"
+                  text-color="white"
+                  class="full-width">
                   <div class="column">
                     <span class="text-h6">{{ report.stats?.average }}</span>
                     <span class="text-caption">میانگین</span>
@@ -59,7 +68,10 @@
                 </q-chip>
               </div>
               <div class="col-6 col-md-2">
-                <q-chip color="blue" text-color="white" class="full-width">
+                <q-chip
+                  color="blue"
+                  text-color="white"
+                  class="full-width">
                   <div class="column">
                     <span class="text-h6">{{ report.stats?.highest }}</span>
                     <span class="text-caption">بالاترین</span>
@@ -67,7 +79,10 @@
                 </q-chip>
               </div>
               <div class="col-6 col-md-2">
-                <q-chip color="orange" text-color="white" class="full-width">
+                <q-chip
+                  color="orange"
+                  text-color="white"
+                  class="full-width">
                   <div class="column">
                     <span class="text-h6">{{ report.stats?.lowest }}</span>
                     <span class="text-caption">پایین ترین</span>
@@ -75,7 +90,10 @@
                 </q-chip>
               </div>
               <div class="col-6 col-md-2">
-                <q-chip color="purple" text-color="white" class="full-width">
+                <q-chip
+                  color="purple"
+                  text-color="white"
+                  class="full-width">
                   <div class="column">
                     <span class="text-h6">{{ report.stats?.pass_rate }}%</span>
                     <span class="text-caption">درصد قبولی</span>
@@ -100,8 +118,13 @@
       </div>
     </div>
 
-    <div v-if="!reports.length && !loading" class="text-center q-pa-lg">
-      <q-icon name="grading" size="100px" color="grey-5" />
+    <div
+      v-if="!reports.length && !loading"
+      class="text-center q-pa-lg">
+      <q-icon
+        name="grading"
+        size="100px"
+        color="grey-5" />
       <p class="text-subtitle1 q-mt-md">درسی را انتخاب کنید تا گزارش نمایش داده شود</p>
     </div>
   </q-page>
@@ -123,7 +146,12 @@ const loading = ref(false)
 const columns = [
   { name: 'student', label: 'دانش آموز', align: 'right' as const, field: 'student' },
   { name: 'raw_grade', label: 'نمره خام', align: 'center' as const, field: 'raw_grade' },
-  { name: 'calculated_grade', label: 'نمره محاسبه شده', align: 'center' as const, field: 'calculated_grade' },
+  {
+    name: 'calculated_grade',
+    label: 'نمره محاسبه شده',
+    align: 'center' as const,
+    field: 'calculated_grade'
+  },
   { name: 'grade_type', label: 'نوع نمره', align: 'center' as const, field: 'grade_type' },
   { name: 'persian_date', label: 'تاریخ', align: 'center' as const, field: 'persian_date' }
 ]
@@ -148,12 +176,14 @@ const loadReport = async () => {
     const result = await grade.multipleLessonsReport({ lesson_ids: selectedLessons.value })
     reports.value = result
   } catch (error: any) {
-    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری گزارش' })
+    $q.notify({
+      color: 'negative',
+      message: error.response?.data?.message || 'خطا در بارگذاری گزارش'
+    })
   } finally {
     loading.value = false
   }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

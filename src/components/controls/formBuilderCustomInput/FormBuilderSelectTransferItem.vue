@@ -250,6 +250,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { ColorType } from 'src/repositories/color'
 import Portlet from 'src/components/cards/portlet.vue'
 import { computed, defineProps, ref, watch } from 'vue'

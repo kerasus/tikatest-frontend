@@ -6,21 +6,35 @@
         <div class="text-grey-7 q-mt-sm">
           درس: {{ homeworkData.lesson?.name || '-' }} | کلاس: {{ homeworkData.schoolClass?.name || '-' }}
         </div>
-        <div class="q-mt-sm" v-if="homeworkData.description">
+        <div
+          v-if="homeworkData.description"
+          class="q-mt-sm">
           <div class="text-subtitle2">توضیحات:</div>
           <p>{{ homeworkData.description }}</p>
         </div>
-        <div class="q-mt-sm" v-if="homeworkData.due_date">
+        <div
+          v-if="homeworkData.due_date"
+          class="q-mt-sm">
           <div class="text-subtitle2">موعد تحویل:</div>
           <p>{{ formatDate(homeworkData.due_date) }}</p>
         </div>
-        <div class="q-mt-sm" v-if="homeworkData.attachment">
+        <div
+          v-if="homeworkData.attachment"
+          class="q-mt-sm">
           <div class="text-subtitle2">ضمیمه ۱:</div>
-          <a :href="homeworkData.attachment" target="_blank" class="text-primary">دانلود فایل</a>
+          <a
+            :href="homeworkData.attachment"
+            target="_blank"
+            class="text-primary">دانلود فایل</a>
         </div>
-        <div class="q-mt-sm" v-if="homeworkData.attachment_2">
+        <div
+          v-if="homeworkData.attachment_2"
+          class="q-mt-sm">
           <div class="text-subtitle2">ضمیمه ۲:</div>
-          <a :href="homeworkData.attachment_2" target="_blank" class="text-primary">دانلود فایل</a>
+          <a
+            :href="homeworkData.attachment_2"
+            target="_blank"
+            class="text-primary">دانلود فایل</a>
         </div>
       </q-card-section>
     </q-card>
@@ -47,7 +61,10 @@
           </template>
           <template #body-cell-read_status="props">
             <q-td :props="props">
-              <q-chip :color="props.value ? 'positive' : 'negative'" text-color="white" :label="props.value ? 'خوانده شده' : 'خوانده نشده'" />
+              <q-chip
+                :color="props.value ? 'positive' : 'negative'"
+                text-color="white"
+                :label="props.value ? 'خوانده شده' : 'خوانده نشده'" />
             </q-td>
           </template>
           <template #body-cell-submitted_at="props">
@@ -57,7 +74,14 @@
           </template>
           <template #body-cell-submission_file="props">
             <q-td :props="props">
-              <q-btn v-if="props.value" flat dense icon="download" color="primary" :href="props.value" target="_blank" />
+              <q-btn
+                v-if="props.value"
+                flat
+                dense
+                icon="download"
+                color="primary"
+                :href="props.value"
+                target="_blank" />
               <span v-else>-</span>
             </q-td>
           </template>
@@ -73,6 +97,8 @@ import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import type { HomeworkType, HomeworkOwnerType } from 'src/repositories/homework'
+
+const homeworkApi = new HomeworkAPI()
 
 const route = useRoute()
 const $q = useQuasar()
@@ -101,7 +127,7 @@ const ownerColumns = [
 onMounted(async () => {
   loading.value = true
   try {
-    homeworkData.value = await HomeworkAPI.prototype.get(Number(route.params.id))
+    homeworkData.value = await homeworkApi.get(Number(route.params.id))
     owners.value = homeworkData.value.owners || []
   } catch (error) {
     $q.notify({

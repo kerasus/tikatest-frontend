@@ -6,7 +6,7 @@ import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
 import { useAppConfig } from 'stores/appConfig'
 import ListItem from './components/listItem.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, Ref } from 'vue'
 import { UserRolesType } from 'src/repositories/user'
 
 const $q = useQuasar()
@@ -67,14 +67,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'نمرات',
     forRoles: [ 'Student' ],
     child: [
-      {
-        title: 'مشاهده نمرات',
-        route: { name: 'Student.Grade.List' }
-      },
-      {
-        title: 'کارنامه',
-        route: { name: 'Student.ReportCard' }
-      }
+      { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
+      { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
     ]
   },
   {
@@ -82,14 +76,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'موارد انضباطی',
     forRoles: [ 'Student' ],
     child: [
-      {
-        title: 'مشاهده غیبت‌ها',
-        route: { name: 'Student.Absences' }
-      },
-      {
-        title: 'مشاهده موارد انضباطی',
-        route: { name: 'Student.Disciplinary.List' }
-      }
+      { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
+      { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
     ]
   },
   {
@@ -97,14 +85,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'مدیریت پیام',
     forRoles: [ 'Student' ],
     child: [
-      {
-        title: 'ارسال پیام',
-        route: { name: 'Student.Message.Create' }
-      },
-      {
-        title: 'مشاهده پیام‌ها',
-        route: { name: 'Student.Message.List' }
-      }
+      { icon: '', title: 'ارسال پیام', route: { name: 'Student.Message.Create' } },
+      { icon: '', title: 'مشاهده پیام‌ها', route: { name: 'Student.Message.List' } }
     ]
   },
   {
@@ -118,18 +100,9 @@ const topLinks = ref<ListItemType[]>([
     title: 'ساعت مطالعه و تکالیف',
     forRoles: [ 'Student' ],
     child: [
-      {
-        title: 'مشاهده تکالیف',
-        route: { name: 'Student.Homework.List' }
-      },
-      {
-        title: 'ثبت ساعت مطالعه',
-        route: { name: 'Student.StudySessions.Create' }
-      },
-      {
-        title: 'مشاهده ساعات مطالعه ثبت شده',
-        route: { name: 'Student.StudySessions.List' }
-      }
+      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
+      { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
+      { icon: '', title: 'مشاهده ساعات مطالعه ثبت شده', route: { name: 'Student.StudySessions.List' } }
     ]
   },
   {
@@ -155,11 +128,11 @@ const topLinks = ref<ListItemType[]>([
     title: 'نمرات',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'ثبت نمره', route: { name: 'Panel.Grade.Create' } },
-      { title: 'مشاهده نمرات', route: { name: 'Panel.Grade.List' } },
-      { title: 'کارنامه', route: { name: 'Panel.ReportCard' } },
-      { title: 'گزارش نمرات تک درس', route: { name: 'Panel.GradeReport.Lesson' } },
-      { title: 'گزارش نمرات چند درس', route: { name: 'Panel.GradeReport.Multiple' } }
+      { icon: '', title: 'ثبت نمره', route: { name: 'Panel.Grade.Create' } },
+      { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Grade.List' } },
+      { icon: '', title: 'کارنامه', route: { name: 'Panel.ReportCard' } },
+      { icon: '', title: 'گزارش نمرات تک درس', route: { name: 'Panel.GradeReport.Lesson' } },
+      { icon: '', title: 'گزارش نمرات چند درس', route: { name: 'Panel.GradeReport.Multiple' } }
     ]
   },
   {
@@ -167,9 +140,9 @@ const topLinks = ref<ListItemType[]>([
     title: 'مدیریت پیام',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'ارسال پیام', route: { name: 'Panel.Message.Create' } },
-      { title: 'مشاهده پیام های ارسالی', route: { name: 'Panel.Message.Sent' } },
-      { title: 'مشاهده پیام های دریافتی', route: { name: 'Panel.Message.Received' } }
+      { icon: '', title: 'ارسال پیام', route: { name: 'Panel.Message.Create' } },
+      { icon: '', title: 'مشاهده پیام های ارسالی', route: { name: 'Panel.Message.Sent' } },
+      { icon: '', title: 'مشاهده پیام های دریافتی', route: { name: 'Panel.Message.Received' } }
     ]
   },
   {
@@ -177,11 +150,11 @@ const topLinks = ref<ListItemType[]>([
     title: 'موارد انضباطی',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'ثبت غیبت', route: { name: 'Panel.Disciplinary.Absence.Create' } },
-      { title: 'مشاهده غیبت های ثبت شده', route: { name: 'Panel.Disciplinary.Absence.List' } },
-      { title: 'تعریف مورد انضباطی', route: { name: 'Panel.DisciplinaryCase.Create' } },
-      { title: 'ثبت مورد انضباطی', route: { name: 'Panel.Disciplinary.Create' } },
-      { title: 'مشاهده موارد انضباطی ثبت شده', route: { name: 'Panel.Disciplinary.List' } }
+      { icon: '', title: 'ثبت غیبت', route: { name: 'Panel.Disciplinary.Absence.Create' } },
+      { icon: '', title: 'مشاهده غیبت های ثبت شده', route: { name: 'Panel.Disciplinary.Absence.List' } },
+      { icon: '', title: 'تعریف مورد انضباطی', route: { name: 'Panel.DisciplinaryCase.Create' } },
+      { icon: '', title: 'ثبت مورد انضباطی', route: { name: 'Panel.Disciplinary.Create' } },
+      { icon: '', title: 'مشاهده موارد انضباطی ثبت شده', route: { name: 'Panel.Disciplinary.List' } }
     ]
   },
   {
@@ -189,8 +162,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'آزمون آنلاین',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'ثبت آزمون', route: { name: 'Panel.Quiz.Create' } },
-      { title: 'مشاهده آزمون ها', route: { name: 'Panel.Quiz.List' } }
+      { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Quiz.Create' } },
+      { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Quiz.List' } }
     ]
   },
   {
@@ -204,8 +177,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'تکالیف',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
-      { title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
+      { icon: '', title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
+      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
     ]
   },
   {
@@ -213,8 +186,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'ساعت مطالعه دانش آموزان',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     child: [
-      { title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
-      { title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
+      { icon: '', title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
+      { icon: '', title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
     ]
   }
 ])
@@ -272,7 +245,7 @@ watch(currentRouteName, () => {
     <div class="left-drawer__inner">
       <div class="left-drawer__logo-section">
         <div class="left-drawer__logo-section-img">
-          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/panel/images/logo.png' : '/panel/images/logo.png'" />
+          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />
         </div>
         <div
           v-if="false"
@@ -309,10 +282,10 @@ watch(currentRouteName, () => {
         <div class="app-version">
           v: {{ appConfigManager.version }}
         </div>
-      <div class="copy-right">
-        <span> Copyright TikaTest co. </span>
-        <span> &copy; {{ new Date().getFullYear() }} </span>
-      </div>
+        <div class="copy-right">
+          <span> Copyright TikaTest co. </span>
+          <span> &copy; {{ new Date().getFullYear() }} </span>
+        </div>
       </div>
     </div>
   </div>

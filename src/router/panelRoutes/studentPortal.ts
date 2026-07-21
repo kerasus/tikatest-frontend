@@ -119,14 +119,14 @@ export const index = [
     },
     component: () => import('src/pages/panel/student/homework-view.vue')
   },
-  {
-    path: 'homework/:id/submit',
-    name: 'Student.Homework.Submit',
-    meta: {
-      pageCategory: 'ارسال تکلیف'
-    },
-    component: () => import('src/pages/panel/student/homework-submit.vue')
-  },
+  // {
+  //   path: 'homework/:id/submit',
+  //   name: 'Student.Homework.Submit',
+  //   meta: {
+  //     pageCategory: 'ارسال تکلیف'
+  //   },
+  //   component: () => import('src/pages/panel/student/homework-submit.vue')
+  // },
   {
     path: 'homework/submissions',
     name: 'Student.Homework.Submissions',

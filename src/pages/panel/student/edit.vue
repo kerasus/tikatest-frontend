@@ -11,37 +11,77 @@
         <q-form @submit.prevent="onSubmit">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input v-model="form.firstname" label="نام" outlined />
+              <q-input
+                v-model="form.firstname"
+                label="نام"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.lastname" label="نام خانوادگی" outlined />
+              <q-input
+                v-model="form.lastname"
+                label="نام خانوادگی"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.student_phone" label="تلفن همراه" outlined dir="ltr" />
+              <q-input
+                v-model="form.student_phone"
+                label="تلفن همراه"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.melli_code" label="کد ملی" outlined dir="ltr" />
+              <q-input
+                v-model="form.melli_code"
+                label="کد ملی"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.address" label="آدرس" outlined type="textarea" />
+              <q-input
+                v-model="form.address"
+                label="آدرس"
+                outlined
+                type="textarea" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_name" label="نام پدر" outlined />
+              <q-input
+                v-model="form.father_name"
+                label="نام پدر"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.father_phone" label="تلفن پدر" outlined dir="ltr" />
+              <q-input
+                v-model="form.father_phone"
+                label="تلفن پدر"
+                outlined
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_name" label="نام مادر" outlined />
+              <q-input
+                v-model="form.mother_name"
+                label="نام مادر"
+                outlined />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="form.mother_phone" label="تلفن مادر" outlined dir="ltr" />
+              <q-input
+                v-model="form.mother_phone"
+                label="تلفن مادر"
+                outlined
+                dir="ltr" />
             </div>
           </div>
 
           <div class="q-mt-md">
-            <q-btn type="submit" color="primary" label="ذخیره تغییرات" :loading="saving" />
-            <q-btn flat label="انصراف" :to="{ name: 'Panel.Student.Show', params: { id: route.params.id } }" class="q-ml-sm" />
+            <q-btn
+              type="submit"
+              color="primary"
+              label="ذخیره تغییرات"
+              :loading="saving" />
+            <q-btn
+              flat
+              label="انصراف"
+              :to="{ name: 'Panel.Student.Show', params: { id: route.params.id } }"
+              class="q-ml-sm" />
           </div>
         </q-form>
       </q-card-section>
@@ -56,6 +96,9 @@ import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { StudentType } from 'src/repositories/student'
+
+const studentApi = new StudentAPI()
+const schoolClassApi = new SchoolClassAPI()
 
 const route = useRoute()
 const router = useRouter()
@@ -86,7 +129,7 @@ const saving = ref(false)
 
 async function loadStudent () {
   try {
-    const result = await StudentAPI.prototype.get(Number(route.params.id))
+    const result = await studentApi.get(Number(route.params.id))
     Object.assign(form, result)
   } catch (error) {
     $q.notify({
@@ -100,7 +143,7 @@ async function loadStudent () {
 async function onSubmit () {
   saving.value = true
   try {
-    await StudentAPI.prototype.update(Number(route.params.id), form as any)
+    await studentApi.update(Number(route.params.id), form as any)
     $q.notify({
       icon: 'check',
       message: 'اطلاعات با موفقیت به‌روزرسانی شد.',
@@ -120,7 +163,7 @@ async function onSubmit () {
 
 onMounted(() => {
   loadStudent()
-  SchoolClassAPI.prototype.index({ length: 100 }).then(result => {
+  schoolClassApi.index({ length: 100 }).then((result) => {
     classOptions.value = result.data
   })
 })

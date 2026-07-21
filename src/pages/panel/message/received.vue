@@ -5,7 +5,11 @@
         <h4 class="q-ma-none">پیام‌های دریافتی</h4>
       </div>
       <div class="col-auto">
-        <q-btn color="primary" icon="add" label="ارسال پیام جدید" :to="{ name: 'Panel.Message.Create' }" />
+        <q-btn
+          color="primary"
+          icon="add"
+          label="ارسال پیام جدید"
+          :to="{ name: 'Panel.Message.Create' }" />
       </div>
     </div>
 
@@ -18,7 +22,7 @@
           :loading="loading"
           :pagination="pagination"
           @request="onTableRequest">
-          <template #body-cell-sender="{ props }">
+          <template #body-cell-sender="props">
             <q-td :props="props">
               {{ props.row.sender?.full_name || '-' }}
             </q-td>
