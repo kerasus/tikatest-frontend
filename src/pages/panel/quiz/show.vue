@@ -37,6 +37,11 @@
               <div class="q-mb-md">
                 <strong>مدت زمان:</strong> {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
               </div>
+              <div
+                v-if="quiz.visible_at"
+                class="q-mb-md">
+                <strong>نمایش آزمون از:</strong> {{ formatDateTime(quiz.visible_at) }}
+              </div>
               <div class="q-mb-md">
                 <strong>شروع:</strong> {{ formatDateTime(quiz.start_time || quiz.starts_at) }}
               </div>
@@ -50,10 +55,7 @@
 
             <div class="col-12 col-md-6">
               <div class="q-mb-md">
-                <q-chip
-                  :color="quiz.is_visible ? 'positive' : 'grey-5'"
-                  text-color="white"
-                  :label="quiz.is_visible ? 'فعال' : 'غیرفعال'" />
+                <strong>زمان نمایش:</strong> {{ formatDateTime(quiz.visible_at) }}
               </div>
               <div v-if="quiz.quiz_class_assignments?.length">
                 <strong>کلاس‌ها:</strong>

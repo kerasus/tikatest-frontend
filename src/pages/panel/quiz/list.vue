@@ -87,7 +87,6 @@ const quizTypeOptions = [
 const filters = reactive({
   search: '',
   quiz_type: null,
-  is_visible: null,
   length: 10,
   page: 1
 })
@@ -103,6 +102,7 @@ const pagination = ref({
 const columns = [
   { name: 'name', label: 'نام آزمون', align: 'right' as const, field: 'name', sortable: true },
   { name: 'quiz_type', label: 'نوع', align: 'center' as const, field: 'quiz_type' },
+  { name: 'visible_at', label: 'تاریخ نمایش', align: 'center' as const, field: 'visible_at' },
   { name: 'start_time', label: 'شروع', align: 'center' as const, field: 'start_time' },
   { name: 'end_time', label: 'پایان', align: 'center' as const, field: 'end_time' },
   { name: 'timer', label: 'زمان (ثانیه)', align: 'center' as const, field: 'timer' },
@@ -118,7 +118,6 @@ async function loadQuizzes () {
     }
     if (filters.quiz_type) params.quiz_type = filters.quiz_type
     if (filters.search) params.name = filters.search
-    if (filters.is_visible !== null) params.is_visible = filters.is_visible
 
     const result = await quizApi.index(params)
     quizzes.value = result.data

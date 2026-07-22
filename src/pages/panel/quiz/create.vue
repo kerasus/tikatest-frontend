@@ -52,6 +52,13 @@
 
             <div class="col-12 col-md-4">
               <form-builder-date-time
+                v-model:value="form.visible_at"
+                label="تاریخ نمایش آزمون"
+                outlined />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <form-builder-date-time
                 v-model:value="form.starts_at"
                 label="تاریخ شروع"
                 outlined />
@@ -80,16 +87,6 @@
                 emit-value
                 map-options
                 clearable />
-            </div>
-
-            <div class="col-12 col-md-4">
-              <q-select
-                v-model="form.is_visible"
-                :options="visibilityOptions"
-                label="وضعیت نمایش"
-                outlined
-                emit-value
-                map-options />
             </div>
 
             <div class="col-12">
@@ -386,7 +383,7 @@ const form = reactive({
   starts_at: null as string | null,
   ends_at: null as string | null,
   description: null as string | null,
-  is_visible: true,
+  visible_at: null as string | null,
   quiz_type: null as string | null,
   question_type: null as 'text' | 'image' | null,
   questions_text: null as string | null,
@@ -405,11 +402,6 @@ const quizTypeOptions = [
   { label: 'آزمون متنی', value: 'text' },
   { label: 'آزمون تصویری', value: 'image' },
   { label: 'آزمون آنلاین', value: 'online' }
-]
-
-const visibilityOptions = [
-  { label: 'فعال', value: true },
-  { label: 'غیرفعال', value: false }
 ]
 
 const questionTypeOptions = [
@@ -522,7 +514,7 @@ function buildFormData (): FormData {
   fd.append('starts_at', form.starts_at || '')
   fd.append('ends_at', form.ends_at || '')
   fd.append('description', form.description || '')
-  fd.append('is_visible', form.is_visible ? '1' : '0')
+  fd.append('visible_at', form.visible_at || '')
   fd.append('quiz_type', form.quiz_type || '')
   fd.append('show_answer_date', form.show_answer_date || '')
   fd.append('no_score_questions', form.no_score_questions || '')
@@ -573,7 +565,7 @@ const loadQuiz = async () => {
     form.starts_at = response.starts_at
     form.ends_at = response.ends_at
     form.description = response.description
-    form.is_visible = response.is_visible
+    form.visible_at = response.visible_at
     form.quiz_type = response.quiz_type
     form.show_answer_date = response.show_answer_date
     form.no_score_questions = response.no_score_questions

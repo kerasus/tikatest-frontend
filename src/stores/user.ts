@@ -32,6 +32,7 @@ export const useUser = defineStore('user', () => {
   const isAdmin = computed(() => hasRole(state.user, 'Admin'))
   const isTeacher = computed(() => hasRole(state.user, 'Teacher'))
   const isStudent = computed(() => hasRole(state.user, 'Student'))
+  const isStaff = computed(() => hasRole(state.user, 'Staff'))
   const isAccountant = computed(() => hasRole(state.user, 'Accountant'))
   const isMiddleWorker = computed(() => hasRole(state.user, 'MiddleWorker'))
   const isWarehouseKeeper = computed(() => hasRole(state.user, 'WarehouseKeeper'))
@@ -52,6 +53,9 @@ export const useUser = defineStore('user', () => {
     if (isStudent.value) {
       return 'Student'
     }
+    if (isStaff.value) {
+      return 'Staff'
+    }
     return null
   })
   const mainRoleForPath = computed<UserRolesForPathType | null>(() => {
@@ -66,6 +70,9 @@ export const useUser = defineStore('user', () => {
     }
     if (isStudent.value) {
       return 'student'
+    }
+    if (isStaff.value) {
+      return 'staff'
     }
     return null
   })
@@ -120,6 +127,7 @@ export const useUser = defineStore('user', () => {
     isManager,
     isTeacher,
     isStudent,
+    isStaff,
     isAccountant,
     isMiddleWorker,
     isWarehouseKeeper,

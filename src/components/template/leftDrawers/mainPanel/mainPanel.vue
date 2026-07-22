@@ -119,6 +119,28 @@ const topLinks = ref<ListItemType[]>([
   },
   {
     icon: 'school',
+    title: 'مدیریت مدارس',
+    forRoles: [ 'Admin' ],
+    child: [
+      { icon: '', title: 'لیست مدارس', route: { name: 'Panel.School.List' } },
+      { icon: '', title: 'افزودن مدرسه', route: { name: 'Panel.School.Create' } }
+    ]
+  },
+  {
+    icon: 'person',
+    title: 'مدیریت کاربران',
+    forRoles: [ 'Admin' ],
+    child: [
+      { icon: '', title: 'لیست کاربران', route: { name: 'Panel.User.List' } },
+      { icon: '', title: 'افزودن کاربر', route: { name: 'Panel.User.Create' } },
+      { icon: '', title: 'معلمان', route: { name: 'Panel.User.Teachers' } },
+      { icon: '', title: 'مدیران', route: { name: 'Panel.User.Managers' } },
+      { icon: '', title: 'کارکنان', route: { name: 'Panel.User.Staff' } },
+      { icon: '', title: 'نقش‌های کاربران', route: { name: 'Panel.User.Roles' } }
+    ]
+  },
+  {
+    icon: 'school',
     title: 'دانش آموزان',
     forRoles: [ 'Manager', 'Teacher', 'Admin' ],
     route: { name: 'Panel.Student.List' }

@@ -111,6 +111,13 @@ const table = ref({
       field: (row: UserType) => row.email
     },
     {
+      name: 'schools',
+      required: true,
+      label: 'مدارس',
+      align: 'left',
+      field: (row: UserType) => row.schools?.map((s) => s.name).join('، ') || '-'
+    },
+    {
       name: 'created_at',
       required: true,
       label: 'زمان ایجاد',

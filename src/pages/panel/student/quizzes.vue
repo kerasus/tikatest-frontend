@@ -38,6 +38,16 @@
             <div class="text-caption text-grey q-mt-sm">
               مدت زمان: {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
             </div>
+            <div
+              v-if="quiz.visible_at"
+              class="text-caption text-grey q-mt-sm">
+              نمایش از: {{ formatDateTime(quiz.visible_at) }}
+            </div>
+            <div
+              v-if="quiz.start_time"
+              class="text-caption text-grey q-mt-sm">
+              شروع: {{ formatDateTime(quiz.start_time) }}
+            </div>
           </q-card-section>
 
           <q-separator />
@@ -85,6 +95,18 @@ const formatTime = (timeString: string | null): string => {
     return `${hours} ساعت ${minutes} دقیقه`
   }
   return `${minutes} دقیقه`
+}
+
+const formatDateTime = (dateString: string | null | undefined): string => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleString('fa-IR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 const getStatusColor = (quiz: any): string => {

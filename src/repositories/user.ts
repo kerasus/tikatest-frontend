@@ -2,14 +2,15 @@ import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
 
 export type WorkerRoleType = 'molding' | 'coloring' | 'fabric-cutter' | 'assembler'
-export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student'
-export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Assembler' | 'MoldingWorker' | 'ColoringWorker' | 'FabricCutter'
+export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
+export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff' | 'Assembler' | 'MoldingWorker' | 'ColoringWorker' | 'FabricCutter'
 
 export const userRoleOptions = [
   { label: 'مدیرکل', value: 'admin' },
   { label: 'مدیر', value: 'manager' },
   { label: 'معلم', value: 'teacher' },
-  { label: 'دانش آموز', value: 'student' }
+  { label: 'دانش آموز', value: 'student' },
+  { label: 'کارمند', value: 'staff' }
 ]
 
 export type RoleType = {
@@ -31,6 +32,14 @@ export type UserType = {
   mobile: string | null;
   roles_list: string[];
   roles: RoleType[];
+  schools?: Array<{
+    id: number | null;
+    name: string | null;
+    code: string | null;
+    pivot: {
+      role: string | null;
+    };
+  }>;
   email_verified_at: string | null;
   mobile_verified_at: string | null;
   created_at: string | null;
@@ -68,7 +77,11 @@ export default class UserAPI extends BaseAPI<UserType> {
       ...this.endpoints,
       assignRole: (userId: number) => `${this.baseEndpoint}/${userId}/assign-role`,
       removeRole: (userId: number) => `${this.baseEndpoint}/${userId}/remove-role`,
-      resetPassword: (userId: number) => `${this.baseEndpoint}/${userId}/reset-password`
+      resetPassword: (userId: number) => `${this.baseEndpoint}/${userId}/reset-password`,
+      getSchools: (userId: number) => `${this.baseEndpoint}/${userId}/schools`,
+      assignSchool: (userId: number) => `${this.baseEndpoint}/${userId}/schools`,
+      removeSchool: (userId: number) => `${this.baseEndpoint}/${userId}/schools`,
+      getByRole: (role: string) => `${this.baseEndpoint}/role/${role}`
     }
   }
 
@@ -100,6 +113,63 @@ export default class UserAPI extends BaseAPI<UserType> {
     }
   }
 
+  async getSchools (userId: number): Promise<any[]> {
+    try {
+      const response = await this.getAxiosInstanceWithToken().get(this.endpoints.getSchools(userId))
+      return response.data.data || []
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      } else {
+        throw new Error('An unknown error occurred on getSchools')
+      }
+    }
+  }
+
+  async assignSchool (userId: number, schoolId: number, role?: string): Promise<{ message: string, data: { user: UserType }}> {
+    try {
+      const payload: any = { school_id: schoolId }
+      if (role) {
+        payload.role = role
+      }
+      const response: AxiosResponse<{ message: string, data: { user: UserType }}> = await this.getAxiosInstanceWithToken()
+        .post(this.endpoints.assignSchool(userId), payload)
+      return response.data
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      } else {
+        throw new Error('An unknown error occurred on assignSchool')
+      }
+    }
+  }
+
+  async removeSchool (userId: number, schoolId: number): Promise<{ message: string, data: { user: UserType }}> {
+    try {
+      const response: AxiosResponse<{ message: string, data: { user: UserType }}> = await this.getAxiosInstanceWithToken()
+        .delete(this.endpoints.removeSchool(userId), { data: { school_id: schoolId } })
+      return response.data
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      } else {
+        throw new Error('An unknown error occurred on removeSchool')
+      }
+    }
+  }
+
+  async getByRole (role: string): Promise<UserType[]> {
+    try {
+      const response = await this.getAxiosInstanceWithToken().get(this.endpoints.getByRole(role))
+      return response.data || []
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      } else {
+        throw new Error('An unknown error occurred on getByRole')
+      }
+    }
+  }
 }
 
 export const user = new UserAPI()

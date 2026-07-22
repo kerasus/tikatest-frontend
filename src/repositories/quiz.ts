@@ -18,16 +18,16 @@ export type QuizType = {
    ends_at: string | null
    start_time: string | null
    end_time: string | null
-   description: string | null
-   is_visible: boolean
-   quiz_type: string | null
-   content: QuizContentType[] | null
-   solution: QuizContentType[] | null
-   show_answer_date: string | null
+    description: string | null
+    visible_at: string | null
+    quiz_type: string | null
+    content: QuizContentType[] | null
+    solution: QuizContentType[] | null
+    show_answer_date: string | null
     no_score_questions: string | null
-    timer: string | null
-    questions?: QuizQuestionType[]
-    answer_keys?: QuizAnswerKeyType[]
+   timer: string | null
+   questions?: QuizQuestionType[]
+   answer_keys?: QuizAnswerKeyType[]
     responses?: QuizResponseType[]
     booklets?: QuizBookletType[]
     created_at: string | null
@@ -84,7 +84,7 @@ export default class QuizAPI extends BaseAPI<QuizType> {
       start_time: null,
       end_time: null,
       description: null,
-      is_visible: true,
+      visible_at: null,
       quiz_type: null,
       content: null,
       solution: null,

@@ -29,6 +29,11 @@
               <div class="q-mb-md">
                 <strong>مدت زمان:</strong> {{ quiz.time_limit ? quiz.time_limit + ' دقیقه' : '-' }}
               </div>
+              <div
+                v-if="quiz.visible_at"
+                class="q-mb-md">
+                <strong>نمایش آزمون از:</strong> {{ formatDateTime(quiz.visible_at) }}
+              </div>
               <div class="q-mb-md">
                 <strong>شروع:</strong> {{ formatDateTime(quiz.start_time) }}
               </div>
