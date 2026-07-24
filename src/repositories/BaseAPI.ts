@@ -8,6 +8,12 @@ export type ListType<T> = {
   from: number;
   to: number;
   total: number;
+  last_page: number;
+  path: string;
+  first_page_url: string;
+  last_page_url: string;
+  next_page_url: string | null;
+  prev_page_url: string | null;
 };
 
 export type Endpoints = {
@@ -156,7 +162,13 @@ export default class BaseAPI<T> {
       to: response.data.to,
       current_page: response.data.current_page,
       per_page: response.data.per_page,
-      total: response.data.total
+      total: response.data.total,
+      last_page: response.data.last_page,
+      path: response.data.path,
+      first_page_url: response.data.first_page_url,
+      last_page_url: response.data.last_page_url,
+      next_page_url: response.data.next_page_url,
+      prev_page_url: response.data.prev_page_url
     }
   }
 

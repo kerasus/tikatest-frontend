@@ -43,10 +43,12 @@
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { message } from 'src/repositories/message'
+import type { MessageType } from 'src/repositories/message'
+import type { ListType } from 'src/repositories/BaseAPI'
 
 const $q = useQuasar()
 
-const messages = ref<any[]>([])
+const messages = ref<MessageType[]>([])
 const loading = ref(false)
 
 const pagination = ref({
@@ -68,8 +70,8 @@ const loadMessages = async () => {
       length: pagination.value.rowsPerPage,
       page: pagination.value.page
     })
-    messages.value = result.data || result
-    pagination.value.rowsNumber = result.total || result.length
+    messages.value = result.data
+    pagination.value.rowsNumber = result.total
   } catch (error: any) {
     $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری پیام‌های ارسالی' })
   } finally {

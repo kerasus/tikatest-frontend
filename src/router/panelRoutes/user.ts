@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
-const routes: RouteRecordRaw[] = [
+export const index: RouteRecordRaw[] = [
   {
     path: 'users',
     name: 'Panel.User',
@@ -125,5 +125,3 @@ const routes: RouteRecordRaw[] = [
     component: () => import('pages/ErrorNotFound.vue')
   }
 ]
-
-export default routes

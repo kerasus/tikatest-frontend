@@ -12,29 +12,10 @@
     :show-expand-button="false"
     :after-load-input-data="afterLoadInputData" />
   <q-separator class="q-my-md" />
-  <q-card>
-    <q-card-section>
-      <div class="text-subtitle1 q-mb-md">مدارس کاربر</div>
-      <q-table
-        v-if="userSchools.length > 0"
-        :rows="userSchools"
-        :columns="schoolColumns"
-        row-key="id"
-        flat
-        bordered>
-        <template #body-cell-role="props">
-          <q-td :props="props">
-            {{ getRoleLabel(props.row.pivot?.role) }}
-          </q-td>
-        </template>
-      </q-table>
-      <div
-        v-else
-        class="text-grey-7">
-        این کاربر به هیچ مدرسه‌ای متصل نیست.
-      </div>
-    </q-card-section>
-  </q-card>
+  <user-schools-manager
+    :user-id="userId"
+    :readonly="true"
+    @update="onChangeUserRole" />
   <q-separator class="q-my-md" />
   <q-card>
     <q-card-section>
@@ -48,11 +29,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { EntityShow } from 'quasar-crud'
 import RoleList from 'src/components/roleList.vue'
 import UserAPI, { type UserType } from 'src/repositories/user'
+import UserSchoolsManager from 'src/components/UserSchoolsManager.vue'
 
 const route = useRoute()
 const userAPI = new UserAPI()
@@ -61,7 +43,6 @@ const userId = computed(() => (route.params.id ? parseInt(route.params.id?.toStr
 
 const entityShowKey = ref(Date.now())
 const userData = ref<UserType | null>(null)
-const userSchools = ref<any[]>([])
 const api = ref(userAPI.endpoints.byId(userId.value))
 const label = ref('مشاهده کاربر')
 const indexRouteName = ref('Panel.User.List')
@@ -126,51 +107,11 @@ const inputs = ref([
   }
 ])
 
-const schoolColumns = [
-  { name: 'code', required: true, label: 'کد', align: 'right' as const, field: 'code' },
-  { name: 'name', required: true, label: 'نام مدرسه', align: 'right' as const, field: 'name' },
-  { name: 'role', label: 'نقش در مدرسه', align: 'right' as const, field: 'pivot.role' }
-]
-
-function getRoleLabel (role: string | undefined | null): string {
-  switch (role) {
-    case 'admin':
-      return 'مدیر'
-    case 'manager':
-      return 'مدیر'
-    case 'teacher':
-      return 'معلم'
-    case 'student':
-      return 'دانش‌آموز'
-    case 'staff':
-      return 'کارمند'
-    default:
-      return role || '-'
-  }
-}
-
 function afterLoadInputData (data: UserType) {
   userData.value = data
-  if (data.id) {
-    loadUserSchools(data.id)
-  }
-}
-
-async function loadUserSchools (userId: number) {
-  try {
-    userSchools.value = await userAPI.getSchools(userId)
-  } catch (error) {
-    console.error('Error loading user schools:', error)
-  }
 }
 
 function onChangeUserRole () {
   entityShowKey.value = Date.now()
 }
-
-onMounted(() => {
-  if (userId.value) {
-    loadUserSchools(userId.value)
-  }
-})
 </script>

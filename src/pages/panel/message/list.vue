@@ -89,7 +89,8 @@ import { ref, onMounted, reactive } from 'vue'
 import { useQuasar } from 'quasar'
 import MessageAPI from 'src/repositories/message'
 import UserAPI from 'src/repositories/user'
-import type { ListType, MessageType } from 'src/repositories/message'
+import type { ListType } from 'src/repositories/BaseAPI'
+import type { MessageType } from 'src/repositories/message'
 
 const messageApi = new MessageAPI()
 const userApi = new UserAPI()

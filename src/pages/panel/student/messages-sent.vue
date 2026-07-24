@@ -59,10 +59,11 @@
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { message } from 'src/repositories/message'
+import type { MessageType } from 'src/repositories/message'
 
 const $q = useQuasar()
 
-const messages = ref<any[]>([])
+const messages = ref<MessageType[]>([])
 const loading = ref(true)
 
 const formatDate = (dateString: string): string => {
@@ -82,8 +83,8 @@ const getReceiverNames = (owners: any[] = []): string => {
 const loadMessages = async () => {
   loading.value = true
   try {
-    const response = await message.sentMessages({ length: 100 })
-    messages.value = response.data?.data || response.data || []
+    const result = await message.sentMessages({ length: 100 })
+    messages.value = result.data
   } catch (error: any) {
     $q.notify({
       type: 'negative',

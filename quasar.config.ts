@@ -77,7 +77,7 @@ export default defineConfig((ctx) => {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      publicPath: process.env.BASE_ROUTE || '/panel',
+      publicPath: process.env.BASE_ROUTE || '/',
 
       vitePlugins: [
         [

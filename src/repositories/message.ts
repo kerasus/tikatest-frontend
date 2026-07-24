@@ -1,6 +1,26 @@
 import BaseAPI from './BaseAPI'
+import type { ListType } from './BaseAPI'
+export type MessageSenderType = {
+  id: number | null
+  firstname: string | null
+  lastname: string | null
+  full_name: string | null
+  username: string | null
+  mobile: string | null
+  email: string | null
+  roles_list: string[]
+}
 
-export type { ListType } from './BaseAPI'
+export type MessageUserType = {
+  id: number | null
+  firstname: string | null
+  lastname: string | null
+  full_name: string | null
+  username: string | null
+  mobile: string | null
+  email: string | null
+}
+
 export type MessageType = {
   id: number | null
   school_id: number | null
@@ -13,7 +33,7 @@ export type MessageType = {
   sent_at: string | null
   created_at: string | null
   updated_at: string | null
-  sender?: any
+  sender?: MessageSenderType
   owners?: MessageOwnerType[]
   receiver_ids?: number[]
   recipient_types?: any[]
@@ -30,7 +50,7 @@ export type MessageOwnerType = {
   read_at: string | null
   created_at: string | null
   updated_at: string | null
-  user?: any
+  user: MessageUserType
   message?: MessageType
 }
 
@@ -59,12 +79,12 @@ export default class MessageAPI extends BaseAPI<MessageType> {
     }
   }
 
-  async sentMessages (params: any = {}): Promise<any> {
+  async sentMessages (params: any = {}): Promise<ListType<MessageType>> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.sent, { params })
     return response.data
   }
 
-  async receivedMessages (params: any = {}): Promise<any> {
+  async receivedMessages (params: any = {}): Promise<ListType<MessageType>> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.received, { params })
     return response.data
   }
@@ -79,7 +99,7 @@ export default class MessageAPI extends BaseAPI<MessageType> {
     return response.data
   }
 
-  async myMessages (params: any = {}): Promise<any> {
+  async myMessages (params: any = {}): Promise<ListType<MessageType>> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.received, { params })
     return response.data
   }

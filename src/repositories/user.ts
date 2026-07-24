@@ -22,6 +22,23 @@ export type RoleType = {
   updated_at: string | null;
 }
 
+export type UserSchoolType = {
+  id: number | null;
+  code: string | null;
+  name: string | null;
+  address: string | null;
+  website: string | null;
+  logo_url: string | null;
+  type: 'school' | 'institute' | null;
+  account_url: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  pivot: {
+    role: string | null;
+  };
+}
+
 export type UserType = {
   id: number | null;
   firstname: string | null;
@@ -32,14 +49,7 @@ export type UserType = {
   mobile: string | null;
   roles_list: string[];
   roles: RoleType[];
-  schools?: Array<{
-    id: number | null;
-    name: string | null;
-    code: string | null;
-    pivot: {
-      role: string | null;
-    };
-  }>;
+  schools?: UserSchoolType[];
   email_verified_at: string | null;
   mobile_verified_at: string | null;
   created_at: string | null;
@@ -113,10 +123,10 @@ export default class UserAPI extends BaseAPI<UserType> {
     }
   }
 
-  async getSchools (userId: number): Promise<any[]> {
+  async getSchools (userId: number): Promise<UserSchoolType[]> {
     try {
       const response = await this.getAxiosInstanceWithToken().get(this.endpoints.getSchools(userId))
-      return response.data.data || []
+      return response.data || []
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message)

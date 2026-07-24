@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { index as studentRoutes } from './student'
+import { index as userRoutes } from './user'
 import { index as classRoutes } from './class'
 import { index as gradeRoutes } from './grade'
 import { index as quizRoutes } from './quiz'
@@ -33,6 +34,7 @@ export const index: RouteRecordRaw[] = [
         component: () => import('src/pages/panel/dashboard.vue')
       },
 
+      ...userRoutes,
       ...studentRoutes,
       ...classRoutes,
       ...gradeRoutes,
