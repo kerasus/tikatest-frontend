@@ -127,6 +127,15 @@ const topLinks = ref<ListItemType[]>([
     ]
   },
   {
+    icon: 'menu_book',
+    title: 'مدیریت دروس',
+    forRoles: [ 'Admin' ],
+    child: [
+      { icon: 'list', title: 'لیست دروس', route: { name: 'Panel.Lesson.List' } },
+      { icon: 'person_add', title: 'افزودن درس', route: { name: 'Panel.Lesson.Create' } }
+    ]
+  },
+  {
     icon: 'person',
     title: 'مدیریت کاربران',
     forRoles: [ 'Admin' ],

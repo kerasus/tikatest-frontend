@@ -12,6 +12,7 @@ import { index as studentPortalRoutes } from './studentPortal'
 import { index as calendarRoutes } from './calendar'
 import { index as studyHoursRoutes } from './studyHours'
 import { index as schoolRoutes } from './school'
+import { index as lessonRoutes } from './lesson'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
@@ -46,7 +47,8 @@ export const index: RouteRecordRaw[] = [
       ...studentPortalRoutes,
       ...calendarRoutes,
       ...studyHoursRoutes,
-      ...schoolRoutes
+      ...schoolRoutes,
+      ...lessonRoutes
     ]
   },
 
