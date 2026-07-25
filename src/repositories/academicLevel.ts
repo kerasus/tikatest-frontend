@@ -8,6 +8,15 @@ export type AcademicLevelType = {
   created_at: string | null
   updated_at: string | null
   deleted_at: string | null
+  school?: {
+    id: number | null
+    name: string | null
+    code: string | null
+  }
+  academicField?: {
+    id: number | null
+    name: string | null
+  }
 }
 
 export default class AcademicLevelAPI extends BaseAPI<AcademicLevelType> {

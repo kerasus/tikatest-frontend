@@ -69,7 +69,8 @@ export default class GradeAPI extends BaseAPI<GradeType> {
       ...this.endpoints,
       lessonReport: (lessonId: number) => `/grades/report/lesson/${lessonId}`,
       multipleLessonsReport: '/grades/report/multiple-lessons',
-      studentReport: (studentId: number) => `/grades/report/student/${studentId}`
+      studentReport: (studentId: number) => `/grades/report/student/${studentId}`,
+      bulkStore: '/grades/bulk'
     }
   }
 
@@ -91,6 +92,11 @@ export default class GradeAPI extends BaseAPI<GradeType> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentReport(studentId), {
       params
     })
+    return response.data
+  }
+
+  async bulkStore (data: { grades: any[] }): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.bulkStore!, data)
     return response.data
   }
 }

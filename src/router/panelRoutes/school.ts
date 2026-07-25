@@ -31,6 +31,24 @@ export const index = [
     component: () => import('src/pages/panel/school/edit.vue')
   },
   {
+    path: 'schools/:school_id/grades/create',
+    name: 'Panel.School.Grade.Create',
+    meta: {
+      pageCategory: 'مدیریت مدارس',
+      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
+    },
+    component: () => import('src/pages/panel/grade/schoolCreate.vue')
+  },
+  {
+    path: 'schools/:school_id/classes',
+    name: 'Panel.School.Classes',
+    meta: {
+      pageCategory: 'مدیریت مدارس',
+      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
+    },
+    component: () => import('src/pages/panel/schoolClasses.vue')
+  },
+  {
     path: 'schools/:id',
     name: 'Panel.School.Show',
     meta: {

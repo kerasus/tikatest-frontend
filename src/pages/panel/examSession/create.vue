@@ -67,10 +67,20 @@
             </div>
             <div class="col-12 col-md-3">
               <q-input
-                v-model="form.min_grade"
+                v-model="form.min_passing_score"
                 label="حداقل نمره قبولی"
                 outlined
-                type="number" />
+                type="number"
+                step="0.01" />
+            </div>
+            <div class="col-12 col-md-3">
+              <q-input
+                v-model="form.max_score"
+                label="حداکثر نمره ممکن"
+                outlined
+                type="number"
+                step="0.01"
+                :rules="[val => val > 0 || 'حداکثر نمره باید بزرگتر از 0 باشد']" />
             </div>
             <div class="col-12 col-md-3">
               <q-select
@@ -161,7 +171,8 @@ const form = reactive({
   persian_date: null as string | null,
   grade_type: null as string | null,
   grade_name_for_other_type: null as string | null,
-  min_grade: null as number | null,
+  min_passing_score: null as number | null,
+  max_score: null as number | null,
   is_report_card: false,
   is_descriptive: false,
   quiz_session_id: null as number | null

@@ -136,6 +136,30 @@ const topLinks = ref<ListItemType[]>([
     ]
   },
   {
+    icon: 'account_tree',
+    title: 'ساختار آموزشی',
+    forRoles: [ 'Admin' ],
+    route: { name: 'Panel.AcademicTree' }
+  },
+  {
+    icon: 'account_balance',
+    title: 'مدیریت رشته‌های تحصیلی',
+    forRoles: [ 'Admin' ],
+    child: [
+      { icon: '', title: 'لیست رشته‌ها', route: { name: 'Panel.AcademicField.List' } },
+      { icon: '', title: 'افزودن رشته', route: { name: 'Panel.AcademicField.Create' } }
+    ]
+  },
+  {
+    icon: 'school',
+    title: 'مدیریت مقطع‌های تحصیلی',
+    forRoles: [ 'Admin' ],
+    child: [
+      { icon: '', title: 'لیست مقطع‌ها', route: { name: 'Panel.AcademicLevel.List' } },
+      { icon: '', title: 'افزودن مقطع', route: { name: 'Panel.AcademicLevel.Create' } }
+    ]
+  },
+  {
     icon: 'person',
     title: 'مدیریت کاربران',
     forRoles: [ 'Admin' ],
