@@ -49,28 +49,48 @@
             <q-td :props="props">
               <q-btn
                 flat
-                dense
-                icon="visibility"
-                color="primary"
-                :to="{ name: 'Panel.School.Show', params: { id: props.row.id } }" />
-              <q-btn
-                flat
-                dense
-                icon="account_tree"
-                color="secondary"
-                :to="{ name: 'Panel.AcademicTree', params: { school_id: props.row.id } }" />
-              <q-btn
-                flat
-                dense
-                icon="grading"
-                color="positive"
-                :to="{ name: 'Panel.School.Grade.Create', params: { school_id: props.row.id } }" />
-              <q-btn
-                flat
-                dense
-                icon="class_"
-                color="accent"
-                :to="{ name: 'Panel.School.Classes', params: { school_id: props.row.id } }" />
+                icon="more"
+                color="primary">
+                <q-menu
+                  transition-show="jump-down"
+                  transition-hide="jump-up">
+                  <q-list>
+                    <q-item
+                      v-close-popup
+                      clickable
+                      :to="{ name: 'Panel.School.Show', params: { id: props.row.id } }">
+                      <q-item-section avatar>
+                        <q-icon
+                          name="visibility"
+                          color="primary" />
+                      </q-item-section>
+                      <q-item-section>مشاهده و ویرایش</q-item-section>
+                    </q-item>
+                    <q-item
+                      v-close-popup
+                      clickable
+                      :to="{ name: 'Panel.AcademicTree', params: { school_id: props.row.id } }">
+                      <q-item-section avatar>
+                        <q-icon
+                          name="account_tree"
+                          color="secondary" />
+                      </q-item-section>
+                      <q-item-section>ساختار دروس و مقطع‌ها</q-item-section>
+                    </q-item>
+                    <q-item
+                      v-close-popup
+                      clickable
+                      :to="{ name: 'Panel.School.Classes', params: { school_id: props.row.id } }">
+                      <q-item-section avatar>
+                        <q-icon
+                          name="class_"
+                          color="accent" />
+                      </q-item-section>
+                      <q-item-section>مدیریت کلاس‌ها</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
             </q-td>
           </template>
         </q-table>
@@ -114,8 +134,22 @@ const typeOptions = [
 ]
 
 const columns = [
-  { name: 'code', required: true, label: 'کد', align: 'right' as const, field: 'code', sortable: true },
-  { name: 'name', required: true, label: 'نام', align: 'right' as const, field: 'name', sortable: true },
+  {
+    name: 'code',
+    required: true,
+    label: 'کد',
+    align: 'right' as const,
+    field: 'code',
+    sortable: true
+  },
+  {
+    name: 'name',
+    required: true,
+    label: 'نام',
+    align: 'right' as const,
+    field: 'name',
+    sortable: true
+  },
   { name: 'type', label: 'نوع', align: 'right' as const, field: 'type' },
   { name: 'address', label: 'آدرس', align: 'right' as const, field: 'address' },
   { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
@@ -158,7 +192,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .school-list-page {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
 }
 </style>

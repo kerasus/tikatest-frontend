@@ -3,14 +3,14 @@ import BaseAPI from './BaseAPI'
 export type { ListType } from './BaseAPI'
 export type GradeType = {
   id: number | null
-  school_id: number | null
   exam_session_id: number | null
   lesson_id: number | null
   student_id: number | null
   class_id: number | null
   raw_grade: number | null
   calculated_grade: number | null
-  min_grade: number | null
+  min_passing_score: number | null
+  max_score: number | null
   grade_type: string | null
   grade_name_for_other_type: string | null
   is_report_card: boolean
@@ -44,14 +44,14 @@ export default class GradeAPI extends BaseAPI<GradeType> {
     super('/grades')
     this.defaultObject = {
       id: null,
-      school_id: null,
       exam_session_id: null,
       lesson_id: null,
       student_id: null,
       class_id: null,
       raw_grade: null,
       calculated_grade: null,
-      min_grade: null,
+      min_passing_score: null,
+      max_score: null,
       grade_type: null,
       grade_name_for_other_type: null,
       is_report_card: false,
@@ -70,7 +70,8 @@ export default class GradeAPI extends BaseAPI<GradeType> {
       lessonReport: (lessonId: number) => `/grades/report/lesson/${lessonId}`,
       multipleLessonsReport: '/grades/report/multiple-lessons',
       studentReport: (studentId: number) => `/grades/report/student/${studentId}`,
-      bulkStore: '/grades/bulk'
+      bulkStore: '/grades/bulk',
+      createExamSessionWithGrades: '/grades/store-with-session'
     }
   }
 
@@ -97,6 +98,11 @@ export default class GradeAPI extends BaseAPI<GradeType> {
 
   async bulkStore (data: { grades: any[] }): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.bulkStore!, data)
+    return response.data
+  }
+
+  async createExamSessionWithGrades (data: any): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.createExamSessionWithGrades!, data)
     return response.data
   }
 }

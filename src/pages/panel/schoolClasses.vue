@@ -97,7 +97,9 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog v-model="dialog.show" persistent>
+    <q-dialog
+      v-model="dialog.show"
+      persistent>
       <q-card style="min-width: 400px; max-width: 90vw;">
         <q-card-section>
           <div class="text-h6">{{ dialog.title }}</div>
@@ -126,8 +128,8 @@
               <q-btn
                 flat
                 label="انصراف"
-                @click="dialog.show = false"
-                class="q-ml-sm" />
+                class="q-ml-sm"
+                @click="dialog.show = false" />
             </div>
           </q-form>
         </q-card-section>
@@ -179,21 +181,21 @@ const dialog = reactive({
 })
 
 function buildTree (fields: AcademicFieldType[], levels: AcademicLevelType[], classes: SchoolClassType[]): any[] {
-  return fields.map(field => ({
+  return fields.map((field) => ({
     id: `field-${field.id}`,
     label: field.name || 'رشته',
     type: 'field',
     data: field,
     children: levels
-      .filter(l => l.field_id === field.id)
-      .map(level => ({
+      .filter((l) => l.field_id === field.id)
+      .map((level) => ({
         id: `level-${level.id}`,
         label: level.name || 'مقطع',
         type: 'level',
         data: level,
         children: classes
-          .filter(c => c.level_id === level.id)
-          .map(cls => ({
+          .filter((c) => c.level_id === level.id)
+          .map((cls) => ({
             id: `class-${cls.id}`,
             label: cls.name || 'کلاس',
             type: 'class',

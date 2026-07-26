@@ -18,10 +18,13 @@ const appConfigManager = useAppConfig()
 
 const searchValue = ref('')
 
-const allowedLinks = computed(() => topLinks.value
-  .filter((link) => {
-    return !link.forRoles ? true : link.forRoles.some((role) => userManager.hasRole(userManager.me, role))
-  }))
+const allowedLinks = computed(() =>
+  topLinks.value.filter((link) => {
+    return !link.forRoles
+      ? true
+      : link.forRoles.some((role) => userManager.hasRole(userManager.me, role))
+  })
+)
 const filterLinks = computed(() => {
   if (searchValue.value === null) {
     return allowedLinks.value
@@ -36,7 +39,7 @@ const filterLinks = computed(() => {
           return { ...link, child: filteredChildren }
         }
       }
-      if ((link.title).includes(searchValue.value)) {
+      if (link.title.includes(searchValue.value)) {
         return link
       }
       return null
@@ -50,7 +53,7 @@ type ListItemType = {
   iconColor?: string;
   title: string;
   mainRouteName?: string;
-  route?: { name: string, params?: Record<string, string> };
+  route?: { name: string; params?: Record<string, string> };
   forRoles?: UserRolesType[];
   child?: ListItemType[];
 };
@@ -59,13 +62,20 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'dashboard',
     title: 'پیشخوان',
-    forRoles: [ 'Student' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
+    route: { name: 'Panel.Dashboard' }
+  },
+  {
+    icon: 'dashboard',
+    title: 'پیشخوان',
+    forRoles: ['Student'],
     route: { name: 'Student.Dashboard' }
   },
+  { icon: 'school', title: 'لیست مدارس', route: { name: 'Panel.School.List' } },
   {
     icon: 'grading',
     title: 'نمرات',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     child: [
       { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
       { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
@@ -74,7 +84,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'gavel',
     title: 'موارد انضباطی',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     child: [
       { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
       { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
@@ -83,7 +93,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'sms',
     title: 'مدیریت پیام',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     child: [
       { icon: '', title: 'ارسال پیام', route: { name: 'Student.Message.Create' } },
       { icon: '', title: 'مشاهده پیام‌ها', route: { name: 'Student.Message.List' } }
@@ -92,96 +102,45 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'quiz',
     title: 'آزمون آنلاین',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     route: { name: 'Student.Quiz.List' }
   },
   {
     icon: 'assignment',
     title: 'ساعت مطالعه و تکالیف',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     child: [
       { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
       { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
-      { icon: '', title: 'مشاهده ساعات مطالعه ثبت شده', route: { name: 'Student.StudySessions.List' } }
+      {
+        icon: '',
+        title: 'مشاهده ساعات مطالعه ثبت شده',
+        route: { name: 'Student.StudySessions.List' }
+      }
     ]
   },
   {
     icon: 'calendar_today',
     title: 'تقویم اجرایی',
-    forRoles: [ 'Student' ],
+    forRoles: ['Student'],
     route: { name: 'Student.Calendar' }
   },
   {
-    icon: 'dashboard',
-    title: 'پیشخوان',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
-    route: { name: 'Panel.Dashboard' }
-  },
-  {
-    icon: 'school',
-    title: 'مدیریت مدارس',
-    forRoles: [ 'Admin' ],
-    child: [
-      { icon: '', title: 'لیست مدارس', route: { name: 'Panel.School.List' } },
-      { icon: '', title: 'افزودن مدرسه', route: { name: 'Panel.School.Create' } }
-    ]
-  },
-  {
-    icon: 'menu_book',
-    title: 'مدیریت دروس',
-    forRoles: [ 'Admin' ],
-    child: [
-      { icon: 'list', title: 'لیست دروس', route: { name: 'Panel.Lesson.List' } },
-      { icon: 'person_add', title: 'افزودن درس', route: { name: 'Panel.Lesson.Create' } }
-    ]
-  },
-  {
-    icon: 'account_tree',
-    title: 'ساختار آموزشی',
-    forRoles: [ 'Admin' ],
-    route: { name: 'Panel.AcademicTree' }
-  },
-  {
-    icon: 'account_balance',
-    title: 'مدیریت رشته‌های تحصیلی',
-    forRoles: [ 'Admin' ],
-    child: [
-      { icon: '', title: 'لیست رشته‌ها', route: { name: 'Panel.AcademicField.List' } },
-      { icon: '', title: 'افزودن رشته', route: { name: 'Panel.AcademicField.Create' } }
-    ]
-  },
-  {
-    icon: 'school',
-    title: 'مدیریت مقطع‌های تحصیلی',
-    forRoles: [ 'Admin' ],
-    child: [
-      { icon: '', title: 'لیست مقطع‌ها', route: { name: 'Panel.AcademicLevel.List' } },
-      { icon: '', title: 'افزودن مقطع', route: { name: 'Panel.AcademicLevel.Create' } }
-    ]
-  },
-  {
     icon: 'person',
-    title: 'مدیریت کاربران',
-    forRoles: [ 'Admin' ],
-    child: [
-      { icon: 'list', title: 'لیست کاربران', route: { name: 'Panel.User.List' } },
-      { icon: 'person_add', title: 'افزودن کاربر', route: { name: 'Panel.User.Create' } },
-      { icon: 'school', title: 'معلمان', route: { name: 'Panel.User.Teachers' } },
-      { icon: 'admin_panel_settings', title: 'مدیران', route: { name: 'Panel.User.Managers' } },
-      { icon: 'work', title: 'کارکنان', route: { name: 'Panel.User.Staff' } },
-      { icon: 'group_work', title: 'نقش‌های کاربران', route: { name: 'Panel.User.Roles' } }
-    ]
+    title: 'لیست کاربران',
+    forRoles: ['Manager', 'Admin'],
+    route: { name: 'Panel.User.List' }
   },
   {
     icon: 'school',
     title: 'دانش آموزان',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     route: { name: 'Panel.Student.List' }
   },
   {
     icon: 'grading',
     title: 'نمرات',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت نمره', route: { name: 'Panel.Grade.Create' } },
       { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Grade.List' } },
@@ -193,7 +152,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'sms',
     title: 'مدیریت پیام',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ارسال پیام', route: { name: 'Panel.Message.Create' } },
       { icon: '', title: 'مشاهده پیام های ارسالی', route: { name: 'Panel.Message.Sent' } },
@@ -203,19 +162,27 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'gavel',
     title: 'موارد انضباطی',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت غیبت', route: { name: 'Panel.Disciplinary.Absence.Create' } },
-      { icon: '', title: 'مشاهده غیبت های ثبت شده', route: { name: 'Panel.Disciplinary.Absence.List' } },
+      {
+        icon: '',
+        title: 'مشاهده غیبت های ثبت شده',
+        route: { name: 'Panel.Disciplinary.Absence.List' }
+      },
       { icon: '', title: 'تعریف مورد انضباطی', route: { name: 'Panel.DisciplinaryCase.Create' } },
       { icon: '', title: 'ثبت مورد انضباطی', route: { name: 'Panel.Disciplinary.Create' } },
-      { icon: '', title: 'مشاهده موارد انضباطی ثبت شده', route: { name: 'Panel.Disciplinary.List' } }
+      {
+        icon: '',
+        title: 'مشاهده موارد انضباطی ثبت شده',
+        route: { name: 'Panel.Disciplinary.List' }
+      }
     ]
   },
   {
     icon: 'quiz',
     title: 'آزمون آنلاین',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Quiz.Create' } },
       { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Quiz.List' } }
@@ -224,13 +191,13 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'calendar_today',
     title: 'تقویم اجرایی',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     route: { name: 'Panel.Calendar' }
   },
   {
     icon: 'assignment',
     title: 'تکالیف',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
       { icon: '', title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
@@ -239,7 +206,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'menu_book',
     title: 'ساعت مطالعه دانش آموزان',
-    forRoles: [ 'Manager', 'Teacher', 'Admin' ],
+    forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
       { icon: '', title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
@@ -271,13 +238,17 @@ function getWorkerProductionPageTitle (userRole: UserRolesType): string {
   return '-'
 }
 
-watch(currentRouteName, () => {
-  if ($q.screen.lt.md) {
-    appLayoutStore.layoutLeftDrawerVisible = false
+watch(
+  currentRouteName,
+  () => {
+    if ($q.screen.lt.md) {
+      appLayoutStore.layoutLeftDrawerVisible = false
+    }
+  },
+  {
+    immediate: true
   }
-}, {
-  immediate: true
-})
+)
 </script>
 
 <template>
@@ -328,15 +299,13 @@ watch(currentRouteName, () => {
                 :color="link.iconColor" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ (link.title) }}</q-item-label>
+              <q-item-label>{{ link.title }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </q-scroll-area>
       <div class="left-drawer__copyright-section">
-        <div class="app-version">
-          v: {{ appConfigManager.version }}
-        </div>
+        <div class="app-version">v: {{ appConfigManager.version }}</div>
         <div class="copy-right">
           <span> Copyright TikaTest co. </span>
           <span> &copy; {{ new Date().getFullYear() }} </span>

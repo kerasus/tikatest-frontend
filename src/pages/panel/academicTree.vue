@@ -129,35 +129,6 @@
                   clearable
                   :rules="[v => !!v || 'رشته الزامی است']" />
               </div>
-              <div
-                v-if="dialog.type === 'lesson'"
-                class="col-12">
-                <q-select
-                  v-model="dialog.form.level_id"
-                  :options="levelOptions"
-                  option-value="id"
-                  option-label="name"
-                  label="مقطع"
-                  outlined
-                  emit-value
-                  map-options
-                  clearable
-                  :rules="[v => !!v || 'مقطع الزامی است']" />
-              </div>
-              <div
-                v-if="dialog.type === 'lesson'"
-                class="col-12">
-                <q-select
-                  v-model="dialog.form.class_id"
-                  :options="classOptions"
-                  option-value="id"
-                  option-label="name"
-                  label="کلاس"
-                  outlined
-                  emit-value
-                  map-options
-                  clearable />
-              </div>
               <div class="col-12">
                 <q-input
                   v-model="dialog.form.name"
@@ -214,13 +185,11 @@ import { useQuasar } from 'quasar'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import LessonAPI from 'src/repositories/lesson'
-import ClassAPI from 'src/repositories/schoolClass'
 import SchoolAPI from 'src/repositories/school'
 import type { SchoolType } from 'src/repositories/school'
 import type { AcademicFieldType } from 'src/repositories/academicField'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
 import type { LessonType } from 'src/repositories/lesson'
-import type { SchoolClassType } from 'src/repositories/schoolClass'
 
 const route = useRoute()
 const $q = useQuasar()
@@ -229,7 +198,6 @@ const schoolApi = new SchoolAPI()
 const fieldApi = new AcademicFieldAPI()
 const levelApi = new AcademicLevelAPI()
 const lessonApi = new LessonAPI()
-const classApi = new ClassAPI()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -237,7 +205,6 @@ const selectedNode = ref(null)
 const treeData = ref<any[]>([])
 const fieldOptions = ref<AcademicFieldType[]>([])
 const levelOptions = ref<AcademicLevelType[]>([])
-const classOptions = ref<SchoolClassType[]>([])
 
 const schoolId = parseInt(route.params.school_id as string)
 
@@ -251,7 +218,6 @@ const dialog = reactive({
     school_id: schoolId,
     field_id: null as number | null,
     level_id: null as number | null,
-    class_id: null as number | null,
     name: null as string | null,
     order: 0 as number | null,
     coefficient: 1 as number | null
@@ -272,7 +238,7 @@ function buildTree (fields: AcademicFieldType[], levels: AcademicLevelType[], le
         type: 'level',
         data: level,
         children: lessons
-          .filter((l) => l.class_id === level.id)
+          .filter((l) => l.level_id === level.id)
           .map((lesson) => ({
             id: `lesson-${lesson.id}`,
             label: lesson.name || 'درس',
@@ -287,11 +253,10 @@ function buildTree (fields: AcademicFieldType[], levels: AcademicLevelType[], le
 async function loadTreeData () {
   loading.value = true
   try {
-    const [fieldsRes, levelsRes, lessonsRes, classesRes] = await Promise.all([
+    const [fieldsRes, levelsRes, lessonsRes] = await Promise.all([
       fieldApi.index({ length: 1000, school_id: schoolId }),
       levelApi.index({ length: 1000, school_id: schoolId }),
-      lessonApi.index({ length: 1000, school_id: schoolId }),
-      classApi.index({ length: 1000, school_id: schoolId })
+      lessonApi.index({ length: 1000 })
     ])
 
     treeData.value = buildTree(fieldsRes.data, levelsRes.data, lessonsRes.data)
@@ -315,7 +280,6 @@ function addRootField () {
     school_id: schoolId,
     field_id: null,
     level_id: null,
-    class_id: null,
     name: null,
     order: 0,
     coefficient: 1
@@ -330,9 +294,8 @@ function addChild (node: any) {
   dialog.title = dialog.type === 'level' ? 'افزودن مقطع' : 'افزودن درس'
   dialog.form = {
     school_id: schoolId,
-    field_id: node.type === 'field' ? node.data.id : (node.data.field_id || null),
+    field_id: null,
     level_id: node.type === 'level' ? node.data.id : null,
-    class_id: node.type === 'level' ? node.data.id : null,
     name: null,
     order: 0,
     coefficient: 1
@@ -340,7 +303,6 @@ function addChild (node: any) {
 
   if (dialog.type === 'lesson') {
     loadLevelOptions(node.data.field_id)
-    loadClassOptions(node.data.id)
   } else if (dialog.type === 'level') {
     loadFieldOptions()
   }
@@ -355,18 +317,15 @@ function editNode (node: any) {
   dialog.title = node.type === 'field' ? 'ویرایش رشته' : node.type === 'level' ? 'ویرایش مقطع' : 'ویرایش درس'
   dialog.form = {
     school_id: schoolId,
-    field_id: node.data.field_id || null,
+    field_id: null,
     level_id: node.data.level_id || null,
-    class_id: node.data.class_id || null,
     name: node.data.name,
     order: node.data.order ?? 0,
     coefficient: node.data.coefficient ?? 1
   }
 
   if (node.type === 'lesson') {
-    loadFieldOptions()
-    loadLevelOptions(node.data.field_id)
-    loadClassOptions(node.data.class_id)
+    loadLevelOptions()
   } else if (node.type === 'level') {
     loadFieldOptions()
   }
@@ -412,8 +371,11 @@ async function onSubmitDialog () {
       if (dialog.edit) await levelApi.update(dialog.node.data.id, dialog.form as any)
       else await levelApi.create(dialog.form as any)
     } else if (dialog.type === 'lesson') {
-      if (dialog.edit) await lessonApi.update(dialog.node.data.id, dialog.form as any)
-      else await lessonApi.create(dialog.form as any)
+      const lessonData = { ...dialog.form }
+      delete lessonData.school_id
+      delete lessonData.field_id
+      if (dialog.edit) await lessonApi.update(dialog.node.data.id, lessonData as any)
+      else await lessonApi.create(lessonData as any)
     }
 
     $q.notify({
@@ -451,15 +413,6 @@ async function loadLevelOptions (fieldId?: number) {
     levelOptions.value = result.data
   } catch (error) {
     console.error('Error loading levels:', error)
-  }
-}
-
-async function loadClassOptions (levelId?: number) {
-  try {
-    const result = await classApi.index({ length: 1000, school_id: schoolId })
-    classOptions.value = result.data
-  } catch (error) {
-    console.error('Error loading classes:', error)
   }
 }
 

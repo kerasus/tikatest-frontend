@@ -55,6 +55,56 @@
 
       <q-card class="q-mb-md">
         <q-card-section>
+          <div class="text-h6">مدارس و کلاس‌ها</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <template v-if="groupedSchools.length > 0">
+            <q-card
+              v-for="school in groupedSchools"
+              :key="school.id"
+              flat
+              bordered
+              class="q-mb-md full-width-card">
+              <q-card-section>
+                <div class="text-subtitle1 text-weight-medium">{{ school.name }}</div>
+              </q-card-section>
+              <q-separator />
+              <q-card-section>
+                <q-list
+                  bordered
+                  separator>
+                  <q-item
+                    v-for="reg in school.registrations"
+                    :key="reg.id"
+                    dense>
+                    <q-item-section>
+                      <q-item-label>{{ reg.schoolClass?.name || '-' }}</q-item-label>
+                      <q-item-label caption>
+                        <template v-if="reg.schoolClass?.academicLevel">
+                          پایه: {{ reg.schoolClass.academicLevel.name }}
+                        </template>
+                        <template v-if="reg.schoolClass?.academicField">
+                          <span v-if="reg.schoolClass?.academicLevel"> - </span>
+                          رشته: {{ reg.schoolClass.academicField.name }}
+                        </template>
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+            </q-card>
+          </template>
+          <div
+            v-else
+            class="text-center text-grey">
+            هیچ مدرسه و کلاسی ثبت نشده است.
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <q-card class="q-mb-md">
+        <q-card-section>
           <div class="text-h6">نمرات</div>
         </q-card-section>
         <q-separator />
@@ -112,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { student } from 'src/repositories/student'
@@ -128,6 +178,30 @@ const getClassName = (): string => {
   const reg = studentData.value.studentClassRegistrations[0]
   return reg?.schoolClass?.name || '-'
 }
+
+const groupedSchools = computed(() => {
+  if (!studentData.value?.studentClassRegistrations?.length) return []
+
+  const map = new Map<number, any>()
+
+  for (const reg of studentData.value.studentClassRegistrations) {
+    const school = reg.school || reg.schoolClass?.school
+    if (!school) continue
+
+    const schoolId = school.id
+    if (!map.has(schoolId)) {
+      map.set(schoolId, {
+        id: schoolId,
+        name: school.name,
+        registrations: []
+      })
+    }
+
+    map.get(schoolId).registrations.push(reg)
+  }
+
+  return Array.from(map.values())
+})
 
 onMounted(async () => {
   loading.value = true

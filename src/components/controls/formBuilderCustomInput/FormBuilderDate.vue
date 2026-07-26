@@ -5,9 +5,6 @@
     <div class="outsideLabel">
       {{ placeholder ? label : null }}
     </div>
-    <!--    :error-message="-->
-    <!--    localErrorData ? $t(localErrorData.message, localErrorData.namedValue) : undefined-->
-    <!--    "-->
     <q-input
       ref="input"
       v-model="displayDateTime"
@@ -27,10 +24,10 @@
       :outlined="outlined"
       :class="customClass"
       :input-class="customClass"
-      :readonly="readonly"
       :error="!!localErrorMessage"
-      :error-message="localErrorData ? localErrorData.message : undefined"
-      :autofocus="false"
+      :error-message="
+        localErrorData ? $t(localErrorData.message, localErrorData.namedValue) : undefined
+      "
       @clear="onClear"
       @update:model-value="onChangeInputDate"
       @keydown="onKeydown">
@@ -61,11 +58,9 @@
         :range="range"
         :multiple="multiple"
         :disable="disable"
-        :default-year-month="defaultYearMonth"
         :today-btn="todayBtn"
         :options="daysOptions"
         minimal
-        :bordered="false"
         @update:model-value="onChangeDate">
         <div class="row items-center justify-end">
           <q-btn
@@ -81,64 +76,146 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { ComputedRef } from 'vue'
 import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
-import { computed, type ModelRef, type Ref, ref, watch } from 'vue'
-import { FormBuilderInputType } from 'src/types'
+import type { PropType, ComputedRef } from 'vue'
+import { ref, watch, type Ref, computed, type ModelRef } from 'vue'
 
 export interface LocalErrorDataType {
-  message: string
-  namedValue: Record<string, unknown>
+  message: string;
+  namedValue: Record<string, unknown>;
 }
 
 defineOptions({
   name: 'FormBuilderDate'
 })
 
-const { t: rawT } = useI18n()
 const dateManager = useDate()
+const i18n = useI18n()
 
-
-const props = withDefaults(defineProps<FormBuilderInputType>(), {
-  name: '',
-  calendar: 'persian',
-  clearable: true,
-  calendarIcon: 'oms:calendar',
-  clockIcon: 'oms:clock',
-  title: '',
-  placeholder: '',
-  closeColorBtn: 'primary',
-  multiple: false,
-  range: false,
-  iso8601: true,
-  todayBtn: false,
-  fillMask: undefined,
-  reverseFillMask: undefined,
-  withTime: false,
-  label: '',
-  class: '',
-  error: false,
-  errorMessage: '',
-  disable: false,
-  defaultYearMonth: undefined,
-  readonly: false,
-  filled: false,
-  dense: true,
-  rounded: false,
-  outlined: false,
-  rules: () => [],
-  lazyRules: false,
-  loading: false,
-  limitFuture: false,
-  limitPast: false
+const props = defineProps({
+  name: {
+    default: '',
+    type: String
+  },
+  calendar: {
+    type: String as PropType<'gregorian' | 'persian' | undefined>,
+    default: 'persian'
+  },
+  clearable: {
+    type: Boolean,
+    default: true
+  },
+  calendarIcon: {
+    type: String,
+    default: 'oms:calendar'
+  },
+  clockIcon: {
+    type: String,
+    default: 'oms:clock'
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  closeColorBtn: {
+    default: 'primary',
+    type: String
+  },
+  multiple: {
+    type: Boolean,
+    default: false
+  },
+  range: {
+    type: Boolean,
+    default: false
+  },
+  iso8601: {
+    type: Boolean,
+    default: true
+  },
+  todayBtn: {
+    type: Boolean,
+    default: false
+  },
+  fillMask: {
+    type: String,
+    default: undefined
+  },
+  reverseFillMask: {
+    type: Boolean,
+    default: undefined
+  },
+  mask: {
+    type: String,
+    default: '####/##/##'
+  },
+  label: {
+    default: '',
+    type: String || null
+  },
+  class: {
+    default: '',
+    type: String
+  },
+  error: {
+    default: false,
+    type: Boolean
+  },
+  errorMessage: {
+    default: '',
+    type: String
+  },
+  disable: {
+    default: false,
+    type: Boolean
+  },
+  readonly: {
+    default: false,
+    type: Boolean
+  },
+  filled: {
+    default: false,
+    type: Boolean
+  },
+  dense: {
+    default: true,
+    type: Boolean
+  },
+  rounded: {
+    default: false,
+    type: Boolean
+  },
+  outlined: {
+    default: false,
+    type: [Boolean]
+  },
+  rules: {
+    default: () => [] as ValidationRule[],
+    type: Array as PropType<ValidationRule[]>
+  },
+  lazyRules: {
+    default: false,
+    type: [Boolean]
+  },
+  loading: {
+    default: false,
+    type: Boolean
+  },
+  limitFuture: {
+    default: false,
+    type: Boolean || String
+  }
 })
 
-// const popupTime = ref(false)
-const popupDate = ref(false)
-const mask = ref('####/##/##')
-const persistentMenu = ref(false)
 const displayDateTime: Ref<string> = ref('')
+const popupDate = ref(false)
+// const popupTime = ref(false)
+const persistentMenu = ref(false)
 const input = ref<HTMLInputElement | null>(null)
 const localErrorMessage: Ref<string | null> = ref(null)
 
@@ -147,26 +224,9 @@ const value: ModelRef<string | null> = defineModel('value', {
   default: null
 })
 
-const localRules = computed(() =>
-  (props.rules as ValidationRule[]).map((rule: any) => {
-    if (rule.ruleName === 'required') {
-      const ruleName = rule.ruleName
-      const ruleParams = rule.ruleParams
-      rule = (): boolean | string => {
-        if (displayDateTime.value === '____/__/__') {
-          return rawT('error.validation.required', { field: props.label })
-        } else return !localErrorMessage.value
-      }
-
-      rule.ruleName = ruleName
-      rule.ruleParams = ruleParams
-    }
-
-    return rule
-  })
-)
 const customClass = computed(() => props.class)
 const showClearAble = computed(() => displayDateTime.value !== '____/__/__')
+
 const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() => {
   if (!localErrorMessage.value) {
     return undefined
@@ -179,22 +239,37 @@ const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() 
   return errorData
 })
 
+const localRules = computed(() =>
+  props.rules.map((rule: any) => {
+    if (rule.ruleName === 'required') {
+      const ruleName = rule.ruleName
+      const ruleParams = rule.ruleParams
+      rule = (): boolean | string => {
+        if (displayDateTime.value === '____/__/__') {
+          return i18n.t('error.validation.required', { field: props.label })
+        } else if (localErrorMessage.value) {
+          return false
+        } else {
+          return true
+        }
+      }
+
+      rule.ruleName = ruleName
+      rule.ruleParams = ruleParams
+    }
+
+    return rule
+  })
+)
+
 watch(
   () => value.value,
   (newValue) => {
-    if (!newValue || isNaN((new Date(newValue)).getTime())) {
+    if (!newValue) {
       displayDateTime.value = '____/__/__'
       return
     }
-    let gregorianDate: null | string
-    const iso8601DateString = dateManager.getDateTimeFromIso8601DateString(newValue)
-    const gd = (typeof iso8601DateString === 'object' ? iso8601DateString.date : '2020-01-01')
-    if (props.withTime) {
-      gregorianDate = gd + 'T00:00:00'
-    } else {
-      gregorianDate = gd
-    }
-    value.value = gregorianDate
+    value.value = dateManager.getDateTimeFromIso8601DateString(newValue).date
     displayDateTime.value = dateManager.miladiToShamsi(newValue.toString())
   },
   { immediate: true }
@@ -209,9 +284,7 @@ watch(
 )
 
 function onChangeInputDate () {
-  if(displayDateTime.value === '____/__/__') {
-    value.value = null
-  }
+  const dateManager = useDate()
   const analysedShamsiDate = dateManager.validationShamsiDate(displayDateTime.value)
 
   if (analysedShamsiDate.isValid) {
@@ -232,15 +305,7 @@ function onChangeDate (newValue: string) {
   }
   let gregorianDate = newValue
   if (props.calendar === 'persian') {
-    if (props.withTime) {
-      gregorianDate = dateManager.shamsiToMiladi(
-        newValue.toString(),
-        'jYYYY/jMM/jDD',
-        'YYYY-MM-DDT00:00:00'
-      )
-    } else {
-      gregorianDate = dateManager.shamsiToMiladi(newValue.toString())
-    }
+    gregorianDate = dateManager.shamsiToMiladi(newValue.toString())
   }
   displayDateTime.value = newValue.toString()
   value.value = gregorianDate
@@ -302,29 +367,17 @@ function onKeydown (e: KeyboardEvent) {
 }
 
 function daysOptions (date: string) {
-  if (!props.limitFuture && !props.limitPast) {
+  if (!props.limitFuture) {
     return true
   }
-  if(props.limitFuture){
-    const limitFutureDate =
+  const limitFutureDate =
     typeof props.limitFuture === 'boolean' ? new Date() : new Date(props.limitFuture)
-    const dateDate = new Date(dateManager.shamsiToMiladi(date))
+  const dateDate = new Date(dateManager.shamsiToMiladi(date))
 
-    if (typeof props.limitFuture === 'string') {
-      return dateDate <= limitFutureDate
-    }
+  if (typeof props.limitFuture === 'string') {
     return dateDate <= limitFutureDate
-
-  }else if(props.limitPast){
-    const limitPastDate =  typeof props.limitPast === 'boolean' ? new Date() : new Date(props.limitPast)
-    limitPastDate.setDate(limitPastDate.getDate() - 1)
-    const dateDate = new Date(dateManager.shamsiToMiladi(date))
-    if (typeof props.limitPast === 'string') {
-      return dateDate >= limitPastDate
-    }
-    return dateDate >= limitPastDate
-
   }
+  return dateDate <= limitFutureDate
 }
 
 watch(displayDateTime, onChangeInputDate)

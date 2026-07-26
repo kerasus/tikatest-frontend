@@ -5,7 +5,6 @@
     <div class="outsideLabel">
       {{ placeholder ? label : null }}
     </div>
-    <!--    $t(localErrorData.message, localErrorData.namedValue)-->
     <q-input
       ref="input"
       v-model="displayDateTime"
@@ -29,8 +28,9 @@
       :class="customClass"
       :input-class="customClass"
       :error="!!localErrorMessage"
-      :error-message="localErrorData ? localErrorData.message : undefined"
-      :autofocus="false"
+      :error-message="
+        localErrorData ? $t(localErrorData.message, localErrorData.namedValue) : undefined
+      "
       @clear="onClear"
       @keydown="onKeydown">
       <template #append>
@@ -63,8 +63,6 @@
         :multiple="multiple"
         :title="title ? title : label"
         :today-btn="todayBtn"
-        :bordered="false"
-        :options="daysOptions"
         @update:model-value="onChangeDate">
         <q-form class="time-picker">
           <q-input
@@ -75,7 +73,6 @@
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
-            :autofocus="false"
             @keydown="onKeydownSecond"
             @update:model-value="onMenuSecondInputUpdate" />
           <div class="time-separator">:</div>
@@ -87,7 +84,6 @@
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
-            :autofocus="false"
             @keydown="onKeydownMinute"
             @update:model-value="onMenuMinuteInputUpdate" />
           <div class="time-separator">:</div>
@@ -99,7 +95,6 @@
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
-            :autofocus="false"
             @keydown="onKeydownHour"
             @update:model-value="onMenuHourInputUpdate" />
         </q-form>
@@ -118,66 +113,153 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { ComputedRef } from 'vue'
 import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
-import { FormBuilderInputType } from 'src/types'
 import type { LocalErrorDataType } from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
-import { type ComponentPublicInstance, computed, type ModelRef, nextTick, reactive, ref, type Ref, watch } from 'vue'
+import type { PropType, ComputedRef } from 'vue'
+import {
+  ref,
+  watch,
+  type Ref,
+  reactive,
+  computed,
+  nextTick,
+  type ModelRef,
+  type ComponentPublicInstance
+} from 'vue'
 
 defineOptions({
   name: 'FormBuilderDateTime'
 })
 
-const { t: rawT } = useI18n()
+const i18n = useI18n()
 const dateManager = useDate()
 
-
 interface DateTimeObject {
-  date: string
-  time: string
-  hours: string
-  minutes: string
-  seconds: string
+  date: string;
+  time: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
 }
 
-
-const props = withDefaults(defineProps<FormBuilderInputType>(), {
-  name: '',
-  calendar: 'persian',
-  clearable: true,
-  calendarIcon: 'oms:calendar',
-  clockIcon: 'oms:clock',
-  title: '',
-  placeholder: '',
-  multiple: false,
-  range: false,
-  iso8601: true,
-  todayBtn: false,
-  fillMask: undefined,
-  reverseFillMask: undefined,
-  label: '',
-  class: '',
-  error: false,
-  errorMessage: '',
-  disable: false,
-  readonly: false,
-  filled: false,
-  closeColorBtn: 'primary',
-  dense: true,
-  rounded: false,
-  outlined: false,
-  rules: () => [],
-  lazyRules: false,
-  loading: false,
-  limitFuture: false,
-  limitPast: false,
-  convertToZone: false
+const props = defineProps({
+  name: {
+    default: '',
+    type: String
+  },
+  calendar: {
+    type: String as PropType<'gregorian' | 'persian' | undefined>,
+    default: 'persian'
+  },
+  clearable: {
+    type: Boolean,
+    default: true
+  },
+  calendarIcon: {
+    type: String,
+    default: 'oms:calendar'
+  },
+  clockIcon: {
+    type: String,
+    default: 'oms:clock'
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  multiple: {
+    type: Boolean,
+    default: false
+  },
+  range: {
+    type: Boolean,
+    default: false
+  },
+  iso8601: {
+    type: Boolean,
+    default: true
+  },
+  todayBtn: {
+    type: Boolean,
+    default: false
+  },
+  fillMask: {
+    type: String,
+    default: undefined
+  },
+  reverseFillMask: {
+    type: Boolean,
+    default: undefined
+  },
+  mask: {
+    type: String,
+    default: '####/##/## ##:##:##'
+  },
+  label: {
+    default: '',
+    type: String || null
+  },
+  class: {
+    default: '',
+    type: String
+  },
+  error: {
+    default: false,
+    type: Boolean
+  },
+  errorMessage: {
+    default: '',
+    type: String
+  },
+  disable: {
+    default: false,
+    type: Boolean
+  },
+  readonly: {
+    default: false,
+    type: Boolean
+  },
+  filled: {
+    default: false,
+    type: Boolean
+  },
+  closeColorBtn: {
+    default: 'primary',
+    type: String
+  },
+  dense: {
+    default: true,
+    type: Boolean
+  },
+  rounded: {
+    default: false,
+    type: Boolean
+  },
+  outlined: {
+    default: false,
+    type: [Boolean]
+  },
+  rules: {
+    default: () => [] as ValidationRule[],
+    type: Array as PropType<ValidationRule[]>
+  },
+  lazyRules: {
+    default: false,
+    type: [Boolean]
+  },
+  loading: {
+    default: false,
+    type: Boolean
+  }
 })
 
-const mask = ref('####/##/## ##:##:##')
 const displayDateTime: Ref<string> = ref('')
-const displayDate: Ref<string> = ref('')
+const displayDate: Ref<string | undefined> = ref('')
 const popupDate = ref(false)
 // const popupTime = ref(false)
 const persistentMenu = ref(false)
@@ -216,27 +298,37 @@ const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() 
   return errorData
 })
 
-const localRules = computed(() => (props.rules as ValidationRule[]).map((rule: any) => {
-  if (rule.ruleName === 'required') {
-    const ruleName = rule.ruleName
-    const ruleParams = rule.ruleParams
-    rule = (): boolean | string => {
-      if (displayDateTime.value === '____/__/__ __:__:__') {
-        return rawT('error.validation.required', { field: props.label })
-      } else return !localErrorMessage.value
+const localRules = computed(() =>
+  props.rules.map((rule: any) => {
+    if (rule.ruleName === 'required') {
+      const ruleName = rule.ruleName
+      const ruleParams = rule.ruleParams
+      rule = (): boolean | string => {
+        if (displayDateTime.value === '____/__/__ __:__:__') {
+          return i18n.t('error.validation.required', { field: props.label })
+        } else if (localErrorMessage.value) {
+          return false
+        } else {
+          return true
+        }
+      }
+
+      rule.ruleName = ruleName
+      rule.ruleParams = ruleParams
     }
 
-    rule.ruleName = ruleName
-    rule.ruleParams = ruleParams
-  }
-
-  return rule
-}))
+    return rule
+  })
+)
 
 function onChangeInputDateTime () {
   const [date, time] = displayDateTime.value.split(' ')
-  dateTime.date = date
-  dateTime.time = time
+  if (date) {
+    dateTime.date = date
+  }
+  if (time) {
+    dateTime.time = time
+  }
 
   const analysedShamsiDate = dateManager.validationShamsiDate(date)
   const analysedTime = dateManager.validationTime(time)
@@ -274,33 +366,22 @@ function onChangeTime (newTime: string) {
 }
 
 // newValue should be miladi
-function updateDateTime (newValue: string, type: 'date' | 'time',isEdit?:false|true) {
+function updateDateTime (newValue: string, type: 'date' | 'time') {
   const systemDate = dateManager.now('YYYY-MM-DD')
-  // const systemTime = dateManager.now('HH:mm:ss')
+  const systemTime = dateManager.now('HH:mm:ss')
 
   const displayTime = `${dateTime.hours}:${dateTime.minutes}:${dateTime.seconds}`
-  const analysedShamsiDate = dateManager.validationShamsiDate(dateTime.date)
+  const analysedShamsiDate = dateManager.validationShamsiDate(displayDate.value)
   const analysedTime = dateManager.validationTime(displayTime)
   // TODO: should fix this for calender != persian
   const defaultDate = analysedShamsiDate.isValid
-    ? dateManager.shamsiToMiladi(dateTime.date)
+    ? dateManager.shamsiToMiladi(displayDate.value)
     : systemDate
-  // const defaultTime = analysedTime.isValid ? displayTime : systemTime
-  const defaultTime = analysedTime.isValid ? displayTime : '__:__:__'
+  const defaultTime = analysedTime.isValid ? displayTime : systemTime
 
   const finalDate = newValue && type === 'date' ? newValue : defaultDate
   const finalTime = newValue && type === 'time' ? newValue : defaultTime
-
-  // const inputData = value.value ? value.value.replace('T', ' ') : `${finalDate} ${finalTime}`
-  const date = isEdit ? value.value: `${finalDate}T${finalTime}`
-
-  const iso8601DateString = dateManager.getDateTimeFromIso8601DateString(date)
-  const normalizedDateTime = (typeof iso8601DateString === 'object') ? iso8601DateString : {
-    date: finalDate,
-    time: finalTime
-  }
-  const inputData = `${normalizedDateTime.date} ${normalizedDateTime.time}`
-
+  const inputData = value.value ? value.value.replace('T', ' ') : `${finalDate} ${finalTime}`
   const arrValue = inputData.trim().split(' ')
   const timeValue = arrValue[1]
   displayDate.value =
@@ -310,24 +391,17 @@ function updateDateTime (newValue: string, type: 'date' | 'time',isEdit?:false|t
     arrValue[0] = newValue.toString()
   } else if (type === 'time') {
     const parsedTime = dateManager.parseTime(timeValue)
-    dateTime.hours = parsedTime.formattedHour
-    dateTime.minutes = parsedTime.formattedMinute
-    dateTime.seconds = parsedTime.formattedSecond
+    if (parsedTime) {
+      dateTime.hours = parsedTime.formattedHour
+      dateTime.minutes = parsedTime.formattedMinute
+      dateTime.seconds = parsedTime.formattedSecond
+    }
     arrValue[1] = newValue
   }
 
   const delimiter = props.iso8601 ? 'T' : ' '
   displayDateTime.value = [displayDate.value, timeValue].join(' ')
-  const generatedDate = arrValue.join(delimiter).replace(',', ' ')
-  value.value = props.convertToZone ?  toUTCISOString(generatedDate) : generatedDate
-}
-
-function toUTCISOString (dateString:string) {
-  const date = new Date(dateString) 
-  if (isNaN(date.getTime())) {
-    return
-  }
-  return date.toISOString() 
+  value.value = arrValue.join(delimiter).replace(',', ' ')
 }
 
 function onClear () {
@@ -456,32 +530,6 @@ function onMenuSecondInputUpdate () {
   onMenuTimeInputUpdate()
 }
 
-function daysOptions (date: string) {
-  if (!props.limitFuture && !props.limitPast) {
-    return true
-  }
-  if(props.limitFuture){
-    const limitFutureDate =
-    typeof props.limitFuture === 'boolean' ? new Date() : new Date(props.limitFuture)
-    const dateDate = new Date(dateManager.shamsiToMiladi(date))
-
-    if (typeof props.limitFuture === 'string') {
-      return dateDate <= limitFutureDate
-    }
-    return dateDate <= limitFutureDate
-
-  }else if(props.limitPast){
-    const limitPastDate =  typeof props.limitPast === 'boolean' ? new Date() : new Date(props.limitPast)
-    limitPastDate.setDate(limitPastDate.getDate() - 1)
-    const dateDate = new Date(dateManager.shamsiToMiladi(date))
-    if (typeof props.limitPast === 'string') {
-      return dateDate >= limitPastDate
-    }
-    return dateDate >= limitPastDate
-
-  }
-}
-
 watch(
   () => value.value,
   (newValue) => {
@@ -489,20 +537,12 @@ watch(
       displayDateTime.value = '____/__/__ __:__:__'
       return
     }
-    const iso8601DateString = dateManager.getDateTimeFromIso8601DateString(newValue)
-    const displayDateMiladi = dateManager.shamsiToMiladi(displayDate.value)
-    const gd = (
-      typeof iso8601DateString === 'object' ?
-        iso8601DateString.date :
-        dateManager.isValidDate(displayDateMiladi) ?
-          displayDateMiladi :
-          '2020-01-01'
-    )
-    const gt = (typeof iso8601DateString === 'object' ? iso8601DateString.time : '__:__:__')
-    const newDate = gd.toString()
-    const newTime = gt.toString()
-    updateDateTime(newDate, 'date',true)
-    updateDateTime(newTime, 'time', true)
+    const normalizedDateTime = dateManager.getDateTimeFromIso8601DateString(newValue)
+    const newDate = normalizedDateTime.date.toString()
+
+    const newTime = normalizedDateTime.time.toString()
+    updateDateTime(newDate, 'date')
+    updateDateTime(newTime, 'time')
   },
   { immediate: true }
 )

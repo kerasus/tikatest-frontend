@@ -58,62 +58,6 @@ export const index: RouteRecordRaw[] = [
           ]
         },
         component: () => import('src/pages/panel/user/edit.vue')
-      },
-      {
-        path: 'roles',
-        name: 'Panel.User.Roles',
-        meta: {
-          pageCategory: 'مدیریت نقش‌های کاربران',
-          middleware: [Authenticated, hasOneOfThisRoles(['Admin'])],
-          breadCrumbs: [
-            {
-              label: 'نقش‌ها'
-            }
-          ]
-        },
-        component: () => import('src/pages/panel/user/role-management.vue')
-      },
-      {
-        path: 'teachers',
-        name: 'Panel.User.Teachers',
-        meta: {
-          pageCategory: 'مدیریت معلمان',
-          middleware: [Authenticated, hasOneOfThisRoles(['Admin'])],
-          breadCrumbs: [
-            {
-              label: 'معلمان'
-            }
-          ]
-        },
-        component: () => import('src/pages/panel/user/teacher-list.vue')
-      },
-      {
-        path: 'managers',
-        name: 'Panel.User.Managers',
-        meta: {
-          pageCategory: 'مدیریت مدیران',
-          middleware: [Authenticated, hasOneOfThisRoles(['Admin'])],
-          breadCrumbs: [
-            {
-              label: 'مدیران'
-            }
-          ]
-        },
-        component: () => import('src/pages/panel/user/manager-list.vue')
-      },
-      {
-        path: 'staff',
-        name: 'Panel.User.Staff',
-        meta: {
-          pageCategory: 'مدیریت کارکنان',
-          middleware: [Authenticated, hasOneOfThisRoles(['Admin'])],
-          breadCrumbs: [
-            {
-              label: 'کارکنان'
-            }
-          ]
-        },
-        component: () => import('src/pages/panel/user/staff-list.vue')
       }
     ]
   },
