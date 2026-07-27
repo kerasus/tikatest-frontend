@@ -35,11 +35,11 @@
         <q-icon
           v-if="clearable"
           v-show="showClearAble"
-          name="oms:close-circle"
+          name="cancel"
           class="cursor-pointer"
           @click="onClear" />
         <q-icon
-          name="oms:calendar"
+          name="calendar_month"
           class="cursor-pointer"
           @click="toggleMenu" />
       </template>
@@ -65,7 +65,7 @@
         <div class="row items-center justify-end">
           <q-btn
             v-close-popup
-            :label="$t('general.close')"
+            label="بستن"
             :color="closeColorBtn"
             flat />
         </div>

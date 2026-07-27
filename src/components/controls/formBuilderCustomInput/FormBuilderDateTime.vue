@@ -37,7 +37,7 @@
         <q-icon
           v-if="clearable"
           v-show="showClearAble"
-          name="oms:close-circle"
+          name="cancel"
           class="cursor-pointer"
           @click="onClear" />
         <q-icon
@@ -69,7 +69,7 @@
             ref="inputSecond"
             v-model="dateTime.seconds"
             mask="##"
-            :label="$t('fieldName.second')"
+            label="ثانیه"
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
@@ -80,7 +80,7 @@
             ref="inputMinute"
             v-model="dateTime.minutes"
             mask="##"
-            :label="$t('fieldName.minute')"
+            label="دقیقه"
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
@@ -91,7 +91,7 @@
             ref="inputHour"
             v-model="dateTime.hours"
             mask="##"
-            :label="$t('fieldName.hour')"
+            label="ساعت"
             :fill-mask="fillMask"
             :reverse-fill-mask="reverseFillMask"
             dir="ltr"
@@ -102,7 +102,7 @@
           <q-btn
             ref="closeBtnRef"
             v-close-popup
-            :label="$t('general.close')"
+            label="بستن"
             :color="closeColorBtn"
             flat />
         </div>
@@ -158,11 +158,11 @@ const props = defineProps({
   },
   calendarIcon: {
     type: String,
-    default: 'oms:calendar'
+    default: 'calendar_month'
   },
   clockIcon: {
     type: String,
-    default: 'oms:clock'
+    default: 'access_time'
   },
   title: {
     type: String,
