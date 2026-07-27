@@ -86,7 +86,7 @@
                         </template>
                         <template v-if="reg.schoolClass?.academicField">
                           <span v-if="reg.schoolClass?.academicLevel"> - </span>
-                          رشته: {{ reg.schoolClass.academicField.name }}
+                          رشته: {{ reg.schoolClass.academicLevel?.academicField?.name }}
                         </template>
                       </q-item-label>
                     </q-item-section>
@@ -174,17 +174,17 @@ const loading = ref(true)
 const studentData = ref<any>(null)
 
 const getClassName = (): string => {
-  if (!studentData.value?.studentClassRegistrations?.length) return '-'
-  const reg = studentData.value.studentClassRegistrations[0]
+  if (!studentData.value?.userClassRegistrations?.length) return '-'
+  const reg = studentData.value.userClassRegistrations[0]
   return reg?.schoolClass?.name || '-'
 }
 
 const groupedSchools = computed(() => {
-  if (!studentData.value?.studentClassRegistrations?.length) return []
+  if (!studentData.value?.userClassRegistrations?.length) return []
 
   const map = new Map<number, any>()
 
-  for (const reg of studentData.value.studentClassRegistrations) {
+  for (const reg of studentData.value.userClassRegistrations) {
     const school = reg.school || reg.schoolClass?.school
     if (!school) continue
 
