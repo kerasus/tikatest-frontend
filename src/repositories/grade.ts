@@ -30,8 +30,8 @@ export type GradeType = {
   student?: {
     id: number | null
     full_name: string | null
-    firstname?: string | null
-    lastname?: string | null
+    first_name?: string | null
+    last_name?: string | null
   } | null
   schoolClass?: {
     id: number | null

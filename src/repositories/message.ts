@@ -2,8 +2,8 @@ import BaseAPI from './BaseAPI'
 import type { ListType } from './BaseAPI'
 export type MessageSenderType = {
   id: number | null
-  firstname: string | null
-  lastname: string | null
+  first_name: string | null
+  last_name: string | null
   full_name: string | null
   username: string | null
   mobile: string | null
@@ -13,8 +13,8 @@ export type MessageSenderType = {
 
 export type MessageUserType = {
   id: number | null
-  firstname: string | null
-  lastname: string | null
+  first_name: string | null
+  last_name: string | null
   full_name: string | null
   username: string | null
   mobile: string | null

@@ -99,8 +99,8 @@ const columns = [
 ]
 
 const getGradeColor = (grade: any): string => {
-  if (!grade.min_grade) return 'primary'
-  return grade.raw_grade >= grade.min_grade ? 'positive' : 'negative'
+  if (!grade.min_passing_score) return 'primary'
+  return grade.raw_grade >= grade.min_passing_score ? 'positive' : 'negative'
 }
 
 const loadReportCard = async () => {

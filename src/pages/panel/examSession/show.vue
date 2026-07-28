@@ -42,7 +42,7 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">حداقل نمره قبولی:</div>
-              <div class="text-body1">{{ session.min_grade ?? '-' }}</div>
+              <div class="text-body1">{{ session.min_passing_score ?? '-' }}</div>
             </div>
           </div>
         </q-card-section>
@@ -115,8 +115,8 @@ const getGradeTypeLabel = (value: string | null): string => {
 }
 
 const getGradeColor = (grade: any): string => {
-  if (!grade.min_grade) return ''
-  return grade.raw_grade >= grade.min_grade ? 'text-positive' : 'text-negative'
+  if (!grade.min_passing_score) return ''
+  return grade.raw_grade >= grade.min_passing_score ? 'text-positive' : 'text-negative'
 }
 
 onMounted(async () => {

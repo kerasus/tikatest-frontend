@@ -130,8 +130,8 @@ function logout () {
                 <div class="profile-menu-user-info text-subtitle1 q-mt-md q-mb-xs">
                   <div class="profile-menu-user-fullname">
                     <div class="labele text-center text-blue-grey-9">
-                      {{ userManager.me?.firstname }}
-                      {{ userManager.me?.lastname }}
+                      {{ userManager.me?.first_name }}
+                      {{ userManager.me?.last_name }}
                     </div>
                   </div>
                   <div class="profile-menu-user-roles text-blue-grey-7">

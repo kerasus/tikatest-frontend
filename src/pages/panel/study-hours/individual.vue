@@ -179,7 +179,7 @@ const loadStudents = async () => {
     const result = await student.index({ length: 100 })
     allStudents.value = result.data.map((s: any) => ({
       id: s.id,
-      full_name: s.full_name || `${s.firstname} ${s.lastname}`,
+      full_name: s.full_name || `${s.first_name} ${s.last_name}`,
       ...s
     }))
     studentOptions.value = allStudents.value

@@ -76,18 +76,18 @@ const table = ref({
       field: (row: UserType) => getUserRoleLabel(row.roles[0]?.name ?? '')
     },
     {
-      name: 'firstname',
+      name: 'first_name',
       required: true,
       label: 'نام',
       align: 'left',
-      field: (row: UserType) => row.firstname
+      field: (row: UserType) => row.first_name
     },
     {
-      name: 'lastname',
+      name: 'last_name',
       required: true,
       label: 'نام خانوادگی',
       align: 'left',
-      field: (row: UserType) => row.lastname
+      field: (row: UserType) => row.last_name
     },
     {
       name: 'username',
@@ -152,14 +152,14 @@ const inputs = ref([
   },
   {
     type: 'input',
-    name: 'firstname',
+    name: 'first_name',
     label: 'نام',
     placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
     type: 'input',
-    name: 'lastname',
+    name: 'last_name',
     label: 'نام خانوادگی',
     placeholder: ' ',
     col: 'col-md-3 col-12'

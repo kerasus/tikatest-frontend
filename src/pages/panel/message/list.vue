@@ -112,7 +112,7 @@ const filters = reactive({
 
 function getInitials (sender: any) {
   if (!sender) return '?'
-  const name = sender.firstname || sender.full_name || ''
+  const name = sender.first_name || sender.full_name || ''
   return name.charAt(0).toUpperCase()
 }
 
@@ -150,7 +150,7 @@ async function loadUsers () {
     const result = await userApi.index({ length: 100 })
     userOptions.value = result.data.map((item: any) => ({
       id: item.id,
-      full_name: item.full_name || `${item.firstname} ${item.lastname}`,
+      full_name: item.full_name || `${item.first_name} ${item.last_name}`,
       ...item
     }))
   } catch (error) {

@@ -65,13 +65,13 @@ const table = ref({
       name: 'from_user',
       label: 'از',
       align: 'left',
-      field: (row: TransferType) => row.from_user?.firstname + ' ' + row.from_user?.lastname
+      field: (row: TransferType) => row.from_user?.first_name + ' ' + row.from_user?.last_name
     },
     {
       name: 'to_user',
       label: 'به',
       align: 'left',
-      field: (row: TransferType) => row.to_user?.firstname + ' ' + row.to_user?.lastname
+      field: (row: TransferType) => row.to_user?.first_name + ' ' + row.to_user?.last_name
     },
     {
       name: 'transfer_date',
@@ -92,7 +92,7 @@ const table = ref({
       name: 'creator',
       label: 'سازنده',
       align: 'left',
-      field: (row: TransferType) => row.creator ? row.creator?.firstname + ' ' + row.creator?.lastname : '-'
+      field: (row: TransferType) => row.creator ? row.creator?.first_name + ' ' + row.creator?.last_name : '-'
     },
     {
       name: 'actions',

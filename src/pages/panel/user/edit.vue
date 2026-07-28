@@ -82,16 +82,16 @@ const inputs = ref([
   },
   {
     type: 'input',
-    name: 'firstname',
-    responseKey: 'firstname',
+    name: 'first_name',
+    responseKey: 'first_name',
     label: 'نام',
     placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
     type: 'input',
-    name: 'lastname',
-    responseKey: 'lastname',
+    name: 'last_name',
+    responseKey: 'last_name',
     label: 'نام خانوادگی',
     placeholder: ' ',
     col: 'col-md-3 col-12'

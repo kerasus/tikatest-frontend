@@ -57,7 +57,7 @@
             :pagination="{ rowsPerPage: 10 }">
             <template #body-cell-name="props">
               <q-td :props="props">
-                {{ props.row.full_name || `${props.row.firstname || ''} ${props.row.lastname || ''}` }}
+                {{ props.row.full_name || `${props.row.first_name || ''} ${props.row.last_name || ''}` }}
               </q-td>
             </template>
             <template #body-cell-actions="props">

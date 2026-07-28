@@ -109,7 +109,7 @@
               flat>
               <template #body-cell-student="props">
                 <q-td :props="props">
-                  {{ props.row.student?.name }} {{ props.row.student?.lastname }}
+                  {{ props.row.student?.name }} {{ props.row.student?.last_name }}
                 </q-td>
               </template>
             </q-table>

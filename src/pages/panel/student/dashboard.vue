@@ -65,7 +65,7 @@
                 </template>
                 <template #body-cell-raw_grade="props">
                   <q-td :props="props">
-                    <span :class="props.row.raw_grade >= (props.row.min_grade || 10) ? 'text-positive' : 'text-negative'">
+                    <span :class="props.row.raw_grade >= (props.row.min_passing_score || 10) ? 'text-positive' : 'text-negative'">
                       {{ props.row.raw_grade }}
                     </span>
                   </q-td>

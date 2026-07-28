@@ -128,7 +128,7 @@
           @request="onRequest">
           <template #body-cell-student="props">
             <q-td :props="props">
-              {{ (props.row.student?.full_name || [props.row.student?.firstname, props.row.student?.lastname].filter(Boolean).join(' ')) || '-' }}
+              {{ (props.row.student?.full_name || [props.row.student?.first_name, props.row.student?.last_name].filter(Boolean).join(' ')) || '-' }}
             </q-td>
           </template>
           <template #body-cell-grade_type="props">

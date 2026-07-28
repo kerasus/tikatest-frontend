@@ -12,13 +12,13 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.firstname"
+                v-model="form.first_name"
                 label="نام"
                 outlined />
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.lastname"
+                v-model="form.last_name"
                 label="نام خانوادگی"
                 outlined />
             </div>
@@ -31,7 +31,7 @@
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.melli_code"
+                v-model="form.national_id"
                 label="کد ملی"
                 outlined
                 dir="ltr" />
@@ -105,10 +105,10 @@ const router = useRouter()
 const $q = useQuasar()
 
 const form = reactive<Partial<StudentType>>({
-  firstname: null,
-  lastname: null,
+  first_name: null,
+  last_name: null,
   student_phone: null,
-  melli_code: null,
+  national_id: null,
   student_code: null,
   birth_date: null,
   student_email: null,
@@ -118,7 +118,7 @@ const form = reactive<Partial<StudentType>>({
   father_email: null,
   father_job: null,
   mother_name: null,
-  mother_lastname: null,
+  mother_last_name: null,
   mother_phone: null,
   mother_email: null,
   mother_job: null
