@@ -103,7 +103,7 @@ const topLinks = ref<ListItemType[]>([
     icon: 'quiz',
     title: 'آزمون آنلاین',
     forRoles: ['Student'],
-    route: { name: 'Student.Quiz.List' }
+    route: { name: 'Student.Exam.List' }
   },
   {
     icon: 'assignment',
@@ -184,8 +184,8 @@ const topLinks = ref<ListItemType[]>([
     title: 'آزمون آنلاین',
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
-      { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Quiz.Create' } },
-      { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Quiz.List' } }
+      { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Exam.Create' } },
+      { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Exam.List' } }
     ]
   },
   {

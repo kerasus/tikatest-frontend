@@ -2,20 +2,28 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h4 class="q-ma-none">مدیریت آزمون‌های کلاسی</h4>
+        <h4 class="q-ma-none">مدیریت آزمون‌ها</h4>
       </div>
       <div class="col-auto">
         <q-btn
           color="primary"
           label="ثبت آزمون جدید"
-          :to="{ name: 'Panel.ExamSession.Create' }" />
+          :to="{ name: 'Panel.Exam.Create' }" />
       </div>
     </div>
 
     <q-card>
       <q-card-section>
         <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model="filters.name"
+              label="نام آزمون"
+              outlined
+              clearable
+              @update:model-value="loadExams" />
+          </div>
+          <div class="col-12 col-md-4">
             <q-select
               v-model="filters.lesson_id"
               :options="lessonOptions"
@@ -26,39 +34,18 @@
               clearable
               emit-value
               map-options
-              @update:model-value="loadSessions" />
+              @update:model-value="loadExams" />
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-4">
             <q-select
-              v-model="filters.class_id"
-              :options="classOptions"
-              option-value="id"
-              option-label="name"
-              label="کلاس"
+              v-model="filters.delivery_mode"
+              :options="deliveryModeOptions"
+              label="نوع تحویل"
               outlined
               clearable
               emit-value
               map-options
-              @update:model-value="loadSessions" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.grade_type"
-              :options="gradeTypeOptions"
-              label="نوع نمره"
-              outlined
-              clearable
-              emit-value
-              map-options
-              @update:model-value="loadSessions" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-input
-              v-model="filters.date"
-              label="تاریخ"
-              outlined
-              type="date"
-              @update:model-value="loadSessions" />
+              @update:model-value="loadExams" />
           </div>
         </div>
       </q-card-section>
@@ -75,7 +62,7 @@
         </div>
 
         <div
-          v-else-if="sessions.data.length === 0"
+          v-else-if="exams.data.length === 0"
           class="text-center q-pa-lg">
           <q-icon
             name="assignment"
@@ -86,7 +73,7 @@
 
         <q-table
           v-else
-          :rows="sessions.data"
+          :rows="exams.data"
           :columns="columns"
           row-key="id"
           :pagination="pagination"
@@ -96,14 +83,24 @@
               {{ props.row.lesson?.name || '-' }}
             </q-td>
           </template>
-          <template #body-cell-class="props">
+          <template #body-cell-category="props">
             <q-td :props="props">
-              {{ props.row.schoolClass?.name || '-' }}
+              {{ props.row.category?.title || '-' }}
             </q-td>
           </template>
-          <template #body-cell-grade_type="props">
+          <template #body-cell-delivery_mode="props">
             <q-td :props="props">
-              {{ getGradeTypeLabel(props.row.grade_type) }}
+              <q-chip
+                :color="props.row.delivery_mode === 'online' ? 'primary' : 'secondary'"
+                text-color="white"
+                dense>
+                {{ props.row.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template #body-cell-created_at="props">
+            <q-td :props="props">
+              {{ props.row.created_at || '-' }}
             </q-td>
           </template>
           <template #body-cell-actions="props">
@@ -115,7 +112,7 @@
                 icon="visibility"
                 color="info"
                 size="sm"
-                @click="viewParticipants(props.row.id)" />
+                @click="viewExam(props.row.id)" />
               <q-btn
                 flat
                 round
@@ -123,7 +120,7 @@
                 icon="delete"
                 color="negative"
                 size="sm"
-                @click="deleteSession(props.row)" />
+                @click="deleteExam(props.row)" />
             </q-td>
           </template>
         </q-table>
@@ -136,74 +133,56 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { examSession } from 'src/repositories/examSession'
+import { exam } from 'src/repositories/exam'
 import { lesson } from 'src/repositories/lesson'
-import { schoolClass } from 'src/repositories/schoolClass'
 
 const router = useRouter()
 const $q = useQuasar()
 
 const loading = ref(false)
-const sessions = ref<any>({ data: [], current_page: 1, per_page: 10, total: 0 })
+const exams = ref<any>({ data: [], current_page: 1, per_page: 10, total: 0 })
 const lessons = ref<any[]>([])
-const classes = ref<any[]>([])
 
 const filters = reactive({
+  name: null as string | null,
   lesson_id: null as number | null,
-  class_id: null as number | null,
-  grade_type: null as string | null,
-  date: null as string | null
+  delivery_mode: null as string | null
 })
 
 const lessonOptions = ref<any[]>([])
-const classOptions = ref<any[]>([])
 
-const gradeTypeOptions = [
-  { label: 'آزمون کلاسی', value: 'class_quiz' },
-  { label: 'آزمون ماهانه', value: 'monthly_quiz' },
-  { label: 'میان ترم اول', value: 'mid_term_1' },
-  { label: 'مستمر اول', value: 'continuous_1' },
-  { label: 'پایان ترم اول', value: 'final_1' },
-  { label: 'میان ترم دوم', value: 'mid_term_2' },
-  { label: 'مستمر دوم', value: 'continuous_2' },
-  { label: 'پایان ترم دوم', value: 'final_2' },
-  { label: 'سایر', value: 'other' }
+const deliveryModeOptions = [
+  { label: 'آنلاین', value: 'online' },
+  { label: 'حضوری', value: 'in_person' }
 ]
 
 const columns = [
+  { name: 'name', label: 'نام آزمون', field: 'name', align: 'center' as const },
   { name: 'lesson', label: 'درس', field: 'lesson', align: 'center' as const },
-  { name: 'class', label: 'کلاس', field: 'class', align: 'center' as const },
-  { name: 'gregorian_date', label: 'تاریخ', field: 'gregorian_date', align: 'center' as const },
-  { name: 'grade_type', label: 'نوع نمره', field: 'grade_type', align: 'center' as const },
-  { name: 'is_report_card', label: 'کارنامه', field: 'is_report_card', align: 'center' as const },
+  { name: 'category', label: 'دسته‌بندی', field: 'category', align: 'center' as const },
+  { name: 'delivery_mode', label: 'نوع تحویل', field: 'delivery_mode', align: 'center' as const },
+  { name: 'created_at', label: 'تاریخ ثبت', field: 'created_at', align: 'center' as const },
   { name: 'actions', label: 'عملیات', field: 'actions', align: 'center' as const }
 ]
 
 const pagination = ref({
-  sortBy: 'gregorian_date',
+  sortBy: 'created_at',
   descending: true,
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0
 })
 
-const getGradeTypeLabel = (value: string | null): string => {
-  const option = gradeTypeOptions.find((o) => o.value === value)
-  return option ? option.label : '-'
-}
-
-const loadSessions = async () => {
+const loadExams = async () => {
   loading.value = true
   try {
     const params: any = { length: pagination.value.rowsPerPage, page: pagination.value.page }
+    if (filters.name) params.name = filters.name
     if (filters.lesson_id) params.lesson_id = filters.lesson_id
-    if (filters.class_id) params.class_ids = [filters.class_id]
-    if (filters.grade_type) params.grade_type = filters.grade_type
-    if (filters.date) params.gregorian_date_since_date = filters.date
-    if (filters.date) params.gregorian_date_till_date = filters.date
+    if (filters.delivery_mode) params.delivery_mode = filters.delivery_mode
 
-    const response = await examSession.index(params)
-    sessions.value = response.data
+    const response = await exam.index(params)
+    exams.value = response.data
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری آزمون‌ها' })
   } finally {
@@ -216,7 +195,7 @@ const onTableRequest = (props: any) => {
   pagination.value.rowsPerPage = props.pagination.rowsPerPage
   pagination.value.sortBy = props.pagination.sortBy
   pagination.value.descending = props.pagination.descending
-  loadSessions()
+  loadExams()
 }
 
 const loadLessons = async () => {
@@ -228,30 +207,21 @@ const loadLessons = async () => {
   }
 }
 
-const loadClasses = async () => {
-  try {
-    const response = await schoolClass.index({ length: 100 })
-    classOptions.value = response.data || []
-  } catch (error: any) {
-    console.error('Error loading classes:', error)
-  }
+const viewExam = (id: number) => {
+  router.push({ name: 'Panel.Exam.Show', params: { id } })
 }
 
-const viewParticipants = (sessionId: number) => {
-  router.push({ name: 'Panel.ExamSession.Show', params: { id: sessionId } })
-}
-
-const deleteSession = async (session: any) => {
+const deleteExam = async (item: any) => {
   $q.dialog({
     title: 'تایید حذف',
-    message: `آزمون ${session.lesson?.name} برای کلاس ${session.schoolClass?.name} حذف شود؟`,
+    message: `آزمون ${item.name} حذف شود؟`,
     cancel: true,
     persistent: true
   }).onOk(async () => {
     try {
-      await examSession.delete(session.id)
+      await exam.delete(item.id)
       $q.notify({ type: 'positive', message: 'آزمون با موفقیت حذف شد' })
-      loadSessions()
+      loadExams()
     } catch (error: any) {
       $q.notify({ type: 'negative', message: 'خطا در حذف آزمون' })
     }
@@ -259,8 +229,7 @@ const deleteSession = async (session: any) => {
 }
 
 onMounted(() => {
-  loadSessions()
+  loadExams()
   loadLessons()
-  loadClasses()
 })
 </script>

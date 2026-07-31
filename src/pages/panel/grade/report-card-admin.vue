@@ -43,7 +43,7 @@
           flat>
           <template #body-cell-lesson="props">
             <q-td :props="props">
-              {{ props.row.lesson?.name || '-' }}
+              {{ props.row.exam?.lesson?.name || '-' }}
             </q-td>
           </template>
         </q-table>
@@ -86,10 +86,10 @@ const reportCard = ref<any[]>([])
 const loading = ref(false)
 
 const columns = [
-  { name: 'lesson', label: 'درس', align: 'right' as const, field: 'lesson' },
-  { name: 'raw_grade', label: 'نمره', align: 'center' as const, field: 'raw_grade' },
+  { name: 'lesson', label: 'درس', align: 'right' as const, field: 'exam.lesson.name' },
+  { name: 'scaled_score', label: 'نمره', align: 'center' as const, field: 'scaled_score' },
   { name: 'grade_type', label: 'نوع نمره', align: 'center' as const, field: 'grade_type' },
-  { name: 'persian_date', label: 'تاریخ', align: 'center' as const, field: 'persian_date' }
+  { name: 'exam_date', label: 'تاریخ', align: 'center' as const, field: 'exam_date' }
 ]
 
 const loadStudents = async () => {

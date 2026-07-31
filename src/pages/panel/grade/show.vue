@@ -30,15 +30,15 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">درس:</div>
-              <div class="text-body1">{{ gradeData.lesson?.name || '-' }}</div>
+              <div class="text-body1">{{ gradeData.exam?.lesson?.name || gradeData.lesson?.name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کلاس:</div>
-              <div class="text-body1">{{ gradeData.schoolClass?.name || '-' }}</div>
+              <div class="text-body1">{{ gradeData.exam?.classes?.[0]?.name || gradeData.schoolClass?.name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">تاریخ:</div>
-              <div class="text-body1">{{ gradeData?.gregorian_date || '-' }}</div>
+              <div class="text-body1">{{ gradeData?.exam_date || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نوع نمره:</div>
@@ -46,11 +46,11 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره خام:</div>
-              <div class="text-body1">{{ gradeData?.raw_grade ?? '-' }}</div>
+              <div class="text-body1">{{ gradeData?.raw_score ?? gradeData?.raw_grade ?? '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره محاسبه شده:</div>
-              <div class="text-body1">{{ gradeData?.calculated_grade ?? '-' }}</div>
+              <div class="text-body1">{{ gradeData?.scaled_score ?? gradeData?.calculated_grade ?? '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نمره Z:</div>

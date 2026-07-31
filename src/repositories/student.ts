@@ -1,81 +1,37 @@
 import BaseAPI from './BaseAPI'
 
-export type AcademicFieldType = {
-  id: number | null
-  school_id: number | null
-  name: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  school?: {
-    id: number | null
-    name: string | null
-    code: string | null
-  }
-}
-
-export type AcademicLevelType = {
-  id: number | null
-  field_id: number | null
-  name: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  academic_field?: AcademicFieldType
-}
-
-export type SchoolClassType = {
-  id: number | null
-  level_id: number | null
-  name: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  academic_level?: AcademicLevelType
-}
-
-export type UserClassRegistrationType = {
-  id: number | null
-  user_id: number | null
-  class_id: number | null
-  created_at: string | null
-  updated_at: string | null
-  school_class?: SchoolClassType
-}
-
 export type StudentType = {
   id: number | null
   first_name: string | null
   last_name: string | null
   full_name: string | null
   email: string | null
+  mobile: string | null
   username: string | null
-  password: string | null
-  class_id: number | null
-  student_phone: string | null
   national_id: string | null
-  student_code: string | null
   birth_date: string | null
-  student_email: string | null
   address: string | null
+  description: string | null
   picture: string | null
-  school_id: number | null
-  father_name: string | null
-  father_phone: string | null
-  father_email: string | null
-  father_job: string | null
-  father_national_id: string | null
-  mother_name: string | null
-  mother_last_name: string | null
-  mother_phone: string | null
-  mother_email: string | null
-  mother_job: string | null
-  mother_national_id: string | null
-  user_type: string | null
   roles_list: string[]
-  user_class_registrations?: UserClassRegistrationType[]
+  permissions_list: string[]
   created_at: string | null
   updated_at: string | null
+  student_profile?: {
+    id: number | null
+    code: string | null
+    xp: number | null
+  } | null
+  guardian_records?: Array<{
+    id: number | null
+    relationship_type: 'father' | 'mother' | 'guardian' | null
+    job: string | null
+    is_primary_contact: boolean | null
+  }> | null
+  user_class_registrations?: Array<{
+    id: number | null
+    class_id: number | null
+  }> | null
 }
 
 export default class StudentAPI extends BaseAPI<StudentType> {
@@ -87,30 +43,15 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       last_name: null,
       full_name: null,
       email: null,
+      mobile: null,
       username: null,
-      password: null,
-      class_id: null,
-      student_phone: null,
       national_id: null,
-      student_code: null,
       birth_date: null,
-      student_email: null,
       address: null,
+      description: null,
       picture: null,
-      school_id: null,
-      father_name: null,
-      father_phone: null,
-      father_email: null,
-      father_job: null,
-      father_national_id: null,
-      mother_name: null,
-      mother_last_name: null,
-      mother_phone: null,
-      mother_email: null,
-      mother_job: null,
-      mother_national_id: null,
-      user_type: null,
       roles_list: [],
+      permissions_list: [],
       created_at: null,
       updated_at: null
     }
@@ -126,27 +67,33 @@ export default class StudentAPI extends BaseAPI<StudentType> {
   }
 
   async dashboard (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
+    return response.data
   }
 
   async myGrades (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.myGrades!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myGrades!, { params })
+    return response.data
   }
 
   async reportCard (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.reportCard!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.reportCard!, { params })
+    return response.data
   }
 
   async absences (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.absences!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.absences!, { params })
+    return response.data
   }
 
   async disciplinary (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.disciplinary!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.disciplinary!, { params })
+    return response.data
   }
 
   async studySessions (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.studySessions!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studySessions!, { params })
+    return response.data
   }
 
   async createStudySession (data: any) {

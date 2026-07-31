@@ -500,7 +500,7 @@ async function onSubmit () {
       }))
     }
 
-    await gradeApi.createExamSessionWithGrades(payload)
+    await gradeApi.createExamWithGrades(payload)
 
     $q.notify({
       icon: 'check',

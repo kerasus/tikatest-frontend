@@ -35,7 +35,7 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس:</div>
-              <div class="text-body1">{{ studentData.student_phone || '-' }}</div>
+              <div class="text-body1">{{ studentData.mobile || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کد ملی:</div>
@@ -43,7 +43,7 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">تاریخ تولد:</div>
-              <div class="text-body1">{{ formatDate(studentData.birth_date) }}</div>
+              <div class="text-body1">{{ studentData.birth_date || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کلاس:</div>
@@ -67,6 +67,10 @@
               bordered
               class="q-mb-md full-width-card">
               <q-card-section>
+                <div class="text-subtitle1 text-weight-medium">{{ school.name }}</div>
+              </q-card-section>
+              <q-separator />
+              <q-card-section>
                 <q-list
                   bordered
                   separator>
@@ -75,18 +79,15 @@
                     :key="reg.id"
                     dense>
                     <q-item-section>
-                      <q-item-label>{{ reg.school_class?.name || '-' }}</q-item-label>
+                      <q-item-label>{{ reg.school_class?.name || reg.schoolClass?.name || '-' }}</q-item-label>
                       <q-item-label caption>
-                        <template v-if="reg.school_class?.academic_level">
-                          پایه: {{ reg.school_class.academic_level.name }}
+                        <template v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel">
+                          پایه: {{ reg.school_class?.academic_level?.name || reg.schoolClass?.academicLevel?.name }}
                         </template>
-                        <template v-if="reg.school_class?.academic_level?.academic_field">
-                          <span v-if="reg.school_class?.academic_level"> - </span>
-                          رشته: {{ reg.school_class.academic_level.academic_field.name }}
+                        <template v-if="reg.school_class?.academic_level?.academic_field || reg.schoolClass?.academicLevel?.academicField">
+                          <span v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel"> - </span>
+                          رشته: {{ reg.school_class?.academic_level?.academic_field?.name || reg.schoolClass?.academicLevel?.academicField?.name }}
                         </template>
-                        <div class="q-mt-xs text-grey">
-                          مدرسه: {{ reg.school_class?.academic_level?.academic_field?.school?.name || '-' }}
-                        </div>
                       </q-item-label>
                     </q-item-section>
                   </q-item>
@@ -138,54 +139,20 @@
         <q-card-section>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <div class="text-subtitle1 text-weight-medium q-mb-md">پدر</div>
-              <div class="q-col-gutter-xs">
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">نام:</div>
-                  <div class="text-body1">{{ studentData?.father_name || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">شماره تماس:</div>
-                  <div class="text-body1">{{ studentData?.father_phone || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">ایمیل:</div>
-                  <div class="text-body1">{{ studentData?.father_email || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">شغل:</div>
-                  <div class="text-body1">{{ studentData?.father_job || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">کد ملی:</div>
-                  <div class="text-body1">{{ studentData?.father_national_id || '-' }}</div>
-                </div>
-              </div>
+              <div class="text-subtitle2">نام پدر:</div>
+              <div class="text-body1">{{ fatherGuardian?.user?.full_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
-              <div class="text-subtitle1 text-weight-medium q-mb-md">مادر</div>
-              <div class="q-col-gutter-xs">
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">نام:</div>
-                  <div class="text-body1">{{ studentData?.mother_name || '-' }} {{ studentData?.mother_last_name || '' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">شماره تماس:</div>
-                  <div class="text-body1">{{ studentData?.mother_phone || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">ایمیل:</div>
-                  <div class="text-body1">{{ studentData?.mother_email || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">شغل:</div>
-                  <div class="text-body1">{{ studentData?.mother_job || '-' }}</div>
-                </div>
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey">کد ملی:</div>
-                  <div class="text-body1">{{ studentData?.mother_national_id || '-' }}</div>
-                </div>
-              </div>
+              <div class="text-subtitle2">شماره تماس پدر:</div>
+              <div class="text-body1">{{ fatherGuardian?.user?.mobile || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">نام مادر:</div>
+              <div class="text-body1">{{ motherGuardian?.user?.full_name || '-' }}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-subtitle2">شماره تماس مادر:</div>
+              <div class="text-body1">{{ motherGuardian?.user?.mobile || '-' }}</div>
             </div>
           </div>
         </q-card-section>
@@ -199,25 +166,32 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { student } from 'src/repositories/student'
-import { useDate } from 'src/composables/Date'
 
 const route = useRoute()
 const $q = useQuasar()
-const date = useDate()
 
 const loading = ref(true)
 const studentData = ref<any>(null)
 
-const formatDate = (dateString: string | null | undefined): string => {
-  if (!dateString) return '-'
-  return date.miladiToShamsi(dateString, 'YYYY-MM-DD', 'jYYYY/jMM/jDD')
-}
-
 const getClassName = (): string => {
   if (!studentData.value?.user_class_registrations?.length) return '-'
   const reg = studentData.value.user_class_registrations[0]
-  return reg?.school_class?.name || '-'
+  return reg?.school_class?.name || reg?.class?.name || '-'
 }
+
+const fatherGuardian = computed(() => {
+  if (!studentData.value?.guardian_records) return null
+  return studentData.value.guardian_records.find(
+    (g: any) => g.relationship_type === 'father'
+  ) || null
+})
+
+const motherGuardian = computed(() => {
+  if (!studentData.value?.guardian_records) return null
+  return studentData.value.guardian_records.find(
+    (g: any) => g.relationship_type === 'mother'
+  ) || null
+})
 
 const groupedSchools = computed(() => {
   if (!studentData.value?.user_class_registrations?.length) return []
@@ -225,7 +199,7 @@ const groupedSchools = computed(() => {
   const map = new Map<number, any>()
 
   for (const reg of studentData.value.user_class_registrations) {
-    const school = reg.school_class?.academic_level?.academic_field?.school
+    const school = reg.school_class || reg.schoolClass?.school
     if (!school) continue
 
     const schoolId = school.id

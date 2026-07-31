@@ -24,7 +24,7 @@
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.student_phone"
+                v-model="form.mobile"
                 label="تلفن همراه"
                 outlined
                 dir="ltr" />
@@ -45,29 +45,31 @@
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.father_name"
-                label="نام پدر"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.father_phone"
-                label="تلفن پدر"
+                v-model="form.email"
+                label="ایمیل"
                 outlined
                 dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.mother_name"
-                label="نام مادر"
-                outlined />
+                v-model="form.birth_date"
+                label="تاریخ تولد"
+                outlined
+                type="date"
+                dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mother_phone"
-                label="تلفن مادر"
+              <q-select
+                v-model="form.class_id"
+                :options="classOptions"
+                option-value="id"
+                option-label="name"
+                label="کلاس"
                 outlined
-                dir="ltr" />
+                dense
+                clearable
+                emit-value
+                map-options />
             </div>
           </div>
 
@@ -95,7 +97,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
-import type { StudentType } from 'src/repositories/student'
 
 const studentApi = new StudentAPI()
 const schoolClassApi = new SchoolClassAPI()
@@ -104,24 +105,26 @@ const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 
-const form = reactive<Partial<StudentType>>({
+const form = reactive<{
+  first_name: string | null
+  last_name: string | null
+  mobile: string | null
+  national_id: string | null
+  birth_date: string | null
+  email: string | null
+  address: string | null
+  description: string | null
+  class_id: number | null
+}>({
   first_name: null,
   last_name: null,
-  student_phone: null,
+  mobile: null,
   national_id: null,
-  student_code: null,
   birth_date: null,
-  student_email: null,
+  email: null,
   address: null,
-  father_name: null,
-  father_phone: null,
-  father_email: null,
-  father_job: null,
-  mother_name: null,
-  mother_last_name: null,
-  mother_phone: null,
-  mother_email: null,
-  mother_job: null
+  description: null,
+  class_id: null
 })
 
 const classOptions = ref<any[]>([])
@@ -130,7 +133,16 @@ const saving = ref(false)
 async function loadStudent () {
   try {
     const result = await studentApi.get(Number(route.params.id))
-    Object.assign(form, result)
+    form.first_name = result.first_name
+    form.last_name = result.last_name
+    form.mobile = result.mobile
+    form.national_id = result.national_id
+    form.birth_date = result.birth_date
+      ? new Date(result.birth_date).toISOString().split('T')[0]
+      : null
+    form.email = result.email
+    form.address = result.address
+    form.description = result.description
   } catch (error) {
     $q.notify({
       icon: 'error',

@@ -62,20 +62,6 @@ const tableKeys = ref({
 const table = ref({
   columns: [
     {
-      name: 'employee_code',
-      required: true,
-      label: 'کد پرسنلی',
-      align: 'left',
-      field: (row: UserType) => row.employee_code
-    },
-    {
-      name: 'role',
-      required: true,
-      label: 'نقش',
-      align: 'left',
-      field: (row: UserType) => getUserRoleLabel(row.roles[0]?.name ?? '')
-    },
-    {
       name: 'first_name',
       required: true,
       label: 'نام',
@@ -111,12 +97,19 @@ const table = ref({
       field: (row: UserType) => row.email
     },
     {
+      name: 'role',
+      required: true,
+      label: 'نقش',
+      align: 'left',
+      field: (row: UserType) => getUserRoleLabel(row.roles[0]?.name ?? '')
+    },
+    {
       name: 'created_at',
       required: true,
       label: 'زمان ایجاد',
       align: 'left',
-      field: (row: UserType) => row.created_at ?
-        dateManager.miladiToShamsi(row.created_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') : '-'
+      field: (row: UserType) => row.created_at
+        ? dateManager.miladiToShamsi(row.created_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') : '-'
     },
     {
       name: 'actions',
@@ -145,13 +138,6 @@ const inputs = ref([
   },
   {
     type: 'input',
-    name: 'employee_code',
-    label: 'کد پرسنلی',
-    placeholder: ' ',
-    col: 'col-md-3 col-12'
-  },
-  {
-    type: 'input',
     name: 'first_name',
     label: 'نام',
     placeholder: ' ',
@@ -161,6 +147,20 @@ const inputs = ref([
     type: 'input',
     name: 'last_name',
     label: 'نام خانوادگی',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'username',
+    label: 'نام کاربری',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'mobile',
+    label: 'موبایل',
     placeholder: ' ',
     col: 'col-md-3 col-12'
   },

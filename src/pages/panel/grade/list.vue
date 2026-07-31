@@ -211,12 +211,13 @@ const showTable = ref(false)
 
 const columns = [
   { name: 'student', label: 'دانش آموز', align: 'right' as const, field: 'student' },
-  { name: 'lesson', label: 'درس', align: 'right' as const, field: 'lesson.name' },
+  { name: 'lesson', label: 'درس', align: 'right' as const, field: 'exam.lesson.name' },
   { name: 'grade_type', label: 'نوع نمره', align: 'right' as const, field: 'grade_type' },
-  { name: 'raw_grade', label: 'نمره خام', align: 'center' as const, field: 'raw_grade' },
-  { name: 'max_score', label: 'حداکثر نمره', align: 'center' as const, field: 'max_score' },
-  { name: 'min_passing_score', label: 'حداقل قبولی', align: 'center' as const, field: 'min_passing_score' },
-  { name: 'persian_date', label: 'تاریخ', align: 'center' as const, field: 'persian_date' }
+  { name: 'raw_score', label: 'نمره خام', align: 'center' as const, field: 'raw_score' },
+  { name: 'scaled_score', label: 'نمره مقیاس\u200cشده', align: 'center' as const, field: 'scaled_score' },
+  { name: 'max_score', label: 'حداکثر نمره', align: 'center' as const, field: 'exam.max_score' },
+  { name: 'min_passing_score', label: 'حداقل قبولی', align: 'center' as const, field: 'exam.min_passing_score' },
+  { name: 'exam_date', label: 'تاریخ', align: 'center' as const, field: 'exam_date' }
 ]
 
 function getGradeTypeLabel (value: string | null): string {
