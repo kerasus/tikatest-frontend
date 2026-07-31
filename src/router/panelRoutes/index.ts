@@ -3,16 +3,17 @@ import { index as studentRoutes } from './student'
 import { index as userRoutes } from './user'
 import { index as classRoutes } from './class'
 import { index as gradeRoutes } from './grade'
-import { index as quizRoutes } from './quiz'
 import { index as homeworkRoutes } from './homework'
 import { index as messageRoutes } from './message'
-import { index as examSessionRoutes } from './examSession'
+import { index as examRoutes } from './exam'
 import { index as disciplinaryRoutes } from './disciplinary'
 import { index as studentPortalRoutes } from './studentPortal'
 import { index as calendarRoutes } from './calendar'
 import { index as studyHoursRoutes } from './studyHours'
 import { index as schoolRoutes } from './school'
 import { index as academicTreeRoutes } from './academicTree'
+import { index as studentProfileRoutes } from './studentProfile'
+import { index as studentGuardianRoutes } from './studentGuardian'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
@@ -39,16 +40,17 @@ export const index: RouteRecordRaw[] = [
       ...studentRoutes,
       ...classRoutes,
       ...gradeRoutes,
-      ...quizRoutes,
       ...homeworkRoutes,
       ...messageRoutes,
-      ...examSessionRoutes,
+      ...examRoutes,
       ...disciplinaryRoutes,
       ...studentPortalRoutes,
       ...calendarRoutes,
       ...studyHoursRoutes,
       ...schoolRoutes,
-      ...academicTreeRoutes
+      ...academicTreeRoutes,
+      ...studentProfileRoutes,
+      ...studentGuardianRoutes
     ]
   },
 

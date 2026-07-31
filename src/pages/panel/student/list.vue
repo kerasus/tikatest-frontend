@@ -179,8 +179,8 @@ const columns = [
     sortable: true
   },
   { name: 'username', label: 'نام کاربری', align: 'right' as const, field: 'username' },
-  { name: 'student_phone', label: 'تلفن', align: 'right' as const, field: 'student_phone' },
-  { name: 'melli_code', label: 'کد ملی', align: 'right' as const, field: 'melli_code' },
+  { name: 'mobile', label: 'تلفن', align: 'right' as const, field: 'mobile' },
+  { name: 'national_id', label: 'کد ملی', align: 'right' as const, field: 'national_id' },
   { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
 ]
 

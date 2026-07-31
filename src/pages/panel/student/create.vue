@@ -12,14 +12,14 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.firstname"
+                v-model="form.first_name"
                 label="نام *"
                 outlined
                 required />
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.lastname"
+                v-model="form.last_name"
                 label="نام خانوادگی *"
                 outlined
                 required />
@@ -42,14 +42,14 @@
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.student_phone"
+                v-model="form.mobile"
                 label="تلفن همراه"
                 outlined
                 dir="ltr" />
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.melli_code"
+                v-model="form.national_id"
                 label="کد ملی"
                 outlined
                 dir="ltr" />
@@ -63,7 +63,7 @@
             </div>
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.student_email"
+                v-model="form.email"
                 label="ایمیل"
                 outlined
                 dir="ltr" />
@@ -81,60 +81,6 @@
                 label="آدرس"
                 outlined
                 type="textarea" />
-            </div>
-
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.father_name"
-                label="نام پدر"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.father_phone"
-                label="تلفن پدر"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.father_email"
-                label="ایمیل پدر"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.father_job"
-                label="شغل پدر"
-                outlined />
-            </div>
-
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mother_name"
-                label="نام مادر"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mother_lastname"
-                label="نام خانوادگی مادر"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mother_phone"
-                label="تلفن مادر"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mother_email"
-                label="ایمیل مادر"
-                outlined
-                dir="ltr" />
             </div>
 
             <div class="col-12 col-md-6">
@@ -175,7 +121,6 @@ import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
-import type { StudentType } from 'src/repositories/student'
 
 const studentApi = new StudentAPI()
 const schoolClassApi = new SchoolClassAPI()
@@ -183,26 +128,18 @@ const schoolClassApi = new SchoolClassAPI()
 const router = useRouter()
 const $q = useQuasar()
 
-const form = reactive<Partial<StudentType>>({
-  firstname: null,
-  lastname: null,
-  username: null,
-  password: null,
-  student_phone: null,
-  melli_code: null,
-  student_code: null,
-  birth_date: null,
-  student_email: null,
-  address: null,
-  father_name: null,
-  father_phone: null,
-  father_email: null,
-  father_job: null,
-  mother_name: null,
-  mother_lastname: null,
-  mother_phone: null,
-  mother_email: null,
-  mother_job: null
+const form = reactive({
+  first_name: null as string | null,
+  last_name: null as string | null,
+  username: null as string | null,
+  password: null as string | null,
+  mobile: null as string | null,
+  national_id: null as string | null,
+  student_code: null as string | null,
+  birth_date: null as string | null,
+  email: null as string | null,
+  address: null as string | null,
+  class_id: null as number | null
 })
 
 const classOptions = ref<any[]>([])

@@ -34,16 +34,16 @@
       pagination.sync="pagination">
       <template #body-cell-lesson_name="props">
         <q-td :props="props">
-          {{ props.row.lesson?.name || '-' }}
+          {{ props.row.exam?.lesson?.name || props.row.lesson?.name || '-' }}
         </q-td>
       </template>
 
       <template #body-cell-grade_value="props">
         <q-td :props="props">
           <q-chip
-            :color="getGradeColor(props.row.grade_value)"
+            :color="getGradeColor(props.row.scaled_score)"
             text-color="white"
-            :label="`${props.row.grade_value.toFixed(2)}`" />
+            :label="`${props.row.scaled_score?.toFixed(2)}`" />
         </q-td>
       </template>
 
@@ -68,8 +68,8 @@ const loading = ref(true)
 const pagination = ref({ rowsPerPage: 10 })
 
 const columns = [
-  { name: 'lesson_name', label: 'درس', field: 'lesson_name' },
-  { name: 'grade_value', label: 'نمره', field: 'grade_value' },
+  { name: 'lesson_name', label: 'درس', field: 'exam.lesson.name' },
+  { name: 'grade_value', label: 'نمره', field: 'scaled_score' },
   { name: 'exam_date', label: 'تاریخ', field: 'exam_date' }
 ]
 

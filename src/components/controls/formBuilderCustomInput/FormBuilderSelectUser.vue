@@ -39,8 +39,8 @@
             (*)
           </div>
           <div class="q-ml-md">
-            {{ opt.firstname }}
-            {{ opt.lastname }}
+            {{ opt.first_name }}
+            {{ opt.last_name }}
           </div>
         </template>
       </template>
@@ -57,8 +57,8 @@
             </span>
           </q-item-section>
           <q-item-section>
-            {{ opt.firstname }}
-            {{ opt.lastname }}
+            {{ opt.first_name }}
+            {{ opt.last_name }}
           </q-item-section>
         </q-item>
       </template>

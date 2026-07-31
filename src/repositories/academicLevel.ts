@@ -33,3 +33,5 @@ export default class AcademicLevelAPI extends BaseAPI<AcademicLevelType> {
     }
   }
 }
+
+export const academicLevel = new AcademicLevelAPI()

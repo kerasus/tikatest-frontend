@@ -35,11 +35,11 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس:</div>
-              <div class="text-body1">{{ studentData.student_phone || '-' }}</div>
+              <div class="text-body1">{{ studentData.mobile || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">کد ملی:</div>
-              <div class="text-body1">{{ studentData.melli_code || '-' }}</div>
+              <div class="text-body1">{{ studentData.national_id || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">تاریخ تولد:</div>
@@ -79,14 +79,14 @@
                     :key="reg.id"
                     dense>
                     <q-item-section>
-                      <q-item-label>{{ reg.schoolClass?.name || '-' }}</q-item-label>
+                      <q-item-label>{{ reg.school_class?.name || reg.schoolClass?.name || '-' }}</q-item-label>
                       <q-item-label caption>
-                        <template v-if="reg.schoolClass?.academicLevel">
-                          پایه: {{ reg.schoolClass.academicLevel.name }}
+                        <template v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel">
+                          پایه: {{ reg.school_class?.academic_level?.name || reg.schoolClass?.academicLevel?.name }}
                         </template>
-                        <template v-if="reg.schoolClass?.academicField">
-                          <span v-if="reg.schoolClass?.academicLevel"> - </span>
-                          رشته: {{ reg.schoolClass.academicLevel?.academicField?.name }}
+                        <template v-if="reg.school_class?.academic_level?.academic_field || reg.schoolClass?.academicLevel?.academicField">
+                          <span v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel"> - </span>
+                          رشته: {{ reg.school_class?.academic_level?.academic_field?.name || reg.schoolClass?.academicLevel?.academicField?.name }}
                         </template>
                       </q-item-label>
                     </q-item-section>
@@ -140,19 +140,19 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام پدر:</div>
-              <div class="text-body1">{{ studentData?.father_name || '-' }}</div>
+              <div class="text-body1">{{ fatherGuardian?.user?.full_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس پدر:</div>
-              <div class="text-body1">{{ studentData?.father_phone || '-' }}</div>
+              <div class="text-body1">{{ fatherGuardian?.user?.mobile || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">نام مادر:</div>
-              <div class="text-body1">{{ studentData?.mother_name || '-' }}</div>
+              <div class="text-body1">{{ motherGuardian?.user?.full_name || '-' }}</div>
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2">شماره تماس مادر:</div>
-              <div class="text-body1">{{ studentData?.mother_phone || '-' }}</div>
+              <div class="text-body1">{{ motherGuardian?.user?.mobile || '-' }}</div>
             </div>
           </div>
         </q-card-section>
@@ -174,18 +174,32 @@ const loading = ref(true)
 const studentData = ref<any>(null)
 
 const getClassName = (): string => {
-  if (!studentData.value?.userClassRegistrations?.length) return '-'
-  const reg = studentData.value.userClassRegistrations[0]
-  return reg?.schoolClass?.name || '-'
+  if (!studentData.value?.user_class_registrations?.length) return '-'
+  const reg = studentData.value.user_class_registrations[0]
+  return reg?.school_class?.name || reg?.class?.name || '-'
 }
 
+const fatherGuardian = computed(() => {
+  if (!studentData.value?.guardian_records) return null
+  return studentData.value.guardian_records.find(
+    (g: any) => g.relationship_type === 'father'
+  ) || null
+})
+
+const motherGuardian = computed(() => {
+  if (!studentData.value?.guardian_records) return null
+  return studentData.value.guardian_records.find(
+    (g: any) => g.relationship_type === 'mother'
+  ) || null
+})
+
 const groupedSchools = computed(() => {
-  if (!studentData.value?.userClassRegistrations?.length) return []
+  if (!studentData.value?.user_class_registrations?.length) return []
 
   const map = new Map<number, any>()
 
-  for (const reg of studentData.value.userClassRegistrations) {
-    const school = reg.school || reg.schoolClass?.school
+  for (const reg of studentData.value.user_class_registrations) {
+    const school = reg.school_class || reg.schoolClass?.school
     if (!school) continue
 
     const schoolId = school.id

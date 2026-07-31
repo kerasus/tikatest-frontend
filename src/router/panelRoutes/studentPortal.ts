@@ -72,36 +72,36 @@ export const index = [
     component: () => import('src/pages/panel/student/messages-received.vue')
   },
   {
-    path: 'quizzes',
-    name: 'Student.Quiz.List',
+    path: 'online-exams',
+    name: 'Student.Exam.List',
     meta: {
       pageCategory: 'آزمون آنلاین'
     },
-    component: () => import('src/pages/panel/student/quizzes.vue')
+    component: () => import('src/pages/panel/student/onlineExams.vue')
   },
   {
-    path: 'quizzes/:id',
-    name: 'Student.Quiz.Show',
+    path: 'online-exams/:id',
+    name: 'Student.Exam.Show',
     meta: {
       pageCategory: 'جزئیات آزمون'
     },
-    component: () => import('src/pages/panel/student/quiz-detail.vue')
+    component: () => import('src/pages/panel/student/exam-detail.vue')
   },
   {
-    path: 'quizzes/:id/attempt',
-    name: 'Student.Quiz.Attempt',
+    path: 'online-exams/:id/attempt',
+    name: 'Student.Exam.Attempt',
     meta: {
       pageCategory: 'شرکت در آزمون'
     },
-    component: () => import('src/pages/panel/quiz/attempt.vue')
+    component: () => import('src/pages/panel/exam/attempt.vue')
   },
   {
-    path: 'quizzes/:id/result',
-    name: 'Student.Quiz.Result',
+    path: 'online-exams/:id/result',
+    name: 'Student.Exam.Result',
     meta: {
       pageCategory: 'نتیجه آزمون'
     },
-    component: () => import('src/pages/panel/student/quiz-result.vue')
+    component: () => import('src/pages/panel/student/exam-result.vue')
   },
   {
     path: 'homework',

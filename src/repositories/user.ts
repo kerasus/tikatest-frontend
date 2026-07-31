@@ -41,17 +41,19 @@ export type UserSchoolType = {
 
 export type UserType = {
   id: number | null;
-  firstname: string | null;
-  lastname: string | null;
+  first_name: string | null;
+  last_name: string | null;
   email: string | null;
   username: string | null;
-  employee_code: string | null;
   mobile: string | null;
   roles_list: string[];
   roles: RoleType[];
-  schools?: UserSchoolType[];
   email_verified_at: string | null;
   mobile_verified_at: string | null;
+  birth_date: string | null;
+  address: string | null;
+  description: string | null;
+  picture: string | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -70,16 +72,19 @@ export default class UserAPI extends BaseAPI<UserType> {
     super('/users')
     this.defaultObject = {
       id: null,
-      firstname: null,
-      lastname: null,
+      first_name: null,
+      last_name: null,
       email: null,
       username: null,
-      employee_code: null,
       mobile: null,
       roles: [],
       roles_list: [],
       email_verified_at: null,
       mobile_verified_at: null,
+      birth_date: null,
+      address: null,
+      description: null,
+      picture: null,
       created_at: null,
       updated_at: null
     }

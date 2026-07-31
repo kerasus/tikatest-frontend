@@ -375,7 +375,7 @@ async function loadStudents (classId: number) {
     const result = await studentApi.index({ length: 1000, class_id: classId })
     studentOptions.value = result.data.map((s: any) => ({
       id: s.id,
-      full_name: s.full_name || `${s.firstname} ${s.lastname}`,
+      full_name: s.full_name || `${s.first_name} ${s.last_name}`,
       raw_grade: null,
       descriptive_value: null
     }))
@@ -500,7 +500,7 @@ async function onSubmit () {
       }))
     }
 
-    await gradeApi.createExamSessionWithGrades(payload)
+    await gradeApi.createExamWithGrades(payload)
 
     $q.notify({
       icon: 'check',

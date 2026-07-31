@@ -103,13 +103,13 @@
             </div>
 
             <q-table
-              :rows="report.grades"
+              :rows="report.results"
               :columns="columns"
               row-key="id"
               flat>
               <template #body-cell-student="props">
                 <q-td :props="props">
-                  {{ props.row.student?.name }} {{ props.row.student?.lastname }}
+                  {{ props.row.student?.full_name || '-' }}
                 </q-td>
               </template>
             </q-table>
@@ -145,15 +145,15 @@ const loading = ref(false)
 
 const columns = [
   { name: 'student', label: 'دانش آموز', align: 'right' as const, field: 'student' },
-  { name: 'raw_grade', label: 'نمره خام', align: 'center' as const, field: 'raw_grade' },
+  { name: 'raw_score', label: 'نمره خام', align: 'center' as const, field: 'raw_score' },
   {
-    name: 'calculated_grade',
-    label: 'نمره محاسبه شده',
+    name: 'scaled_score',
+    label: 'نمره مقیاس\u200cشده',
     align: 'center' as const,
-    field: 'calculated_grade'
+    field: 'scaled_score'
   },
   { name: 'grade_type', label: 'نوع نمره', align: 'center' as const, field: 'grade_type' },
-  { name: 'persian_date', label: 'تاریخ', align: 'center' as const, field: 'persian_date' }
+  { name: 'exam_date', label: 'تاریخ', align: 'center' as const, field: 'exam_date' }
 ]
 
 const loadLessons = async () => {

@@ -2,36 +2,36 @@ import BaseAPI from './BaseAPI'
 
 export type StudentType = {
   id: number | null
-  firstname: string | null
-  lastname: string | null
+  first_name: string | null
+  last_name: string | null
   full_name: string | null
   email: string | null
+  mobile: string | null
   username: string | null
-  password: string | null
-  class_id: number | null
-  student_phone: string | null
-  melli_code: string | null
-  student_code: string | null
+  national_id: string | null
   birth_date: string | null
-  student_email: string | null
   address: string | null
+  description: string | null
   picture: string | null
-  school_id: number | null
-  father_name: string | null
-  father_phone: string | null
-  father_email: string | null
-  father_job: string | null
-  father_melli_code: string | null
-  mother_name: string | null
-  mother_lastname: string | null
-  mother_phone: string | null
-  mother_email: string | null
-  mother_job: string | null
-  mother_melli_code: string | null
-  user_type: string | null
   roles_list: string[]
+  permissions_list: string[]
   created_at: string | null
   updated_at: string | null
+  student_profile?: {
+    id: number | null
+    code: string | null
+    xp: number | null
+  } | null
+  guardian_records?: Array<{
+    id: number | null
+    relationship_type: 'father' | 'mother' | 'guardian' | null
+    job: string | null
+    is_primary_contact: boolean | null
+  }> | null
+  user_class_registrations?: Array<{
+    id: number | null
+    class_id: number | null
+  }> | null
 }
 
 export default class StudentAPI extends BaseAPI<StudentType> {
@@ -39,34 +39,19 @@ export default class StudentAPI extends BaseAPI<StudentType> {
     super('/students')
     this.defaultObject = {
       id: null,
-      firstname: null,
-      lastname: null,
+      first_name: null,
+      last_name: null,
       full_name: null,
       email: null,
+      mobile: null,
       username: null,
-      password: null,
-      class_id: null,
-      student_phone: null,
-      melli_code: null,
-      student_code: null,
+      national_id: null,
       birth_date: null,
-      student_email: null,
       address: null,
+      description: null,
       picture: null,
-      school_id: null,
-      father_name: null,
-      father_phone: null,
-      father_email: null,
-      father_job: null,
-      father_melli_code: null,
-      mother_name: null,
-      mother_lastname: null,
-      mother_phone: null,
-      mother_email: null,
-      mother_job: null,
-      mother_melli_code: null,
-      user_type: null,
       roles_list: [],
+      permissions_list: [],
       created_at: null,
       updated_at: null
     }
@@ -82,27 +67,33 @@ export default class StudentAPI extends BaseAPI<StudentType> {
   }
 
   async dashboard (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
+    return response.data
   }
 
   async myGrades (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.myGrades!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myGrades!, { params })
+    return response.data
   }
 
   async reportCard (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.reportCard!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.reportCard!, { params })
+    return response.data
   }
 
   async absences (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.absences!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.absences!, { params })
+    return response.data
   }
 
   async disciplinary (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.disciplinary!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.disciplinary!, { params })
+    return response.data
   }
 
   async studySessions (params?: any) {
-    return this.getAxiosInstanceWithToken().get(this.endpoints.studySessions!, { params })
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studySessions!, { params })
+    return response.data
   }
 
   async createStudySession (data: any) {

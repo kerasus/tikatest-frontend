@@ -303,7 +303,7 @@ async function loadStudents (classId: number) {
     const result = await studentApi.index({ length: 1000, class_id: classId })
     studentOptions.value = (result.data || []).map((item: any) => ({
       id: item.id,
-      full_name: item.full_name || `${item.firstname} ${item.lastname}`,
+      full_name: item.full_name || `${item.first_name} ${item.last_name}`,
       username: item.username,
       selected: true
     }))
