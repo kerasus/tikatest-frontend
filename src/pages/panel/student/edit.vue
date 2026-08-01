@@ -88,6 +88,11 @@
         </q-form>
       </q-card-section>
     </q-card>
+
+    <student-class-assignment
+      :student-id="Number(route.params.id)"
+      :registrations="studentData?.user_class_registrations || []"
+      :readonly="false" />
   </div>
 </template>
 
@@ -97,6 +102,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
+import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
 
 const studentApi = new StudentAPI()
 const schoolClassApi = new SchoolClassAPI()
@@ -104,6 +110,8 @@ const schoolClassApi = new SchoolClassAPI()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
+
+const studentData = ref<any>(null)
 
 const form = reactive<{
   first_name: string | null
@@ -127,12 +135,13 @@ const form = reactive<{
   class_id: null
 })
 
-const classOptions = ref<any[]>([])
 const saving = ref(false)
+const classOptions = ref<any[]>([])
 
 async function loadStudent () {
   try {
     const result = await studentApi.get(Number(route.params.id))
+    studentData.value = result
     form.first_name = result.first_name
     form.last_name = result.last_name
     form.mobile = result.mobile
@@ -173,11 +182,14 @@ async function onSubmit () {
   }
 }
 
-onMounted(() => {
-  loadStudent()
-  schoolClassApi.index({ length: 100 }).then((result) => {
-    classOptions.value = result.data
-  })
+onMounted(async () => {
+  await Promise.all([
+    loadStudent(),
+    (async () => {
+      const result = await schoolClassApi.index({ length: 100 })
+      classOptions.value = result.data
+    })()
+  ])
 })
 </script>
 

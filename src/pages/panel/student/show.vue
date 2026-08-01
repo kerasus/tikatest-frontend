@@ -53,55 +53,9 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="q-mb-md">
-        <q-card-section>
-          <div class="text-h6">مدارس و کلاس‌ها</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section>
-          <template v-if="groupedSchools.length > 0">
-            <q-card
-              v-for="school in groupedSchools"
-              :key="school.id"
-              flat
-              bordered
-              class="q-mb-md full-width-card">
-              <q-card-section>
-                <div class="text-subtitle1 text-weight-medium">{{ school.name }}</div>
-              </q-card-section>
-              <q-separator />
-              <q-card-section>
-                <q-list
-                  bordered
-                  separator>
-                  <q-item
-                    v-for="reg in school.registrations"
-                    :key="reg.id"
-                    dense>
-                    <q-item-section>
-                      <q-item-label>{{ reg.school_class?.name || reg.schoolClass?.name || '-' }}</q-item-label>
-                      <q-item-label caption>
-                        <template v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel">
-                          پایه: {{ reg.school_class?.academic_level?.name || reg.schoolClass?.academicLevel?.name }}
-                        </template>
-                        <template v-if="reg.school_class?.academic_level?.academic_field || reg.schoolClass?.academicLevel?.academicField">
-                          <span v-if="reg.school_class?.academic_level || reg.schoolClass?.academicLevel"> - </span>
-                          رشته: {{ reg.school_class?.academic_level?.academic_field?.name || reg.schoolClass?.academicLevel?.academicField?.name }}
-                        </template>
-                      </q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-card-section>
-            </q-card>
-          </template>
-          <div
-            v-else
-            class="text-center text-grey">
-            هیچ مدرسه و کلاسی ثبت نشده است.
-          </div>
-        </q-card-section>
-      </q-card>
+      <student-class-assignment
+        :student-id="studentData.id"
+        :registrations="studentData.user_class_registrations || []" />
 
       <q-card class="q-mb-md">
         <q-card-section>
@@ -166,6 +120,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { student } from 'src/repositories/student'
+import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
 
 const route = useRoute()
 const $q = useQuasar()
@@ -191,30 +146,6 @@ const motherGuardian = computed(() => {
   return studentData.value.guardian_records.find(
     (g: any) => g.relationship_type === 'mother'
   ) || null
-})
-
-const groupedSchools = computed(() => {
-  if (!studentData.value?.user_class_registrations?.length) return []
-
-  const map = new Map<number, any>()
-
-  for (const reg of studentData.value.user_class_registrations) {
-    const school = reg.school_class || reg.schoolClass?.school
-    if (!school) continue
-
-    const schoolId = school.id
-    if (!map.has(schoolId)) {
-      map.set(schoolId, {
-        id: schoolId,
-        name: school.name,
-        registrations: []
-      })
-    }
-
-    map.get(schoolId).registrations.push(reg)
-  }
-
-  return Array.from(map.values())
 })
 
 onMounted(async () => {

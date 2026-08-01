@@ -40,45 +40,66 @@
       <q-separator />
 
       <q-card-section>
-        <q-list
-          bordered
-          separator>
-          <q-item
-            v-for="msg in messages"
-            :key="msg.id"
-            clickable
-            :to="{ name: 'Panel.Message.Show', params: { id: msg.id } }"
-            :class="{ 'bg-blue-1': !msg.owners?.some((o: any) => o.is_read) }">
-            <q-item-section avatar>
-              <q-avatar
+        <q-table
+          :rows="messages"
+          :columns="columns"
+          row-key="id"
+          :loading="loading"
+          :pagination="pagination"
+          @request="onRequest">
+          <template #body-cell-sender="props">
+            <q-td :props="props">
+              <div class="row items-center">
+                <q-avatar
+                  size="32px"
+                  class="q-ml-sm">
+                  <q-img :src="'/images/blankProfile.png'" />
+                </q-avatar>
+                <span>{{ props.row.sender?.full_name || '-' }}</span>
+              </div>
+            </q-td>
+          </template>
+          <template #body-cell-subject="props">
+            <q-td :props="props">
+              <q-btn
+                flat
+                :to="{ name: 'Panel.Message.Show', params: { id: props.row.id } }"
+                class="text-left">
+                {{ props.row.subject || '(بدون موضوع)' }}
+              </q-btn>
+            </q-td>
+          </template>
+          <template #body-cell-body="props">
+            <q-td :props="props">
+              <span class="text-grey-7">{{ props.row.body }}</span>
+            </q-td>
+          </template>
+          <template #body-cell-sent_at="props">
+            <q-td :props="props">
+              {{ formatDate(props.row.sent_at) }}
+            </q-td>
+          </template>
+          <template #body-cell-is_read="props">
+            <q-td :props="props">
+              <q-chip
+                :color="props.row.owners?.some((o: any) => !o.is_read) ? 'orange' : 'green'"
+                text-color="white"
+                dense>
+                {{ props.row.owners?.some((o: any) => !o.is_read) ? 'جدید' : 'خوانده شده' }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template #body-cell-actions="props">
+            <q-td :props="props">
+              <q-btn
+                flat
+                dense
+                icon="visibility"
                 color="primary"
-                text-color="white">
-                {{ getInitials(msg.sender) }}
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-weight-medium">
-                {{ msg.subject || '(بدون موضوع)' }}
-              </q-item-label>
-              <q-item-label
-                caption
-                lines="2">
-                {{ msg.body }}
-              </q-item-label>
-              <q-item-label
-                caption
-                class="text-grey-7">
-                {{ formatDate(msg.sent_at) }}
-              </q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-badge
-                v-if="!msg.owners?.some((o: any) => o.is_read)"
-                color="orange"
-                label="جدید" />
-            </q-item-section>
-          </q-item>
-        </q-list>
+                :to="{ name: 'Panel.Message.Show', params: { id: props.row.id } }" />
+            </q-td>
+          </template>
+        </q-table>
       </q-card-section>
     </q-card>
   </div>
@@ -110,11 +131,22 @@ const filters = reactive({
   page: 1
 })
 
-function getInitials (sender: any) {
-  if (!sender) return '?'
-  const name = sender.first_name || sender.full_name || ''
-  return name.charAt(0).toUpperCase()
-}
+const pagination = ref({
+  sortBy: 'sent_at',
+  descending: true,
+  page: 1,
+  rowsPerPage: 20,
+  rowsNumber: 0
+})
+
+const columns = [
+  { name: 'sender', label: 'فرستنده', align: 'right' as const, field: 'sender' },
+  { name: 'subject', label: 'موضوع', align: 'right' as const, field: 'subject' },
+  { name: 'body', label: 'متن', align: 'right' as const, field: 'body' },
+  { name: 'sent_at', label: 'تاریخ', align: 'center' as const, field: 'sent_at' },
+  { name: 'is_read', label: 'وضعیت', align: 'center' as const, field: 'is_read' },
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
+]
 
 function formatDate (date: string | null) {
   if (!date) return '-'
@@ -125,8 +157,8 @@ async function loadMessages () {
   loading.value = true
   try {
     const params: any = {
-      length: filters.length || 20,
-      page: (filters.page || 1) - 1
+      length: pagination.value.rowsPerPage,
+      page: pagination.value.page - 1
     }
     if (filters.sender_id) params.sender_ids = [filters.sender_id]
     if (filters.receiver_id) params.receiver_ids = [filters.receiver_id]
@@ -134,6 +166,7 @@ async function loadMessages () {
 
     const result = await messageApi.index(params)
     messages.value = result.data
+    pagination.value.rowsNumber = result.total
   } catch (error) {
     $q.notify({
       icon: 'error',
@@ -143,6 +176,14 @@ async function loadMessages () {
   } finally {
     loading.value = false
   }
+}
+
+function onRequest (props: any) {
+  pagination.value.page = props.pagination.page
+  pagination.value.rowsPerPage = props.pagination.rowsPerPage
+  pagination.value.sortBy = props.pagination.sortBy
+  pagination.value.descending = props.pagination.descending
+  loadMessages()
 }
 
 async function loadUsers () {
@@ -166,11 +207,5 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .message-list-page {
-  .q-item {
-    transition: background-color 0.2s;
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.03);
-    }
-  }
 }
 </style>
