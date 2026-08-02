@@ -1,5 +1,5 @@
 <template>
-  <div class="form-builder-select-productPart">
+  <div class="form-builder-select-exam-category">
     <div class="outsideLabel">{{ label }}</div>
     <q-select
       ref="input"
@@ -24,12 +24,29 @@
       input-debounce="500"
       :disable="disable"
       :readonly="readonly"
-      :emit-value="emitValue"
-      :map-options="mapOptions"
+      emit-value
+      map-options
       :hide-dropdown-icon="hideDropdownIcon"
       :dropdown-icon="dropdownIcon"
       :clearable="clearable"
       @filter="filterFn">
+      <template #option="{ opt, toggleOption }">
+        <q-item
+          clickable
+          @click="toggleOption(opt)">
+          <q-item-section>
+            <q-item-label>{{ opt.title }}</q-item-label>
+            <q-item-label caption>
+              <template v-if="opt.term_number">
+                ترم {{ opt.term_number }}
+              </template>
+              <template v-else>
+                عمومی
+              </template>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+      </template>
       <template #no-option>
         <q-item v-show="showNoOption">
           <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
@@ -40,17 +57,16 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { computed, defineProps, defineEmits, ref } from 'vue'
-import RawMaterialAPI, { type RawMaterialType } from 'src/repositories/rawMaterial'
+import { computed, ref } from 'vue'
+import ExamCategoryAPI, { type ExamCategoryType } from 'src/repositories/examCategory'
 
 defineOptions({
-  name: 'FormBuilderSelectRawMaterial'
+  name: 'FormBuilderSelectExamCategory'
 })
 
 const props = defineProps({
   label: {
-    default: 'ماده اولیه',
+    default: 'دسته‌بندی آزمون',
     type: String
   },
   name: {
@@ -113,14 +129,6 @@ const props = defineProps({
     default: false,
     type: Boolean
   },
-  emitValue: {
-    default: true,
-    type: Boolean
-  },
-  mapOptions: {
-    default: true,
-    type: Boolean
-  },
   readonly: {
     default: false,
     type: Boolean
@@ -129,7 +137,7 @@ const props = defineProps({
 
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
-const rawMaterialAPI = new RawMaterialAPI()
+const examCategoryAPI = new ExamCategoryAPI()
 
 const localValue = computed({
   get () {
@@ -143,17 +151,9 @@ const placeholderSetter = computed(() => {
   if (localValue.value === null) {
     return props.placeholder
   }
-  // in single select after setting value,
-  // v-model type changes to string
-
-  // in the multiple scenario, inputData type changes to Array!
   if (props.multiple && Array.isArray(localValue.value)) {
-    if (localValue.value.length === 0) {
-      return props.placeholder
-    }
-    return ''
+    return localValue.value.length === 0 ? props.placeholder : ''
   }
-  // be an object
   if (Object.keys(localValue.value).length === 0) {
     return props.placeholder
   }
@@ -161,28 +161,20 @@ const placeholderSetter = computed(() => {
 })
 
 const errorMessage = ref<string | undefined>(undefined)
-const filteredOptions = ref<RawMaterialType[]>([])
+const filteredOptions = ref<ExamCategoryType[]>([])
 const optionValue = ref('id')
-const optionLabel = ref('name')
+const optionLabel = ref('title')
 
-async function getProductParts (name: string | null) {
-  const productPartsList = await rawMaterialAPI.index({ name })
-  return productPartsList.data
+async function getExamCategories (name: string | null) {
+  const examCategoriesList = await examCategoryAPI.index({ name })
+  return examCategoriesList.data
 }
 
-function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
-  if (val === '') {
-    update(async () => {
-      filteredOptions.value = await getProductParts(null)
-    })
-    return
-  }
-
+function filterFn (value: string, update: (callback: () => Promise<void>) => void) {
   update(async () => {
-    filteredOptions.value = await getProductParts(val)
+    filteredOptions.value = await getExamCategories(value || null)
   })
 }
-
 </script>
 
 <style scoped></style>

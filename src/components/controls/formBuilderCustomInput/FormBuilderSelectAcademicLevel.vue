@@ -1,5 +1,5 @@
 <template>
-  <div class="form-builder-select-color">
+  <div class="form-builder-select-academic-level">
     <div class="outsideLabel">{{ label }}</div>
     <q-select
       ref="input"
@@ -24,21 +24,23 @@
       input-debounce="500"
       :disable="disable"
       :readonly="readonly"
-      :emit-value="emitValue"
-      :map-options="mapOptions"
+      emit-value
+      map-options
       :hide-dropdown-icon="hideDropdownIcon"
       :dropdown-icon="dropdownIcon"
       :clearable="clearable"
       @filter="filterFn">
-      <template #option="{opt, toggleOption}">
+      <template #option="{ opt, toggleOption }">
         <q-item
           clickable
           @click="toggleOption(opt)">
-          <q-item-section avatar>
-            <span :style="{ backgroundColor: opt.color_hex, width: '10px', height:'10px', display: 'inline-block', marginLeft: '5px' }" />
-          </q-item-section>
           <q-item-section>
-            {{ opt.name }}
+            <q-item-label>{{ opt.name }}</q-item-label>
+            <q-item-label caption>
+              {{ opt.academic_field?.school?.name }}
+              -
+              {{ opt.academic_field?.name }}
+            </q-item-label>
           </q-item-section>
         </q-item>
       </template>
@@ -52,17 +54,16 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { computed, defineProps, defineEmits, ref } from 'vue'
-import ColorAPI, { type ColorType } from 'src/repositories/color'
+import { computed, ref } from 'vue'
+import AcademicLevelAPI, { type AcademicLevelType } from 'src/repositories/academicLevel'
 
 defineOptions({
-  name: 'FormBuilderSelectColor'
+  name: 'FormBuilderSelectAcademicLevel'
 })
 
 const props = defineProps({
   label: {
-    default: 'رنگ',
+    default: 'مقطع تحصیلی',
     type: String
   },
   name: {
@@ -125,23 +126,23 @@ const props = defineProps({
     default: false,
     type: Boolean
   },
-  emitValue: {
-    default: true,
-    type: Boolean
-  },
-  mapOptions: {
-    default: true,
-    type: Boolean
-  },
   readonly: {
     default: false,
     type: Boolean
+  },
+  schoolId: {
+    default: null,
+    type: Number
+  },
+  fieldId: {
+    default: null,
+    type: Number
   }
 })
 
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
-const colorAPI = new ColorAPI()
+const academicLevelAPI = new AcademicLevelAPI()
 
 const localValue = computed({
   get () {
@@ -155,17 +156,9 @@ const placeholderSetter = computed(() => {
   if (localValue.value === null) {
     return props.placeholder
   }
-  // in single select after setting value,
-  // v-model type changes to string
-
-  // in the multiple scenario, inputData type changes to Array!
   if (props.multiple && Array.isArray(localValue.value)) {
-    if (localValue.value.length === 0) {
-      return props.placeholder
-    }
-    return ''
+    return localValue.value.length === 0 ? props.placeholder : ''
   }
-  // be an object
   if (Object.keys(localValue.value).length === 0) {
     return props.placeholder
   }
@@ -173,28 +166,27 @@ const placeholderSetter = computed(() => {
 })
 
 const errorMessage = ref<string | undefined>(undefined)
-const filteredOptions = ref<ColorType[]>([])
+const filteredOptions = ref<AcademicLevelType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
 
-async function getColors (name: string | null) {
-  const colorsList = await colorAPI.index({ name })
-  return colorsList.data
+async function getAcademicLevels (name: string | null) {
+  const params: any = { name }
+  if (props.schoolId) {
+    params.school_id = props.schoolId
+  }
+  if (props.fieldId) {
+    params.field_id = props.fieldId
+  }
+  const academicLevelsList = await academicLevelAPI.index(params)
+  return academicLevelsList.data
 }
 
-function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
-  if (val === '') {
-    update(async () => {
-      filteredOptions.value = await getColors(null)
-    })
-    return
-  }
-
+function filterFn (value: string, update: (callback: () => Promise<void>) => void) {
   update(async () => {
-    filteredOptions.value = await getColors(val)
+    filteredOptions.value = await getAcademicLevels(value || null)
   })
 }
-
 </script>
 
 <style scoped></style>

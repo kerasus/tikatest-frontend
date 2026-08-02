@@ -2,7 +2,7 @@ import BaseAPI from './BaseAPI'
 
 export type { ListType } from './BaseAPI'
 
-export type StudentProfileType = {
+export interface StudentProfileType {
   id: number | null
   user_id: number | null
   code: string | null
@@ -19,7 +19,7 @@ export type StudentProfileType = {
   guardians?: StudentGuardianType[] | null
 }
 
-export type StudentGuardianType = {
+export interface StudentGuardianType {
   id: number | null
   user_id: number | null
   student_profile_id: number | null

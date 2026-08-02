@@ -1,140 +1,55 @@
 <template>
-  <div class="student-list-page">
-    <q-card>
-      <q-card-section>
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.school_id"
-              :options="schoolOptions"
-              option-value="id"
-              option-label="name"
-              label="مدرسه"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              @update:model-value="onSchoolChange" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.field_id"
-              :options="fieldOptions"
-              option-value="id"
-              option-label="name"
-              label="رشته"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              :disable="!filters.school_id"
-              @update:model-value="onFieldChange" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.level_id"
-              :options="levelOptions"
-              option-value="id"
-              option-label="name"
-              label="پایه"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              :disable="!filters.field_id"
-              @update:model-value="onLevelChange" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.class_id"
-              :options="classOptions"
-              option-value="id"
-              option-label="name"
-              label="کلاس"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              :disable="!filters.level_id"
-              @update:model-value="loadStudents" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-input
-              v-model="filters.search"
-              label="جستجو (نام، نام خانوادگی، کد ملی)"
-              outlined
-              dense
-              clearable
-              @update:model-value="loadStudents" />
-          </div>
-          <div class="col-12 col-md-3 flex items-center">
-            <q-btn
-              color="primary"
-              icon="add"
-              label="افزودن دانش آموز"
-              :to="{ name: 'Panel.Student.Create' }"
-              class="full-width" />
-          </div>
+  <entity-index
+    ref="entityIndexRef"
+    :value="inputs"
+    :title="label"
+    :api="api"
+    :table="table"
+    :table-keys="tableKeys"
+    :create-route-name="createRouteName"
+    :show-route-name="showRouteName"
+    :show-close-button="false"
+    :show-expand-button="false"
+    :show-reload-button="false"
+    :show-search-button="true"
+    :row-key="itemIdentifyKey">
+    <template #entity-index-table-cell="{ inputData }">
+      <template v-if="inputData.col.name === 'actions'">
+        <div class="action-column-entity-index">
+          <delete-btn
+            :row="inputData.props.row"
+            :api="studentAPI"
+            :use-flag="false"
+            @change="afterRemove" />
+          <q-btn
+            color="primary"
+            flat
+            icon="visibility"
+            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
         </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section>
-        <q-table
-          :rows="students"
-          :columns="columns"
-          row-key="id"
-          :loading="loading"
-          :pagination="pagination"
-          @request="onRequest">
-          <template #body-cell-name="props">
-            <q-td :props="props">
-              <div class="row items-center">
-                <q-avatar
-                  size="40px"
-                  class="q-ml-sm">
-                  <q-img :src="props.row.picture || '/images/blankProfile.png'" />
-                </q-avatar>
-                <span>{{ props.row.name }}</span>
-              </div>
-            </q-td>
-          </template>
-          <template #body-cell-actions="props">
-            <q-td :props="props">
-              <q-btn
-                flat
-                dense
-                icon="visibility"
-                color="primary"
-                :to="{ name: 'Panel.Student.Show', params: { id: props.row.id } }" />
-              <q-btn
-                flat
-                dense
-                icon="edit"
-                color="warning"
-                :to="{ name: 'Panel.Student.Edit', params: { id: props.row.id } }" />
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-  </div>
+      </template>
+      <template v-else>
+        {{ inputData.col.value }}
+      </template>
+    </template>
+  </entity-index>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
-import StudentAPI from 'src/repositories/student'
+import { EntityIndex } from 'quasar-crud'
 import SchoolAPI from 'src/repositories/school'
+import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import type { StudentType } from 'src/repositories/student'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 
 const studentAPI = new StudentAPI()
 const schoolAPI = new SchoolAPI()
@@ -143,6 +58,123 @@ const academicFieldAPI = new AcademicFieldAPI()
 const academicLevelAPI = new AcademicLevelAPI()
 
 const $q = useQuasar()
+const FormBuilderSelectSchoolComponent = shallowRef(FormBuilderSelectSchool)
+const FormBuilderSelectSchoolClassComponent = shallowRef(FormBuilderSelectSchoolClass)
+const FormBuilderSelectAcademicFieldComponent = shallowRef(FormBuilderSelectAcademicField)
+const FormBuilderSelectAcademicLevelComponent = shallowRef(FormBuilderSelectAcademicLevel)
+
+const api = ref(studentAPI.endpoints.base)
+const label = ref('دانش آموزان')
+const createRouteName = ref('Panel.Student.Create')
+const showRouteName = ref('Panel.Student.Show')
+const itemIdentifyKey = ref('id')
+const tableKeys = ref({
+  data: 'data',
+  total: 'total',
+  currentPage: 'current_page',
+  perPage: 'per_page',
+  pageKey: 'page'
+})
+const table = ref({
+  columns: [
+    {
+      name: 'first_name',
+      required: true,
+      label: 'نام',
+      align: 'right' as const,
+      field: 'first_name',
+      sortable: true
+    },
+    {
+      name: 'last_name',
+      required: true,
+      label: 'نام خانوادگی',
+      align: 'right' as const,
+      field: 'last_name',
+      sortable: true
+    },
+    { name: 'username', label: 'نام کاربری', align: 'right' as const, field: 'username' },
+    { name: 'mobile', label: 'تلفن', align: 'right' as const, field: 'mobile' },
+    { name: 'national_id', label: 'کد ملی', align: 'right' as const, field: 'national_id' },
+    {
+      name: 'actions',
+      required: true,
+      label: 'عملیات',
+      align: 'left',
+      field: () => ''
+    }
+  ]
+})
+const inputs = ref([
+  {
+    type: 'hidden',
+    name: 'sortation_field',
+    value: 'created_at'
+  },
+  {
+    type: 'hidden',
+    name: 'sortation_order',
+    value: 'desc'
+  },
+  {
+    type: 'hidden',
+    name: 'length',
+    value: 10
+  },
+  {
+    type: FormBuilderSelectSchoolComponent,
+    name: 'school_id',
+    label: 'مدرسه',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicFieldComponent,
+    name: 'field_id',
+    label: 'رشته',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicLevelComponent,
+    name: 'level_id',
+    label: 'پایه',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: FormBuilderSelectSchoolClassComponent,
+    name: 'class_id',
+    label: 'کلاس',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'first_name',
+    label: 'نام',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'last_name',
+    label: 'نام خانوادگی',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'national_id',
+    label: 'کدملی',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'input',
+    name: 'username',
+    label: 'نام کاربری',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  }
+])
+const entityIndexRef = ref()
 
 const students = ref<StudentType[]>([])
 const schoolOptions = ref<any[]>([])
@@ -301,6 +333,14 @@ function onRequest (props: any) {
   pagination.value.page = props.pagination.page
   pagination.value.rowsPerPage = props.pagination.rowsPerPage
   loadStudents()
+}
+
+function afterRemove () {
+  entityIndexRef.value.reload()
+  $q.notify({
+    message: 'حذف با موفقیت انجام شد.',
+    type: 'positive'
+  })
 }
 
 onMounted(() => {

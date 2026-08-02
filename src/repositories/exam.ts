@@ -62,6 +62,33 @@ export default class ExamAPI extends BaseAPI<ExamType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results'
+    }
+  }
+
+  async storeWithInPersonDetailAndResults (data: {
+    name: string
+    description?: string
+    lesson_id?: number
+    min_passing_score?: number
+    max_score?: number
+    exam_category_id: number
+    created_by?: number
+    held_at: string
+    is_descriptive?: boolean
+    class_ids?: number[]
+    academic_level_ids?: number[]
+    results: {
+      user_id: number
+      raw_score?: number
+      scaled_score?: number
+      z_score?: number
+    }[]
+  }): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.storeWithInPersonDetailAndResults!, data)
+    return response.data
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-builder-select-fabric">
+  <div class="form-builder-select-academic-field">
     <div class="outsideLabel">{{ label }}</div>
     <q-select
       ref="input"
@@ -24,21 +24,21 @@
       input-debounce="500"
       :disable="disable"
       :readonly="readonly"
-      :emit-value="emitValue"
-      :map-options="mapOptions"
+      emit-value
+      map-options
       :hide-dropdown-icon="hideDropdownIcon"
       :dropdown-icon="dropdownIcon"
       :clearable="clearable"
       @filter="filterFn">
-      <template #option="{opt, toggleOption}">
+      <template #option="{ opt, toggleOption }">
         <q-item
           clickable
           @click="toggleOption(opt)">
-          <q-item-section avatar>
-            <span :style="{ backgroundColor: opt.color_hex, width: '10px', height:'10px', display: 'inline-block', marginLeft: '5px' }" />
-          </q-item-section>
           <q-item-section>
-            {{ opt.name }}
+            <q-item-label>{{ opt.name }}</q-item-label>
+            <q-item-label caption>
+              {{ opt.school?.name }}
+            </q-item-label>
           </q-item-section>
         </q-item>
       </template>
@@ -52,17 +52,16 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { computed, defineProps, defineEmits, ref } from 'vue'
-import FabricAPI, { type FabricType } from 'src/repositories/fabric'
+import { computed, ref } from 'vue'
+import AcademicFieldAPI, { type AcademicFieldType } from 'src/repositories/academicField'
 
 defineOptions({
-  name: 'FormBuilderSelectFabric'
+  name: 'FormBuilderSelectAcademicField'
 })
 
 const props = defineProps({
   label: {
-    default: 'پارچه',
+    default: 'رشته تحصیلی',
     type: String
   },
   name: {
@@ -125,23 +124,19 @@ const props = defineProps({
     default: false,
     type: Boolean
   },
-  emitValue: {
-    default: true,
-    type: Boolean
-  },
-  mapOptions: {
-    default: true,
-    type: Boolean
-  },
   readonly: {
     default: false,
     type: Boolean
+  },
+  schoolId: {
+    default: null,
+    type: Number
   }
 })
 
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
-const fabricAPI = new FabricAPI()
+const academicFieldAPI = new AcademicFieldAPI()
 
 const localValue = computed({
   get () {
@@ -155,17 +150,9 @@ const placeholderSetter = computed(() => {
   if (localValue.value === null) {
     return props.placeholder
   }
-  // in single select after setting value,
-  // v-model type changes to string
-
-  // in the multiple scenario, inputData type changes to Array!
   if (props.multiple && Array.isArray(localValue.value)) {
-    if (localValue.value.length === 0) {
-      return props.placeholder
-    }
-    return ''
+    return localValue.value.length === 0 ? props.placeholder : ''
   }
-  // be an object
   if (Object.keys(localValue.value).length === 0) {
     return props.placeholder
   }
@@ -173,28 +160,24 @@ const placeholderSetter = computed(() => {
 })
 
 const errorMessage = ref<string | undefined>(undefined)
-const filteredOptions = ref<FabricType[]>([])
+const filteredOptions = ref<AcademicFieldType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
 
-async function getFabrics (name: string | null) {
-  const fabricsList = await fabricAPI.index({ name })
-  return fabricsList.data
+async function getAcademicFields (name: string | null) {
+  const params: any = { name }
+  if (props.schoolId) {
+    params.school_id = props.schoolId
+  }
+  const academicFieldsList = await academicFieldAPI.index(params)
+  return academicFieldsList.data
 }
 
-function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
-  if (val === '') {
-    update(async () => {
-      filteredOptions.value = await getFabrics(null)
-    })
-    return
-  }
-
+function filterFn (value: string, update: (callback: () => Promise<void>) => void) {
   update(async () => {
-    filteredOptions.value = await getFabrics(val)
+    filteredOptions.value = await getAcademicFields(value || null)
   })
 }
-
 </script>
 
 <style scoped></style>

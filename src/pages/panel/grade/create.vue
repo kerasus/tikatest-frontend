@@ -12,18 +12,12 @@
           <!-- Step 1: School -->
           <div class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.school_id"
-                :options="schoolOptions"
-                option-value="id"
-                option-label="name"
+              <form-builder-select-school
+                v-model:value="form.school_id"
                 label="انتخاب مدرسه *"
                 outlined
-                emit-value
-                map-options
-                clearable
                 :rules="[(v) => !!v || 'مدرسه الزامی است']"
-                @update:model-value="onSchoolChange" />
+                @update:value="onSchoolChange" />
             </div>
           </div>
 
@@ -32,18 +26,14 @@
             v-if="form.school_id"
             class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.field_id"
-                :options="fieldOptions"
-                option-value="id"
-                option-label="name"
+              <form-builder-select-academic-field
+                v-model:value="form.field_id"
                 label="انتخاب رشته *"
                 outlined
-                emit-value
-                map-options
-                clearable
+                :disable="!form.school_id"
                 :rules="[(v) => !!v || 'رشته الزامی است']"
-                @update:model-value="onFieldChange" />
+                :school-id="form.school_id"
+                @update:value="onFieldChange" />
             </div>
           </div>
 
@@ -52,18 +42,15 @@
             v-if="form.field_id"
             class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.level_id"
-                :options="levelOptions"
-                option-value="id"
-                option-label="name"
+              <form-builder-select-academic-level
+                v-model:value="form.level_id"
                 label="انتخاب پایه *"
                 outlined
-                emit-value
-                map-options
-                clearable
+                :disable="!form.field_id"
                 :rules="[(v) => !!v || 'پایه الزامی است']"
-                @update:model-value="onLevelChange" />
+                :school-id="form.school_id"
+                :field-id="form.field_id"
+                @update:value="onLevelChange" />
             </div>
           </div>
 
@@ -72,31 +59,27 @@
             v-if="form.level_id"
             class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.class_id"
-                :options="classOptions"
-                option-value="id"
-                option-label="name"
+              <form-builder-select-school-class
+                v-model:value="form.class_id"
                 label="انتخاب کلاس *"
                 outlined
-                emit-value
-                map-options
-                clearable
+                :disable="!form.level_id"
                 :rules="[(v) => !!v || 'کلاس الزامی است']"
-                @update:model-value="onClassChange" />
+                :school-id="form.school_id"
+                :field-id="form.field_id"
+                :level-id="form.level_id"
+                @update:value="onClassChange" />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.lesson_id"
-                :options="lessonOptions"
-                option-value="id"
-                option-label="name"
+              <form-builder-select-lesson
+                v-model:value="form.lesson_id"
                 label="انتخاب درس *"
                 outlined
-                emit-value
-                map-options
-                clearable
-                :rules="[(v) => !!v || 'درس الزامی است']" />
+                :disable="!form.level_id"
+                :rules="[(v) => !!v || 'درس الزامی است']"
+                :school-id="form.school_id"
+                :field-id="form.field_id"
+                :level-id="form.level_id" />
             </div>
           </div>
 
@@ -113,26 +96,19 @@
                   :rules="[() => !!form.exam_date || 'تاریخ الزامی است']" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
-                  v-model="form.grade_type"
-                  :options="gradeTypeOptions"
-                  option-value="value"
-                  option-label="label"
-                  label="نوع نمره *"
+                <form-builder-select-exam-category
+                  v-model:value="form.exam_category_id"
+                  label="دسته‌بندی آزمون *"
                   outlined
-                  emit-value
-                  map-options
-                  :rules="[(v) => !!v || 'نوع نمره الزامی است']"
-                  @update:model-value="onGradeTypeChange" />
+                  :disable="!form.school_id"
+                  :rules="[(v) => !!v || 'دسته‌بندی آزمون الزامی است']" />
               </div>
-              <div
-                v-if="form.grade_type === 'other'"
-                class="col-12">
+              <div class="col-12 col-md-6">
                 <q-input
-                  v-model="form.grade_name_for_other_type"
-                  label="نام نمره برای نوع دیگر"
+                  v-model="examName"
+                  label="نام آزمون *"
                   outlined
-                  :rules="[(v) => !!v || 'نام نمره الزامی است']" />
+                  :rules="[(v) => !!v || 'نام آزمون الزامی است']" />
               </div>
               <div class="col-12 col-md-6">
                 <q-checkbox
@@ -223,7 +199,7 @@
               color="primary"
               label="ثبت نمره‌ها"
               :loading="saving"
-              :disable="!form.class_id || !form.lesson_id" />
+              :disable="!form.class_id || !form.lesson_id || !form.exam_category_id" />
             <q-btn
               flat
               label="انصراف"
@@ -237,38 +213,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
-import SchoolAPI from 'src/repositories/school'
-import AcademicFieldAPI from 'src/repositories/academicField'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import LessonAPI from 'src/repositories/lesson'
 import StudentAPI from 'src/repositories/student'
-import GradeAPI from 'src/repositories/grade'
+import ExamAPI from 'src/repositories/exam'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
-import type { SchoolType } from 'src/repositories/school'
-import type { AcademicFieldType } from 'src/repositories/academicField'
-import type { AcademicLevelType } from 'src/repositories/academicLevel'
-import type { SchoolClassType } from 'src/repositories/schoolClass'
-import type { LessonType } from 'src/repositories/lesson'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 import type { StudentType } from 'src/repositories/student'
 
-const schoolApi = new SchoolAPI()
-const fieldApi = new AcademicFieldAPI()
-const levelApi = new AcademicLevelAPI()
-const classApi = new SchoolClassAPI()
-const lessonApi = new LessonAPI()
 const studentApi = new StudentAPI()
-const gradeApi = new GradeAPI()
+const examApi = new ExamAPI()
 
 const $q = useQuasar()
 
-const schoolOptions = ref<SchoolType[]>([])
-const fieldOptions = ref<AcademicFieldType[]>([])
-const levelOptions = ref<AcademicLevelType[]>([])
-const classOptions = ref<SchoolClassType[]>([])
-const lessonOptions = ref<LessonType[]>([])
 const studentOptions = ref<any[]>([])
 const saving = ref(false)
 
@@ -279,18 +241,6 @@ const descriptiveOptions = [
   { label: 'نیاز به آموزش و تلاش بیشتر', value: 4 }
 ]
 
-const gradeTypeOptions = [
-  { label: 'آزمون کلاسی', value: 'class_quiz' },
-  { label: 'آزمون ماهانه', value: 'monthly_quiz' },
-  { label: 'میان ترم اول', value: 'mid_term_1' },
-  { label: 'مستمر اول', value: 'continuous_1' },
-  { label: 'پایان ترم اول', value: 'final_1' },
-  { label: 'میان ترم دوم', value: 'mid_term_2' },
-  { label: 'مستمر دوم', value: 'continuous_2' },
-  { label: 'پایان ترم دوم', value: 'final_2' },
-  { label: 'سایر', value: 'other' }
-]
-
 const form = reactive({
   school_id: null as number | null,
   field_id: null as number | null,
@@ -298,77 +248,21 @@ const form = reactive({
   class_id: null as number | null,
   lesson_id: null as number | null,
   exam_date: null as string | null,
-  grade_type: '',
-  grade_name_for_other_type: '',
   is_descriptive: false,
   min_passing_score: null as number | null,
-  max_score: null as number | null
+  max_score: null as number | null,
+  exam_name: '',
+  exam_category_id: null as number | null
 })
 
-async function loadSchools () {
-  try {
-    const result = await schoolApi.index({ length: 1000 })
-    schoolOptions.value = result.data
-  } catch (error) {
-    console.error('Error loading schools:', error)
+const examName = computed({
+  get () {
+    return form.exam_name
+  },
+  set (val) {
+    form.exam_name = val
   }
-}
-
-async function loadFields (schoolId: number) {
-  try {
-    const result = await fieldApi.index({ length: 1000, school_id: schoolId })
-    fieldOptions.value = result.data
-    form.field_id = null
-    form.level_id = null
-    form.class_id = null
-    form.lesson_id = null
-    studentOptions.value = []
-    levelOptions.value = []
-    classOptions.value = []
-    lessonOptions.value = []
-  } catch (error) {
-    console.error('Error loading fields:', error)
-  }
-}
-
-async function loadLevels (fieldId: number) {
-  try {
-    const result = await levelApi.index({ length: 1000, field_id: fieldId })
-    levelOptions.value = result.data
-    form.level_id = null
-    form.class_id = null
-    form.lesson_id = null
-    studentOptions.value = []
-    classOptions.value = []
-    lessonOptions.value = []
-  } catch (error) {
-    console.error('Error loading levels:', error)
-  }
-}
-
-async function loadClasses (levelId: number) {
-  try {
-    const result = await classApi.index({ length: 1000, level_id: levelId })
-    classOptions.value = result.data
-    form.class_id = null
-    form.lesson_id = null
-    studentOptions.value = []
-    lessonOptions.value = []
-  } catch (error) {
-    console.error('Error loading classes:', error)
-  }
-}
-
-async function loadLessons (levelId: number) {
-  try {
-    const result = await lessonApi.index({ length: 1000, level_id: levelId })
-    lessonOptions.value = result.data
-    form.lesson_id = null
-    studentOptions.value = []
-  } catch (error) {
-    console.error('Error loading lessons:', error)
-  }
-}
+})
 
 async function loadStudents (classId: number) {
   try {
@@ -385,58 +279,33 @@ async function loadStudents (classId: number) {
 }
 
 function onSchoolChange (schoolId: number | null) {
-  if (schoolId) {
-    loadFields(schoolId)
-  } else {
-    fieldOptions.value = []
-    levelOptions.value = []
-    classOptions.value = []
-    lessonOptions.value = []
-    studentOptions.value = []
-    form.field_id = null
-    form.level_id = null
-    form.class_id = null
-    form.lesson_id = null
-  }
+  form.field_id = null
+  form.level_id = null
+  form.class_id = null
+  form.lesson_id = null
+  form.exam_category_id = null
+  form.exam_name = ''
+  studentOptions.value = []
 }
 
 function onFieldChange (fieldId: number | null) {
-  if (fieldId) {
-    loadLevels(fieldId)
-  } else {
-    levelOptions.value = []
-    classOptions.value = []
-    lessonOptions.value = []
-    studentOptions.value = []
-    form.level_id = null
-    form.class_id = null
-    form.lesson_id = null
-  }
+  form.level_id = null
+  form.class_id = null
+  form.lesson_id = null
+  studentOptions.value = []
 }
 
 function onLevelChange (levelId: number | null) {
-  if (levelId) {
-    loadClasses(levelId)
-    loadLessons(levelId)
-  } else {
-    classOptions.value = []
-    lessonOptions.value = []
-    studentOptions.value = []
-    form.class_id = null
-    form.lesson_id = null
-  }
+  form.class_id = null
+  form.lesson_id = null
+  studentOptions.value = []
 }
 
 function onClassChange (classId: number | null) {
+  studentOptions.value = []
   if (classId) {
     loadStudents(classId)
-  } else {
-    studentOptions.value = []
   }
-}
-
-function onGradeTypeChange () {
-  // Template handles visibility of conditional fields
 }
 
 async function onSubmit () {
@@ -453,7 +322,10 @@ async function onSubmit () {
         return
       }
 
-      if (form.min_passing_score !== null && Number(form.min_passing_score) >= Number(form.max_score)) {
+      if (
+        form.min_passing_score !== null &&
+        Number(form.min_passing_score) >= Number(form.max_score)
+      ) {
         $q.notify({
           icon: 'error',
           message: 'حداقل نمره قبولی باید از حداکثر نمره کمتر باشد.',
@@ -484,31 +356,43 @@ async function onSubmit () {
       }
     }
 
+    const results = studentOptions.value.map((s: any) => {
+      const rawScore = form.is_descriptive ? (s.descriptive_value || 0) : (s.raw_grade === null || s.raw_grade === '' ? null : Number(s.raw_grade))
+      let scaledScore = null
+      if (!form.is_descriptive && rawScore !== null && form.min_passing_score && Number(form.min_passing_score) > 0) {
+        scaledScore = Math.round((rawScore / Number(form.min_passing_score)) * 20)
+      }
+
+      return {
+        user_id: s.id,
+        raw_score: rawScore,
+        scaled_score: scaledScore,
+        z_score: null
+      }
+    })
+
     const payload = {
+      name: examName.value || form.exam_name,
+      description: null,
       lesson_id: form.lesson_id,
-      class_id: form.class_id,
-      exam_date: form.exam_date,
-      grade_type: form.grade_type,
-      grade_name_for_other_type: form.grade_name_for_other_type || null,
-      is_descriptive: form.is_descriptive,
       min_passing_score: form.min_passing_score,
       max_score: form.max_score,
-      grades: studentOptions.value.map((s: any) => ({
-        student_id: s.id,
-        raw_grade: s.raw_grade,
-        descriptive_value: s.descriptive_value
-      }))
+      exam_category_id: form.exam_category_id,
+      held_at: form.exam_date,
+      is_descriptive: form.is_descriptive,
+      class_ids: [form.class_id],
+      results
     }
 
-    await gradeApi.createExamWithGrades(payload)
+    await examApi.storeWithInPersonDetailAndResults(payload)
 
     $q.notify({
       icon: 'check',
-      message: 'نمرات با موفقیت ثبت شد.',
+      message: 'آزمون با موفقیت ثبت شد.',
       color: 'positive'
     })
   } catch (error: any) {
-    const message = error?.response?.data?.message || 'خطا در ثبت نمرات.'
+    const message = error?.response?.data?.message || 'خطا در ثبت آزمون.'
     $q.notify({
       icon: 'error',
       message,
@@ -520,7 +404,7 @@ async function onSubmit () {
 }
 
 onMounted(() => {
-  loadSchools()
+  // No need to load schools - FormBuilderSelectSchool loads internally
 })
 </script>
 

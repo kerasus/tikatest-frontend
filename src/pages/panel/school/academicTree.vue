@@ -5,9 +5,7 @@
         <div class="row items-center q-col-gutter-md">
           <div class="col">
             <div class="text-h6">ساختار دروس و مقطع‌های تحصیلی</div>
-            <div class="text-caption text-grey">
-              درختواره بر اساس رشته، مقطع و درس
-            </div>
+            <div class="text-caption text-grey">درختواره بر اساس رشته، مقطع و درس</div>
           </div>
           <div class="col-auto">
             <q-btn
@@ -23,6 +21,13 @@
               label="بروزرسانی"
               :loading="loading"
               @click="loadTreeData" />
+          </div>
+          <div class="col-auto">
+            <q-btn
+              color="primary"
+              icon="list"
+              label="لیست مدارس"
+              :to="{ name: 'Panel.School.List' }" />
           </div>
         </div>
       </q-card-section>
@@ -104,7 +109,7 @@
     <q-dialog
       v-model="dialog.show"
       persistent>
-      <q-card style="min-width: 400px; max-width: 90vw;">
+      <q-card style="min-width: 400px; max-width: 90vw">
         <q-card-section>
           <div class="text-h6">{{ dialog.title }}</div>
         </q-card-section>
@@ -127,14 +132,20 @@
                   emit-value
                   map-options
                   clearable
-                  :rules="[v => !!v || 'رشته الزامی است']" />
+                  :rules="[(v) => !!v || 'رشته الزامی است']" />
               </div>
               <div class="col-12">
                 <q-input
                   v-model="dialog.form.name"
-                  :label="dialog.type === 'field' ? 'نام رشته' : dialog.type === 'level' ? 'نام مقطع' : 'نام درس'"
+                  :label="
+                    dialog.type === 'field'
+                      ? 'نام رشته'
+                      : dialog.type === 'level'
+                        ? 'نام مقطع'
+                        : 'نام درس'
+                  "
                   outlined
-                  :rules="[v => !!v || 'نام الزامی است']" />
+                  :rules="[(v) => !!v || 'نام الزامی است']" />
               </div>
               <div
                 v-if="dialog.type === 'lesson'"
@@ -224,7 +235,11 @@ const dialog = reactive({
   }
 })
 
-function buildTree (fields: AcademicFieldType[], levels: AcademicLevelType[], lessons: LessonType[]): any[] {
+function buildTree (
+  fields: AcademicFieldType[],
+  levels: AcademicLevelType[],
+  lessons: LessonType[]
+): any[] {
   return fields.map((field) => ({
     id: `field-${field.id}`,
     label: field.name || 'رشته',
@@ -314,7 +329,8 @@ function editNode (node: any) {
   dialog.edit = true
   dialog.node = node
   dialog.type = node.type
-  dialog.title = node.type === 'field' ? 'ویرایش رشته' : node.type === 'level' ? 'ویرایش مقطع' : 'ویرایش درس'
+  dialog.title =
+    node.type === 'field' ? 'ویرایش رشته' : node.type === 'level' ? 'ویرایش مقطع' : 'ویرایش درس'
   dialog.form = {
     school_id: schoolId,
     field_id: null,

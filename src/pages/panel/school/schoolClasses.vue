@@ -17,6 +17,13 @@
               :loading="loading"
               @click="loadTreeData" />
           </div>
+          <div class="col-auto">
+            <q-btn
+              color="primary"
+              icon="list"
+              label="لیست مدارس"
+              :to="{ name: 'Panel.School.List' }" />
+          </div>
         </div>
       </q-card-section>
 
@@ -100,7 +107,7 @@
     <q-dialog
       v-model="dialog.show"
       persistent>
-      <q-card style="min-width: 400px; max-width: 90vw;">
+      <q-card style="min-width: 400px; max-width: 90vw">
         <q-card-section>
           <div class="text-h6">{{ dialog.title }}</div>
         </q-card-section>
@@ -115,7 +122,7 @@
                   v-model="dialog.form.name"
                   label="نام کلاس *"
                   outlined
-                  :rules="[v => !!v || 'نام کلاس الزامی است']" />
+                  :rules="[(v) => !!v || 'نام کلاس الزامی است']" />
               </div>
             </div>
 
@@ -180,7 +187,11 @@ const dialog = reactive({
   }
 })
 
-function buildTree (fields: AcademicFieldType[], levels: AcademicLevelType[], classes: SchoolClassType[]): any[] {
+function buildTree (
+  fields: AcademicFieldType[],
+  levels: AcademicLevelType[],
+  classes: SchoolClassType[]
+): any[] {
   return fields.map((field) => ({
     id: `field-${field.id}`,
     label: field.name || 'رشته',

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-builder-select-productPart">
+  <div class="form-builder-select-lesson">
     <div class="outsideLabel">{{ label }}</div>
     <q-select
       ref="input"
@@ -24,12 +24,24 @@
       input-debounce="500"
       :disable="disable"
       :readonly="readonly"
-      :emit-value="emitValue"
-      :map-options="mapOptions"
+      emit-value
+      map-options
       :hide-dropdown-icon="hideDropdownIcon"
       :dropdown-icon="dropdownIcon"
       :clearable="clearable"
       @filter="filterFn">
+      <template #option="{ opt, toggleOption }">
+        <q-item
+          clickable
+          @click="toggleOption(opt)">
+          <q-item-section>
+            <q-item-label>{{ opt.name }}</q-item-label>
+            <q-item-label caption>
+              {{ opt.academic_level?.name || '-' }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+      </template>
       <template #no-option>
         <q-item v-show="showNoOption">
           <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
@@ -40,17 +52,16 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { computed, defineEmits, defineProps, ref } from 'vue'
-import InventoryAPI, { type InventoryType } from 'src/repositories/inventory'
+import { computed, ref } from 'vue'
+import LessonAPI, { type LessonType } from 'src/repositories/lesson'
 
 defineOptions({
-  name: 'FormBuilderSelectInventory'
+  name: 'FormBuilderSelectLesson'
 })
 
 const props = defineProps({
   label: {
-    default: 'انبار',
+    default: 'درس',
     type: String
   },
   name: {
@@ -63,14 +74,6 @@ const props = defineProps({
   },
   useChips: {
     default: false,
-    type: Boolean
-  },
-  emitValue: {
-    default: true,
-    type: Boolean
-  },
-  mapOptions: {
-    default: true,
     type: Boolean
   },
   options: {
@@ -124,12 +127,24 @@ const props = defineProps({
   readonly: {
     default: false,
     type: Boolean
+  },
+  schoolId: {
+    default: null,
+    type: Number
+  },
+  fieldId: {
+    default: null,
+    type: Number
+  },
+  levelId: {
+    default: null,
+    type: Number
   }
 })
 
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
-const inventoryAPI = new InventoryAPI()
+const lessonAPI = new LessonAPI()
 
 const localValue = computed({
   get () {
@@ -143,17 +158,9 @@ const placeholderSetter = computed(() => {
   if (localValue.value === null) {
     return props.placeholder
   }
-  // in single select after setting value,
-  // v-model type changes to string
-
-  // in the multiple scenario, inputData type changes to Array!
   if (props.multiple && Array.isArray(localValue.value)) {
-    if (localValue.value.length === 0) {
-      return props.placeholder
-    }
-    return ''
+    return localValue.value.length === 0 ? props.placeholder : ''
   }
-  // be an object
   if (Object.keys(localValue.value).length === 0) {
     return props.placeholder
   }
@@ -161,28 +168,30 @@ const placeholderSetter = computed(() => {
 })
 
 const errorMessage = ref<string | undefined>(undefined)
-const filteredOptions = ref<InventoryType[]>([])
+const filteredOptions = ref<LessonType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
 
-async function getEntity (name: string | null) {
-  const productPartsList = await inventoryAPI.index({ name })
-  return productPartsList.data
+async function getLessons (name: string | null) {
+  const params: any = { name }
+  if (props.schoolId) {
+    params.school_id = props.schoolId
+  }
+  if (props.fieldId) {
+    params.field_id = props.fieldId
+  }
+  if (props.levelId) {
+    params.level_id = props.levelId
+  }
+  const lessonsList = await lessonAPI.index(params)
+  return lessonsList.data
 }
 
-function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
-  if (val === '') {
-    update(async () => {
-      filteredOptions.value = await getEntity(null)
-    })
-    return
-  }
-
+function filterFn (value: string, update: (callback: () => Promise<void>) => void) {
   update(async () => {
-    filteredOptions.value = await getEntity(val)
+    filteredOptions.value = await getLessons(value || null)
   })
 }
-
 </script>
 
 <style scoped></style>

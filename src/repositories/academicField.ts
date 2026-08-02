@@ -1,22 +1,19 @@
 import BaseAPI from './BaseAPI'
+import { SchoolType } from 'src/repositories/school'
 
 export type AcademicFieldType = {
-  id: number | null
-  school_id: number | null
-  name: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  school?: {
-    id: number | null
-    name: string | null
-    code: string | null
-  }
+  id: number | null;
+  school_id: number | null;
+  name: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  school?: SchoolType;
   academicLevels?: Array<{
-    id: number | null
-    name: string | null
-  }>
-}
+    id: number | null;
+    name: string | null;
+  }>;
+};
 
 export default class AcademicFieldAPI extends BaseAPI<AcademicFieldType> {
   constructor () {

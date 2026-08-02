@@ -10,6 +10,6 @@ export const index = [
       pageCategory: 'ساختار آموزشی',
       middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
     },
-    component: () => import('src/pages/panel/academicTree.vue')
+    component: () => import('pages/panel/school/academicTree.vue')
   }
 ]

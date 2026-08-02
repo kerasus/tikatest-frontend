@@ -39,7 +39,7 @@ export type UserSchoolType = {
   };
 }
 
-export type UserType = {
+export interface UserType {
   id: number | null;
   first_name: string | null;
   last_name: string | null;

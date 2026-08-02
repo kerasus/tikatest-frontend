@@ -46,7 +46,7 @@ export const index = [
       pageCategory: 'مدیریت مدارس',
       middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
     },
-    component: () => import('src/pages/panel/schoolClasses.vue')
+    component: () => import('pages/panel/school/schoolClasses.vue')
   },
   {
     path: 'schools/:id',

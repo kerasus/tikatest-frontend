@@ -1,7 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { index as studentRoutes } from './student'
 import { index as userRoutes } from './user'
-import { index as classRoutes } from './class'
 import { index as gradeRoutes } from './grade'
 import { index as homeworkRoutes } from './homework'
 import { index as messageRoutes } from './message'
@@ -38,7 +37,6 @@ export const index: RouteRecordRaw[] = [
 
       ...userRoutes,
       ...studentRoutes,
-      ...classRoutes,
       ...gradeRoutes,
       ...homeworkRoutes,
       ...messageRoutes,
