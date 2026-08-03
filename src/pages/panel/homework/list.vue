@@ -107,7 +107,7 @@ const filters = reactive({
   lesson_id: null,
   class_id: null,
   field_id: null,
-  level_id: null,
+  academic_level_id: null,
   length: 10,
   page: 1
 })
@@ -138,7 +138,7 @@ async function loadHomework () {
     if (filters.lesson_id) params.lesson_id = filters.lesson_id
     if (filters.class_id) params.class_id = filters.class_id
     if (filters.field_id) params.field_id = filters.field_id
-    if (filters.level_id) params.level_id = filters.level_id
+    if (filters.academic_level_id) params.academic_level_id = filters.academic_level_id
     if (filters.search) params.title = filters.search
 
     const result = await homeworkApi.index(params)

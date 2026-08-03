@@ -182,7 +182,7 @@ const dialog = reactive({
   form: {
     id: null as number | null,
     school_id: schoolId,
-    level_id: null as number | null,
+    academic_level_id: null as number | null,
     name: null as string | null
   }
 })
@@ -205,7 +205,7 @@ function buildTree (
         type: 'level',
         data: level,
         children: classes
-          .filter((c) => c.level_id === level.id)
+          .filter((c) => c.academic_level_id === level.id)
           .map((cls) => ({
             id: `class-${cls.id}`,
             label: cls.name || 'کلاس',
@@ -246,7 +246,7 @@ function addClass (node: any) {
   dialog.form = {
     id: null,
     school_id: schoolId,
-    level_id: node.data.id,
+    academic_level_id: node.data.id,
     name: null
   }
   dialog.show = true
@@ -259,7 +259,7 @@ function editClass (node: any) {
   dialog.form = {
     id: node.data.id,
     school_id: schoolId,
-    level_id: node.data.level_id,
+    academic_level_id: node.data.academic_level_id,
     name: node.data.name
   }
   dialog.show = true

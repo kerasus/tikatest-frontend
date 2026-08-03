@@ -4,7 +4,7 @@ export type { ListType } from './BaseAPI'
 export type LessonType = {
   id: number | null
   name: string | null
-  level_id: number | null
+  academic_level_id: number | null
   order: number | null
   coefficient: number | null
   is_report_card: boolean
@@ -23,7 +23,7 @@ export default class LessonAPI extends BaseAPI<LessonType> {
     this.defaultObject = {
       id: null,
       name: null,
-      level_id: null,
+      academic_level_id: null,
       order: 0,
       coefficient: 1,
       is_report_card: false,

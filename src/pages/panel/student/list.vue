@@ -135,7 +135,7 @@ const inputs = ref([
   },
   {
     type: FormBuilderSelectAcademicLevelComponent,
-    name: 'level_id',
+    name: 'academic_level_id',
     label: 'پایه',
     col: 'col-md-3 col-12'
   },
@@ -187,7 +187,7 @@ const filters = reactive({
   search: '',
   school_id: null as number | null,
   field_id: null as number | null,
-  level_id: null as number | null,
+  academic_level_id: null as number | null,
   class_id: null as number | null,
   length: 10,
   page: 1
@@ -225,7 +225,7 @@ async function loadStudents () {
     }
     if (filters.school_id) params.school_id = filters.school_id
     if (filters.field_id) params.field_id = filters.field_id
-    if (filters.level_id) params.level_id = filters.level_id
+    if (filters.academic_level_id) params.academic_level_id = filters.academic_level_id
     if (filters.class_id) params.class_id = filters.class_id
     if (filters.search) {
       params.full_name_search = filters.search
@@ -259,7 +259,7 @@ async function loadFields (schoolId: number) {
     const result = await academicFieldAPI.index({ length: 100, school_id: schoolId })
     fieldOptions.value = result.data
     filters.field_id = null
-    filters.level_id = null
+    filters.academic_level_id = null
     filters.class_id = null
     levelOptions.value = []
     classOptions.value = []
@@ -273,7 +273,7 @@ async function loadLevels (fieldId: number) {
   try {
     const result = await academicLevelAPI.index({ length: 100, field_id: fieldId })
     levelOptions.value = result.data
-    filters.level_id = null
+    filters.academic_level_id = null
     filters.class_id = null
     classOptions.value = []
     loadStudents()
@@ -284,7 +284,7 @@ async function loadLevels (fieldId: number) {
 
 async function loadClasses (levelId: number) {
   try {
-    const result = await schoolClassAPI.index({ length: 100, level_id: levelId })
+    const result = await schoolClassAPI.index({ length: 100, academic_level_id: levelId })
     classOptions.value = result.data
     filters.class_id = null
     loadStudents()
@@ -301,7 +301,7 @@ function onSchoolChange (schoolId: number | null) {
     levelOptions.value = []
     classOptions.value = []
     filters.field_id = null
-    filters.level_id = null
+    filters.academic_level_id = null
     filters.class_id = null
     loadStudents()
   }
@@ -313,7 +313,7 @@ function onFieldChange (fieldId: number | null) {
   } else {
     levelOptions.value = []
     classOptions.value = []
-    filters.level_id = null
+    filters.academic_level_id = null
     filters.class_id = null
     loadStudents()
   }

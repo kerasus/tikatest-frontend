@@ -1,37 +1,75 @@
 import BaseAPI from './BaseAPI'
 
+export type StudentProfileType = {
+  id: number | null
+  user_id: number | null
+  code: string | null
+  xp: number | null
+  deleted_at: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export type StudentGuardianType = {
+  id: number | null
+  user_id: number | null
+  student_profile_id: number | null
+  relationship_type: 'father' | 'mother' | 'guardian' | null
+  job: string | null
+  is_primary_contact: boolean | null
+  user?: {
+    id: number | null
+    first_name: string | null
+    last_name: string | null
+    full_name: string | null
+    mobile: string | null
+    email: string | null
+  } | null
+  student_profile?: StudentProfileType | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export type StudentUserClassRegistrationType = {
+  id: number | null
+  user_id: number | null
+  class_id: number | null
+  school_class?: {
+    id: number | null
+    name: string | null
+    school_id: number | null
+    academic_level_id: number | null
+  } | null
+  class?: {
+    id: number | null
+    name: string | null
+  } | null
+  created_at: string | null
+  updated_at: string | null
+}
+
 export type StudentType = {
   id: number | null
   first_name: string | null
   last_name: string | null
   full_name: string | null
   email: string | null
-  mobile: string | null
   username: string | null
+  mobile: string | null
   national_id: string | null
   birth_date: string | null
   address: string | null
   description: string | null
   picture: string | null
+  email_verified_at: string | null
+  mobile_verified_at: string | null
   roles_list: string[]
   permissions_list: string[]
   created_at: string | null
   updated_at: string | null
-  student_profile?: {
-    id: number | null
-    code: string | null
-    xp: number | null
-  } | null
-  guardian_records?: Array<{
-    id: number | null
-    relationship_type: 'father' | 'mother' | 'guardian' | null
-    job: string | null
-    is_primary_contact: boolean | null
-  }> | null
-  user_class_registrations?: Array<{
-    id: number | null
-    class_id: number | null
-  }> | null
+  student_profile?: StudentProfileType | null
+  guardian_records?: StudentGuardianType[] | null
+  user_class_registrations?: StudentUserClassRegistrationType[] | null
 }
 
 export default class StudentAPI extends BaseAPI<StudentType> {
@@ -43,17 +81,22 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       last_name: null,
       full_name: null,
       email: null,
-      mobile: null,
       username: null,
+      mobile: null,
       national_id: null,
       birth_date: null,
       address: null,
       description: null,
       picture: null,
+      email_verified_at: null,
+      mobile_verified_at: null,
       roles_list: [],
       permissions_list: [],
       created_at: null,
-      updated_at: null
+      updated_at: null,
+      student_profile: null,
+      guardian_records: null,
+      user_class_registrations: null
     }
     this.endpoints = {
       ...this.endpoints,

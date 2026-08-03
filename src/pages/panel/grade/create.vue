@@ -43,7 +43,7 @@
             class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <form-builder-select-academic-level
-                v-model:value="form.level_id"
+                v-model:value="form.academic_level_id"
                 label="انتخاب پایه *"
                 outlined
                 :disable="!form.field_id"
@@ -56,18 +56,18 @@
 
           <!-- Step 4: Class and Lesson -->
           <div
-            v-if="form.level_id"
+            v-if="form.academic_level_id"
             class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <form-builder-select-school-class
                 v-model:value="form.class_id"
                 label="انتخاب کلاس *"
                 outlined
-                :disable="!form.level_id"
+                :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'کلاس الزامی است']"
                 :school-id="form.school_id"
                 :field-id="form.field_id"
-                :level-id="form.level_id"
+                :level-id="form.academic_level_id"
                 @update:value="onClassChange" />
             </div>
             <div class="col-12 col-md-6">
@@ -75,11 +75,11 @@
                 v-model:value="form.lesson_id"
                 label="انتخاب درس *"
                 outlined
-                :disable="!form.level_id"
+                :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'درس الزامی است']"
                 :school-id="form.school_id"
                 :field-id="form.field_id"
-                :level-id="form.level_id" />
+                :level-id="form.academic_level_id" />
             </div>
           </div>
 
@@ -244,7 +244,7 @@ const descriptiveOptions = [
 const form = reactive({
   school_id: null as number | null,
   field_id: null as number | null,
-  level_id: null as number | null,
+  academic_level_id: null as number | null,
   class_id: null as number | null,
   lesson_id: null as number | null,
   exam_date: null as string | null,
@@ -280,7 +280,7 @@ async function loadStudents (classId: number) {
 
 function onSchoolChange (schoolId: number | null) {
   form.field_id = null
-  form.level_id = null
+  form.academic_level_id = null
   form.class_id = null
   form.lesson_id = null
   form.exam_category_id = null
@@ -289,7 +289,7 @@ function onSchoolChange (schoolId: number | null) {
 }
 
 function onFieldChange (fieldId: number | null) {
-  form.level_id = null
+  form.academic_level_id = null
   form.class_id = null
   form.lesson_id = null
   studentOptions.value = []

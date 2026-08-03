@@ -186,7 +186,7 @@ async function getSchoolClasses (name: string | null) {
     params.field_id = props.fieldId
   }
   if (props.levelId) {
-    params.level_id = props.levelId
+    params.academic_level_id = props.levelId
   }
   const schoolClassesList = await schoolClassAPI.index(params)
   return schoolClassesList.data

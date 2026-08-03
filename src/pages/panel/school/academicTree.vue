@@ -228,7 +228,7 @@ const dialog = reactive({
   form: {
     school_id: schoolId,
     field_id: null as number | null,
-    level_id: null as number | null,
+    academic_level_id: null as number | null,
     name: null as string | null,
     order: 0 as number | null,
     coefficient: 1 as number | null
@@ -253,7 +253,7 @@ function buildTree (
         type: 'level',
         data: level,
         children: lessons
-          .filter((l) => l.level_id === level.id)
+          .filter((l) => l.academic_level_id === level.id)
           .map((lesson) => ({
             id: `lesson-${lesson.id}`,
             label: lesson.name || 'درس',
@@ -294,7 +294,7 @@ function addRootField () {
   dialog.form = {
     school_id: schoolId,
     field_id: null,
-    level_id: null,
+    academic_level_id: null,
     name: null,
     order: 0,
     coefficient: 1
@@ -310,7 +310,7 @@ function addChild (node: any) {
   dialog.form = {
     school_id: schoolId,
     field_id: null,
-    level_id: node.type === 'level' ? node.data.id : null,
+    academic_level_id: node.type === 'level' ? node.data.id : null,
     name: null,
     order: 0,
     coefficient: 1
@@ -334,7 +334,7 @@ function editNode (node: any) {
   dialog.form = {
     school_id: schoolId,
     field_id: null,
-    level_id: node.data.level_id || null,
+    academic_level_id: node.data.academic_level_id || null,
     name: node.data.name,
     order: node.data.order ?? 0,
     coefficient: node.data.coefficient ?? 1

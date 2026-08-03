@@ -5,7 +5,7 @@ export type { ListType } from './BaseAPI'
 export type SchoolClassType = {
   id: number | null;
   school_id: number | null;
-  level_id: number | null;
+  academic_level_id: number | null;
   name: string | null;
   academic_level?: AcademicLevelType;
   created_at: string | null;
@@ -19,7 +19,7 @@ export default class SchoolClassAPI extends BaseAPI<SchoolClassType> {
     this.defaultObject = {
       id: null,
       school_id: null,
-      level_id: null,
+      academic_level_id: null,
       name: null,
       created_at: null,
       updated_at: null,

@@ -41,7 +41,7 @@
             </div>
             <div class="col-12 col-md-4">
               <q-select
-                v-model="form.level_id"
+                v-model="form.academic_level_id"
                 :options="levelOptions"
                 option-value="id"
                 option-label="name"
@@ -65,7 +65,7 @@
                 emit-value
                 map-options
                 clearable
-                :disable="!form.level_id"
+                :disable="!form.academic_level_id"
                 dense
                 @update:model-value="onClassChange" />
             </div>
@@ -212,7 +212,7 @@ const studentOptions = ref<any[]>([])
 const form = reactive({
   school_id: null as number | null,
   field_id: null as number | null,
-  level_id: null as number | null,
+  academic_level_id: null as number | null,
   class_id: null as number | null,
   subject: '',
   body: '',
@@ -261,7 +261,7 @@ async function loadFields (schoolId: number) {
     const result = await fieldApi.index({ length: 100, school_id: schoolId })
     fieldOptions.value = result.data
     form.field_id = null
-    form.level_id = null
+    form.academic_level_id = null
     form.class_id = null
     levelOptions.value = []
     classOptions.value = []
@@ -276,7 +276,7 @@ async function loadLevels (fieldId: number) {
   try {
     const result = await levelApi.index({ length: 100, field_id: fieldId })
     levelOptions.value = result.data
-    form.level_id = null
+    form.academic_level_id = null
     form.class_id = null
     classOptions.value = []
     studentOptions.value = []
@@ -288,7 +288,7 @@ async function loadLevels (fieldId: number) {
 
 async function loadClasses (levelId: number) {
   try {
-    const result = await classApi.index({ length: 100, level_id: levelId })
+    const result = await classApi.index({ length: 100, academic_level_id: levelId })
     classOptions.value = result.data
     form.class_id = null
     studentOptions.value = []
@@ -324,7 +324,7 @@ function onSchoolChange (schoolId: number | null) {
     studentOptions.value = []
     showStudentList.value = false
     form.field_id = null
-    form.level_id = null
+    form.academic_level_id = null
     form.class_id = null
   }
 }
@@ -337,7 +337,7 @@ function onFieldChange (fieldId: number | null) {
     classOptions.value = []
     studentOptions.value = []
     showStudentList.value = false
-    form.level_id = null
+    form.academic_level_id = null
     form.class_id = null
   }
 }
