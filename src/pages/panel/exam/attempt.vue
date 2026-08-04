@@ -49,7 +49,7 @@
             v-html="currentQuestionBody" />
         </q-card-section>
 
-        <q-card-section v-if="answerKeys.length > 0">
+        <q-card-section v-if="answer_keys.length > 0">
           <q-list>
             <q-item
               v-for="option in getOptions(currentQuestionNumber)"
@@ -106,7 +106,7 @@ const $q = useQuasar()
 const loading = ref(true)
 const error = ref<string | null>(null)
 const session = ref<any>(null)
-const answerKeys = ref<any[]>([])
+const answer_keys = ref<any[]>([])
 const totalQuestions = ref(0)
 const currentQuestionNumber = ref(1)
 const selectedOption = ref<string | null>(null)
@@ -123,10 +123,10 @@ const formatRemainingTime = computed(() => {
 })
 
 const currentQuestionBody = computed(() => {
-  if (!session.value?.exam?.onlineDetail?.content || !Array.isArray(session.value.exam.onlineDetail.content)) {
+  if (!session.value?.exam?.online_detail?.content || !Array.isArray(session.value.exam.online_detail.content)) {
     return `سوال شماره ${currentQuestionNumber.value}`
   }
-  const content = session.value.exam.onlineDetail.content[currentQuestionNumber.value - 1]
+  const content = session.value.exam.online_detail.content[currentQuestionNumber.value - 1]
   if (! content) return `سوال شماره ${currentQuestionNumber.value}`
   if (content.type === 'text') return content.body || content.text || content
   if (content.type === 'image') return `<img src="${content.path}" alt="سوال" style="max-width:100%">`
@@ -153,14 +153,14 @@ const startSession = async () => {
       return
     }
 
-    const examDetail = session.value.exam?.onlineDetail
-    if (examDetail?.answerKeys) {
-      answerKeys.value = examDetail.answerKeys
+    const examDetail = session.value.exam?.online_detail
+    if (examDetail?.answer_keys) {
+      answer_keys.value = examDetail.answer_keys
     } else if (response.answer_keys) {
-      answerKeys.value = response.answer_keys
+      answer_keys.value = response.answer_keys
     }
 
-    totalQuestions.value = answerKeys.value.length || 1
+    totalQuestions.value = answer_keys.value.length || 1
 
     loadExistingAnswers()
 

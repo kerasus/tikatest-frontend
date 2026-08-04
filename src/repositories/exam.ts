@@ -1,4 +1,53 @@
 import BaseAPI from './BaseAPI'
+import { UserType } from 'src/repositories/user'
+import { ExamCategoryType } from 'src/repositories/examCategory'
+import { SchoolClassType } from 'src/repositories/schoolClass'
+import { AcademicLevelType } from 'src/repositories/academicLevel'
+import { LessonType } from 'src/repositories/lesson'
+
+export type OnlineExamContentItem = {
+  type: 'text' | 'image';
+  body?: string;
+  path?: string;
+};
+
+export type OnlineExamSolutionItem = {
+  type: 'text' | 'image';
+  body?: string;
+  path?: string;
+};
+
+export type OnlineExamDetailType = {
+  id: number | null
+  exam_id: number | null
+  starts_at: string | null
+  ends_at: string | null
+  time_limit_minutes: number | null
+  visible_at: string | null
+  answers_visible_at: string | null
+  content: OnlineExamContentItem[] | null
+  solution: OnlineExamSolutionItem[] | null
+  created_by: number | null
+  created_at: string | null
+  updated_at: string | null
+  deleted_at: string | null
+  sessions?: any[]
+  booklets?: any[]
+  createdBy?: UserType | null
+}
+
+export type InPersonExamDetailType = {
+  id: number | null
+  exam_id: number | null
+  held_at: string | null
+  is_descriptive: boolean
+  created_by: number | null
+  created_at: string | null
+  updated_at: string | null
+  deleted_at: string | null
+  results?: any[]
+  createdBy?: UserType | null
+}
 
 export type ExamType = {
   id: number | null
@@ -9,40 +58,17 @@ export type ExamType = {
   max_score: number | null
   delivery_mode: 'online' | 'in_person' | null
   exam_category_id: number | null
-  created_by: number | null
+  created_by: UserType | null
   created_at: string | null
   updated_at: string | null
-  category?: {
-    id: number | null
-    title: string | null
-    school_id: number | null
-    term_number: number | null
-    is_system: boolean
-  } | null
-  lesson?: {
-    id: number | null
-    name: string | null
-  } | null
-  inPersonDetail?: {
-    id: number | null
-    exam_id: number | null
-    held_at: string | null
-    is_descriptive: boolean
-  } | null
-  onlineDetail?: {
-    id: number | null
-    exam_id: number | null
-    starts_at: string | null
-    ends_at: string | null
-    time_limit_minutes: number | null
-    visible_at: string | null
-    answers_visible_at: string | null
-    content: any | null
-    solution: any | null
-  } | null
-  answerKeys?: any[]
-  classes?: any[]
-  academicLevels?: any[]
+  category?: ExamCategoryType | null
+  lesson?: LessonType | null
+  in_person_exam_detail?: InPersonExamDetailType | null
+  online_exam_detail?: OnlineExamDetailType | null
+  answer_keys?: any[]
+  classes?: SchoolClassType[]
+  academic_levels?: AcademicLevelType[]
+  in_person_results?: any[]
   grades?: any[]
 }
 

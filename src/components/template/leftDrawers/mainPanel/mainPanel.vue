@@ -143,7 +143,7 @@ const topLinks = ref<ListItemType[]>([
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت نمره', route: { name: 'Panel.Grade.Create' } },
-      { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Grade.List' } },
+      { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Exam.List' } },
       { icon: '', title: 'کارنامه', route: { name: 'Panel.ReportCard' } },
       { icon: '', title: 'گزارش نمرات تک درس', route: { name: 'Panel.GradeReport.Lesson' } },
       { icon: '', title: 'گزارش نمرات چند درس', route: { name: 'Panel.GradeReport.Multiple' } }

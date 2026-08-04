@@ -22,5 +22,13 @@ export const index = [
       pageCategory: 'مدیریت آزمون‌ها'
     },
     component: () => import('src/pages/panel/exam/show.vue')
+  },
+  {
+    path: 'exams/:id/edit',
+    name: 'Panel.Exam.Edit',
+    meta: {
+      pageCategory: 'مدیریت آزمون‌ها'
+    },
+    component: () => import('src/pages/panel/exam/edit.vue')
   }
 ]

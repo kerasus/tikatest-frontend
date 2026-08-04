@@ -100,8 +100,7 @@
                   v-model:value="form.exam_category_id"
                   label="دسته‌بندی آزمون *"
                   outlined
-                  :disable="!form.school_id"
-                  :rules="[(v) => !!v || 'دسته‌بندی آزمون الزامی است']" />
+                  :disable="!form.school_id" />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
@@ -224,7 +223,6 @@ import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderC
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
-import type { StudentType } from 'src/repositories/student'
 
 const studentApi = new StudentAPI()
 const examApi = new ExamAPI()
@@ -249,9 +247,9 @@ const form = reactive({
   lesson_id: null as number | null,
   exam_date: null as string | null,
   is_descriptive: false,
-  min_passing_score: null as number | null,
-  max_score: null as number | null,
-  exam_name: '',
+  min_passing_score: 10 as number | null,
+  max_score: 20 as number | null,
+  exam_name: 'آزمون کلاسی',
   exam_category_id: null as number | null
 })
 

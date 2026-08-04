@@ -201,21 +201,6 @@ const pagination = ref({
   rowsNumber: 0
 })
 
-const columns = [
-  {
-    name: 'name',
-    required: true,
-    label: 'نام و نام خانوادگی',
-    align: 'right' as const,
-    field: 'name',
-    sortable: true
-  },
-  { name: 'username', label: 'نام کاربری', align: 'right' as const, field: 'username' },
-  { name: 'mobile', label: 'تلفن', align: 'right' as const, field: 'mobile' },
-  { name: 'national_id', label: 'کد ملی', align: 'right' as const, field: 'national_id' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
-]
-
 async function loadStudents () {
   loading.value = true
   try {
