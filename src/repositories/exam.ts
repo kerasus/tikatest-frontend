@@ -49,28 +49,41 @@ export type InPersonExamDetailType = {
   createdBy?: UserType | null
 }
 
+export type InPersonExamResultType = {
+  id: number | null;
+  in_person_exam_id: number | null;
+  raw_score: number | null;
+  scaled_score: number | null;
+  z_score: number | null;
+  recorded_by: number | null;
+  user_id: number | null;
+  student?: UserType | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 export type ExamType = {
-  id: number | null
-  name: string | null
-  description: string | null
-  lesson_id: number | null
-  min_passing_score: number | null
-  max_score: number | null
-  delivery_mode: 'online' | 'in_person' | null
-  exam_category_id: number | null
-  created_by: UserType | null
-  created_at: string | null
-  updated_at: string | null
-  category?: ExamCategoryType | null
-  lesson?: LessonType | null
-  in_person_exam_detail?: InPersonExamDetailType | null
-  online_exam_detail?: OnlineExamDetailType | null
-  answer_keys?: any[]
-  classes?: SchoolClassType[]
-  academic_levels?: AcademicLevelType[]
-  in_person_results?: any[]
-  grades?: any[]
-}
+  id: number | null;
+  name: string | null;
+  description: string | null;
+  lesson_id: number | null;
+  min_passing_score: number | null;
+  max_score: number | null;
+  delivery_mode: 'online' | 'in_person' | null;
+  exam_category_id: number | null;
+  created_by: UserType | null;
+  created_at: string | null;
+  updated_at: string | null;
+  category?: ExamCategoryType | null;
+  lesson?: LessonType | null;
+  in_person_exam_detail?: InPersonExamDetailType | null;
+  online_exam_detail?: OnlineExamDetailType | null;
+  answer_keys?: any[];
+  classes?: SchoolClassType[];
+  academic_levels?: AcademicLevelType[];
+  in_person_exam_results?: InPersonExamResultType[];
+  grades?: any[];
+};
 
 export default class ExamAPI extends BaseAPI<ExamType> {
   constructor () {

@@ -28,40 +28,7 @@
     <template v-else-if="examItem">
       <exam-detail-card :exam="examItem" />
 
-      <q-card class="q-mb-md">
-        <q-card-section>
-          <div class="text-h6">کلیدهای پاسخ آنلاین</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section>
-          <q-table
-            v-if="examItem.answer_keys?.length"
-            :rows="examItem.answer_keys"
-            :columns="answerKeyColumns"
-            row-key="id"
-            :pagination="{ rowsPerPage: 10 }">
-            <template #body-cell-is_active="props">
-              <q-td :props="props">
-                <q-chip
-                  :color="props.row.is_active ? 'positive' : 'grey'"
-                  text-color="white"
-                  dense>
-                  {{ props.row.is_active ? 'فعال' : 'غیرفعال' }}
-                </q-chip>
-              </q-td>
-            </template>
-          </q-table>
-          <div
-            v-else
-            class="text-center q-pa-md text-grey">کلید پاسخی ثبت نشده است.</div>
-        </q-card-section>
-      </q-card>
-
-      <exam-results-card
-        :delivery_mode="examItem.delivery_mode"
-        :exam-id="examItem.id"
-        :in_person_results="examItem.in_person_results"
-        :online_exam_sessions="examItem.online_exam_detail?.sessions" />
+      <exam-results-card :exam="examItem" />
     </template>
   </q-page>
 </template>

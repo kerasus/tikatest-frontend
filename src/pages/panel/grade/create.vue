@@ -343,7 +343,7 @@ async function onSubmit () {
           return
         }
 
-        if (Number(rawGrade) >= Number(form.max_score)) {
+        if (Number(rawGrade) > Number(form.max_score)) {
           $q.notify({
             icon: 'error',
             message: `نمره دانش آموز ${student.full_name} باید کمتر از حداکثر نمره (${form.max_score}) باشد.`,
@@ -355,10 +355,19 @@ async function onSubmit () {
     }
 
     const results = studentOptions.value.map((s: any) => {
-      const rawScore = form.is_descriptive ? (s.descriptive_value || 0) : (s.raw_grade === null || s.raw_grade === '' ? null : Number(s.raw_grade))
+      const rawScore = form.is_descriptive
+        ? s.descriptive_value || 0
+        : s.raw_grade === null || s.raw_grade === ''
+          ? null
+          : Number(s.raw_grade)
       let scaledScore = null
-      if (!form.is_descriptive && rawScore !== null && form.min_passing_score && Number(form.min_passing_score) > 0) {
-        scaledScore = Math.round((rawScore / Number(form.min_passing_score)) * 20)
+      if (
+        !form.is_descriptive &&
+        rawScore !== null &&
+        form.max_score &&
+        Number(form.max_score) > 0
+      ) {
+        scaledScore = Math.round((rawScore / Number(form.max_score)) * 20)
       }
 
       return {

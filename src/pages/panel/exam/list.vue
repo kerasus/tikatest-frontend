@@ -53,11 +53,14 @@
 import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { exam } from 'src/repositories/exam'
+import { exam, ExamType } from 'src/repositories/exam'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import type { UserType } from 'src/repositories/user'
+import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()
+const dateManager = useDate()
 const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
 
 const examApi = exam
@@ -88,7 +91,20 @@ const table = ref({
     { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
     { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
     { name: 'delivery_mode', label: 'نوع تحویل', align: 'center' as const, field: 'delivery_mode' },
-    { name: 'created_at', label: 'تاریخ ثبت', align: 'center' as const, field: 'created_at' },
+    {
+      name: 'created_at',
+      required: true,
+      label: 'تاریخ ثبت',
+      align: 'left',
+      field: (row: ExamType) =>
+        row.created_at
+          ? dateManager.miladiToShamsi(
+            row.created_at,
+            'YYYY-MM-DDThh:mm:ss',
+            'hh:mm:ss jYYYY/jMM/jDD'
+          )
+          : '-'
+    },
     {
       name: 'actions',
       required: true,
