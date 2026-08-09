@@ -70,11 +70,11 @@
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">زمان شروع:</div>
-            <div class="text-body1">{{ exam.online_exam_detail.starts_at || '-' }}</div>
+            <div class="text-body1">{{ startsAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">زمان پایان:</div>
-            <div class="text-body1">{{ exam.online_exam_detail.ends_at || '-' }}</div>
+            <div class="text-body1">{{ endsAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">زمان محدودیت (دقیقه):</div>
@@ -82,11 +82,11 @@
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">قابل مشاهده از:</div>
-            <div class="text-body1">{{ exam.online_exam_detail.visible_at || '-' }}</div>
+            <div class="text-body1">{{ visibleAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">پاسخ‌ها قابل مشاهده از:</div>
-            <div class="text-body1">{{ exam.online_exam_detail.answers_visible_at || '-' }}</div>
+            <div class="text-body1">{{ answersVisibleAtFormatted }}</div>
           </div>
         </div>
       </q-card-section>
@@ -127,6 +127,30 @@ const dateManager = useDate()
 
 const heldAtFormatted = computed(() => {
   const raw = props.exam.in_person_exam_detail?.held_at
+  if (!raw) return '-'
+  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+})
+
+const startsAtFormatted = computed(() => {
+  const raw = props.exam.online_exam_detail?.starts_at
+  if (!raw) return '-'
+  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+})
+
+const endsAtFormatted = computed(() => {
+  const raw = props.exam.online_exam_detail?.ends_at
+  if (!raw) return '-'
+  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+})
+
+const visibleAtFormatted = computed(() => {
+  const raw = props.exam.online_exam_detail?.visible_at
+  if (!raw) return '-'
+  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+})
+
+const answersVisibleAtFormatted = computed(() => {
+  const raw = props.exam.online_exam_detail?.answers_visible_at
   if (!raw) return '-'
   return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
 })

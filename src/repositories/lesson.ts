@@ -1,21 +1,19 @@
 import BaseAPI from './BaseAPI'
+import { AcademicLevelType } from 'src/repositories/academicLevel'
 
 export type { ListType } from './BaseAPI'
 export type LessonType = {
-  id: number | null
-  name: string | null
-  academic_level_id: number | null
-  order: number | null
-  coefficient: number | null
-  is_report_card: boolean
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  academicLevel?: {
-    id: number | null
-    name: string | null
-  }
-}
+  id: number | null;
+  name: string | null;
+  academic_level_id: number | null;
+  order: number | null;
+  coefficient: number | null;
+  is_report_card: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  academic_level?: AcademicLevelType;
+};
 
 export default class LessonAPI extends BaseAPI<LessonType> {
   constructor () {

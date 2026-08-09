@@ -2,9 +2,6 @@
   <div
     class="form-builder-date"
     :class="customClass">
-    <div class="outsideLabel">
-      {{ placeholder ? label : null }}
-    </div>
     <q-input
       ref="input"
       v-model="displayDateTime"
@@ -16,7 +13,7 @@
       :fill-mask="fillMask"
       :reverse-fill-mask="reverseFillMask"
       dir="ltr"
-      :label="placeholder ? undefined : label"
+      :label="label"
       :stack-label="!!placeholder"
       :placeholder="placeholder"
       :rules="localRules"

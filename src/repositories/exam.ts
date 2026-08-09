@@ -5,36 +5,31 @@ import { SchoolClassType } from 'src/repositories/schoolClass'
 import { AcademicLevelType } from 'src/repositories/academicLevel'
 import { LessonType } from 'src/repositories/lesson'
 
-export type OnlineExamContentItem = {
+export type OnlineExamContentType = {
   type: 'text' | 'image';
   body?: string;
   path?: string;
-};
-
-export type OnlineExamSolutionItem = {
-  type: 'text' | 'image';
-  body?: string;
-  path?: string;
+  file?: File;
 };
 
 export type OnlineExamDetailType = {
-  id: number | null
-  exam_id: number | null
-  starts_at: string | null
-  ends_at: string | null
-  time_limit_minutes: number | null
-  visible_at: string | null
-  answers_visible_at: string | null
-  content: OnlineExamContentItem[] | null
-  solution: OnlineExamSolutionItem[] | null
-  created_by: number | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  sessions?: any[]
-  booklets?: any[]
-  createdBy?: UserType | null
-}
+  id: number | null;
+  exam_id: number | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  time_limit_minutes: number | null;
+  visible_at: string | null;
+  answers_visible_at: string | null;
+  content: OnlineExamContentType | null;
+  solution: OnlineExamContentType | null;
+  created_by: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  sessions?: any[];
+  booklets?: any[];
+  createdBy?: UserType | null;
+};
 
 export type InPersonExamDetailType = {
   id: number | null
@@ -103,8 +98,14 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     }
     this.endpoints = {
       ...this.endpoints,
-      storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results'
+      storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results',
+      storeWithOnlineDetail: '/exams/store-with-online-detail'
     }
+  }
+
+  async storeWithOnlineDetail (data: any): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.storeWithOnlineDetail!, data)
+    return response.data
   }
 
   async storeWithInPersonDetailAndResults (data: {

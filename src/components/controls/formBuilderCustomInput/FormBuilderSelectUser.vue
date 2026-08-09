@@ -1,74 +1,65 @@
 <template>
-  <div class="form-builder-select-user">
-    <div class="outsideLabel">{{ label }}</div>
-    <q-select
-      ref="input"
-      v-model="localValue"
-      transition-show="jump-down"
-      transition-hide="jump-up"
-      :name="name"
-      :filled="filled"
-      :rounded="rounded"
-      :outlined="outlined"
-      :error-message="errorMessage"
-      :option-value="optionValue"
-      :option-label="optionLabel"
-      :option-disable="optionDisable"
-      :options="filteredOptions"
-      :label="' '"
-      :stack-label="!!placeholder"
-      :placeholder="placeholderSetter"
-      :multiple="multiple"
-      :use-chips="useChips"
-      use-input
-      input-debounce="500"
-      :disable="disable"
-      :readonly="readonly"
-      emit-value
-      map-options
-      :hide-dropdown-icon="hideDropdownIcon"
-      :dropdown-icon="dropdownIcon"
-      :clearable="clearable"
-      @filter="filterFn">
-      <template #selected-item="{opt}">
-        <template v-if="opt.roles">
-          <div v-if="opt.roles[0]?.name">
-            ({{ getUserRoleLabel(opt.roles[0].name) }})
-          </div>
-          <div v-else>
-            (*)
-          </div>
-          <div class="q-ml-md">
-            {{ opt.first_name }}
-            {{ opt.last_name }}
-          </div>
-        </template>
+  <q-select
+    ref="input"
+    v-model="localValue"
+    transition-show="jump-down"
+    transition-hide="jump-up"
+    :name="name"
+    :filled="filled"
+    :rounded="rounded"
+    :outlined="outlined"
+    :error-message="errorMessage"
+    :option-value="optionValue"
+    :option-label="optionLabel"
+    :option-disable="optionDisable"
+    :options="filteredOptions"
+    :label="label"
+    :stack-label="!!placeholder"
+    :placeholder="placeholderSetter"
+    :multiple="multiple"
+    :use-chips="useChips"
+    use-input
+    input-debounce="500"
+    :disable="disable"
+    :readonly="readonly"
+    emit-value
+    map-options
+    :hide-dropdown-icon="hideDropdownIcon"
+    :dropdown-icon="dropdownIcon"
+    :clearable="clearable"
+    @filter="filterFn">
+    <template #selected-item="{ opt }">
+      <template v-if="opt.roles">
+        <div v-if="opt.roles[0]?.name">({{ getUserRoleLabel(opt.roles[0].name) }})</div>
+        <div v-else>(*)</div>
+        <div class="q-ml-md">
+          {{ opt.first_name }}
+          {{ opt.last_name }}
+        </div>
       </template>
-      <template #option="{opt, toggleOption}">
-        <q-item
-          clickable
-          @click="toggleOption(opt)">
-          <q-item-section avatar>
-            <span v-if="opt.roles[0]?.name">
-              {{ getUserRoleLabel(opt.roles[0].name) }}
-            </span>
-            <span v-else>
-              *
-            </span>
-          </q-item-section>
-          <q-item-section>
-            {{ opt.first_name }}
-            {{ opt.last_name }}
-          </q-item-section>
-        </q-item>
-      </template>
-      <template #no-option>
-        <q-item v-show="showNoOption">
-          <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
-        </q-item>
-      </template>
-    </q-select>
-  </div>
+    </template>
+    <template #option="{ opt, toggleOption }">
+      <q-item
+        clickable
+        @click="toggleOption(opt)">
+        <q-item-section avatar>
+          <span v-if="opt.roles[0]?.name">
+            {{ getUserRoleLabel(opt.roles[0].name) }}
+          </span>
+          <span v-else> * </span>
+        </q-item-section>
+        <q-item-section>
+          {{ opt.first_name }}
+          {{ opt.last_name }}
+        </q-item-section>
+      </q-item>
+    </template>
+    <template #no-option>
+      <q-item v-show="showNoOption">
+        <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
+      </q-item>
+    </template>
+  </q-select>
 </template>
 
 <script setup lang="ts">
@@ -193,7 +184,7 @@ async function getUsers (fullName: string | null) {
   return usersList.data
 }
 
-function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
+function filterFn (val: string, update: (cb: () => Promise<void>) => void) {
   if (val === '') {
     update(async () => {
       filteredOptions.value = await getUsers(null)
@@ -205,7 +196,6 @@ function filterFn (val: string, update: (cb: ()=>Promise<void>)=>void) {
     filteredOptions.value = await getUsers(val)
   })
 }
-
 </script>
 
 <style scoped></style>

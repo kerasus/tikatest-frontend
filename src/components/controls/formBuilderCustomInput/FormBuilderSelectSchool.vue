@@ -1,42 +1,39 @@
 <template>
-  <div class="form-builder-select-school">
-    <div class="outsideLabel">{{ label }}</div>
-    <q-select
-      ref="input"
-      v-model="localValue"
-      transition-show="jump-down"
-      transition-hide="jump-up"
-      :name="name"
-      :filled="filled"
-      :rounded="rounded"
-      :outlined="outlined"
-      :error-message="errorMessage"
-      :option-value="optionValue"
-      :option-label="optionLabel"
-      :option-disable="optionDisable"
-      :options="filteredOptions"
-      :label="' '"
-      :stack-label="!!placeholder"
-      :placeholder="placeholderSetter"
-      :multiple="multiple"
-      :use-chips="useChips"
-      use-input
-      input-debounce="500"
-      :disable="disable"
-      :readonly="readonly"
-      emit-value
-      map-options
-      :hide-dropdown-icon="hideDropdownIcon"
-      :dropdown-icon="dropdownIcon"
-      :clearable="clearable"
-      @filter="filterFn">
-      <template #no-option>
-        <q-item v-show="showNoOption">
-          <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
-        </q-item>
-      </template>
-    </q-select>
-  </div>
+  <q-select
+    ref="input"
+    v-model="localValue"
+    transition-show="jump-down"
+    transition-hide="jump-up"
+    :name="name"
+    :filled="filled"
+    :rounded="rounded"
+    :outlined="outlined"
+    :error-message="errorMessage"
+    :option-value="optionValue"
+    :option-label="optionLabel"
+    :option-disable="optionDisable"
+    :options="filteredOptions"
+    :label="label"
+    :stack-label="!!placeholder"
+    :placeholder="placeholderSetter"
+    :multiple="multiple"
+    :use-chips="useChips"
+    use-input
+    input-debounce="500"
+    :disable="disable"
+    :readonly="readonly"
+    emit-value
+    map-options
+    :hide-dropdown-icon="hideDropdownIcon"
+    :dropdown-icon="dropdownIcon"
+    :clearable="clearable"
+    @filter="filterFn">
+    <template #no-option>
+      <q-item v-show="showNoOption">
+        <q-item-section class="text-grey"> موردی یافت نشد </q-item-section>
+      </q-item>
+    </template>
+  </q-select>
 </template>
 
 <script setup lang="ts">

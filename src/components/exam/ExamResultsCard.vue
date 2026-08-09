@@ -35,7 +35,7 @@
                   outlined
                   dense
                   label="نمره خام"
-                  @input="onRawScoreInput" />
+                  @update:modelValue="onRawScoreInput" />
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -74,87 +74,6 @@
           v-else
           class="text-center q-pa-md text-grey">نمره‌ای ثبت نشده است.</div>
       </template>
-
-      <!--      <template v-else-if="exam.delivery_mode === 'online'">-->
-      <!--        <q-list-->
-      <!--          v-if="exam.online_exam_sessions?.length"-->
-      <!--          bordered-->
-      <!--          separator>-->
-      <!--          <q-expansion-item-->
-      <!--            v-for="session in exam.online_exam_sessions"-->
-      <!--            :key="session.id"-->
-      <!--            dense-toggle-->
-      <!--            expand-icon="expand_more"-->
-      <!--            header-class="q-pa-sm">-->
-      <!--            <template #header>-->
-      <!--              <q-item-section>-->
-      <!--                <q-item-label>{{ session.student?.full_name || '-' }}</q-item-label>-->
-      <!--                <q-item-label caption>-->
-      <!--                  وضعیت: {{ session.status || '-' }} | نمره: {{ session.score ?? '-' }} | درصد:-->
-      <!--                  {{ session.percent ?? '-' }}% | تلاش: {{ session.attempt_number ?? '-' }}-->
-      <!--                </q-item-label>-->
-      <!--              </q-item-section>-->
-      <!--              <q-item-section side>-->
-      <!--                <q-chip-->
-      <!--                  :color="getStatusColor(session.status)"-->
-      <!--                  text-color="white"-->
-      <!--                  dense>-->
-      <!--                  {{ getStatusLabel(session.status) }}-->
-      <!--                </q-chip>-->
-      <!--              </q-item-section>-->
-      <!--            </template>-->
-      <!--            <q-separator />-->
-      <!--            <q-card-section>-->
-      <!--              <div class="row q-col-gutter-md">-->
-      <!--                <div class="col-6">-->
-      <!--                  <div class="text-subtitle2">شروع:</div>-->
-      <!--                  <div class="text-body1">{{ session.started_at || '-' }}</div>-->
-      <!--                </div>-->
-      <!--                <div class="col-6">-->
-      <!--                  <div class="text-subtitle2">ثبت:</div>-->
-      <!--                  <div class="text-body1">{{ session.submitted_at || '-' }}</div>-->
-      <!--                </div>-->
-      <!--                <div class="col-6">-->
-      <!--                  <div class="text-subtitle2">زمان محدود:</div>-->
-      <!--                  <div class="text-body1">{{ session.duration_limit_seconds ?? '-' }} ثانیه</div>-->
-      <!--                </div>-->
-      <!--                <div class="col-6">-->
-      <!--                  <div class="text-subtitle2">زمان استفاده:</div>-->
-      <!--                  <div class="text-body1">{{ session.time_used_seconds ?? '-' }} ثانیه</div>-->
-      <!--                </div>-->
-      <!--              </div>-->
-      <!--            </q-card-section>-->
-      <!--            <q-separator />-->
-      <!--            <q-card-section>-->
-      <!--              <div class="text-subtitle2 q-mb-sm">پاسخ‌ها:</div>-->
-      <!--              <q-list-->
-      <!--                v-if="session.responses?.length"-->
-      <!--                bordered-->
-      <!--                separator>-->
-      <!--                <q-item-->
-      <!--                  v-for="response in session.responses"-->
-      <!--                  :key="response.id"-->
-      <!--                  dense>-->
-      <!--                  <q-item-section>-->
-      <!--                    <q-item-label>سوال {{ response.question_number }}</q-item-label>-->
-      <!--                    <q-item-label caption>-->
-      <!--                      پاسخ: {{ response.submitted_option || response.answer_text || '-' }} | درست:-->
-      <!--                      {{ response.is_correct ? 'بله' : 'خیر' }} | نمره:-->
-      <!--                      {{ response.marks_obtained ?? '-' }}-->
-      <!--                    </q-item-label>-->
-      <!--                  </q-item-section>-->
-      <!--                </q-item>-->
-      <!--              </q-list>-->
-      <!--              <div-->
-      <!--                v-else-->
-      <!--                class="text-center q-pa-md text-grey">پاسخی ثبت نشده است.</div>-->
-      <!--            </q-card-section>-->
-      <!--          </q-expansion-item>-->
-      <!--        </q-list>-->
-      <!--        <div-->
-      <!--          v-else-->
-      <!--          class="text-center q-pa-md text-grey">جلسه آزمونی ثبت نشده است.</div>-->
-      <!--      </template>-->
     </q-card-section>
   </q-card>
 </template>
@@ -195,7 +114,10 @@ function cancelEdit () {
 
 async function saveEdit (result: any) {
   try {
-    await inPersonExamResult.update(result.id, { raw_score: editRawScore.value, scaled_score: editScore.value } as any)
+    await inPersonExamResult.update(result.id, {
+      raw_score: editRawScore.value,
+      scaled_score: editScore.value
+    } as any)
     result.scaled_score = editScore.value
     result.raw_score = editRawScore.value
     $q.notify({ type: 'positive', message: 'نمره با موفقیت به‌روز شد' })
