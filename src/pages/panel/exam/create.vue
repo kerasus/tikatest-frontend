@@ -335,6 +335,14 @@ function buildFormData (): FormData {
 }
 
 const onSubmit = async () => {
+  if (!form.content || (typeof form.content === 'object' && !form.content.body && !form.content.file)) {
+    $q.notify({
+      icon: 'error',
+      message: 'محتوای آزمون الزامی است.',
+      color: 'negative'
+    })
+    return
+  }
   saving.value = true
   try {
     const formData = buildFormData()

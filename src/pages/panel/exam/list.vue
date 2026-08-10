@@ -56,7 +56,6 @@ import { EntityIndex } from 'quasar-crud'
 import { exam, ExamType } from 'src/repositories/exam'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
-import type { UserType } from 'src/repositories/user'
 import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()

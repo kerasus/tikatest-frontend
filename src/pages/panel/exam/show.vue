@@ -10,6 +10,13 @@
           label="بازگشت"
           :to="{ name: 'Panel.Exam.List' }" />
         <q-btn
+          v-if="examItem?.delivery_mode === 'online'"
+          color="secondary"
+          label="جلسات آزمون"
+          icon="menu_book"
+          :to="{ name: 'Panel.Exam.Sessions', params: { id: examItem?.id } }"
+          class="q-ml-sm" />
+        <q-btn
           color="primary"
           label="ویرایش آزمون"
           :to="{ name: 'Panel.Exam.Edit', params: { id: examItem?.id } }"
@@ -28,7 +35,9 @@
     <template v-else-if="examItem">
       <exam-detail-card :exam="examItem" />
 
-      <exam-results-card :exam="examItem" />
+      <exam-results-card
+        :exam="examItem"
+        @result-updated="loadExam" />
     </template>
   </q-page>
 </template>
@@ -70,7 +79,9 @@ const answerKeyColumns = [
   { name: 'is_active', label: 'وضعیت', field: 'is_active', align: 'center' as const }
 ]
 
-onMounted(async () => {
+onMounted(loadExam)
+
+async function loadExam () {
   loading.value = true
   try {
     const id = parseInt(route.params.id as string)
@@ -81,5 +92,5 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
-})
+}
 </script>

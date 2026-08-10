@@ -1,6 +1,8 @@
 <template>
   <div class="exam-answer-key-editor">
-    <div class="row q-col-gutter-sm q-mb-md">
+    <div
+      v-if="!readonly"
+      class="row q-col-gutter-sm q-mb-md">
       <div class="col-12 col-md-4">
         <q-input
           v-model.number="questionCount"
@@ -23,129 +25,197 @@
           max="10"
           :rules="[(val) => val >= 2 || 'تعداد گزینه باید حداقل ۲ باشد']" />
       </div>
-      <div class="col-12 col-md-4 flex items-center">
-        <q-btn
-          color="primary"
-          label="تولید برگه پاسخ"
-          class="full-width"
-          @click="generateAnswerKeys" />
-      </div>
     </div>
 
-    <q-list
+    <q-table
       v-if="answerKeys.length"
-      bordered
-      separator>
-      <q-item class="q-py-sm">
-        <q-item-section avatar>
-          <div class="text-subtitle2 q-mb-xs" />
-        </q-item-section>
-        <q-item-section>
-          <div class="row q-col-gutter-sm">
-            <div
-              v-for="(choice, choiceIndex) in choices"
-              :key="choiceIndex"
-              class="col-auto">
-              <span class="q-ml-lg">
-                {{ choice }}
-              </span>
-            </div>
+      :columns="tableColumns"
+      :rows="answerKeys"
+      row-key="question_number"
+      :rows-per-page-options="[0]"
+      dense
+      separator="cell"
+      hide-pagination>
+      <template #body-cell="cellProps">
+        <q-td
+          v-if="cellProps.col.name === 'question_number'"
+          :props="cellProps">
+          <div class="text-center">
+            {{ cellProps.row.question_number }}
           </div>
-        </q-item-section>
-      </q-item>
-      <q-item
-        v-for="key in answerKeys"
-        :key="key.question_number"
-        class="q-py-sm">
-        <q-item-section avatar>
-          <div class="text-subtitle2 q-mb-xs q-mr-md">سوال {{ key.question_number }}</div>
-        </q-item-section>
-        <q-item-section>
-          <div class="row q-col-gutter-md">
-            <div
-              v-for="(choice, choiceIndex) in choices"
-              :key="choiceIndex"
-              class="col-auto">
-              <q-radio
-                v-model="key.correct_option"
-                :val="choice"
-                dense
-                color="primary"
-                @update:model-value="onChangeCorrectOption(key)" />
-            </div>
+        </q-td>
+        <q-td
+          v-else-if="cellProps.col.name === 'weight'"
+          :props="cellProps">
+          <div class="text-center">
+            <q-input
+              v-if="!readonly"
+              v-model.number="cellProps.row.weight"
+              type="number"
+              min="1"
+              dense
+              outlined
+              style="max-width: 80px"
+              @update:model-value="onChangeCorrectOption(cellProps.row)" />
+            <span v-else>{{ cellProps.row.weight ?? 1 }}</span>
           </div>
-        </q-item-section>
-      </q-item>
-    </q-list>
+        </q-td>
+        <q-td
+          v-else-if="cellProps.col.name === 'has_negative_mark'"
+          :props="cellProps">
+          <div class="text-center">
+            <q-checkbox
+              v-if="!readonly"
+              v-model="cellProps.row.has_negative_mark"
+              dense
+              color="primary"
+              @update:model-value="onChangeCorrectOption(cellProps.row)" />
+            <q-chip
+              v-else
+              :color="cellProps.row.has_negative_mark ? 'warning' : 'positive'"
+              text-color="white"
+              dense>
+              {{ cellProps.row.has_negative_mark ? 'منفی' : 'مثبت' }}
+            </q-chip>
+          </div>
+        </q-td>
+        <q-td
+          v-else
+          :props="cellProps"
+          :class="{ 'cursor-default': readonly, 'cursor-pointer': !readonly }"
+          @click="!readonly && toggleCorrectOption(cellProps.row, cellProps.col.name)">
+          <div class="text-center">
+            <q-radio
+              v-if="!readonly"
+              v-model="cellProps.row.correct_option"
+              :val="cellProps.col.name"
+              dense
+              color="primary"
+              readonly />
+            <q-icon
+              v-else
+              :name="
+                cellProps.row.correct_option == cellProps.col.name
+                  ? 'check_circle'
+                  : 'radio_button_unchecked'
+              "
+              :color="
+                cellProps.row.correct_option == cellProps.col.name
+                  ? 'primary'
+                  : 'grey-4'
+              "
+              size="24px" />
+          </div>
+        </q-td>
+      </template>
+    </q-table>
     <div
       v-else
-      class="text-center q-pa-md text-grey">برگه پاسخی تولید نشده است.</div>
+      class="text-center q-pa-md text-grey">
+      {{ readonly ? 'کلید پاسخی تنظیم نشده است.' : 'برای نمایش برگه پاسخ، تعداد سوالات و گزینه‌ها را وارد کنید.' }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 
 const props = defineProps<{
   modelValue?: any[];
+  readonly?: boolean;
 }>()
 
 const emit = defineEmits<{
   (e: 'update:value', value: any[]): void;
 }>()
 
-const questionCount = ref(0)
+const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
+const maxOptions = optionLabels.length
+
+const questionCount = ref(props.modelValue?.length || 0)
 const choiceCount = ref(4)
 const answerKeys = ref<any[]>(props.modelValue || [])
-
-watch(
-  answerKeys,
-  (newVal) => {
-    emit('update:value', newVal)
-  },
-  { deep: true }
-)
+const isSyncingFromProps = ref(false)
 
 watch(
   () => props.modelValue,
-  (newVal) => {
+  async (newVal) => {
     if (Array.isArray(newVal)) {
+      isSyncingFromProps.value = true
       answerKeys.value = newVal
       if (newVal.length > 0) {
         questionCount.value = newVal.length
         const firstKey = newVal[0]
         if (firstKey && firstKey.correct_option) {
-          const optionCount = firstKey.correct_option.length
-          if (optionCount >= 2 && optionCount <= 10) {
-            choiceCount.value = optionCount
+          const optionNum = Number(firstKey.correct_option)
+          if (optionNum >= 2 && optionNum <= maxOptions) {
+            choiceCount.value = optionNum
           }
         }
       }
+      await nextTick()
+      isSyncingFromProps.value = false
     }
   },
   { deep: true }
 )
 
-const choices = computed(() => {
-  return ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی', 'ک', 'ل', 'م', 'ن'].slice(
-    0,
-    choiceCount.value
-  )
+watch([questionCount, choiceCount], () => {
+  if (isSyncingFromProps.value || props.readonly) return
+  regenerateAnswerKeys()
 })
 
-function generateAnswerKeys () {
-  if (questionCount.value <= 0 || choiceCount.value < 2) {
+watch(
+  answerKeys,
+  (newVal) => {
+    if (props.readonly) return
+    emit('update:value', newVal)
+  },
+  { deep: true }
+)
+
+const tableColumns = computed(() => {
+  const cols = [
+    {
+      name: 'question_number',
+      label: 'شماره سوال',
+      field: 'question_number',
+      align: 'center' as const
+    }
+  ]
+  for (let i = 0; i < choiceCount.value; i++) {
+    cols.push({
+      name: String(i + 1),
+      label: optionLabels[i],
+      field: String(i + 1),
+      align: 'center' as const
+    })
+  }
+  cols.push(
+    { name: 'weight', label: 'وزن', field: 'weight', align: 'center' as const },
+    {
+      name: 'has_negative_mark',
+      label: 'نمره منفی',
+      field: 'has_negative_mark',
+      align: 'center' as const
+    }
+  )
+  return cols
+})
+
+function regenerateAnswerKeys () {
+  if (questionCount.value <= 0) {
+    answerKeys.value = []
     return
   }
 
-  const labels = 'ABCDEFGHIJ'
   const newKeys: any[] = []
 
   for (let i = 1; i <= questionCount.value; i++) {
     const existingKey = answerKeys.value.find((k) => k.question_number === i)
     newKeys.push({
       question_number: i,
-      correct_option: existingKey?.correct_option || labels[0],
+      correct_option: existingKey?.correct_option ?? '1',
       weight: existingKey?.weight ?? 1,
       has_negative_mark: existingKey?.has_negative_mark ?? false,
       is_active: existingKey?.is_active ?? true
@@ -156,8 +226,16 @@ function generateAnswerKeys () {
 }
 
 function onChangeCorrectOption (key: any) {
-  // trigger reactivity update
   answerKeys.value = [...answerKeys.value]
+}
+
+function toggleCorrectOption (row: any, option: string) {
+  if (row.correct_option == option) {
+    row.correct_option = null
+  } else {
+    row.correct_option = option
+  }
+  onChangeCorrectOption(row)
 }
 </script>
 

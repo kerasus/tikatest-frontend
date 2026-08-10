@@ -18,6 +18,12 @@ export type OnlineExamSessionType = {
   created_at: string | null
   updated_at: string | null
   exam?: any | null
+  student?: {
+    id: number | null
+    full_name: string | null
+    first_name: string | null
+    last_name: string | null
+  } | null
   responses?: any[] | null
 }
 
@@ -55,6 +61,13 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
   async mySessions (): Promise<OnlineExamSessionType[]> {
     const response = await this.getAxiosInstanceWithToken().get(
       `${this.baseEndpoint}/my-sessions`
+    )
+    return response.data
+  }
+
+  async getExamSessions (examId: number): Promise<OnlineExamSessionType[]> {
+    const response = await this.getAxiosInstanceWithToken().get(
+      `${this.baseEndpoint}/${examId}/sessions`
     )
     return response.data
   }

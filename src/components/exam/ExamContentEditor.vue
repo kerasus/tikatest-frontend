@@ -46,15 +46,6 @@
           rows="2"
           placeholder="<p>متن سوال...</p>" />
       </div>
-      <div class="col-auto">
-        <q-btn
-          color="primary"
-          icon="save"
-          label="ذخیره"
-          dense
-          :disable="!canSave"
-          @click="saveItem" />
-      </div>
     </div>
 
     <div
@@ -103,22 +94,6 @@ const currentBody = ref('')
 const currentFile = ref<File | null>(null)
 const imageFileInput = ref<HTMLInputElement | null>(null)
 
-const currentItem = ref<{ type: 'text' | 'image'; body?: string; path?: string; file?: File } | null>(props.modelValue || null)
-
-watch(() => props.modelValue, (newVal) => {
-  if (newVal && typeof newVal === 'object') {
-    currentItem.value = newVal
-    currentType.value = newVal.type || 'text'
-    currentBody.value = newVal.body || ''
-    currentFile.value = newVal.file || null
-  } else {
-    currentItem.value = null
-    currentType.value = 'text'
-    currentBody.value = ''
-    currentFile.value = null
-  }
-}, { deep: true })
-
 const canSave = computed(() => {
   if (!currentType.value) return false
   if (currentType.value === 'image') {
@@ -126,6 +101,26 @@ const canSave = computed(() => {
   }
   return !!currentBody.value.trim()
 })
+
+const currentItem = computed(() => {
+  if (!canSave.value) return null
+
+  const item: { type: 'text' | 'image'; body?: string; path?: string; file?: File } = {
+    type: currentType.value
+  }
+
+  if (currentType.value === 'image') {
+    item.file = currentFile.value || undefined
+  } else {
+    item.body = currentBody.value.trim()
+  }
+
+  return item
+})
+
+watch(currentItem, (newVal) => {
+  emit('update:value', newVal)
+}, { immediate: true })
 
 function openFilePicker () {
   imageFileInput.value?.click()
@@ -136,23 +131,6 @@ function onFileChange (event: Event) {
   if (target.files && target.files[0]) {
     currentFile.value = target.files[0]
   }
-}
-
-function saveItem () {
-  if (!canSave.value) return
-
-  const newItem: { type: 'text' | 'image'; body?: string; path?: string; file?: File } = {
-    type: currentType.value
-  }
-
-  if (currentType.value === 'image') {
-    newItem.file = currentFile.value || undefined
-  } else {
-    newItem.body = currentBody.value.trim()
-  }
-
-  currentItem.value = newItem
-  emit('update:value', newItem)
 }
 </script>
 

@@ -132,6 +132,17 @@ export default defineConfig((ctx) => {
             return path.replace(new RegExp('^' + (process.env.FRONTEND_API_BASE || '/api')), '');
           },
         },
+        [process.env.FRONTEND_STORAGE_BASE_PATH || '/storage']: {
+          target: process.env.STORAGE_BASE_PATH || 'http://localhost/storage',
+          changeOrigin: true,
+          rewrite: (path) => {
+            console.log(path);
+            return path.replace(
+              new RegExp('^' + (process.env.FRONTEND_STORAGE_BASE_PATH || '/storage')),
+              '',
+            );
+          },
+        },
       },
     },
 

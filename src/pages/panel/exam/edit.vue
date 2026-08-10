@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h4 class="q-ma-none">{{ isResultMode ? 'ویرایش نمره دانش آموز' : 'ویرایش آزمون' }}</h4>
+        <h4 class="q-ma-none">{{ isResultMode ? 'ویرایش نمره دانش‌آموز' : 'ویرایش آزمون' }}</h4>
       </div>
       <div class="col-auto">
         <q-btn
@@ -20,78 +20,22 @@
         size="100px" />
     </div>
 
-    <template v-else-if="!isResultMode">
-      <q-card>
-        <q-card-section>
-          <q-form @submit.prevent="onSubmitExam">
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="form.name"
-                  label="نام آزمون *"
-                  outlined
-                  :rules="[(v) => !!v || 'نام الزامی است']" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select
-                  v-model="form.lesson_id"
-                  :options="lessonOptions"
-                  option-value="id"
-                  option-label="name"
-                  label="درس"
-                  outlined
-                  emit-value
-                  map-options
-                  clearable />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select
-                  v-model="form.exam_category_id"
-                  :options="categoryOptions"
-                  option-value="id"
-                  option-label="title"
-                  label="دسته‌بندی"
-                  outlined
-                  emit-value
-                  map-options
-                  clearable />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="form.min_passing_score"
-                  label="حداقل نمره قبولی"
-                  outlined
-                  type="number"
-                  step="0.01" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="form.max_score"
-                  label="حداکثر نمره"
-                  outlined
-                  type="number"
-                  step="0.01" />
-              </div>
-              <div class="col-12">
-                <q-input
-                  v-model="form.description"
-                  label="توضیحات"
-                  outlined
-                  type="textarea"
-                  rows="3" />
-              </div>
-            </div>
+    <template v-else-if="!isResultMode && examItem">
+      <exam-detail-card
+        :exam="examItem"
+        :editable="true"
+        :lesson-options="lessonOptions"
+        :category-options="categoryOptions" />
 
-            <div class="q-mt-md">
-              <q-btn
-                type="submit"
-                color="primary"
-                label="ذخیره تغییرات"
-                :loading="saving" />
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
+      <div class="row q-mt-md">
+        <div class="col-12">
+          <q-btn
+            color="primary"
+            label="ذخیره تغییرات"
+            :loading="saving"
+            @click="onSubmitExam" />
+        </div>
+      </div>
     </template>
 
     <template v-else-if="resultItem">
@@ -100,12 +44,12 @@
           <q-form @submit.prevent="onSubmitResult">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <div class="text-subtitle2">دانش آموز:</div>
+                <div class="text-subtitle2">دانش‌آموز:</div>
                 <div class="text-body1">{{ resultItem.student?.full_name || '-' }}</div>
               </div>
               <div class="col-12 col-md-6">
                 <q-input
-                  v-model="resultForm.raw_score"
+                  v-model.number="resultForm.raw_score"
                   label="نمره خام *"
                   outlined
                   type="number"
@@ -114,7 +58,7 @@
               </div>
               <div class="col-12 col-md-6">
                 <q-input
-                  v-model="resultForm.scaled_score"
+                  v-model.number="resultForm.scaled_score"
                   label="نمره محاسبه شده"
                   outlined
                   type="number"
@@ -122,7 +66,7 @@
               </div>
               <div class="col-12 col-md-6">
                 <q-input
-                  v-model="resultForm.z_score"
+                  v-model.number="resultForm.z_score"
                   label="Z نمره"
                   outlined
                   type="number"
@@ -148,12 +92,11 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { exam } from 'src/repositories/exam'
+import { exam, ExamType } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
-import { lesson } from 'src/repositories/lesson'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
-import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -162,20 +105,13 @@ const lessonApi = new LessonAPI()
 
 const loading = ref(true)
 const saving = ref(false)
-const examId = ref<number>(0)
+const examId = computed(() => parseInt(route.params.id as string))
 const lessonOptions = ref<any[]>([])
 const categoryOptions = ref<any[]>([])
 
 const isResultMode = computed(() => !!route.query.result_id)
 
-const form = reactive({
-  name: '',
-  lesson_id: null as number | null,
-  exam_category_id: null as number | null,
-  min_passing_score: null as number | null,
-  max_score: null as number | null,
-  description: ''
-})
+const examItem = ref<ExamType | null>(null)
 
 const resultForm = reactive({
   raw_score: null as number | null,
@@ -188,8 +124,6 @@ const resultItem = ref<any>(null)
 onMounted(async () => {
   loading.value = true
   try {
-    examId.value = parseInt(route.params.id as string)
-
     if (isResultMode.value) {
       const resultId = parseInt(route.query.result_id as string)
       const result = await inPersonExamResult.get(resultId)
@@ -199,12 +133,7 @@ onMounted(async () => {
       resultForm.z_score = result.z_score
     } else {
       const examData = await exam.get(examId.value)
-      form.name = examData.name || ''
-      form.lesson_id = examData.lesson_id
-      form.exam_category_id = examData.exam_category_id
-      form.min_passing_score = examData.min_passing_score
-      form.max_score = examData.max_score
-      form.description = examData.description || ''
+      examItem.value = examData
 
       await loadLessons()
       await loadCategories()
@@ -235,13 +164,39 @@ async function loadCategories () {
 }
 
 async function onSubmitExam () {
+  if (!examItem.value) return
+
   saving.value = true
   try {
-    await exam.update(examId.value, form as any)
-    $q.notify({ type: 'positive', message: 'اطلاعات آزمون با موفقیت به‌روز شد' })
+    const payload: any = {
+      name: examItem.value.name,
+      description: examItem.value.description,
+      lesson_id: examItem.value.lesson_id,
+      min_passing_score: examItem.value.min_passing_score,
+      max_score: examItem.value.max_score,
+      exam_category_id: examItem.value.exam_category_id,
+      delivery_mode: examItem.value.delivery_mode
+    }
+
+    if (examItem.value.online_exam_detail) {
+      payload.starts_at = examItem.value.online_exam_detail.starts_at
+      payload.ends_at = examItem.value.online_exam_detail.ends_at
+      payload.time_limit_minutes = examItem.value.online_exam_detail.time_limit_minutes
+      payload.visible_at = examItem.value.online_exam_detail.visible_at
+      payload.answers_visible_at = examItem.value.online_exam_detail.answers_visible_at
+    }
+
+    if (examItem.value.in_person_exam_detail) {
+      payload.held_at = examItem.value.in_person_exam_detail.held_at
+      payload.is_descriptive = examItem.value.in_person_exam_detail.is_descriptive
+    }
+
+    await exam.update(examId.value, payload)
+
+    $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
     router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
   } catch (error: any) {
-    $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی اطلاعات آزمون' })
+    $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی آزمون' })
   } finally {
     saving.value = false
   }

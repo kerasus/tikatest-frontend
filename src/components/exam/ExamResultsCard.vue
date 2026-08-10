@@ -90,6 +90,8 @@ const props = defineProps<{
   exam: ExamType;
 }>()
 
+const emit = defineEmits(['result-updated'])
+
 const editingId = ref<number | null>(null)
 const editScore = ref<number | null>(null)
 const editRawScore = ref<number | null>(null)
@@ -121,7 +123,7 @@ async function saveEdit (result: any) {
     result.scaled_score = editScore.value
     result.raw_score = editRawScore.value
     $q.notify({ type: 'positive', message: 'نمره با موفقیت به‌روز شد' })
-    window.location.reload()
+    emit('result-updated')
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی نمره' })
   } finally {
