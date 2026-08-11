@@ -108,6 +108,11 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     return response.data
   }
 
+  async updateWithOnlineDetail (id: number, data: any): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(`exams/update-with-online-detail/${id}`, data)
+    return response.data
+  }
+
   async storeWithInPersonDetailAndResults (data: {
     name: string
     description?: string

@@ -72,10 +72,10 @@
               @update:model-value="onChangeCorrectOption(cellProps.row)" />
             <q-chip
               v-else
-              :color="cellProps.row.has_negative_mark ? 'warning' : 'positive'"
+              :color="cellProps.row.has_negative_mark ? 'warning' : 'info'"
               text-color="white"
               dense>
-              {{ cellProps.row.has_negative_mark ? 'منفی' : 'مثبت' }}
+              {{ cellProps.row.has_negative_mark ? 'ندارد' : 'دارد' }}
             </q-chip>
           </div>
         </q-td>
@@ -99,11 +99,7 @@
                   ? 'check_circle'
                   : 'radio_button_unchecked'
               "
-              :color="
-                cellProps.row.correct_option == cellProps.col.name
-                  ? 'primary'
-                  : 'grey-4'
-              "
+              :color="cellProps.row.correct_option == cellProps.col.name ? 'primary' : 'grey-4'"
               size="24px" />
           </div>
         </q-td>
@@ -112,7 +108,11 @@
     <div
       v-else
       class="text-center q-pa-md text-grey">
-      {{ readonly ? 'کلید پاسخی تنظیم نشده است.' : 'برای نمایش برگه پاسخ، تعداد سوالات و گزینه‌ها را وارد کنید.' }}
+      {{
+        readonly
+          ? 'کلید پاسخی تنظیم نشده است.'
+          : 'برای نمایش برگه پاسخ، تعداد سوالات و گزینه‌ها را وارد کنید.'
+      }}
     </div>
   </div>
 </template>
@@ -121,7 +121,7 @@
 import { ref, watch, computed, nextTick } from 'vue'
 
 const props = defineProps<{
-  modelValue?: any[];
+  value?: any[];
   readonly?: boolean;
 }>()
 
@@ -132,13 +132,13 @@ const emit = defineEmits<{
 const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
 const maxOptions = optionLabels.length
 
-const questionCount = ref(props.modelValue?.length || 0)
+const questionCount = ref(props.value?.length || 0)
 const choiceCount = ref(4)
-const answerKeys = ref<any[]>(props.modelValue || [])
+const answerKeys = ref<any[]>(props.value || [])
 const isSyncingFromProps = ref(false)
 
 watch(
-  () => props.modelValue,
+  () => props.value,
   async (newVal) => {
     if (Array.isArray(newVal)) {
       isSyncingFromProps.value = true

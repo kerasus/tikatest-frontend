@@ -33,7 +33,9 @@
     </div>
 
     <template v-else-if="examItem">
-      <exam-detail-card :exam="examItem" />
+      <exam-detail-card
+        :exam="examItem"
+        :editable="false" />
 
       <exam-results-card
         :exam="examItem"

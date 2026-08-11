@@ -291,7 +291,7 @@
           <div class="text-subtitle2 q-mb-sm">پاسخنامه کلیدی آزمون (بابل شیت)</div>
           <exam-answer-key-editor
             v-model:value="exam.answer_keys"
-            readonly />
+            :readonly="!editable" />
         </div>
 
         <div class="col-12">
