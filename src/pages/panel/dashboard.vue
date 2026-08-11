@@ -37,7 +37,10 @@
 
     <q-card class="q-mt-md">
       <q-card-section>
-        <div class="text-h6">خوش آمدید به سیستم مدیریت دانش آموزی TikaTest</div>
+        <div class="text-h6">
+          خوش آمدید به سیستم مدیریت دانش آموزی
+          <span class="text-bold"> تیکا تست </span>
+        </div>
         <p class="text-grey-7">گزینه مورد نظر را از منو انتخاب کنید.</p>
       </q-card-section>
     </q-card>
@@ -90,7 +93,7 @@ onMounted(async () => {
     transition: all 0.3s ease;
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
   }
 }

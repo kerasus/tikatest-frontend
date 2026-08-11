@@ -133,13 +133,15 @@ const currentQuestionBody = computed(() => {
   return JSON.stringify(content)
 })
 
+const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
+
 const getOptions = (questionNum: number) => {
-  return [
-    { label: 'گزینه 1', value: '1' },
-    { label: 'گزینه 2', value: '2' },
-    { label: 'گزینه 3', value: '3' },
-    { label: 'گزینه 4', value: '4' }
-  ]
+  const answerKey = answer_keys.value.find((k) => k.question_number === questionNum)
+  const numChoices = Number(answerKey?.number_of_choices) || 4
+  return optionLabels.slice(0, numChoices).map((label, i) => ({
+    label,
+    value: String(i + 1)
+  }))
 }
 
 const startSession = async () => {

@@ -245,46 +245,56 @@
       <div class="row q-col-gutter-md">
         <div class="col-12">
           <div class="text-subtitle2 q-mb-sm">تصویر آزمون</div>
-          <template v-if="exam.online_exam_detail?.content">
-            <img
-              v-if="
-                exam.online_exam_detail.content.type === 'image' &&
-                  exam.online_exam_detail.content.path
-              "
-              :src="`storage/${exam.online_exam_detail.content.path}`"
-              alt="تصویر آزمون"
-              style="max-width: 100%; display: block">
+          <exam-content-editor
+            v-if="editable && exam.online_exam_detail"
+            v-model:value="exam.online_exam_detail.content" />
+          <template v-else>
+            <template v-if="exam.online_exam_detail?.content">
+              <img
+                v-if="
+                  exam.online_exam_detail.content.type === 'image' &&
+                    exam.online_exam_detail.content.path
+                "
+                :src="`storage/${exam.online_exam_detail.content.path}`"
+                alt="تصویر آزمون"
+                style="max-width: 100%; display: block">
+              <div
+                v-else-if="exam.online_exam_detail.content.type === 'text'"
+                class="text-body1">
+                {{ exam.online_exam_detail.content.body || '-' }}
+              </div>
+            </template>
             <div
-              v-else-if="exam.online_exam_detail.content.type === 'text'"
-              class="text-body1">
-              {{ exam.online_exam_detail.content.body || '-' }}
-            </div>
+              v-else
+              class="text-center q-pa-md text-grey">تصویری ثبت نشده است.</div>
           </template>
-          <div
-            v-else
-            class="text-center q-pa-md text-grey">تصویری ثبت نشده است.</div>
         </div>
 
         <div class="col-12">
           <div class="text-subtitle2 q-mb-sm">تصویر پاسخنامه</div>
-          <template v-if="exam.online_exam_detail?.solution">
-            <img
-              v-if="
-                exam.online_exam_detail.solution.type === 'image' &&
-                  exam.online_exam_detail.solution.path
-              "
-              :src="`storage/${exam.online_exam_detail.solution.path}`"
-              alt="تصویر پاسخنامه"
-              style="max-width: 100%; display: block">
+          <exam-content-editor
+            v-if="editable && exam.online_exam_detail"
+            v-model:value="exam.online_exam_detail.solution" />
+          <template v-else>
+            <template v-if="exam.online_exam_detail?.solution">
+              <img
+                v-if="
+                  exam.online_exam_detail.solution.type === 'image' &&
+                    exam.online_exam_detail.solution.path
+                "
+                :src="`storage/${exam.online_exam_detail.solution.path}`"
+                alt="تصویر پاسخنامه"
+                style="max-width: 100%; display: block">
+              <div
+                v-else-if="exam.online_exam_detail.solution.type === 'text'"
+                class="text-body1">
+                {{ exam.online_exam_detail.solution.body || '-' }}
+              </div>
+            </template>
             <div
-              v-else-if="exam.online_exam_detail.solution.type === 'text'"
-              class="text-body1">
-              {{ exam.online_exam_detail.solution.body || '-' }}
-            </div>
+              v-else
+              class="text-center q-pa-md text-grey">تصویری ثبت نشده است.</div>
           </template>
-          <div
-            v-else
-            class="text-center q-pa-md text-grey">تصویری ثبت نشده است.</div>
         </div>
 
         <div class="col-12">
@@ -295,7 +305,20 @@
         </div>
 
         <div class="col-12">
-          <div class="text-subtitle2 q-mb-sm">دفترچه های آزمون</div>
+          <div class="row items-center q-mb-sm">
+            <div class="col">
+              <div class="text-subtitle2">دفترچه‌ها</div>
+            </div>
+            <div
+              v-if="editable && exam.online_exam_detail"
+              class="col-auto">
+              <q-btn
+                color="primary"
+                label="افزودن دفترچه"
+                size="sm"
+                @click="addBooklet" />
+            </div>
+          </div>
           <q-list
             v-if="exam.online_exam_detail?.booklets?.length"
             bordered
@@ -305,22 +328,136 @@
               :key="index"
               class="q-py-sm">
               <q-item-section>
-                <q-item-label>{{ booklet.title || '-' }}</q-item-label>
-                <q-item-label caption>
-                  {{
-                    booklet.lesson?.name || booklet.lesson_id
-                      ? `درس: ${booklet.lesson?.name || booklet.lesson_id}`
-                      : ''
-                  }}
-                  | از سوال {{ booklet.from_question ?? '-' }} تا سوال
-                  {{ booklet.to_question ?? '-' }}
-                </q-item-label>
+                <div class="row q-col-gutter-sm">
+                  <div class="col-12 col-md-6">
+                    <q-select
+                      v-if="editable"
+                      v-model="booklet.lesson_id"
+                      :options="lessonOptions"
+                      option-value="id"
+                      option-label="name"
+                      outlined
+                      dense
+                      clearable
+                      emit-value
+                      map-options />
+                    <span
+                      v-else
+                      class="text-body1">{{ booklet.lesson?.name || booklet.lesson_id || '-' }}</span>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-if="editable"
+                      v-model="booklet.title"
+                      label="عنوان *"
+                      outlined
+                      dense
+                      :rules="[(val) => !!val || 'عنوان الزامی است']" />
+                    <span
+                      v-else
+                      class="text-body1">{{ booklet.title || '-' }}</span>
+                  </div>
+                  <div class="col-6">
+                    <q-input
+                      v-if="editable"
+                      v-model.number="booklet.from_question"
+                      label="از سوال"
+                      outlined
+                      dense
+                      type="number"
+                      min="1" />
+                    <span
+                      v-else
+                      class="text-caption">از سوال {{ booklet.from_question ?? '-' }}</span>
+                  </div>
+                  <div class="col-6">
+                    <q-input
+                      v-if="editable"
+                      v-model.number="booklet.to_question"
+                      label="تا سوال"
+                      outlined
+                      dense
+                      type="number"
+                      min="1" />
+                    <span
+                      v-else
+                      class="text-caption">تا سوال {{ booklet.to_question ?? '-' }}</span>
+                  </div>
+                </div>
+              </q-item-section>
+              <q-item-section
+                v-if="editable"
+                side>
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="delete"
+                  color="negative"
+                  size="sm"
+                  @click="removeBooklet(index)" />
               </q-item-section>
             </q-item>
           </q-list>
           <div
             v-else
             class="text-center q-pa-md text-grey">دفترچه‌ای ثبت نشده است.</div>
+        </div>
+
+        <div class="col-12">
+          <div class="text-subtitle2 q-mb-sm">سطوح آموزشی</div>
+          <q-select
+            v-if="editable"
+            v-model="exam.academic_levels"
+            :options="academicLevelOptions"
+            multiple
+            option-value="id"
+            option-label="name"
+            outlined
+            dense
+            clearable
+            use-chips />
+          <div v-else>
+            <q-chip
+              v-for="level in exam.academic_levels"
+              :key="level.id"
+              color="primary"
+              text-color="white"
+              dense>
+              {{ level.name || '-' }}
+            </q-chip>
+            <span
+              v-if="!exam.academic_levels?.length"
+              class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="text-subtitle2 q-mb-sm">کلاس‌ها</div>
+          <q-select
+            v-if="editable"
+            v-model="exam.classes"
+            :options="schoolClassOptions"
+            multiple
+            option-value="id"
+            option-label="name"
+            outlined
+            dense
+            clearable
+            use-chips />
+          <div v-else>
+            <q-chip
+              v-for="cls in exam.classes"
+              :key="cls.id"
+              color="secondary"
+              text-color="white"
+              dense>
+              {{ cls.name || '-' }}
+            </q-chip>
+            <span
+              v-if="!exam.classes?.length"
+              class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
+          </div>
         </div>
       </div>
     </q-card-section>
@@ -333,12 +470,15 @@ import { useDate } from 'src/composables/Date'
 import { ExamType } from 'src/repositories/exam'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
 import ExamAnswerKeyEditor from 'src/components/exam/ExamAnswerKeyEditor.vue'
+import ExamContentEditor from 'src/components/exam/ExamContentEditor.vue'
 
 const exam = defineModel<ExamType>('exam')
 const props = defineProps<{
-  editable?: boolean;
-  lessonOptions?: any[];
-  categoryOptions?: any[];
+  editable?: boolean
+  lessonOptions?: any[]
+  categoryOptions?: any[]
+  academicLevelOptions?: any[]
+  schoolClassOptions?: any[]
 }>()
 
 const dateManager = useDate()
@@ -372,6 +512,22 @@ const answersVisibleAtFormatted = computed(() => {
   if (!raw) return '-'
   return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
 })
+
+function addBooklet () {
+  if (!exam.value.online_exam_detail) return
+  exam.value.online_exam_detail.booklets = exam.value.online_exam_detail.booklets || []
+  exam.value.online_exam_detail.booklets.push({
+    lesson_id: null,
+    title: '',
+    from_question: null,
+    to_question: null
+  })
+}
+
+function removeBooklet (index: number) {
+  if (!exam.value.online_exam_detail?.booklets) return
+  exam.value.online_exam_detail.booklets.splice(index, 1)
+}
 </script>
 
 <style scoped></style>

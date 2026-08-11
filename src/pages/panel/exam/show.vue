@@ -66,6 +66,12 @@ const answerKeyColumns = [
     align: 'center' as const
   },
   {
+    name: 'number_of_choices',
+    label: 'تعداد گزینه',
+    field: 'number_of_choices',
+    align: 'center' as const
+  },
+  {
     name: 'correct_option',
     label: 'گزینه صحیح',
     field: 'correct_option',

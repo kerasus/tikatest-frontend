@@ -17,7 +17,7 @@
       <div class="col-12 col-md-4">
         <q-input
           v-model.number="choiceCount"
-          label="تعداد گزینه"
+          label="تعداد گزینه (پیش‌فرض)"
           outlined
           dense
           type="number"
@@ -42,6 +42,23 @@
           :props="cellProps">
           <div class="text-center">
             {{ cellProps.row.question_number }}
+          </div>
+        </q-td>
+        <q-td
+          v-else-if="cellProps.col.name === 'number_of_choices'"
+          :props="cellProps">
+          <div class="text-center">
+            <q-input
+              v-if="!readonly"
+              v-model.number="cellProps.row.number_of_choices"
+              type="number"
+              min="2"
+              max="10"
+              dense
+              outlined
+              style="max-width: 80px"
+              @update:model-value="onChangeCorrectOption(cellProps.row)" />
+            <span v-else>{{ cellProps.row.number_of_choices ?? 4 }}</span>
           </div>
         </q-td>
         <q-td
@@ -72,10 +89,10 @@
               @update:model-value="onChangeCorrectOption(cellProps.row)" />
             <q-chip
               v-else
-              :color="cellProps.row.has_negative_mark ? 'warning' : 'info'"
+              :color="cellProps.row.has_negative_mark ? 'warning' : 'positive'"
               text-color="white"
               dense>
-              {{ cellProps.row.has_negative_mark ? 'ندارد' : 'دارد' }}
+              {{ cellProps.row.has_negative_mark ? 'دارد' : 'ندارد' }}
             </q-chip>
           </div>
         </q-td>
@@ -84,7 +101,9 @@
           :props="cellProps"
           :class="{ 'cursor-default': readonly, 'cursor-pointer': !readonly }"
           @click="!readonly && toggleCorrectOption(cellProps.row, cellProps.col.name)">
-          <div class="text-center">
+          <div
+            v-if="Number(cellProps.col.name) <= (cellProps.row.number_of_choices || choiceCount)"
+            class="text-center">
             <q-radio
               v-if="!readonly"
               v-model="cellProps.row.correct_option"
@@ -146,10 +165,12 @@ watch(
       if (newVal.length > 0) {
         questionCount.value = newVal.length
         const firstKey = newVal[0]
-        if (firstKey && firstKey.correct_option) {
+        if (firstKey?.number_of_choices) {
+          // choiceCount.value = Number(firstKey.number_of_choices)
+        } else if (firstKey && firstKey.correct_option) {
           const optionNum = Number(firstKey.correct_option)
           if (optionNum >= 2 && optionNum <= maxOptions) {
-            choiceCount.value = optionNum
+            // choiceCount.value = optionNum
           }
         }
       }
@@ -162,6 +183,7 @@ watch(
 
 watch([questionCount, choiceCount], () => {
   if (isSyncingFromProps.value || props.readonly) return
+  answerKeys.value = []
   regenerateAnswerKeys()
 })
 
@@ -174,6 +196,14 @@ watch(
   { deep: true }
 )
 
+const effectiveChoiceCount = computed(() => {
+  const maxFromKeys = answerKeys.value.reduce((max, key) => {
+    const n = Number(key.number_of_choices) || 0
+    return n > max ? n : max
+  }, 0)
+  return Math.max(choiceCount.value, maxFromKeys, 2)
+})
+
 const tableColumns = computed(() => {
   const cols = [
     {
@@ -181,9 +211,15 @@ const tableColumns = computed(() => {
       label: 'شماره سوال',
       field: 'question_number',
       align: 'center' as const
+    },
+    {
+      name: 'number_of_choices',
+      label: 'تعداد گزینه',
+      field: 'number_of_choices',
+      align: 'center' as const
     }
   ]
-  for (let i = 0; i < choiceCount.value; i++) {
+  for (let i = 0; i < effectiveChoiceCount.value; i++) {
     cols.push({
       name: String(i + 1),
       label: optionLabels[i],
@@ -216,6 +252,7 @@ function regenerateAnswerKeys () {
     newKeys.push({
       question_number: i,
       correct_option: existingKey?.correct_option ?? '1',
+      number_of_choices: existingKey?.number_of_choices ?? choiceCount.value,
       weight: existingKey?.weight ?? 1,
       has_negative_mark: existingKey?.has_negative_mark ?? false,
       is_active: existingKey?.is_active ?? true

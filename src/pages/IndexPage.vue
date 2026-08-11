@@ -1,4 +1,4 @@
 <template>
-  تینا رز
+  تیکا تست
 </template>
 

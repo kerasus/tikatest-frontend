@@ -25,7 +25,9 @@
         :exam="examItem"
         :editable="true"
         :lesson-options="lessonOptions"
-        :category-options="categoryOptions" />
+        :category-options="categoryOptions"
+        :academic-level-options="academicLevelOptions"
+        :school-class-options="schoolClassOptions" />
 
       <div class="row q-mt-md">
         <div class="col-12">
@@ -96,18 +98,24 @@ import { exam, ExamType } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
+import SchoolClassAPI from 'src/repositories/schoolClass'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
 
-const route = useRoute()
 const router = useRouter()
+const route = useRoute()
 const $q = useQuasar()
 const lessonApi = new LessonAPI()
+const academicLevelApi = new AcademicLevelAPI()
+const schoolClassApi = new SchoolClassAPI()
 
 const loading = ref(true)
 const saving = ref(false)
 const examId = computed(() => parseInt(route.params.id as string))
 const lessonOptions = ref<any[]>([])
 const categoryOptions = ref<any[]>([])
+const academicLevelOptions = ref<any[]>([])
+const schoolClassOptions = ref<any[]>([])
 
 const isResultMode = computed(() => !!route.query.result_id)
 
@@ -137,6 +145,8 @@ onMounted(async () => {
 
       await loadLessons()
       await loadCategories()
+      await loadAcademicLevels()
+      await loadSchoolClasses()
     }
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری اطلاعات' })
@@ -160,6 +170,24 @@ async function loadCategories () {
     categoryOptions.value = response.data || []
   } catch (error: any) {
     console.error('Error loading categories:', error)
+  }
+}
+
+async function loadAcademicLevels () {
+  try {
+    const response = await academicLevelApi.index({ length: 100 })
+    academicLevelOptions.value = response.data || []
+  } catch (error: any) {
+    console.error('Error loading academic levels:', error)
+  }
+}
+
+async function loadSchoolClasses () {
+  try {
+    const response = await schoolClassApi.index({ length: 100 })
+    schoolClassOptions.value = response.data || []
+  } catch (error: any) {
+    console.error('Error loading school classes:', error)
   }
 }
 
