@@ -12,6 +12,21 @@ export type OnlineExamContentType = {
   file?: File;
 };
 
+export type BookletType = {
+  id: number | null;
+  online_exam_id: number | null;
+  lesson_id: number | null;
+  title: string | null;
+  from_question: number | null;
+  to_question: number | null;
+  booklet_scores: any[] | null;
+  created_by: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  lesson?: LessonType | null;
+};
+
 export type OnlineExamDetailType = {
   id: number | null;
   exam_id: number | null;
@@ -27,7 +42,7 @@ export type OnlineExamDetailType = {
   updated_at: string | null;
   deleted_at: string | null;
   sessions?: any[];
-  booklets?: any[];
+  booklets?: BookletType[];
   createdBy?: UserType | null;
 };
 

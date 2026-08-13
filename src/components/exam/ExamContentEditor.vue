@@ -1,6 +1,8 @@
 <template>
   <div class="exam-content-editor">
-    <div class="row q-col-gutter-sm">
+    <div
+      v-if="editable"
+      class="row q-col-gutter-sm">
       <div class="col-auto">
         <q-select
           v-model="currentType"
@@ -56,29 +58,50 @@
     <div
       v-if="currentItem"
       class="q-mt-sm">
-      <!--      <q-chip-->
-      <!--        :color="currentItem.type === 'image' ? 'info' : 'secondary'"-->
-      <!--        text-color="white"-->
-      <!--        dense-->
-      <!--        class="q-ml-sm">-->
-      <!--        {{ currentItem.type === 'image' ? 'تصویر' : 'متن' }}-->
-      <!--      </q-chip>-->
-      <span v-if="currentItem.type === 'image' && currentItem.file">
-        {{ currentItem.file.name }}
-      </span>
-      <span v-else-if="currentItem.type === 'image' && currentItem.path">
-        <img
-          :src="`storage/${currentItem.path}`"
+      <template v-if="currentItem.type === 'image'">
+        <q-img
+          :src="previewSrc"
           alt="پیش‌نمایش تصویر"
-          style="max-width: 100%; display: block; margin-top: 8px">
-      </span>
+          style="width: 120px; height: 80px; cursor: pointer; border-radius: 4px;"
+          @click="openPreview" />
+        <span class="q-ml-sm text-grey">
+          {{ currentItem.file ? currentItem.file.name : (currentItem.path || '') }}
+        </span>
+      </template>
       <span v-else-if="currentItem.type === 'text' && currentItem.body">
         {{ currentItem.body.substring(0, 100) }}{{ currentItem.body.length > 100 ? '...' : '' }}
       </span>
     </div>
     <div
       v-else
-      class="text-center q-pa-md text-grey">محتوایی ثبت نشده است.</div>
+      class="text-center q-pa-md text-grey">
+      محتوایی ثبت نشده است.
+    </div>
+
+    <q-dialog v-model="previewDialog">
+      <q-card style="max-width: 90vw; max-height: 90vh;">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="col">
+            <div class="text-subtitle2">پیش‌نمایش تصویر</div>
+          </div>
+          <div class="col-auto">
+            <q-btn
+              v-close-popup
+              flat
+              round
+              dense
+              icon="close"
+              color="grey" />
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <img
+            :src="previewSrc"
+            alt="پیش‌نمایش تصویر"
+            style="width: 100%; height: auto; display: block;">
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -92,6 +115,10 @@ const modelValue = defineModel<{
   file?: File;
 } | null>('value')
 
+defineProps<{
+  editable?: boolean
+}>()
+
 const typeOptions = [
   { label: 'تصویر', value: 'image' },
   { label: 'متن', value: 'text' }
@@ -101,33 +128,9 @@ const currentType = ref<'text' | 'image'>(modelValue.value?.type || 'text')
 const currentBody = ref(modelValue.value?.body || '')
 const currentFile = ref<File | null>(null)
 const imageFileInput = ref<HTMLInputElement | null>(null)
-
-watch(modelValue, (newVal) => {
-  if (newVal) {
-    currentType.value = newVal.type
-    if (newVal.type === 'text') {
-      currentBody.value = newVal.body || ''
-    } else {
-      currentFile.value = null
-    }
-  } else {
-    currentType.value = 'text'
-    currentBody.value = ''
-    currentFile.value = null
-  }
-})
-
-const canSave = computed(() => {
-  if (!currentType.value) return false
-  if (currentType.value === 'image') {
-    return !!currentFile.value || !!modelValue.value?.path
-  }
-  return !!currentBody.value.trim()
-})
+const previewDialog = ref(false)
 
 const currentItem = computed(() => {
-  if (!canSave.value) return null
-
   const item: { type: 'text' | 'image'; body?: string; path?: string; file?: File } = {
     type: currentType.value
   }
@@ -142,8 +145,27 @@ const currentItem = computed(() => {
   return item
 })
 
-watch(currentItem, (newVal) => {
-  modelValue.value = newVal
+const canSave = computed(() => {
+  if (!currentType.value) return false
+  if (currentType.value === 'image') {
+    return !!currentFile.value || !!modelValue.value?.path
+  }
+  return !!currentBody.value.trim()
+})
+
+const previewSrc = computed(() => {
+  const item = currentItem.value
+  if (!item || item.type !== 'image') return ''
+
+  if (item.file) {
+    return URL.createObjectURL(item.file)
+  }
+
+  if (item.path) {
+    return `storage/${item.path}`
+  }
+
+  return ''
 })
 
 function openFilePicker () {
@@ -154,7 +176,52 @@ function onFileChange (event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
     currentFile.value = target.files[0]
+    emitChange()
   }
+}
+
+function openPreview () {
+  if (previewSrc.value) {
+    previewDialog.value = true
+  }
+}
+
+watch(currentBody, (newVal) => {
+  if (currentType.value === 'text' && newVal) {
+    emitChange()
+  }
+})
+
+watch(modelValue, (newVal) => {
+  if (newVal) {
+    currentType.value = newVal.type
+    if (newVal.type === 'text') {
+      currentBody.value = newVal.body || ''
+    } else {
+      currentFile.value = newVal.file || null
+    }
+  } else {
+    currentType.value = 'text'
+    currentBody.value = ''
+    currentFile.value = null
+  }
+})
+
+function emitChange () {
+  if (!canSave.value) return
+
+  const item: { type: 'text' | 'image'; body?: string; path?: string; file?: File } = {
+    type: currentType.value
+  }
+
+  if (currentType.value === 'image') {
+    item.file = currentFile.value || undefined
+    item.path = modelValue.value?.path || undefined
+  } else {
+    item.body = currentBody.value.trim()
+  }
+
+  modelValue.value = item
 }
 </script>
 

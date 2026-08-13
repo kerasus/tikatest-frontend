@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import AcademicLevelAPI, { type AcademicLevelType } from 'src/repositories/academicLevel'
 
 defineOptions({
@@ -184,6 +184,10 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getAcademicLevels(value || null)
   })
 }
+
+onMounted(async () => {
+  filteredOptions.value = await getAcademicLevels(null)
+})
 </script>
 
 <style scoped></style>

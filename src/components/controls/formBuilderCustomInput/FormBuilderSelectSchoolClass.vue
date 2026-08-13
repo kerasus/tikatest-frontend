@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import SchoolClassAPI, { type SchoolClassType } from 'src/repositories/schoolClass'
 import { getUserRoleLabel } from 'src/repositories/user'
 
@@ -194,6 +194,10 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getSchoolClasses(value || null)
   })
 }
+
+onMounted(async () => {
+  filteredOptions.value = await getSchoolClasses(null)
+})
 </script>
 
 <style scoped></style>

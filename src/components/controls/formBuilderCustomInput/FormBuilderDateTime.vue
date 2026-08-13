@@ -195,6 +195,8 @@ const props = defineProps({
   },
   mask: {
     type: String,
+    // 1405/05/31 10:30:00
+    // ####/##/## ##:##:##
     default: '####/##/## ##:##:##'
   },
   label: {
@@ -380,20 +382,32 @@ function updateDateTime (newValue: string, type: 'date' | 'time') {
   const finalTime = newValue && type === 'time' ? newValue : defaultTime
   const inputData = value.value ? value.value.replace('T', ' ') : `${finalDate} ${finalTime}`
   const arrValue = inputData.trim().split(' ')
-  const timeValue = arrValue[1]
+  let timeValue = arrValue[1]
   displayDate.value =
     props.calendar === 'persian' ? dateManager.miladiToShamsi(arrValue[0]) : arrValue[0]
 
   if (type === 'date') {
     arrValue[0] = newValue.toString()
+    if (timeValue) {
+      const parsedTime = dateManager.parseTime(timeValue)
+      if (parsedTime) {
+        const cleanTime = `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
+        timeValue = cleanTime
+        arrValue[1] = cleanTime
+      }
+    }
   } else if (type === 'time') {
-    const parsedTime = dateManager.parseTime(timeValue)
+    const parsedTime = dateManager.parseTime(newValue || timeValue)
     if (parsedTime) {
       dateTime.hours = parsedTime.formattedHour
       dateTime.minutes = parsedTime.formattedMinute
       dateTime.seconds = parsedTime.formattedSecond
     }
-    arrValue[1] = newValue
+    const cleanTime = parsedTime
+      ? `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
+      : (newValue || timeValue)
+    timeValue = cleanTime
+    arrValue[1] = cleanTime
   }
 
   const delimiter = props.iso8601 ? 'T' : ' '
@@ -498,6 +512,7 @@ function onMenuTimeInputUpdate () {
   // ____/__/__ __:__:__
   const defaultDate = dateManager.now('jYYYY/jMM/jDD')
 
+  debugger
   if (!value.value) {
     displayDateTime.value = defaultDate + displayDateTime.value.slice(10, 19)
   }
@@ -536,7 +551,6 @@ watch(
     }
     const normalizedDateTime = dateManager.getDateTimeFromIso8601DateString(newValue)
     const newDate = normalizedDateTime.date.toString()
-
     const newTime = normalizedDateTime.time.toString()
     updateDateTime(newDate, 'date')
     updateDateTime(newTime, 'time')
@@ -552,5 +566,8 @@ watch(
   { immediate: true }
 )
 
-watch(displayDateTime, onChangeInputDateTime)
+watch(displayDateTime, (newVal) => {
+  if (!input.value) return
+  onChangeInputDateTime()
+})
 </script>

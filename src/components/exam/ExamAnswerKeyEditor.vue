@@ -254,7 +254,7 @@ function regenerateAnswerKeys () {
       correct_option: existingKey?.correct_option ?? '1',
       number_of_choices: existingKey?.number_of_choices ?? choiceCount.value,
       weight: existingKey?.weight ?? 1,
-      has_negative_mark: existingKey?.has_negative_mark ?? false,
+      has_negative_mark: existingKey?.has_negative_mark ?? true,
       is_active: existingKey?.is_active ?? true
     })
   }
