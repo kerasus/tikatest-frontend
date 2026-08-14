@@ -27,6 +27,27 @@ export type OnlineExamSessionType = {
   responses?: any[] | null
 }
 
+export type StudentAnswerKeyType = {
+  id: number | null
+  exam_id: number | null
+  question_number: number | null
+  number_of_choices: number | null
+  correct_option?: string | null
+  submitted_option?: string | null
+  weight: string | number | null
+  has_negative_mark: boolean | null
+  is_active: boolean | null
+}
+
+export type StartExamResponseType = {
+  session: OnlineExamSessionType
+  remaining_time: number | null
+  online_detail: any | null
+  answer_keys: StudentAnswerKeyType[] | null
+  error?: string | null
+  status?: number | null
+}
+
 export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType> {
   constructor () {
     super('/online-exam-sessions')
@@ -50,7 +71,7 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
     }
   }
 
-  async start (examId: number, attemptNumber: number = 1): Promise<any> {
+  async start (examId: number, attemptNumber: number = 1): Promise<StartExamResponseType> {
     const response = await this.getAxiosInstanceWithToken().post(
       `${this.baseEndpoint}/${examId}/start`,
       { attempt_number: attemptNumber }
@@ -75,6 +96,21 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
   async getSession (sessionId: number): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().get(
       `${this.baseEndpoint}/${sessionId}/view`
+    )
+    return response.data
+  }
+
+  async show (sessionId: number): Promise<StartExamResponseType> {
+    const response = await this.getAxiosInstanceWithToken().get(
+      `${this.baseEndpoint}/${sessionId}`
+    )
+    return response.data
+  }
+
+  async getResultByExamId (examId: number, params?: { attempt_number?: number }): Promise<StartExamResponseType> {
+    const response = await this.getAxiosInstanceWithToken().get(
+      `${this.baseEndpoint}/${examId}/result`,
+      { params }
     )
     return response.data
   }

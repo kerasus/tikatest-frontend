@@ -120,6 +120,8 @@ async function redirectAfterLogin () {
     defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'molding' } }
   } else if (userManager.isAssembler) {
     defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'assembler' } }
+  } else if (userManager.isStudent) {
+    defaultRoute = { name: 'Student.Exam.List', params: {} }
   }
 
   const redirectLocation = appConfigManager.redirectAfterLogin || defaultRoute

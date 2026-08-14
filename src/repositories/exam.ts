@@ -1,9 +1,10 @@
-import BaseAPI from './BaseAPI'
+import BaseAPI, { ListType } from './BaseAPI'
 import { UserType } from 'src/repositories/user'
 import { ExamCategoryType } from 'src/repositories/examCategory'
 import { SchoolClassType } from 'src/repositories/schoolClass'
 import { AcademicLevelType } from 'src/repositories/academicLevel'
 import { LessonType } from 'src/repositories/lesson'
+import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
 export type OnlineExamContentType = {
   type: 'text' | 'image';
@@ -93,7 +94,12 @@ export type ExamType = {
   academic_levels?: AcademicLevelType[];
   in_person_exam_results?: InPersonExamResultType[];
   grades?: any[];
+  online_exam_sessions?: OnlineExamSessionType[];
+  latest_session?: OnlineExamSessionType | null;
+  session_status?: OnlineExamSessionType['status'];
 };
+
+export type StudentOnlineExamListType = ListType<ExamType>;
 
 export default class ExamAPI extends BaseAPI<ExamType> {
   constructor () {
@@ -114,8 +120,14 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     this.endpoints = {
       ...this.endpoints,
       storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results',
-      storeWithOnlineDetail: '/exams/store-with-online-detail'
+      storeWithOnlineDetail: '/exams/store-with-online-detail',
+      studentOnlineExams: '/student-portal/online-exams'
     }
+  }
+
+  async studentOnlineExams (params?: { length?: number; page?: number }): Promise<StudentOnlineExamListType> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentOnlineExams!, { params })
+    return response.data
   }
 
   async storeWithOnlineDetail (data: any): Promise<any> {

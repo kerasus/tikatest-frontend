@@ -71,7 +71,12 @@ const topLinks = ref<ListItemType[]>([
     forRoles: ['Student'],
     route: { name: 'Student.Dashboard' }
   },
-  { icon: 'school', title: 'لیست مدارس', route: { name: 'Panel.School.List' } },
+  {
+    icon: 'school',
+    title: 'لیست مدارس',
+    forRoles: ['Admin'],
+    route: { name: 'Panel.School.List' }
+  },
   {
     icon: 'grading',
     title: 'نمرات',

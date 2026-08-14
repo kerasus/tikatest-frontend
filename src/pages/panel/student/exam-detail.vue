@@ -33,19 +33,19 @@
 
       <q-separator />
 
-      <q-card-section v-if="examData.onlineDetail">
+      <q-card-section v-if="examData.online_exam_detail">
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <div class="text-caption text-grey-6">زمان شروع</div>
-            <div>{{ formatDateTime(examData.onlineDetail.starts_at) }}</div>
+            <div>{{ formatDateTime(examData.online_exam_detail.starts_at) }}</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-caption text-grey-6">زمان پایان</div>
-            <div>{{ formatDateTime(examData.onlineDetail.ends_at) }}</div>
+            <div>{{ formatDateTime(examData.online_exam_detail.ends_at) }}</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-caption text-grey-6">مدت زمان</div>
-            <div>{{ examData.onlineDetail.time_limit_minutes }} دقیقه</div>
+            <div>{{ examData.online_exam_detail.time_limit_minutes }} دقیقه</div>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-caption text-grey-6">حداکثر نمره</div>
@@ -104,8 +104,8 @@ const examData = ref<any>(null)
 const sessionAPI = new OnlineExamSessionAPI()
 
 const canStart = computed(() => {
-  if (!examData.value?.onlineDetail) return false
-  const detail = examData.value.onlineDetail
+  if (!examData.value?.online_exam_detail) return false
+  const detail = examData.value.online_exam_detail
   if (detail.visible_at && new Date(detail.visible_at) > new Date()) return false
   if (detail.starts_at && new Date(detail.starts_at) > new Date()) return false
   if (detail.ends_at && new Date(detail.ends_at) < new Date()) return false

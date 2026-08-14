@@ -91,15 +91,29 @@ export const index = [
     path: 'online-exams/:id/attempt',
     name: 'Student.Exam.Attempt',
     meta: {
-      pageCategory: 'شرکت در آزمون'
+      pageCategory: 'شرکت در آزمون',
+      layoutConfig: {
+        layoutHeaderType: 'onlineExam',
+        layoutLeftDrawerType: 'onlineExam',
+        layoutLeftDrawerWidth: 360,
+        layoutLeftDrawerBehavior: 'default',
+        layoutLeftDrawerOverlay: false
+      }
     },
-    component: () => import('src/pages/panel/exam/attempt.vue')
+    component: () => import('pages/panel/student/attempt.vue')
   },
   {
     path: 'online-exams/:id/result',
     name: 'Student.Exam.Result',
     meta: {
-      pageCategory: 'نتیجه آزمون'
+      pageCategory: 'نتیجه آزمون',
+      layoutConfig: {
+        layoutHeaderType: 'onlineExam',
+        layoutLeftDrawerType: 'onlineExam',
+        layoutLeftDrawerWidth: 360,
+        layoutLeftDrawerBehavior: 'default',
+        layoutLeftDrawerOverlay: false
+      }
     },
     component: () => import('src/pages/panel/student/exam-result.vue')
   },
