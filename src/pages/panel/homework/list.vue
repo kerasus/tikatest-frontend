@@ -68,7 +68,14 @@
                 dense
                 icon="visibility"
                 color="primary"
+                class="q-mr-xs"
                 :to="{ name: 'Panel.Homework.Show', params: { id: props.row.id } }" />
+              <q-btn
+                flat
+                dense
+                icon="edit"
+                color="secondary"
+                :to="{ name: 'Panel.Homework.Edit', params: { id: props.row.id } }" />
             </q-td>
           </template>
         </q-table>

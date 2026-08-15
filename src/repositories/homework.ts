@@ -1,59 +1,90 @@
 import BaseAPI from './BaseAPI'
 
 export type { ListType } from './BaseAPI'
+
+export type HomeworkAttachmentType = {
+  id: number | null;
+  homework_id: number | null;
+  content: {
+    type: 'text' | 'image' | 'pdf';
+    body?: string;
+    path?: string;
+    file?: File;
+  } | null;
+  sort_order: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 export type HomeworkType = {
-  id: number | null
-  school_id: number | null
-  lesson_id: number | null
-  class_id: number | null
-  title: string | null
-  description: string | null
-  attachment: string | null
-  attachment_2: string | null
-  due_date: string | null
-  created_by: number | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  owners?: HomeworkOwnerType[]
-  submissions?: HomeworkSubmissionType[]
+  id: number | null;
+  school_id: number | null;
+  lesson_id: number | null;
+  class_id: number | null;
+  title: string | null;
+  description: string | null;
+  due_date: string | null;
+  created_by: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  owners?: HomeworkOwnerType[];
+  submissions?: HomeworkSubmissionType[];
+  attachments?: HomeworkAttachmentType[];
+  academic_levels?: { id: number; name: string }[];
+  classes?: { id: number; name: string }[];
   lesson?: {
-    id: number | null
-    name: string | null
-  } | null
+    id: number | null;
+    name: string | null;
+  } | null;
   schoolClass?: {
-    id: number | null
-    name: string | null
-  } | null
+    id: number | null;
+    name: string | null;
+  } | null;
 }
 
 export type HomeworkOwnerType = {
-  id: number | null
-  homework_id: number | null
-  user_id: number | null
-  read_status: boolean | null
-  read_at: string | null
-  submission_file: string | null
-  submitted_at: string | null
-  created_at: string | null
-  updated_at: string | null
-  homework?: HomeworkType
+  id: number | null;
+  homework_id: number | null;
+  user_id: number | null;
+  read_status: boolean | null;
+  read_at: string | null;
+  submission_file: string | null;
+  submitted_at: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  student?: {
+    id: number | null;
+    full_name?: string;
+  } | null;
 }
 
 export type HomeworkSubmissionType = {
-  id: number | null
-  school_id: number | null
-  homework_id: number | null
-  student_id: number | null
-  submission_text: string | null
-  submission_file: string | null
-  submitted_at: string | null
-  grade: number | null
-  feedback: string | null
-  graded_by: number | null
-  graded_at: string | null
-  created_at: string | null
-  updated_at: string | null
+  id: number | null;
+  school_id: number | null;
+  homework_id: number | null;
+  student_id: number | null;
+  submission_text: string | null;
+  submission_file: string | null;
+  submitted_at: string | null;
+  student_seen_at: string | null;
+  operator_seen_at: string | null;
+  grade: number | null;
+  feedback: string | null;
+  graded_by: number | null;
+  graded_at: string | null;
+  content: {
+    type: 'text' | 'image' | 'pdf';
+    body?: string;
+    path?: string;
+    file?: File;
+  } | null;
+  created_at: string | null;
+  updated_at: string | null;
+  student?: {
+    id: number | null;
+    full_name?: string;
+  } | null;
 }
 
 export default class HomeworkAPI extends BaseAPI<HomeworkType> {
@@ -66,8 +97,6 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
       class_id: null,
       title: null,
       description: null,
-      attachment: null,
-      attachment_2: null,
       due_date: null,
       created_by: null,
       created_at: null,
@@ -86,8 +115,20 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     return response.data
   }
 
-  async submitHomework (homeworkId: number, data: { submission_file?: string }) {
+  async submitHomework (homeworkId: number, data: { submission_file?: string; content?: any }) {
     const response = await this.getAxiosInstanceWithToken().post(`${this.endpoints.base}/${homeworkId}/submit`, data)
+    return response.data
+  }
+
+  async storeAttachment (homeworkId: number, data: FormData) {
+    const response = await this.getAxiosInstanceWithToken().post(`${this.endpoints.base}/${homeworkId}/attachments`, data)
+    return response.data
+  }
+
+  async destroyAttachment (homeworkId: number, attachmentId: number) {
+    const response = await this.getAxiosInstanceWithToken().delete(
+      `${this.endpoints.base}/${homeworkId}/attachments/${attachmentId}`
+    )
     return response.data
   }
 

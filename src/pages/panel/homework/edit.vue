@@ -2,17 +2,25 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h4 class="q-ma-none">ایجاد تکلیف جدید</h4>
+        <h4 class="q-ma-none">ویرایش تکلیف</h4>
       </div>
       <div class="col-auto">
         <q-btn
           flat
           label="انصراف"
-          :to="{ name: 'Panel.Homework.List' }" />
+          :to="{ name: 'Panel.Homework.Show', params: { id: routeId } }" />
       </div>
     </div>
 
-    <q-form @submit.prevent="onSubmit">
+    <div
+      v-if="loading"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="100px" />
+    </div>
+
+    <q-form v-else @submit.prevent="onSubmit">
       <div class="row q-col-gutter-md">
         <div class="col-12">
           <q-input
@@ -97,18 +105,31 @@
           <div class="text-subtitle2 q-mb-sm">پیوست‌ها (فایل‌های اضافی)</div>
           <div
             v-for="(att, index) in attachmentList"
-            :key="index"
+            :key="att.id || `new-${index}`"
             class="row q-col-gutter-sm items-center q-mb-sm">
             <div class="col">
               <exam-content-editor
                 v-model:value="att.content"
                 :editable="true" />
             </div>
-            <div class="col-auto">
+            <div
+              v-if="att.id"
+              class="col-auto">
               <q-btn
                 flat
                 dense
-                color="negative"
+                color="error"
+                icon="delete"
+                label="حذف"
+                @click="removeAttachment(index)" />
+            </div>
+            <div
+              v-else
+              class="col-auto">
+              <q-btn
+                flat
+                dense
+                color="primary"
                 icon="delete"
                 label="حذف"
                 @click="removeAttachment(index)" />
@@ -128,12 +149,12 @@
         <q-btn
           type="submit"
           color="primary"
-          label="ایجاد تکلیف"
+          label="ذخیره تغییرات"
           :loading="saving" />
         <q-btn
           flat
           label="انصراف"
-          :to="{ name: 'Panel.Homework.List' }"
+          :to="{ name: 'Panel.Homework.Show', params: { id: routeId } }"
           class="q-ml-sm" />
       </div>
     </q-form>
@@ -141,24 +162,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import LessonAPI from 'src/repositories/lesson'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import ExamContentEditor from 'src/components/exam/ExamContentEditor.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import type { HomeworkType } from 'src/repositories/homework'
 
 const homeworkApi = new HomeworkAPI()
 const lessonApi = new LessonAPI()
-const academicLevelApi = new AcademicLevelAPI()
 const schoolClassApi = new SchoolClassAPI()
 
+const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
+
+const routeId = computed(() => Number(route.params.id))
+
+const homeworkData = ref<Partial<HomeworkType>>({})
+const loading = ref(true)
+const saving = ref(false)
 
 const form = reactive({
   title: null as string | null,
@@ -177,10 +204,10 @@ const contentItem = ref<{
   file?: File;
 } | null>(null)
 
-const attachmentList = ref<{ content: any }[]>([])
+const attachmentList = ref<{ id?: number; content: any }[]>([])
 
 const lessonOptions = ref<any[]>([])
-const saving = ref(false)
+const classOptions = ref<any[]>([])
 
 async function loadLessons () {
   try {
@@ -188,6 +215,51 @@ async function loadLessons () {
     lessonOptions.value = result.data
   } catch (error: any) {
     console.error('Error loading lessons:', error)
+  }
+}
+
+async function loadClasses () {
+  try {
+    const result = await schoolClassApi.index({ length: 100 })
+    classOptions.value = result.data
+  } catch (error: any) {
+    console.error('Error loading classes:', error)
+  }
+}
+
+async function loadHomework () {
+  loading.value = true
+  try {
+    homeworkData.value = await homeworkApi.get(routeId.value)
+
+    form.title = homeworkData.value.title
+    form.description = homeworkData.value.description
+    form.lesson_id = homeworkData.value.lesson_id
+    form.class_id = homeworkData.value.class_id
+    form.due_date = homeworkData.value.due_date
+
+    if (homeworkData.value.attachments) {
+      attachmentList.value = homeworkData.value.attachments.map((att: any) => ({
+        id: att.id,
+        content: att.content ? { ...att.content } : null
+      }))
+    }
+
+    if (homeworkData.value.academic_levels) {
+      form.academic_level_ids = homeworkData.value.academic_levels.map((l: any) => l.id)
+    }
+
+    if (homeworkData.value.classes) {
+      form.class_ids = homeworkData.value.classes.map((c: any) => c.id)
+    }
+  } catch (error: any) {
+    $q.notify({
+      icon: 'error',
+      message: 'خطا در بارگذاری اطلاعات تکلیف.',
+      color: 'negative'
+    })
+  } finally {
+    loading.value = false
   }
 }
 
@@ -237,18 +309,18 @@ async function onSubmit () {
       fd.append('attachments', JSON.stringify(attachmentsPayload))
     }
 
-    await homeworkApi.create(fd)
+    await homeworkApi.update(routeId.value, fd)
 
     $q.notify({
       icon: 'check',
-      message: 'تکلیف با موفقیت ایجاد شد.',
+      message: 'تکلیف با موفقیت به‌روز شد.',
       color: 'positive'
     })
-    router.push({ name: 'Panel.Homework.List' })
+    router.push({ name: 'Panel.Homework.Show', params: { id: routeId.value } })
   } catch (error: any) {
     $q.notify({
       icon: 'error',
-      message: 'خطا در ایجاد تکلیف.',
+      message: 'خطا در به‌روزرسانی تکلیف.',
       color: 'negative'
     })
   } finally {
@@ -266,12 +338,10 @@ function removeAttachment (index: number) {
 
 onMounted(() => {
   loadLessons()
+  loadClasses()
+  loadHomework()
 })
 </script>
 
 <style lang="scss" scoped>
-.homework-form-page {
-  max-width: 800px;
-  margin: 0 auto;
-}
 </style>
