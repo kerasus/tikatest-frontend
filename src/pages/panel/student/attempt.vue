@@ -39,6 +39,12 @@
                 alt="تصویر آزمون"
                 style="max-width: 100%; display: block" />
             </template>
+            <template v-else-if="examContent.type === 'pdf'">
+              <iframe
+                v-if="examContent.path"
+                :src="`storage/${examContent.path}`"
+                style="width: 100%; height: 600px; border: none;" />
+            </template>
           </div>
           <div
             v-else

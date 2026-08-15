@@ -69,6 +69,12 @@
                 alt="تصویر آزمون"
                 style="max-width: 100%; display: block" />
             </template>
+            <template v-else-if="examContent.type === 'pdf'">
+              <iframe
+                v-if="examContent.path"
+                :src="`storage/${examContent.path}`"
+                style="width: 100%; height: 600px; border: none;" />
+            </template>
           </div>
           <div
             v-else
@@ -91,6 +97,12 @@
                 :src="solutionContent.path ? `storage/${solutionContent.path}` : ''"
                 alt="پاسخنامه آزمون"
                 style="max-width: 100%; display: block" />
+            </template>
+            <template v-else-if="solutionContent.type === 'pdf'">
+              <iframe
+                v-if="solutionContent.path"
+                :src="`storage/${solutionContent.path}`"
+                style="width: 100%; height: 600px; border: none;" />
             </template>
           </div>
           <div
@@ -209,7 +221,9 @@ onUnmounted(() => {
     position: sticky;
     z-index: 100;
     background: #fff;
-    border-radius: inherit inherit 0 0;
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   }
 

@@ -512,7 +512,6 @@ function onMenuTimeInputUpdate () {
   // ____/__/__ __:__:__
   const defaultDate = dateManager.now('jYYYY/jMM/jDD')
 
-  debugger
   if (!value.value) {
     displayDateTime.value = defaultDate + displayDateTime.value.slice(10, 19)
   }

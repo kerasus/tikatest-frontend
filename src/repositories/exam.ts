@@ -7,7 +7,7 @@ import { LessonType } from 'src/repositories/lesson'
 import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
 export type OnlineExamContentType = {
-  type: 'text' | 'image';
+  type: 'text' | 'image' | 'pdf';
   body?: string;
   path?: string;
   file?: File;
