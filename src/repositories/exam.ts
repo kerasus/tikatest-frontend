@@ -6,12 +6,14 @@ import { AcademicLevelType } from 'src/repositories/academicLevel'
 import { LessonType } from 'src/repositories/lesson'
 import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
-export type OnlineExamContentType = {
+export interface ContentType {
   type: 'text' | 'image' | 'pdf';
   body?: string;
   path?: string;
   file?: File;
-};
+}
+
+export interface OnlineExamContentType extends ContentType {}
 
 export type BookletType = {
   id: number | null;

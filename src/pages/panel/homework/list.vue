@@ -1,201 +1,150 @@
 <template>
-  <div class="homework-list-page">
-    <q-card>
-      <q-card-section>
-        <div class="row q-col-gutter-md items-end">
-          <div class="col-12 col-md-3">
-            <q-input
-              v-model="filters.search"
-              label="جستجو در عنوان تکلیف"
-              outlined
-              dense
-              clearable
-              @update:model-value="loadHomework" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.lesson_id"
-              :options="lessonOptions"
-              option-value="id"
-              option-label="name"
-              label="درس"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              @update:model-value="loadHomework" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="filters.class_id"
-              :options="classOptions"
-              option-value="id"
-              option-label="name"
-              label="کلاس"
-              outlined
-              dense
-              clearable
-              emit-value
-              map-options
-              @update:model-value="loadHomework" />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-btn
-              color="primary"
-              icon="add"
-              label="ایجاد تکلیف"
-              :to="{ name: 'Panel.Homework.Create' }"
-              class="full-width" />
-          </div>
+  <entity-index
+    ref="entityIndexRef"
+    :value="inputs"
+    :title="label"
+    :api="api"
+    :table="table"
+    :table-keys="tableKeys"
+    :create-route-name="createRouteName"
+    :show-route-name="showRouteName"
+    :show-close-button="false"
+    :show-expand-button="false"
+    :show-reload-button="false"
+    :show-search-button="true"
+    :row-key="itemIdentifyKey">
+    <template #entity-index-table-cell="{ inputData }">
+      <template v-if="inputData.col.name === 'schoolClass'">
+        {{ inputData.props.row.schoolClass?.name || '-' }}
+      </template>
+      <template v-else-if="inputData.col.name === 'due_date'">
+        {{ formatDate(inputData.props.row.due_date) }}
+      </template>
+      <template v-else-if="inputData.col.name === 'actions'">
+        <div class="action-column-entity-index">
+          <q-btn
+            color="primary"
+            flat
+            icon="visibility"
+            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
+          <q-btn
+            color="secondary"
+            flat
+            icon="edit"
+            :to="{ name: 'Panel.Homework.Edit', params: { id: inputData.props.row.id } }" />
+          <delete-btn
+            :row="inputData.props.row"
+            :api="homeworkApi"
+            :use-flag="false"
+            @change="afterRemove" />
         </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section>
-        <q-table
-          :rows="homework"
-          :columns="columns"
-          row-key="id"
-          :loading="loading"
-          :pagination="pagination"
-          @request="onRequest">
-          <template #body-cell-actions="props">
-            <q-td :props="props">
-              <q-btn
-                flat
-                dense
-                icon="visibility"
-                color="primary"
-                class="q-mr-xs"
-                :to="{ name: 'Panel.Homework.Show', params: { id: props.row.id } }" />
-              <q-btn
-                flat
-                dense
-                icon="edit"
-                color="secondary"
-                :to="{ name: 'Panel.Homework.Edit', params: { id: props.row.id } }" />
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-  </div>
+      </template>
+      <template v-else>
+        {{ inputData.col.value }}
+      </template>
+    </template>
+  </entity-index>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
-import HomeworkAPI from 'src/repositories/homework'
-import LessonAPI from 'src/repositories/lesson'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import AcademicFieldAPI from 'src/repositories/academicField'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
-import type { ListType, HomeworkType } from 'src/repositories/homework'
-
-const homeworkApi = new HomeworkAPI()
-const lessonApi = new LessonAPI()
-const schoolClassApi = new SchoolClassAPI()
-const academicFieldApi = new AcademicFieldAPI()
-const academicLevelApi = new AcademicLevelAPI()
+import { EntityIndex } from 'quasar-crud'
+import { homework, HomeworkType } from 'src/repositories/homework'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()
+const dateManager = useDate()
 
-const homework = ref<HomeworkType[]>([])
-const lessonOptions = ref<any[]>([])
-const classOptions = ref<any[]>([])
-const fieldOptions = ref<any[]>([])
-const levelOptions = ref<any[]>([])
-const loading = ref(false)
+const homeworkApi = homework
 
-const filters = reactive({
-  search: '',
-  lesson_id: null,
-  class_id: null,
-  field_id: null,
-  academic_level_id: null,
-  length: 10,
-  page: 1
+const api = ref(homework.endpoints.base)
+const label = ref('تکالیف')
+const createRouteName = ref('Panel.Homework.Create')
+const showRouteName = ref('Panel.Homework.Show')
+const itemIdentifyKey = ref('id')
+const tableKeys = ref({
+  data: 'data',
+  total: 'total',
+  currentPage: 'current_page',
+  perPage: 'per_page',
+  pageKey: 'page'
 })
 
-const pagination = ref({
-  sortBy: 'id',
-  descending: true,
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 0
-})
-
-const columns = [
-  { name: 'title', label: 'عنوان', align: 'right' as const, field: 'title', sortable: true },
-  { name: 'lesson', label: 'درس', align: 'right' as const, field: 'lesson.name' },
-  { name: 'schoolClass', label: 'کلاس', align: 'right' as const, field: 'schoolClass.name' },
-  { name: 'due_date', label: 'موعد تحویل', align: 'center' as const, field: 'due_date' },
-  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }
-]
-
-async function loadHomework () {
-  loading.value = true
-  try {
-    const params: any = {
-      length: pagination.value.rowsPerPage,
-      page: pagination.value.page - 1
+const table = ref({
+  columns: [
+    {
+      name: 'title',
+      required: true,
+      label: 'عنوان تکلیف',
+      align: 'center' as const,
+      field: 'title',
+      sortable: true
+    },
+    { name: 'schoolClass', label: 'کلاس', align: 'center' as const, field: 'schoolClass' },
+    {
+      name: 'due_date',
+      label: 'موعد تحویل',
+      align: 'center' as const,
+      field: 'due_date',
+      sortable: true
+    },
+    {
+      name: 'actions',
+      required: true,
+      label: 'عملیات',
+      align: 'left',
+      field: () => ''
     }
-    if (filters.lesson_id) params.lesson_id = filters.lesson_id
-    if (filters.class_id) params.class_id = filters.class_id
-    if (filters.field_id) params.field_id = filters.field_id
-    if (filters.academic_level_id) params.academic_level_id = filters.academic_level_id
-    if (filters.search) params.title = filters.search
-
-    const result = await homeworkApi.index(params)
-    homework.value = result.data
-    pagination.value.rowsNumber = result.total
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در بارگذاری لیست تکالیف.',
-      color: 'negative'
-    })
-  } finally {
-    loading.value = false
-  }
-}
-
-async function loadLessons () {
-  const result = await lessonApi.index({ length: 100 })
-  lessonOptions.value = result.data
-}
-
-async function loadClasses () {
-  const result = await schoolClassApi.index({ length: 100 })
-  classOptions.value = result.data
-}
-
-async function loadFields () {
-  const result = await academicFieldApi.index({ length: 100 })
-  fieldOptions.value = result.data
-}
-
-async function loadLevels () {
-  const result = await academicLevelApi.index({ length: 100 })
-  levelOptions.value = result.data
-}
-
-function onRequest (props: any) {
-  pagination.value.page = props.pagination.page
-  pagination.value.rowsPerPage = props.pagination.rowsPerPage
-  loadHomework()
-}
-
-onMounted(() => {
-  loadLessons()
-  loadClasses()
-  loadFields()
-  loadLevels()
-  loadHomework()
+  ]
 })
+
+const inputs = ref([
+  {
+    type: 'hidden',
+    name: 'sortation_field',
+    value: 'created_at'
+  },
+  {
+    type: 'hidden',
+    name: 'sortation_order',
+    value: 'desc'
+  },
+  {
+    type: 'hidden',
+    name: 'length',
+    value: 10
+  },
+  {
+    type: 'input',
+    name: 'title',
+    label: 'عنوان تکلیف',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  }
+])
+
+const entityIndexRef = ref()
+
+const afterRemove = () => {
+  entityIndexRef.value.reload()
+  $q.notify({
+    message: 'حذف با موفقیت انجام شد.',
+    type: 'positive'
+  })
+}
+
+const formatDate = (value: string | null | undefined): string => {
+  if (!value) return '-'
+  return dateManager.miladiToShamsi(value, 'YYYY-MM-DD', 'jYYYY/jMM/jDD') || value
+}
 </script>
 
 <style lang="scss" scoped>
+.action-column-entity-index {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
 </style>

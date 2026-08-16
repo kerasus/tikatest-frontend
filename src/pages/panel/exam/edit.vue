@@ -20,9 +20,9 @@
         size="100px" />
     </div>
 
-    <template v-else-if="!isResultMode && examItem">
+    <template v-else-if="!isResultMode && form.delivery_mode">
       <exam-detail-card
-        :exam="examItem"
+        :exam="form"
         :editable="true"
         :lesson-options="lessonOptions"
         :category-options="categoryOptions"
@@ -101,6 +101,7 @@ import LessonAPI from 'src/repositories/lesson'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
+import { useExamForm } from 'src/composables/useExamForm'
 
 const router = useRouter()
 const route = useRoute()
@@ -119,7 +120,7 @@ const schoolClassOptions = ref<any[]>([])
 
 const isResultMode = computed(() => !!route.query.result_id)
 
-const examItem = ref<ExamType | null>(null)
+const { form, validate, buildFormData, loadFromExam } = useExamForm(true)
 
 const resultForm = reactive({
   raw_score: null as number | null,
@@ -141,7 +142,7 @@ onMounted(async () => {
       resultForm.z_score = result.z_score
     } else {
       const examData = await exam.get(examId.value)
-      examItem.value = examData
+      loadFromExam(examData)
 
       await loadLessons()
       await loadCategories()
@@ -192,89 +193,22 @@ async function loadSchoolClasses () {
 }
 
 async function onSubmitExam () {
-  if (!examItem.value) return
+  if (!validate()) {
+    return
+  }
 
   saving.value = true
   try {
-    if (examItem.value.delivery_mode === 'online' && examItem.value.online_exam_detail) {
-      const fd = new FormData()
+    const formData = buildFormData()
 
-      fd.append('name', examItem.value.name || '')
-      fd.append('description', examItem.value.description || '')
-      fd.append('lesson_id', String(examItem.value.lesson_id ?? ''))
-      fd.append('min_passing_score', String(examItem.value.min_passing_score ?? ''))
-      fd.append('max_score', String(examItem.value.max_score ?? ''))
-      fd.append('exam_category_id', String(examItem.value.exam_category_id ?? ''))
-      fd.append('delivery_mode', examItem.value.delivery_mode || 'online')
-      fd.append('starts_at', examItem.value.online_exam_detail.starts_at || '')
-      fd.append('ends_at', examItem.value.online_exam_detail.ends_at || '')
-      fd.append('time_limit_minutes', String(examItem.value.online_exam_detail.time_limit_minutes ?? ''))
-      fd.append('visible_at', examItem.value.online_exam_detail.visible_at || '')
-      fd.append('answers_visible_at', examItem.value.online_exam_detail.answers_visible_at || '')
-      fd.append('class_ids', JSON.stringify((examItem.value.classes || []).map((c: any) => c.id)))
-      fd.append('academic_level_ids', JSON.stringify((examItem.value.academic_levels || []).map((l: any) => l.id)))
-
-      const content = examItem.value.online_exam_detail.content
-      if (content) {
-        const contentMeta = { ...content }
-        delete contentMeta.file
-        fd.append('content', JSON.stringify(contentMeta))
-        if (content.file) {
-          fd.append('content_file', content.file)
-        }
-      }
-
-      const solution = examItem.value.online_exam_detail.solution
-      if (solution) {
-        const solutionMeta = { ...solution }
-        delete solutionMeta.file
-        fd.append('solution', JSON.stringify(solutionMeta))
-        if (solution.file) {
-          fd.append('solution_file', solution.file)
-        }
-      }
-
-      if (examItem.value.online_exam_detail.booklets?.length) {
-        fd.append('booklets', JSON.stringify(examItem.value.online_exam_detail.booklets))
-      }
-
-      if (examItem.value.answer_keys?.length) {
-        fd.append('answer_keys', JSON.stringify(examItem.value.answer_keys))
-      }
-
-      await exam.updateWithOnlineDetail(examId.value, fd)
-
-      $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
-      router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
+    if (form.delivery_mode === 'online') {
+      await exam.updateWithOnlineDetail(examId.value, formData)
     } else {
-      const payload: any = {
-        name: examItem.value.name,
-        description: examItem.value.description,
-        lesson_id: examItem.value.lesson_id,
-        min_passing_score: examItem.value.min_passing_score,
-        max_score: examItem.value.max_score,
-        exam_category_id: examItem.value.exam_category_id,
-        delivery_mode: examItem.value.delivery_mode
-      }
-
-      if (examItem.value.online_exam_detail) {
-        payload.starts_at = examItem.value.online_exam_detail.starts_at
-        payload.ends_at = examItem.value.online_exam_detail.ends_at
-        payload.time_limit_minutes = examItem.value.online_exam_detail.time_limit_minutes
-        payload.visible_at = examItem.value.online_exam_detail.visible_at
-        payload.answers_visible_at = examItem.value.online_exam_detail.answers_visible_at
-      }
-
-      if (examItem.value.in_person_exam_detail) {
-        payload.held_at = examItem.value.in_person_exam_detail.held_at
-        payload.is_descriptive = examItem.value.in_person_exam_detail.is_descriptive
-      }
-
-      await exam.update(examId.value, payload)
-
-      $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
-      router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
+      await exam.update(examId.value, formData)
     }
+
+    $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
+    router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی آزمون' })
   } finally {
@@ -296,3 +230,6 @@ async function onSubmitResult () {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+</style>

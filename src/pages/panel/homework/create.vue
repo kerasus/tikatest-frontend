@@ -13,116 +13,9 @@
     </div>
 
     <q-form @submit.prevent="onSubmit">
-      <div class="row q-col-gutter-md">
-        <div class="col-12">
-          <q-input
-            v-model="form.title"
-            label="عنوان تکلیف *"
-            outlined
-            required />
-        </div>
-
-        <div class="col-12 col-md-6">
-          <q-select
-            v-model="form.lesson_id"
-            :options="lessonOptions"
-            option-value="id"
-            option-label="name"
-            label="درس *"
-            outlined
-            emit-value
-            map-options
-            required />
-        </div>
-
-        <div class="col-12 col-md-6">
-          <q-select
-            v-model="form.class_id"
-            :options="classOptions"
-            option-value="id"
-            option-label="name"
-            label="کلاس (اختیاری)"
-            outlined
-            emit-value
-            map-options
-            clearable />
-        </div>
-
-        <div class="col-12">
-          <q-input
-            v-model="form.description"
-            label="توضیحات تکلیف"
-            outlined
-            type="textarea" />
-        </div>
-
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.due_date"
-            label="موعد تحویل"
-            outlined
-            type="date" />
-        </div>
-
-        <div class="col-12">
-          <form-builder-select-academic-level
-            v-model:value="form.academic_level_ids"
-            label="پایه‌ها"
-            outlined
-            clearable
-            multiple
-            use-chips />
-        </div>
-
-        <div class="col-12">
-          <form-builder-select-school-class
-            v-model:value="form.class_ids"
-            label="کلاس‌ها"
-            outlined
-            clearable
-            multiple
-            use-chips />
-        </div>
-      </div>
-
-      <div class="q-mt-md">
-        <div class="text-subtitle2 q-mb-sm">محتوای تکلیف</div>
-        <exam-content-editor
-          v-model:value="contentItem"
-          :editable="true" />
-      </div>
-
-      <div class="row q-col-gutter-md q-mt-md">
-        <div class="col-12">
-          <div class="text-subtitle2 q-mb-sm">پیوست‌ها (فایل‌های اضافی)</div>
-          <div
-            v-for="(att, index) in attachmentList"
-            :key="index"
-            class="row q-col-gutter-sm items-center q-mb-sm">
-            <div class="col">
-              <exam-content-editor
-                v-model:value="att.content"
-                :editable="true" />
-            </div>
-            <div class="col-auto">
-              <q-btn
-                flat
-                dense
-                color="negative"
-                icon="delete"
-                label="حذف"
-                @click="removeAttachment(index)" />
-            </div>
-          </div>
-          <q-btn
-            flat
-            dense
-            color="primary"
-            icon="add"
-            label="افزودن پیوست"
-            @click="addAttachment" />
-        </div>
-      </div>
+      <homework-detail-card
+        v-model:homework="form"
+        :editable="true" />
 
       <div class="q-mt-md">
         <q-btn
@@ -141,59 +34,58 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import HomeworkAPI from 'src/repositories/homework'
-import LessonAPI from 'src/repositories/lesson'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import ExamContentEditor from 'src/components/exam/ExamContentEditor.vue'
-import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import HomeworkAPI, {
+  type HomeworkAttachmentType,
+  type HomeworkType
+} from 'src/repositories/homework'
+import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
+import { useHomeworkValidation } from 'src/composables/useHomeworkValidation'
 
 const homeworkApi = new HomeworkAPI()
-const lessonApi = new LessonAPI()
-const academicLevelApi = new AcademicLevelAPI()
-const schoolClassApi = new SchoolClassAPI()
 
 const router = useRouter()
 const $q = useQuasar()
 
-const form = reactive({
-  title: null as string | null,
-  description: null as string | null,
-  lesson_id: null as number | null,
-  class_id: null as number | null,
-  due_date: null as string | null,
-  academic_level_ids: [] as number[],
-  class_ids: [] as number[],
+const { validate } = useHomeworkValidation()
+
+const form = reactive<HomeworkType>({
+  ...homeworkApi.defaultObject,
+  academic_level_ids: [],
+  class_ids: [],
+  attachments: []
 })
 
-const contentItem = ref<{
-  type: 'text' | 'image' | 'pdf';
-  body?: string;
-  path?: string;
-  file?: File;
-} | null>(null)
-
-const attachmentList = ref<{ content: any }[]>([])
-
-const lessonOptions = ref<any[]>([])
 const saving = ref(false)
 
-async function loadLessons () {
-  try {
-    const result = await lessonApi.index({ length: 100 })
-    lessonOptions.value = result.data
-  } catch (error: any) {
-    console.error('Error loading lessons:', error)
-  }
+function appendAttachments (formData: FormData, attachments: HomeworkAttachmentType[]) {
+  let payloadIndex = 0
+
+  attachments.forEach((attachment) => {
+    const content = attachment.content
+    if (!content) return
+
+    const key = `attachments[${payloadIndex}]`
+    formData.append(`${key}[type]`, content.type)
+
+    if (content.body) {
+      formData.append(`${key}[body]`, content.body)
+    }
+    if (content.path) {
+      formData.append(`${key}[path]`, content.path)
+    }
+    if (content.file) {
+      formData.append(`${key}[file]`, content.file)
+    }
+
+    payloadIndex += 1
+  })
 }
 
 async function onSubmit () {
-  if (!form.title || !form.lesson_id) {
-    $q.notify({ icon: 'warning', message: 'عنوان و درس الزامی هستند.', color: 'warning' })
+  if (!validate(form)) {
     return
   }
 
@@ -201,40 +93,22 @@ async function onSubmit () {
   try {
     const fd = new FormData()
 
-    fd.append('title', form.title || '')
+    fd.append('title', form.title?.trim() || '')
+    if (form.lesson_id !== null) fd.append('lesson_id', String(form.lesson_id))
     if (form.description) fd.append('description', form.description)
-    if (form.lesson_id) fd.append('lesson_id', String(form.lesson_id))
-    if (form.class_id) fd.append('class_id', String(form.class_id))
     if (form.due_date) fd.append('due_date', form.due_date)
+    if (form.created_by !== null) fd.append('created_by', String(form.created_by))
 
-    if (contentItem.value) {
-      const contentMeta = { ...contentItem.value }
-      delete contentMeta.file
-      fd.append('content', JSON.stringify(contentMeta))
-      if (contentItem.value.file) {
-        fd.append('content_file', contentItem.value.file)
-      }
-    }
-
-    if (form.academic_level_ids.length > 0) {
+    if (form.academic_level_ids?.length) {
       fd.append('academic_level_ids', JSON.stringify(form.academic_level_ids))
     }
 
-    if (form.class_ids.length > 0) {
+    if (form.class_ids?.length) {
       fd.append('class_ids', JSON.stringify(form.class_ids))
     }
 
-    if (attachmentList.value.length > 0) {
-      const attachmentsPayload: any[] = []
-      attachmentList.value.forEach((att, index) => {
-        const meta = { ...att.content }
-        delete meta.file
-        attachmentsPayload.push(meta)
-        if (att.content?.file) {
-          fd.append(`attachments.${index}.file`, att.content.file)
-        }
-      })
-      fd.append('attachments', JSON.stringify(attachmentsPayload))
+    if (form.attachments?.length) {
+      appendAttachments(fd, form.attachments)
     }
 
     await homeworkApi.create(fd)
@@ -255,18 +129,6 @@ async function onSubmit () {
     saving.value = false
   }
 }
-
-function addAttachment () {
-  attachmentList.value.push({ content: null })
-}
-
-function removeAttachment (index: number) {
-  attachmentList.value.splice(index, 1)
-}
-
-onMounted(() => {
-  loadLessons()
-})
 </script>
 
 <style lang="scss" scoped>

@@ -30,13 +30,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
+import { useExamForm } from 'src/composables/useExamForm'
 
 const router = useRouter()
 const $q = useQuasar()
@@ -46,41 +47,7 @@ const saving = ref(false)
 
 const categoryOptions = ref<any[]>([])
 const lessonOptions = ref<any[]>([])
-
-const form = reactive({
-  id: null as number | null,
-  name: null as string | null,
-  description: null as string | null,
-  lesson_id: null as number | null,
-  min_passing_score: null as number | null,
-  max_score: null as number | null,
-  delivery_mode: 'online' as 'online' | 'in_person',
-  exam_category_id: null as number | null,
-  created_by: null,
-  created_at: null as string | null,
-  updated_at: null as string | null,
-  online_exam_detail: {
-    id: null as number | null,
-    exam_id: null as number | null,
-    starts_at: null as string | null,
-    ends_at: null as string | null,
-    time_limit_minutes: null as number | null,
-    visible_at: null as string | null,
-    answers_visible_at: null as string | null,
-    content: null as { type: 'text' | 'image'; body?: string; path?: string; file?: File } | null,
-    solution: null as { type: 'text' | 'image'; body?: string; path?: string; file?: File } | null,
-    created_by: null as number | null,
-    created_at: null as string | null,
-    updated_at: null as string | null,
-    deleted_at: null as string | null,
-    booklets: [] as any[]
-  },
-  answer_keys: [] as any[],
-  class_ids: [] as number[],
-  academic_level_ids: [] as number[],
-  classes: [] as any[],
-  academic_levels: [] as any[]
-})
+const { form, validate, buildFormData, resetForm } = useExamForm()
 
 const loadCategories = async () => {
   try {
@@ -100,60 +67,8 @@ const loadLessons = async () => {
   }
 }
 
-function buildFormData (): FormData {
-  const fd = new FormData()
-
-  fd.append('name', form.name || '')
-  fd.append('description', form.description || '')
-  fd.append('lesson_id', String(form.lesson_id ?? ''))
-  fd.append('min_passing_score', String(form.min_passing_score ?? ''))
-  fd.append('max_score', String(form.max_score ?? ''))
-  fd.append('exam_category_id', String(form.exam_category_id ?? ''))
-  fd.append('starts_at', form.online_exam_detail?.starts_at || '')
-  fd.append('ends_at', form.online_exam_detail?.ends_at || '')
-  fd.append('time_limit_minutes', String(form.online_exam_detail?.time_limit_minutes ?? ''))
-  fd.append('visible_at', form.online_exam_detail?.visible_at || '')
-  fd.append('answers_visible_at', form.online_exam_detail?.answers_visible_at || '')
-  fd.append('class_ids', JSON.stringify(form.class_ids || []))
-  fd.append('academic_level_ids', JSON.stringify(form.academic_level_ids || []))
-
-  if (form.online_exam_detail?.content) {
-    const contentMeta = { ...form.online_exam_detail.content }
-    delete contentMeta.file
-    fd.append('content', JSON.stringify(contentMeta))
-    if (form.online_exam_detail.content.file) {
-      fd.append('content_file', form.online_exam_detail.content.file)
-    }
-  }
-
-  if (form.online_exam_detail?.solution) {
-    const solutionMeta = { ...form.online_exam_detail.solution }
-    delete solutionMeta.file
-    fd.append('solution', JSON.stringify(solutionMeta))
-    if (form.online_exam_detail.solution.file) {
-      fd.append('solution_file', form.online_exam_detail.solution.file)
-    }
-  }
-
-  if (form.online_exam_detail?.booklets?.length) {
-    fd.append('booklets', JSON.stringify(form.online_exam_detail.booklets))
-  }
-
-  if (form.answer_keys?.length) {
-    fd.append('answer_keys', JSON.stringify(form.answer_keys))
-  }
-
-  return fd
-}
-
 const onSubmit = async () => {
-  const content = form.online_exam_detail?.content
-  if (!content || (typeof content === 'object' && !content.body && !content.file)) {
-    $q.notify({
-      icon: 'error',
-      message: 'محتوای آزمون الزامی است.',
-      color: 'negative'
-    })
+  if (!validate()) {
     return
   }
 
@@ -168,6 +83,7 @@ const onSubmit = async () => {
       message: 'آزمون با موفقیت ثبت شد.',
       color: 'positive'
     })
+    resetForm()
     router.push({ name: 'Panel.Exam.List' })
   } catch (error: any) {
     const message = error?.response?.data?.message || 'خطا در ثبت آزمون.'

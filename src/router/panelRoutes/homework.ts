@@ -15,20 +15,20 @@ export const index = [
     },
     component: () => import('src/pages/panel/homework/create.vue')
   },
-   {
-     path: 'homework/:id',
-     name: 'Panel.Homework.Show',
-     meta: {
-       pageCategory: 'تکلیف'
-     },
-     component: () => import('src/pages/panel/homework/show.vue')
-   },
-   {
-     path: 'homework/:id/edit',
-     name: 'Panel.Homework.Edit',
-     meta: {
-       pageCategory: 'تکلیف'
-     },
-     component: () => import('src/pages/panel/homework/edit.vue')
-   }
+  {
+    path: 'homework/:id',
+    name: 'Panel.Homework.Show',
+    meta: {
+      pageCategory: 'تکلیف'
+    },
+    component: () => import('src/pages/panel/homework/show.vue')
+  },
+  {
+    path: 'homework/:id/edit',
+    name: 'Panel.Homework.Edit',
+    meta: {
+      pageCategory: 'تکلیف'
+    },
+    component: () => import('src/pages/panel/homework/edit.vue')
+  }
 ]

@@ -300,14 +300,14 @@
           <div class="row q-col-gutter-md">
             <div class="col-md-6 col-12">
               <div class="text-subtitle2 q-mb-sm">تصویر آزمون</div>
-              <exam-content-editor
+              <content-editor
                 v-if="exam.online_exam_detail"
                 v-model:value="exam.online_exam_detail.content"
                 :editable="editable" />
             </div>
             <div class="col-md-6 col-12">
               <div class="text-subtitle2 q-mb-sm">تصویر پاسخنامه</div>
-              <exam-content-editor
+              <content-editor
                 v-if="exam.online_exam_detail"
                 v-model:value="exam.online_exam_detail.solution"
                 :editable="editable" />
@@ -440,7 +440,7 @@ import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 import ExamAnswerKeyEditor from 'src/components/exam/ExamAnswerKeyEditor.vue'
-import ExamContentEditor from 'src/components/exam/ExamContentEditor.vue'
+import ContentEditor from 'src/components/ContentEditor.vue'
 
 const exam = defineModel<ExamType>('exam')
 const props = defineProps<{

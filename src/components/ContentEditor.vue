@@ -1,5 +1,5 @@
 <template>
-  <div class="exam-content-editor">
+  <div class="content-editor">
     <div
       v-if="editable"
       class="row q-col-gutter-sm">
@@ -15,11 +15,11 @@
           style="min-width: 120px" />
       </div>
       <div class="col">
-        <template v-if="currentType === 'image' || currentType === 'pdf'">
+        <template v-if="currentType === 'image'">
           <div class="row q-col-gutter-sm items-center">
             <div class="col-auto">
               <q-btn
-                :label="currentType === 'image' ? 'انتخاب تصویر' : 'انتخاب فایل PDF'"
+                label="انتخاب تصویر"
                 icon="attach_file"
                 dense
                 outlined
@@ -27,9 +27,37 @@
               <input
                 ref="imageFileInput"
                 type="file"
-                :accept="currentType === 'image' ? 'image/*' : 'application/pdf'"
+                accept="image/*"
                 style="display: none"
                 @change="onFileChange">
+            </div>
+            <div
+              v-if="currentFile"
+              class="col text-truncate">
+              {{ currentFile.name }}
+            </div>
+            <div
+              v-else-if="modelValue?.path"
+              class="col text-truncate">
+              {{ modelValue.path }}
+            </div>
+          </div>
+        </template>
+        <template v-else-if="currentType === 'pdf'">
+          <div class="row q-col-gutter-sm items-center">
+            <div class="col-auto">
+              <q-btn
+                label="انتخاب PDF"
+                icon="attach_file"
+                dense
+                outlined
+                @click="openPdfPicker" />
+              <input
+                ref="pdfFileInput"
+                type="file"
+                accept="application/pdf"
+                style="display: none"
+                @change="onPdfChange">
             </div>
             <div
               v-if="currentFile"
@@ -62,22 +90,22 @@
         <q-img
           :src="previewSrc"
           alt="پیش‌نمایش تصویر"
-          style="width: 120px; height: 80px; cursor: pointer; border-radius: 4px;"
+          style="width: 120px; height: 80px; cursor: pointer; border-radius: 4px"
           @click="openPreview" />
         <span class="q-ml-sm text-grey">
-          {{ currentItem.file ? currentItem.file.name : (currentItem.path || '') }}
+          {{ currentItem.file ? currentItem.file.name : currentItem.path || '' }}
         </span>
       </template>
-      <template v-else-if="currentItem.type === 'pdf'">
+      <template v-else-if="currentItem.type === 'pdf' && currentItem.path">
         <q-btn
           flat
           dense
           color="primary"
           icon="picture_as_pdf"
-          label="پیش‌نمایش PDF"
-          @click="openPreview" />
+          label="PDF"
+          @click="openPdfPreview" />
         <span class="q-ml-sm text-grey">
-          {{ currentItem.file ? currentItem.file.name : (currentItem.path || '') }}
+          {{ currentItem.file ? currentItem.file.name : currentItem.path }}
         </span>
       </template>
       <span v-else-if="currentItem.type === 'text' && currentItem.body">
@@ -86,17 +114,38 @@
     </div>
     <div
       v-else
-      class="text-center q-pa-md text-grey">
-      محتوایی ثبت نشده است.
-    </div>
+      class="text-center q-pa-md text-grey">محتوایی ثبت نشده است.</div>
 
     <q-dialog v-model="previewDialog">
-      <q-card style="width: 90vw; max-width: 90vw; height: 90vh; max-height: 90vh; display: flex; flex-direction: column;">
+      <q-card style="max-width: 90vw; max-height: 90vh">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
-            <div class="text-subtitle2">
-              {{ currentType === 'image' ? 'پیش‌نمایش تصویر' : 'پیش‌نمایش PDF' }}
-            </div>
+            <div class="text-subtitle2">پیش‌نمایش تصویر</div>
+          </div>
+          <div class="col-auto">
+            <q-btn
+              v-close-popup
+              flat
+              round
+              dense
+              icon="close"
+              color="grey" />
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <img
+            :src="previewSrc"
+            alt="پیش‌نمایش تصویر"
+            style="width: 100%; height: auto; display: block">
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="pdfPreviewDialog">
+      <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="col">
+            <div class="text-subtitle2">پیش‌نمایش PDF</div>
           </div>
           <div class="col-auto">
             <q-btn
@@ -109,15 +158,9 @@
           </div>
         </q-card-section>
         <q-card-section class="col q-pa-none overflow-hidden">
-          <img
-            v-if="currentType === 'image'"
-            :src="previewSrc"
-            alt="پیش‌نمایش تصویر"
-            style="width: 100%; height: auto; display: block;">
           <iframe
-            v-else-if="currentType === 'pdf'"
-            :src="previewSrc"
-            style="width: 100%; height: 100%; border: none;" />
+            :src="pdfPreviewSrc"
+            style="width: 100%; height: 100%; border: none" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -126,36 +169,38 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { ContentType } from 'src/repositories/exam'
 
-const modelValue = defineModel<{
-  type: 'text' | 'image' | 'pdf';
-  body?: string;
-  path?: string;
-  file?: File;
-} | null>('value')
+const modelValue = defineModel<ContentType | null>('value')
 
 defineProps<{
-  editable?: boolean
+  editable?: boolean;
 }>()
 
 const typeOptions = [
   { label: 'تصویر', value: 'image' },
-  { label: 'فایل PDF', value: 'pdf' },
-  { label: 'متن', value: 'text' }
+  { label: 'متن', value: 'text' },
+  { label: 'PDF', value: 'pdf' }
 ]
 
 const currentType = ref<'text' | 'image' | 'pdf'>(modelValue.value?.type || 'text')
 const currentBody = ref(modelValue.value?.body || '')
 const currentFile = ref<File | null>(null)
 const imageFileInput = ref<HTMLInputElement | null>(null)
+const pdfFileInput = ref<HTMLInputElement | null>(null)
 const previewDialog = ref(false)
+const pdfPreviewDialog = ref(false)
+const pdfPreviewSrc = ref('')
 
 const currentItem = computed(() => {
   const item: { type: 'text' | 'image' | 'pdf'; body?: string; path?: string; file?: File } = {
     type: currentType.value
   }
 
-  if (currentType.value === 'image' || currentType.value === 'pdf') {
+  if (currentType.value === 'image') {
+    item.file = currentFile.value || undefined
+    item.path = modelValue.value?.path || undefined
+  } else if (currentType.value === 'pdf') {
     item.file = currentFile.value || undefined
     item.path = modelValue.value?.path || undefined
   } else {
@@ -175,7 +220,7 @@ const canSave = computed(() => {
 
 const previewSrc = computed(() => {
   const item = currentItem.value
-  if (!item || (item.type !== 'image' && item.type !== 'pdf')) return ''
+  if (!item || item.type !== 'image') return ''
 
   if (item.file) {
     return URL.createObjectURL(item.file)
@@ -200,27 +245,34 @@ function onFileChange (event: Event) {
   }
 }
 
+function openPdfPicker () {
+  pdfFileInput.value?.click()
+}
+
+function onPdfChange (event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    currentFile.value = target.files[0]
+    emitChange()
+  }
+}
+
 function openPreview () {
   if (previewSrc.value) {
     previewDialog.value = true
   }
 }
 
-watch(currentType, (newType) => {
-  currentFile.value = null
-  if (newType === 'text') {
-    currentBody.value = ''
-  } else {
-    currentBody.value = ''
+function openPdfPreview () {
+  const path = modelValue.value?.path || currentItem.value?.path
+  if (path) {
+    pdfPreviewSrc.value = `storage/${path}`
+    pdfPreviewDialog.value = true
   }
-  // Clear file input value to allow selecting same file again if needed
-  if (imageFileInput.value) {
-    imageFileInput.value.value = ''
-  }
-})
+}
 
 watch(currentBody, (newVal) => {
-  if (currentType.value === 'text') {
+  if (currentType.value === 'text' && newVal) {
     emitChange()
   }
 })
