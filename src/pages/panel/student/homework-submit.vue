@@ -126,7 +126,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
-import type { HomeworkType, HomeworkOwnerType } from 'src/repositories/homework'
+import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 import ContentEditor from 'src/components/ContentEditor.vue'
 import { useDate } from 'src/composables/Date'
 
@@ -138,7 +138,7 @@ const $q = useQuasar()
 const dateManager = useDate()
 
 const homeworkData = ref<Partial<HomeworkType>>({})
-const submission = ref<Partial<HomeworkOwnerType> | null>(null)
+const submission = ref<Partial<HomeworkSubmissionType> | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
 const content = ref<{ type: 'text' | 'image' | 'pdf'; body?: string; path?: string } | null>(null)

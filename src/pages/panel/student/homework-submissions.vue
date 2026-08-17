@@ -73,13 +73,13 @@
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
-import type { HomeworkOwnerType } from 'src/repositories/homework'
+import type { HomeworkSubmissionType } from 'src/repositories/homework'
 
 const homeworkApi = new HomeworkAPI()
 
 const $q = useQuasar()
 
-const submissions = ref<HomeworkOwnerType[]>([])
+const submissions = ref<HomeworkSubmissionType[]>([])
 const loading = ref(true)
 
 const formatDate = (dateString: string): string => {

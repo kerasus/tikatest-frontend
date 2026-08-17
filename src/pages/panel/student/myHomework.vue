@@ -54,7 +54,7 @@ import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import HomeworkAPI from 'src/repositories/homework'
-import type { HomeworkType, HomeworkOwnerType } from 'src/repositories/homework'
+import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
 const $q = useQuasar()
 const dateManager = useDate()
@@ -139,18 +139,18 @@ const formatDate = (value: string | null | undefined): string => {
 }
 
 const getOwner = (
-  homework: HomeworkType & { owners?: HomeworkOwnerType[] }
-): HomeworkOwnerType | undefined => {
-  return homework.owners?.[0]
+  homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }
+): HomeworkSubmissionType | undefined => {
+  return homework.submissions?.[0]
 }
 
-const getStatusColor = (homework: HomeworkType & { owners?: HomeworkOwnerType[] }): string => {
+const getStatusColor = (homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }): string => {
   const owner = getOwner(homework)
   if (!owner) return 'info'
   return owner.submitted_at ? 'positive' : 'info'
 }
 
-const getStatusLabel = (homework: HomeworkType & { owners?: HomeworkOwnerType[] }): string => {
+const getStatusLabel = (homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }): string => {
   const owner = getOwner(homework)
   if (!owner) return 'در انتظار ارسال'
   return owner.submitted_at ? 'ارسال شده' : 'در انتظار ارسال'

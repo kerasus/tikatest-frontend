@@ -39,34 +39,6 @@ export type HomeworkType = {
   class_ids?: number[];
 };
 
-export type HomeworkOwnerType = {
-  id: number | null;
-  homework_id: number | null;
-  user_id: number | null;
-  read_status: boolean | null;
-  read_at: string | null;
-  submission_file: string | null;
-  submitted_at: string | null;
-  created_at: string | null;
-  updated_at: string | null;
-  student?: {
-    id: number | null;
-    full_name?: string;
-  } | null;
-  homework?: {
-    id: number | null;
-    title: string | null;
-    lesson?: {
-      id: number | null;
-      name: string | null;
-    } | null;
-    schoolClass?: {
-      id: number | null;
-      name: string | null;
-    } | null;
-  } | null;
-}
-
 export type HomeworkSubmissionType = {
   id: number | null;
   homework_id: number | null;
@@ -102,7 +74,10 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     }
     this.endpoints = {
       ...this.endpoints,
-      myHomeworks: `${this.baseEndpoint}/mine`
+      myHomeworks: `${this.baseEndpoint}/mine`,
+      homeworkSubmissions: (homeworkId: number) => `${this.baseEndpoint}/${homeworkId}/submissions`,
+      storeAttachment: (homeworkId: number) => `${this.baseEndpoint}/${homeworkId}/attachments`,
+      destroyAttachment: (homeworkId: number, attachmentId: number) => `${this.baseEndpoint}/${homeworkId}/attachments/${attachmentId}`
     }
   }
 

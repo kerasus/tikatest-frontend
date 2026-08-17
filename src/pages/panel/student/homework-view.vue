@@ -138,7 +138,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
-import type { HomeworkType, HomeworkOwnerType } from 'src/repositories/homework'
+import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
 const homeworkApi = new HomeworkAPI()
 
@@ -146,7 +146,7 @@ const route = useRoute()
 const $q = useQuasar()
 
 const homeworkData = ref<Partial<HomeworkType>>({})
-const submission = ref<Partial<HomeworkOwnerType> | null>(null)
+const submission = ref<Partial<HomeworkSubmissionType> | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
 const file = ref<File | null>(null)
