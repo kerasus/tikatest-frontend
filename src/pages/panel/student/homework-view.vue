@@ -13,7 +13,7 @@
         <q-card-section>
           <div class="text-h4">{{ homeworkData.title }}</div>
           <div class="text-grey-7 q-mt-sm">
-            کلاس: {{ homeworkData.schoolClass?.name || '-' }}
+            کلاس: {{ schoolClassName }}
           </div>
           <div
             v-if="homeworkData.description"
@@ -36,22 +36,17 @@
               :key="att.id || index"
               class="q-mt-sm">
               <div class="text-subtitle2">ضمیمه {{ index + 1 }}:</div>
-              <a
-                v-if="att.content?.path"
-                :href="`storage/${att.content.path}`"
-                target="_blank"
-                class="text-primary">دانلود فایل</a>
-              <span v-else>-</span>
+              <content-editor
+                :value="att.content"
+                :editable="false" />
             </div>
           </div>
         </q-card-section>
       </q-card>
 
-      <q-card
-        v-if="!submission"
-        class="q-mt-md">
+      <q-card class="q-mt-md">
         <q-card-section>
-          <div class="text-h6">ارسال تکلیف</div>
+          <div class="text-h6">ارسال / ویرایش تکلیف</div>
         </q-card-section>
 
         <q-separator />
@@ -60,26 +55,10 @@
           <q-form @submit.prevent="onSubmit">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-file
-                  v-model="file"
-                  label="فایل تکلیف"
-                  outlined
-                  accept=".pdf,image/*"
-                  @update:model-value="onFileChange" />
-              </div>
-              <div
-                v-if="previewUrl"
-                class="col-12">
-                <div class="q-mt-md">
-                  <img
-                    v-if="!isPdf"
-                    :src="previewUrl"
-                    style="max-width: 100%; max-height: 300px;">
-                  <iframe
-                    v-else
-                    :src="previewUrl"
-                    style="width: 100%; height: 400px; border: none;" />
-                </div>
+                <div class="text-subtitle2 q-mb-sm">پاسخ تکلیف</div>
+                <content-editor
+                  v-model:value="submissionContent"
+                  :editable="canSubmit" />
               </div>
             </div>
 
@@ -88,7 +67,8 @@
                 type="submit"
                 color="primary"
                 label="ثبت تکلیف"
-                :loading="submitting" />
+                :loading="submitting"
+                :disable="!canSubmit" />
               <q-btn
                 flat
                 label="انصراف"
@@ -100,10 +80,10 @@
       </q-card>
 
       <q-card
-        v-else
+        v-if="submission"
         class="q-mt-md">
         <q-card-section>
-          <div class="text-h6">تکلیف ارسال شده</div>
+          <div class="text-h6">پاسخ قبلی</div>
         </q-card-section>
 
         <q-separator />
@@ -111,14 +91,10 @@
         <q-card-section>
           <div class="row q-col-gutter-md">
             <div class="col-12">
-              <div class="text-subtitle2">فایل ارسال شده:</div>
-              <div v-if="submission.submission_file">
-                <a
-                  :href="submission.submission_file"
-                  target="_blank"
-                  class="text-primary">مشاهده فایل</a>
-              </div>
-              <div v-else>فایلی ارسال نشده است.</div>
+              <div class="text-subtitle2">پاسخ ارسال شده:</div>
+              <content-editor
+                :value="submissionContentDisplay"
+                :editable="false" />
             </div>
             <div
               v-if="submission.submitted_at"
@@ -134,11 +110,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
+import ContentEditor from 'src/components/ContentEditor.vue'
 
 const homeworkApi = new HomeworkAPI()
 
@@ -149,9 +126,27 @@ const homeworkData = ref<Partial<HomeworkType>>({})
 const submission = ref<Partial<HomeworkSubmissionType> | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
-const file = ref<File | null>(null)
-const previewUrl = ref('')
-const isPdf = ref(false)
+const submissionContent = ref<{ type: 'text' | 'image' | 'pdf'; body?: string; path?: string; file?: File } | null>(null)
+
+const schoolClassName = computed(() => (homeworkData.value as any).schoolClass?.name || '-')
+const canSubmit = computed(() => {
+  const due = (homeworkData.value as any).due_date
+  if (!due) return true
+  return new Date(due + 'T00:00:00') >= new Date(new Date().toLocaleDateString('en-CA'))
+})
+const submissionFile = computed(() => {
+  const sub = submission.value as any
+  if (!sub?.content) return null
+  const content = Array.isArray(sub.content) ? sub.content : [sub.content].filter(Boolean)
+  const fileItem = content.find((item: any) => item.type === 'pdf' || item.type === 'image')
+  return fileItem?.path || null
+})
+const submissionContentDisplay = computed(() => {
+  const sub = submission.value as any
+  if (!sub?.content) return null
+  const content = Array.isArray(sub.content) ? sub.content : [sub.content].filter(Boolean)
+  return content[0] || null
+})
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return '-'
@@ -163,47 +158,26 @@ const formatDate = (dateString: string): string => {
   }).format(date)
 }
 
-const onFileChange = (files: File[] | null) => {
-  if (files && files.length > 0) {
-    const selectedFile = files[0]
-    file.value = selectedFile
-    previewUrl.value = URL.createObjectURL(selectedFile)
-    isPdf.value = selectedFile.type === 'application/pdf'
-  } else {
-    file.value = null
-    previewUrl.value = ''
-    isPdf.value = false
-  }
-}
-
 const onSubmit = async () => {
-  if (!file.value) {
-    $q.notify({
-      type: 'negative',
-      message: 'لطفاً فایل را انتخاب کنید.'
-    })
-    return
-  }
-
   submitting.value = true
   try {
     const formData = new FormData()
-    formData.append('file', file.value)
 
-    // For now, we'll just pass the file name as submission_file
-    // In a real implementation, you would upload the file first
-    const fileName = `homework_${Date.now()}_${file.value.name}`
+    if (submissionContent.value?.file) {
+      formData.append('submission_file', submissionContent.value.file)
+    }
 
-    await homeworkApi.submitHomework(Number(route.params.id), {
-      submission_file: `/uploads/homework/${fileName}`
-    })
+    const contentPayload = { ...submissionContent.value }
+    delete (contentPayload as any).file
+    formData.append('content', JSON.stringify(contentPayload))
+
+    await homeworkApi.submitHomework(Number(route.params.id), formData)
 
     $q.notify({
       type: 'positive',
       message: 'تکلیف با موفقیت ارسال شد.'
     })
 
-    // Reload data
     await loadHomework()
   } catch (error: any) {
     $q.notify({
@@ -221,6 +195,16 @@ const loadHomework = async () => {
     const data = await homeworkApi.viewHomework(Number(route.params.id))
     homeworkData.value = data.homework
     submission.value = data.submission
+
+    if (data.submission?.content) {
+      const content = Array.isArray(data.submission.content)
+        ? data.submission.content
+        : [data.submission.content].filter(Boolean)
+      const first = content[0] || null
+      submissionContent.value = first ? { ...first, file: null } : null
+    } else {
+      submissionContent.value = null
+    }
   } catch (error) {
     $q.notify({
       icon: 'error',

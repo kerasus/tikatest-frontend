@@ -19,10 +19,9 @@ export type HomeworkAttachmentType = {
 
 export type HomeworkType = {
   id: number | null;
-  class_id: number | null;
-  lesson_id: number | null;
   title: string | null;
   description: string | null;
+  lesson_id: number | null;
   due_date: string | null;
   created_by: number | null;
   created_at: string | null;
@@ -30,13 +29,12 @@ export type HomeworkType = {
   deleted_at: string | null;
   createdBy?: UserType | null;
   lesson?: LessonType | null;
-  schoolClass?: SchoolClassType | null;
-  submissions?: HomeworkSubmissionType[];
   attachments?: HomeworkAttachmentType[];
   academic_levels?: AcademicLevelType[];
   classes?: SchoolClassType[];
   academic_level_ids?: number[];
   class_ids?: number[];
+  submissions?: HomeworkSubmissionType[];
 };
 
 export type HomeworkSubmissionType = {
@@ -47,24 +45,20 @@ export type HomeworkSubmissionType = {
   student_seen_at: string | null;
   operator_seen_at: string | null;
   feedback: string | null;
-  content: ContentType | null;
+  content: ContentType | ContentType[] | null;
   created_at: string | null;
   updated_at: string | null;
   homework?: HomeworkType | null;
-  student?: {
-    id: number | null;
-    full_name?: string;
-  } | null;
-}
+  student?: UserType | null;
+};
 
 export default class HomeworkAPI extends BaseAPI<HomeworkType> {
   constructor () {
     super('/homework')
     this.defaultObject = {
       id: null,
-      class_id: null,
-      lesson_id: null,
       title: null,
+      lesson_id: null,
       description: null,
       due_date: null,
       created_by: null,
@@ -91,7 +85,7 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     return response.data
   }
 
-  async submitHomework (homeworkId: number, data: { submission_file?: string; content?: any }) {
+  async submitHomework (homeworkId: number, data: FormData) {
     const response = await this.getAxiosInstanceWithToken().post(`${this.endpoints.base}/${homeworkId}/submit`, data)
     return response.data
   }

@@ -33,13 +33,6 @@
           color="primary"
           icon="visibility"
           :to="{ name: 'Student.Homework.Show', params: { id: inputData.props.row.id } }" />
-        <q-btn
-          v-if="!getOwner(inputData.props.row)?.submitted_at"
-          flat
-          dense
-          color="positive"
-          icon="send"
-          :to="{ name: 'Student.Homework.Submit', params: { id: inputData.props.row.id } }" />
       </template>
       <template v-else>
         {{ inputData.col.value }}

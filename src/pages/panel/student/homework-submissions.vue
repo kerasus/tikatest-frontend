@@ -43,7 +43,7 @@
                     <strong>زمان ارسال:</strong> {{ formatDate(item.submitted_at) }}
                   </div>
                   <div class="col-auto">
-                    <strong>کلاس:</strong> {{ item.homework?.schoolClass?.name || '-' }}
+                    <strong>کلاس:</strong> {{ schoolClassName(item.homework) }}
                   </div>
                 </div>
               </div>
@@ -81,6 +81,8 @@ const $q = useQuasar()
 
 const submissions = ref<HomeworkSubmissionType[]>([])
 const loading = ref(true)
+
+const schoolClassName = (homework: any) => homework?.schoolClass?.name || '-'
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return '-'
