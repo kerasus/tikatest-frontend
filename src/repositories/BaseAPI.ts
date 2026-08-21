@@ -221,7 +221,16 @@ export default class BaseAPI<T> {
 
   async update (id: number, data: T | FormData): Promise<void | Error> {
     try {
-      await this.getAxiosInstanceWithToken().put(this.endpoints.byId(id), data)
+      const endpoint = this.endpoints.byId(id)
+
+      // PHP does not parse multipart file uploads sent with a real PUT request.
+      // Use Laravel's method override so FormData files reach the controller.
+      if (data instanceof FormData) {
+        data.append('_method', 'PUT')
+        await this.getAxiosInstanceWithToken().post(endpoint, data)
+      } else {
+        await this.getAxiosInstanceWithToken().put(endpoint, data)
+      }
     } catch {
       return new Error()
     }

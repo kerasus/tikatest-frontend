@@ -129,16 +129,15 @@
         <div class="col-12">
           <div class="row items-center q-mb-sm">
             <div class="col">
-              <div class="text-subtitle2">پیوست‌ها</div>
-            </div>
-            <div
-              v-if="editable"
-              class="col-auto">
-              <q-btn
-                color="primary"
-                label="افزودن پیوست"
-                size="sm"
-                @click="addAttachment" />
+              <div class="text-subtitle2">
+                پیوست‌ها
+                <q-btn
+                  v-if="editable"
+                  color="primary"
+                  icon="add"
+                  class="q-ml-md"
+                  @click="addAttachment" />
+              </div>
             </div>
           </div>
           <q-list

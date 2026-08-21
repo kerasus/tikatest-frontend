@@ -12,7 +12,6 @@
         <q-btn
           color="primary"
           label="ویرایش"
-          size="sm"
           :to="{ name: 'Panel.Homework.Edit', params: { id: route.params.id } }"
           class="q-ml-sm" />
       </div>
@@ -63,12 +62,16 @@
               {{ inputData.props.row.content.body?.substring(0, 80) || '-' }}
             </div>
             <img
-              v-else-if="inputData.props.row.content?.type === 'image' && inputData.props.row.content?.path"
+              v-else-if="
+                inputData.props.row.content?.type === 'image' && inputData.props.row.content?.path
+              "
               :src="`storage/${inputData.props.row.content.path}`"
               alt="پیش‌نمایش"
               style="max-width: 80px; max-height: 60px; display: block">
             <q-btn
-              v-else-if="inputData.props.row.content?.type === 'pdf' && inputData.props.row.content?.path"
+              v-else-if="
+                inputData.props.row.content?.type === 'pdf' && inputData.props.row.content?.path
+              "
               flat
               dense
               color="primary"
@@ -85,8 +88,8 @@
               flat
               dense
               color="primary"
-              icon="edit"
-              @click.stop="openFeedbackDialog(inputData.props.row)" />
+              icon="visibility"
+              @click.stop="openSubmissionDetailDialog(inputData.props.row)" />
           </template>
           <template v-else>
             {{ inputData.col.value }}
@@ -95,26 +98,71 @@
       </entity-index>
     </template>
 
-    <q-dialog v-model="feedbackDialog">
-      <q-card style="min-width: 400px">
-        <q-card-section>
-          <div class="text-h6">بازخورد</div>
+    <q-dialog v-model="submissionDetailDialog">
+      <q-card style="min-width: 90vw; max-width: 90vw">
+        <q-card-section class="row items-center">
+          <div class="col">
+            <div class="text-h6">جزئیات ارسال</div>
+          </div>
+          <div class="col-auto">
+            <q-btn
+              v-close-popup
+              flat
+              round
+              dense
+              icon="close"
+              color="grey" />
+          </div>
         </q-card-section>
-        <q-card-section>
+        <q-card-section v-if="selectedSubmission">
           <div class="q-gutter-md">
-            <q-input
-              v-model="feedbackForm.feedback"
-              label="بازخورد"
-              outlined
-              type="textarea"
-              rows="3" />
+            <div class="row">
+              <div class="col-5 text-subtitle2">دانش‌آموز:</div>
+              <div class="col-7">
+                {{ selectedSubmission.student?.first_name }}
+                {{ selectedSubmission.student?.last_name || selectedSubmission.student_id || '-' }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-5 text-subtitle2">زمان ارسال:</div>
+              <div class="col-7">{{ formatDateTime(selectedSubmission.submitted_at) }}</div>
+            </div>
+            <div class="row">
+              <div class="col-5 text-subtitle2">مشاهده توسط دانش‌آموز:</div>
+              <div class="col-7">{{ formatDateTime(selectedSubmission.student_seen_at) }}</div>
+            </div>
+            <div class="row">
+              <div class="col-5 text-subtitle2">مشاهده توسط معلم:</div>
+              <div class="col-7">{{ formatDateTime(selectedSubmission.operator_seen_at) }}</div>
+            </div>
+            <div class="row">
+              <div class="col-5 text-subtitle2">بازخورد:</div>
+              <div class="col-7">
+                <q-input
+                  v-model="feedbackForm.feedback"
+                  label="ویرایش بازخورد"
+                  outlined
+                  type="textarea"
+                  rows="3" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 text-subtitle2">محتوای ارسالی:</div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <content-editor
+                  v-model:value="submissionContentForEditor"
+                  :editable="false" />
+              </div>
+            </div>
           </div>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
             flat
             label="انصراف"
-            @click="feedbackDialog = false" />
+            @click="submissionDetailDialog = false" />
           <q-btn
             color="primary"
             label="ذخیره"
@@ -125,7 +173,7 @@
     </q-dialog>
 
     <q-dialog v-model="pdfDialog">
-      <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column;">
+      <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle2">پیش‌نمایش PDF</div>
@@ -143,7 +191,7 @@
         <q-card-section class="col q-pa-none overflow-hidden">
           <iframe
             :src="pdfPreviewSrc"
-            style="width: 100%; height: 100%; border: none;" />
+            style="width: 100%; height: 100%; border: none" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -151,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
@@ -159,6 +207,7 @@ import { useDate } from 'src/composables/Date'
 import HomeworkAPI from 'src/repositories/homework'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
+import ContentEditor from 'src/components/ContentEditor.vue'
 
 const homeworkApi = new HomeworkAPI()
 
@@ -169,7 +218,7 @@ const dateManager = useDate()
 const homeworkData = ref<Partial<HomeworkType>>({})
 const loading = ref(false)
 const saving = ref(false)
-const feedbackDialog = ref(false)
+const submissionDetailDialog = ref(false)
 const pdfDialog = ref(false)
 const pdfPreviewSrc = ref('')
 
@@ -186,9 +235,25 @@ const tableKeys = ref({
 const submissionsTable = ref({
   columns: [
     { name: 'student_name', label: 'دانش‌آموز', align: 'right' as const, field: 'student_name' },
-    { name: 'submitted_at', label: 'زمان ارسال', align: 'center' as const, field: 'submitted_at', sortable: true },
-    { name: 'student_seen_at', label: 'مشاهده توسط دانش‌آموز', align: 'center' as const, field: 'student_seen_at' },
-    { name: 'operator_seen_at', label: 'مشاهده توسط معلم', align: 'center' as const, field: 'operator_seen_at' },
+    {
+      name: 'submitted_at',
+      label: 'زمان ارسال',
+      align: 'center' as const,
+      field: 'submitted_at',
+      sortable: true
+    },
+    {
+      name: 'student_seen_at',
+      label: 'مشاهده توسط دانش‌آموز',
+      align: 'center' as const,
+      field: 'student_seen_at'
+    },
+    {
+      name: 'operator_seen_at',
+      label: 'مشاهده توسط معلم',
+      align: 'center' as const,
+      field: 'operator_seen_at'
+    },
     { name: 'content', label: 'محتوای ارسالی', align: 'center' as const, field: 'content' },
     { name: 'feedback', label: 'بازخورد', align: 'center' as const, field: 'feedback' },
     {
@@ -214,10 +279,21 @@ const feedbackForm = ref({
   feedback: null as string | null
 })
 const currentFeedbackSubmissionId = ref<number | null>(null)
+const selectedSubmission = ref<HomeworkSubmissionType | null>(null)
+
+const submissionContentForEditor = computed(() => {
+  if (!selectedSubmission.value?.content) return null
+  if (Array.isArray(selectedSubmission.value.content)) {
+    return selectedSubmission.value.content[0] || null
+  }
+  return selectedSubmission.value.content
+})
 
 const formatDateTime = (value: string | null | undefined): string => {
   if (!value) return '-'
-  return dateManager.miladiToShamsi(value, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || value
+  return (
+    dateManager.miladiToShamsi(value, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || value
+  )
 }
 
 function openPdfPreview (path: string) {
@@ -225,22 +301,21 @@ function openPdfPreview (path: string) {
   pdfDialog.value = true
 }
 
-function openFeedbackDialog (submission: HomeworkSubmissionType) {
+function openSubmissionDetailDialog (submission: HomeworkSubmissionType) {
+  selectedSubmission.value = submission
   currentFeedbackSubmissionId.value = submission.id
   feedbackForm.value.feedback = submission.feedback
-  feedbackDialog.value = true
+  submissionDetailDialog.value = true
+  homeworkApi.markAsSeen(submission.id).catch(() => {})
 }
 
 async function saveFeedback () {
   if (!currentFeedbackSubmissionId.value) return
   saving.value = true
   try {
-    await homeworkApi.getAxiosInstanceWithToken().put(`/homework-submissions/${currentFeedbackSubmissionId.value}`, {
-      feedback: feedbackForm.value.feedback,
-      operator_seen_at: new Date().toISOString()
-    })
+    await homeworkApi.sendFeedback(currentFeedbackSubmissionId.value, feedbackForm.value.feedback)
     $q.notify({ type: 'positive', message: 'بازخورد ثبت شد' })
-    feedbackDialog.value = false
+    submissionDetailDialog.value = false
     currentFeedbackSubmissionId.value = null
     submissionsIndexRef.value?.reload()
   } catch (error: any) {
@@ -270,5 +345,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -117,7 +117,7 @@
       class="text-center q-pa-md text-grey">محتوایی ثبت نشده است.</div>
 
     <q-dialog v-model="previewDialog">
-      <q-card style="max-width: 90vw; max-height: 90vh">
+      <q-card style="max-width: 99vw; min-width: 99vw; max-height: 99vh">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle2">پیش‌نمایش تصویر</div>
@@ -142,7 +142,14 @@
     </q-dialog>
 
     <q-dialog v-model="pdfPreviewDialog">
-      <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column">
+      <q-card
+        style="
+          max-width: 99vw;
+          min-width: 99vw;
+          height: 99vh;
+          display: flex;
+          flex-direction: column;
+        ">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle2">پیش‌نمایش PDF</div>
@@ -309,5 +316,3 @@ function emitChange () {
   modelValue.value = item
 }
 </script>
-
-<style scoped></style>

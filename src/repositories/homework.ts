@@ -115,6 +115,18 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     })
     return response.data
   }
+
+  async sendFeedback (submissionId: number, feedback: string | null) {
+    const response = await this.getAxiosInstanceWithToken().put(`/homework-submissions/${submissionId}/feedback`, {
+      feedback
+    })
+    return response.data
+  }
+
+  async markAsSeen (submissionId: number) {
+    const response = await this.getAxiosInstanceWithToken().put(`/homework-submissions/${submissionId}/seen`)
+    return response.data
+  }
 }
 
 export const homework = new HomeworkAPI()

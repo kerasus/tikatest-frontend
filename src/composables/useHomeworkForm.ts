@@ -27,7 +27,7 @@ export function buildHomeworkFormData (homework: Partial<HomeworkType>): FormDat
       delete meta.file
       attachmentsPayload.push(meta)
       if (att.content?.file) {
-        fd.append(`attachments.${index}.file`, att.content.file)
+        fd.append(`attachments[${index}][file]`, att.content.file)
       }
     })
     fd.append('attachments', JSON.stringify(attachmentsPayload))

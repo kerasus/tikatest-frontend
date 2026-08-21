@@ -66,69 +66,10 @@ const topLinks = ref<ListItemType[]>([
     route: { name: 'Panel.Dashboard' }
   },
   {
-    icon: 'dashboard',
-    title: 'پیشخوان',
-    forRoles: ['Student'],
-    route: { name: 'Student.Dashboard' }
-  },
-  {
     icon: 'school',
     title: 'لیست مدارس',
     forRoles: ['Admin'],
     route: { name: 'Panel.School.List' }
-  },
-  {
-    icon: 'grading',
-    title: 'نمرات',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
-      { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
-    ]
-  },
-  {
-    icon: 'gavel',
-    title: 'موارد انضباطی',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
-      { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
-    ]
-  },
-  {
-    icon: 'sms',
-    title: 'مدیریت پیام',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'ارسال پیام', route: { name: 'Student.Message.Create' } },
-      { icon: '', title: 'مشاهده پیام‌ها', route: { name: 'Student.Message.List' } }
-    ]
-  },
-  {
-    icon: 'quiz',
-    title: 'آزمون آنلاین',
-    forRoles: ['Student'],
-    route: { name: 'Student.Exam.List' }
-  },
-  {
-    icon: 'assignment',
-    title: 'ساعت مطالعه و تکالیف',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
-      { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
-      {
-        icon: '',
-        title: 'مشاهده ساعات مطالعه ثبت شده',
-        route: { name: 'Student.StudySessions.List' }
-      }
-    ]
-  },
-  {
-    icon: 'calendar_today',
-    title: 'تقویم اجرایی',
-    forRoles: ['Student'],
-    route: { name: 'Student.Calendar' }
   },
   {
     icon: 'person',
@@ -158,6 +99,15 @@ const topLinks = ref<ListItemType[]>([
     child: [
       { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Exam.Create' } },
       { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Exam.List' } }
+    ]
+  },
+  {
+    icon: 'assignment',
+    title: 'تکالیف',
+    forRoles: ['Manager', 'Teacher', 'Admin'],
+    child: [
+      { icon: '', title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
+      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
     ]
   },
   {
@@ -197,15 +147,6 @@ const topLinks = ref<ListItemType[]>([
     route: { name: 'Panel.Calendar' }
   },
   {
-    icon: 'assignment',
-    title: 'تکالیف',
-    forRoles: ['Manager', 'Teacher', 'Admin'],
-    child: [
-      { icon: '', title: 'ثبت تکلیف', route: { name: 'Panel.Homework.Create' } },
-      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Panel.Homework.List' } }
-    ]
-  },
-  {
     icon: 'menu_book',
     title: 'ساعت مطالعه دانش آموزان',
     forRoles: ['Manager', 'Teacher', 'Admin'],
@@ -213,6 +154,65 @@ const topLinks = ref<ListItemType[]>([
       { icon: '', title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
       { icon: '', title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
     ]
+  },
+  {
+    icon: 'dashboard',
+    title: 'پیشخوان',
+    forRoles: ['Student'],
+    route: { name: 'Student.Dashboard' }
+  },
+  {
+    icon: 'quiz',
+    title: 'آزمون آنلاین',
+    forRoles: ['Student'],
+    route: { name: 'Student.Exam.List' }
+  },
+  {
+    icon: 'assignment',
+    title: 'ساعت مطالعه و تکالیف',
+    forRoles: ['Student'],
+    child: [
+      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
+      { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
+      {
+        icon: '',
+        title: 'مشاهده ساعات مطالعه ثبت شده',
+        route: { name: 'Student.StudySessions.List' }
+      }
+    ]
+  },
+  {
+    icon: 'grading',
+    title: 'نمرات',
+    forRoles: ['Student'],
+    child: [
+      { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
+      { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
+    ]
+  },
+  {
+    icon: 'gavel',
+    title: 'موارد انضباطی',
+    forRoles: ['Student'],
+    child: [
+      { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
+      { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
+    ]
+  },
+  {
+    icon: 'sms',
+    title: 'مدیریت پیام',
+    forRoles: ['Student'],
+    child: [
+      { icon: '', title: 'ارسال پیام', route: { name: 'Student.Message.Create' } },
+      { icon: '', title: 'مشاهده پیام‌ها', route: { name: 'Student.Message.List' } }
+    ]
+  },
+  {
+    icon: 'calendar_today',
+    title: 'تقویم اجرایی',
+    forRoles: ['Student'],
+    route: { name: 'Student.Calendar' }
   }
 ])
 

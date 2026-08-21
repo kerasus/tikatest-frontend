@@ -83,7 +83,19 @@
         v-if="submission"
         class="q-mt-md">
         <q-card-section>
-          <div class="text-h6">پاسخ قبلی</div>
+          <div class="row items-center">
+            <div class="col">
+              <div class="text-h6">پاسخ قبلی</div>
+            </div>
+            <div class="col-auto">
+              <q-btn
+                flat
+                dense
+                color="primary"
+                icon="visibility"
+                @click="openSubmissionDetailDialog(submission)" />
+            </div>
+          </div>
         </q-card-section>
 
         <q-separator />
@@ -102,9 +114,84 @@
               <div class="text-subtitle2">زمان ارسال:</div>
               <p>{{ formatDate(submission.submitted_at) }}</p>
             </div>
+            <div
+              v-if="submission.feedback"
+              class="col-12">
+              <div class="text-subtitle2">بازخورد معلم:</div>
+              <q-card
+                class="q-mt-sm"
+                flat
+                bordered>
+                <q-card-section class="q-py-sm">
+                  <p class="q-ma-none">{{ submission.feedback }}</p>
+                </q-card-section>
+              </q-card>
+            </div>
           </div>
         </q-card-section>
       </q-card>
+
+      <q-dialog v-model="submissionDetailDialog">
+        <q-card style="min-width: 500px; max-width: 700px">
+          <q-card-section class="row items-center">
+            <div class="col">
+              <div class="text-h6">جزئیات ارسال</div>
+            </div>
+            <div class="col-auto">
+              <q-btn
+                v-close-popup
+                flat
+                round
+                dense
+                icon="close"
+                color="grey" />
+            </div>
+          </q-card-section>
+          <q-card-section v-if="selectedSubmission">
+            <div class="q-gutter-md">
+              <div class="row">
+                <div class="col-5 text-subtitle2">زمان ارسال:</div>
+                <div class="col-7">{{ formatDate(selectedSubmission.submitted_at || '') }}</div>
+              </div>
+              <div class="row">
+                <div class="col-5 text-subtitle2">بازخورد معلم:</div>
+                <div class="col-7">{{ selectedSubmission.feedback || '-' }}</div>
+              </div>
+              <div class="row">
+                <div class="col-12 text-subtitle2">محتوای ارسالی:</div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <content-editor
+                    :value="submissionContentDisplay"
+                    :editable="false" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <q-input
+                    v-model="feedbackForm.feedback"
+                    label="ثبت سؤال یا نظر"
+                    outlined
+                    type="textarea"
+                    rows="3" />
+                </div>
+              </div>
+            </div>
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              label="انصراف"
+              @click="submissionDetailDialog = false" />
+            <q-btn
+              color="primary"
+              label="ارسال"
+              :loading="submitting"
+              @click="sendFeedback" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -132,7 +219,11 @@ const schoolClassName = computed(() => (homeworkData.value as any).schoolClass?.
 const canSubmit = computed(() => {
   const due = (homeworkData.value as any).due_date
   if (!due) return true
-  return new Date(due + 'T00:00:00') >= new Date(new Date().toLocaleDateString('en-CA'))
+  const dueDate = new Date(due)
+  const today = new Date()
+  const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
+  const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return todayOnly <= dueDateOnly
 })
 const submissionFile = computed(() => {
   const sub = submission.value as any
@@ -147,6 +238,10 @@ const submissionContentDisplay = computed(() => {
   const content = Array.isArray(sub.content) ? sub.content : [sub.content].filter(Boolean)
   return content[0] || null
 })
+
+const submissionDetailDialog = ref(false)
+const selectedSubmission = ref<HomeworkSubmissionType | null>(null)
+const feedbackForm = ref({ feedback: null as string | null })
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return '-'
@@ -183,6 +278,31 @@ const onSubmit = async () => {
     $q.notify({
       type: 'negative',
       message: error.message || 'خطا در ارسال تکلیف.'
+    })
+  } finally {
+    submitting.value = false
+  }
+}
+
+function openSubmissionDetailDialog (sub: Partial<HomeworkSubmissionType>) {
+  selectedSubmission.value = sub as HomeworkSubmissionType
+  feedbackForm.value.feedback = sub.feedback || null
+  submissionDetailDialog.value = true
+}
+
+async function sendFeedback () {
+  if (!selectedSubmission.value?.id) return
+  submitting.value = true
+  try {
+    await homeworkApi.sendFeedback(selectedSubmission.value.id, feedbackForm.value.feedback)
+    $q.notify({ type: 'positive', message: 'پیام شما ارسال شد.' })
+    submissionDetailDialog.value = false
+    feedbackForm.value.feedback = null
+    await loadHomework()
+  } catch (error: any) {
+    $q.notify({
+      type: 'negative',
+      message: error.message || 'خطا در ارسال پیام.'
     })
   } finally {
     submitting.value = false
