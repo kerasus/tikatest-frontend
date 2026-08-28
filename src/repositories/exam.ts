@@ -104,7 +104,9 @@ export type ExamType = {
   online_exam_detail?: OnlineExamDetailType | null;
   answer_keys?: any[];
   classes?: SchoolClassType[];
+  class_ids?: number[];
   academic_levels?: AcademicLevelType[];
+  academic_level_ids?: number[];
   in_person_exam_results?: InPersonExamResultType[];
   grades?: any[];
   online_exam_sessions?: OnlineExamSessionType[];

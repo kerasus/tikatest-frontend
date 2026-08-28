@@ -1,17 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="col">
-        <h4 class="q-ma-none">{{ isResultMode ? 'ویرایش نمره دانش‌آموز' : 'ویرایش آزمون' }}</h4>
-      </div>
-      <div class="col-auto">
-        <q-btn
-          flat
-          label="انصراف"
-          :to="{ name: 'Panel.Exam.Online.Show', params: { id: examId } }" />
-      </div>
-    </div>
-
+  <div>
     <div
       v-if="loading"
       class="text-center q-pa-lg">
@@ -21,13 +9,11 @@
     </div>
 
     <template v-else-if="!isResultMode && form.delivery_mode">
-      <exam-detail-card
+      <exam-in-person-detail-card
         :exam="form"
         :editable="true"
         :lesson-options="lessonOptions"
-        :category-options="categoryOptions"
-        :academic-level-options="academicLevelOptions"
-        :school-class-options="schoolClassOptions" />
+        :category-options="categoryOptions" />
 
       <div class="row q-mt-md">
         <div class="col-12">
@@ -56,7 +42,7 @@
                   outlined
                   type="number"
                   step="0.01"
-                  :rules="[(v) => v !== null && v !== '' || 'نمره الزامی است']" />
+                  :rules="[(v) => (v !== null && v !== '') || 'نمره الزامی است']" />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
@@ -87,20 +73,20 @@
         </q-card-section>
       </q-card>
     </template>
-  </q-page>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { exam, ExamType } from 'src/repositories/exam'
+import { exam } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
 import SchoolClassAPI from 'src/repositories/schoolClass'
-import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
+import ExamInPersonDetailCard from 'components/exam/ExamInPersonDetailCard.vue'
 import { useExamForm } from 'src/composables/useExamForm'
 
 const router = useRouter()
@@ -201,14 +187,10 @@ async function onSubmitExam () {
   try {
     const formData = buildFormData()
 
-    if (form.delivery_mode === 'online') {
-      await exam.updateWithOnlineDetail(examId.value, formData)
-    } else {
-      await exam.update(examId.value, formData)
-    }
+    await exam.update(examId.value, formData)
 
     $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
-    router.push({ name: 'Panel.Exam.Online.Show', params: { id: examId.value } })
+    router.push({ name: 'Panel.Exam.InPerson.Show', params: { id: examId.value } })
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی آزمون' })
   } finally {
@@ -231,5 +213,4 @@ async function onSubmitResult () {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

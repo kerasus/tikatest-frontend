@@ -1,28 +1,4 @@
 <template>
-  <div class="row items-center q-mb-lg">
-    <div class="col">
-      <h4 class="q-ma-none">جزئیات آزمون</h4>
-    </div>
-    <div class="col-auto">
-      <q-btn
-        flat
-        label="بازگشت"
-        :to="{ name: 'Panel.Exam.Online.List' }" />
-      <q-btn
-        v-if="examItem?.delivery_mode === 'online'"
-        color="secondary"
-        label="جلسات آزمون"
-        icon="menu_book"
-        :to="{ name: 'Panel.Exam.Sessions', params: { id: examItem?.id } }"
-        class="q-ml-sm" />
-      <q-btn
-        color="primary"
-        label="ویرایش آزمون"
-        :to="{ name: 'Panel.Exam.Edit', params: { id: examItem?.id } }"
-        class="q-ml-sm" />
-    </div>
-  </div>
-
   <div
     v-if="loading"
     class="text-center q-pa-lg">
@@ -32,7 +8,7 @@
   </div>
 
   <template v-else-if="examItem">
-    <exam-detail-card
+    <exam-online-detail-card
       :exam="examItem"
       :editable="false" />
 
@@ -47,7 +23,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam, ExamType } from 'src/repositories/exam'
-import ExamDetailCard from 'components/exam/ExamDetailCard.vue'
+import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 import ExamResultsCard from 'components/exam/ExamResultsCard.vue'
 
 const route = useRoute()

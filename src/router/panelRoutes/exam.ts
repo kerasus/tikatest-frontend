@@ -30,6 +30,14 @@ export const index = [
               pageCategory: 'مدیریت آزمون‌ها'
             },
             component: () => import('pages/panel/exam/online/show.vue')
+          },
+          {
+            path: ':id/edit',
+            name: 'Panel.Exam.Online.Edit',
+            meta: {
+              pageCategory: 'مدیریت آزمون‌ها'
+            },
+            component: () => import('src/pages/panel/exam/online/edit.vue')
           }
         ]
       },
@@ -60,6 +68,14 @@ export const index = [
               pageCategory: 'مدیریت آزمون‌ها'
             },
             component: () => import('src/pages/panel/exam/inPerson/show.vue')
+          },
+          {
+            path: ':id/edit',
+            name: 'Panel.Exam.InPerson.Edit',
+            meta: {
+              pageCategory: 'مدیریت آزمون‌ها'
+            },
+            component: () => import('pages/panel/exam/inPerson/edit.vue')
           }
         ]
       }
@@ -72,13 +88,5 @@ export const index = [
       pageCategory: 'مدیریت آزمون‌ها'
     },
     component: () => import('src/pages/panel/exam/sessions.vue')
-  },
-  {
-    path: 'exams/:id/edit',
-    name: 'Panel.Exam.Edit',
-    meta: {
-      pageCategory: 'مدیریت آزمون‌ها'
-    },
-    component: () => import('src/pages/panel/exam/edit.vue')
   }
 ]

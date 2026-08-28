@@ -7,7 +7,7 @@
     </div>
 
     <q-form @submit.prevent="onSubmit">
-      <exam-detail-card
+      <exam-online-detail-card
         :exam="form"
         :editable="true"
         :lesson-options="lessonOptions"
@@ -36,7 +36,7 @@ import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
-import ExamDetailCard from 'components/exam/ExamDetailCard.vue'
+import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 import { useExamForm } from 'src/composables/useExamForm'
 
 const $q = useQuasar()
