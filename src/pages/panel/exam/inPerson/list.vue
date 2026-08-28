@@ -54,8 +54,8 @@ import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import { exam, ExamType } from 'src/repositories/exam'
-import DeleteBtn from 'src/components/controls/deleteBtn.vue'
-import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import DeleteBtn from 'components/controls/deleteBtn.vue'
+import FormBuilderSelectLesson from 'components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()
@@ -66,8 +66,8 @@ const examApi = exam
 
 const api = ref(exam.endpoints.base)
 const label = ref('آزمون‌ها')
-const createRouteName = ref('Panel.OnlineExam.Create')
-const showRouteName = ref('Panel.Exam.Show')
+const createRouteName = ref('Panel.Exam.Online.Create')
+const showRouteName = ref('Panel.Exam.InPerson.Show')
 const itemIdentifyKey = ref('id')
 const tableKeys = ref({
   data: 'data',

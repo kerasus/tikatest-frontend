@@ -8,7 +8,7 @@
         <q-btn
           flat
           label="بازگشت"
-          :to="{ name: 'Panel.Exam.Show', params: { id: examId } }" />
+          :to="{ name: 'Panel.Exam.Online.Show', params: { id: examId } }" />
       </div>
     </div>
 

@@ -334,7 +334,9 @@ async function onSubmit () {
 
       for (const student of studentOptions.value) {
         const rawGrade = student.raw_grade
-        if (rawGrade === null || rawGrade === '' || isNaN(Number(rawGrade))) {
+
+        const isEmpty = rawGrade === null || rawGrade === ''
+        if (!isEmpty && isNaN(Number(rawGrade))) {
           $q.notify({
             icon: 'error',
             message: `نمره دانش آموز ${student.full_name} باید عدد باشد.`,
@@ -343,7 +345,7 @@ async function onSubmit () {
           return
         }
 
-        if (Number(rawGrade) > Number(form.max_score)) {
+        if (!isEmpty && Number(rawGrade) > Number(form.max_score)) {
           $q.notify({
             icon: 'error',
             message: `نمره دانش آموز ${student.full_name} باید کمتر از حداکثر نمره (${form.max_score}) باشد.`,
@@ -354,29 +356,33 @@ async function onSubmit () {
       }
     }
 
-    const results = studentOptions.value.map((s: any) => {
-      const rawScore = form.is_descriptive
-        ? s.descriptive_value || 0
-        : s.raw_grade === null || s.raw_grade === ''
-          ? null
-          : Number(s.raw_grade)
-      let scaledScore = null
-      if (
-        !form.is_descriptive &&
-        rawScore !== null &&
-        form.max_score &&
-        Number(form.max_score) > 0
-      ) {
-        scaledScore = Math.round((rawScore / Number(form.max_score)) * 20)
-      }
+    const results = studentOptions.value
+      .map((s: any) => {
+        const rawScore = form.is_descriptive
+          ? s.descriptive_value || 0
+          : s.raw_grade === null || s.raw_grade === ''
+            ? null
+            : Number(s.raw_grade)
+        let scaledScore = null
+        if (
+          !form.is_descriptive &&
+          rawScore !== null &&
+          form.max_score &&
+          Number(form.max_score) > 0
+        ) {
+          scaledScore = Math.round((rawScore / Number(form.max_score)) * 20)
+        }
 
-      return {
-        user_id: s.id,
-        raw_score: rawScore,
-        scaled_score: scaledScore,
-        z_score: null
-      }
-    })
+        return {
+          user_id: s.id,
+          raw_score: rawScore,
+          scaled_score: scaledScore,
+          z_score: null
+        }
+      })
+      .filter(
+        (r) => typeof r.raw_score !== 'undefined' && r.raw_score !== null && !isNaN(r.raw_score)
+      )
 
     const payload = {
       name: examName.value || form.exam_name,

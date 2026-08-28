@@ -3,6 +3,7 @@
     <q-card-section>
       <div class="text-h6">جزئیات آزمون</div>
     </q-card-section>
+
     <q-separator />
 
     <q-card-section>
@@ -39,7 +40,7 @@
               v-if="!editable"
               color="info"
               text-color="white">
-              {{ exam.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
+              {{ exam?.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
             </q-chip>
           </div>
         </div>
@@ -98,7 +99,9 @@
         </div>
       </div>
 
-      <template v-if="exam.delivery_mode === 'in_person' && exam.in_person_exam_detail">
+      <q-separator class="q-my-md" />
+
+      <template v-if="exam?.delivery_mode === 'in_person' && exam.in_person_exam_detail">
         <div class="row q-col-gutter-md q-mt-md">
           <div class="col-12 col-md-6">
             <div class="text-subtitle2">تاریخ برگزاری:</div>
@@ -133,34 +136,27 @@
         </div>
       </template>
 
-      <template v-else-if="exam.delivery_mode === 'online' && exam.online_exam_detail">
-        <div class="row q-col-gutter-md q-mt-md">
+      <template v-else-if="exam?.delivery_mode === 'online' && exam.online_exam_detail">
+        <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
-            <div class="text-subtitle2">زمان شروع:</div>
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.online_exam_detail.starts_at"
-              label="زمان شروع"
-              outlined
-              dense />
+              label="زمان شروع" />
             <div
               v-else
               class="text-body1">{{ startsAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
-            <div class="text-subtitle2">زمان پایان:</div>
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.online_exam_detail.ends_at"
-              label="زمان پایان"
-              outlined
-              dense />
+              label="زمان پایان" />
             <div
               v-else
               class="text-body1">{{ endsAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
-            <div class="text-subtitle2">زمان محدودیت (دقیقه):</div>
             <q-input
               v-if="editable"
               v-model.number="exam.online_exam_detail.time_limit_minutes"
@@ -176,7 +172,6 @@
             </div>
           </div>
           <div class="col-12 col-md-6">
-            <div class="text-subtitle2">قابل مشاهده از:</div>
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.online_exam_detail.visible_at"
@@ -188,13 +183,10 @@
               class="text-body1">{{ visibleAtFormatted }}</div>
           </div>
           <div class="col-12 col-md-6">
-            <div class="text-subtitle2">پاسخ‌ها قابل مشاهده از:</div>
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.online_exam_detail.answers_visible_at"
-              label="پاسخ‌ها قابل مشاهده از"
-              outlined
-              dense />
+              label="پاسخ‌ها قابل مشاهده از" />
             <div
               v-else
               class="text-body1">{{ answersVisibleAtFormatted }}</div>
@@ -226,10 +218,10 @@
     </q-card-section>
   </q-card>
 
-  <q-separator />
+  <q-separator class="q-my-md" />
 
   <q-card
-    v-if="exam.delivery_mode === 'online'"
+    v-if="exam?.delivery_mode === 'online'"
     class="q-mb-md">
     <q-card-section>
       <div class="text-h6">اطلاعات بیشتر آزمون</div>

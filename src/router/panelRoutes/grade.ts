@@ -1,13 +1,5 @@
 export const index = [
   {
-    path: 'grades/create',
-    name: 'Panel.Grade.Create',
-    meta: {
-      pageCategory: 'مدیریت نمرات'
-    },
-    component: () => import('pages/panel/exam/inPerson/create.vue')
-  },
-  {
     path: 'grades/:id',
     name: 'Panel.Grade.Show',
     meta: {

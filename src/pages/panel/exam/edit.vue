@@ -8,7 +8,7 @@
         <q-btn
           flat
           label="انصراف"
-          :to="{ name: 'Panel.Exam.Show', params: { id: examId } }" />
+          :to="{ name: 'Panel.Exam.Online.Show', params: { id: examId } }" />
       </div>
     </div>
 
@@ -208,7 +208,7 @@ async function onSubmitExam () {
     }
 
     $q.notify({ type: 'positive', message: 'آزمون با موفقیت به‌روز شد' })
-    router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
+    router.push({ name: 'Panel.Exam.Online.Show', params: { id: examId.value } })
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی آزمون' })
   } finally {
@@ -222,7 +222,7 @@ async function onSubmitResult () {
     const resultId = parseInt(route.query.result_id as string)
     await inPersonExamResult.update(resultId, resultForm as any)
     $q.notify({ type: 'positive', message: 'نمره با موفقیت به‌روز شد' })
-    router.push({ name: 'Panel.Exam.Show', params: { id: examId.value } })
+    router.push({ name: 'Panel.Exam.Online.Show', params: { id: examId.value } })
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در به‌روزرسانی نمره' })
   } finally {

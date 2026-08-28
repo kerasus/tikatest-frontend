@@ -66,8 +66,8 @@ const examApi = exam
 
 const api = ref(exam.endpoints.base)
 const label = ref('آزمون‌ها')
-const createRouteName = ref('Panel.OnlineExam.Create')
-const showRouteName = ref('Panel.Exam.Show')
+const createRouteName = ref('Panel.Exam.Online.Create')
+const showRouteName = ref('Panel.Exam.Online.Show')
 const itemIdentifyKey = ref('id')
 const tableKeys = ref({
   data: 'data',

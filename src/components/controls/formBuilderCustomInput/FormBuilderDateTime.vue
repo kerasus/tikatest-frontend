@@ -2,7 +2,6 @@
   <div
     class="form-builder-date-time"
     :class="customClass">
-    <div v-text="label" />
     <q-input
       ref="input"
       v-model="displayDateTime"
@@ -17,6 +16,7 @@
       :rounded="rounded"
       :reverse-fill-mask="reverseFillMask"
       dir="ltr"
+      :label="label"
       :stack-label="!!placeholder"
       :placeholder="placeholder"
       :rules="localRules"
@@ -378,18 +378,13 @@ function updateDateTime (newValue: string, type: 'date' | 'time') {
     ? dateManager.shamsiToMiladi(displayDate.value)
     : systemDate
 
-  const defaultTime = analysedTime.isValid
-    ? displayTime
-    : systemTime
+  const defaultTime = analysedTime.isValid ? displayTime : systemTime
 
   /*
    * مقدار قبلی را بدون Z و بدون T می‌خوانیم.
    * مهم: از Date / new Date استفاده نمی‌کنیم تا timezone ساعت را تغییر ندهد.
    */
-  const rawValue = (value.value ?? '')
-    .trim()
-    .replace(/[zZ]$/, '')
-    .replace('T', ' ')
+  const rawValue = (value.value ?? '').trim().replace(/[zZ]$/, '').replace('T', ' ')
 
   const [oldDate, oldTime] = rawValue.split(/\s+/)
 
@@ -426,9 +421,7 @@ function updateDateTime (newValue: string, type: 'date' | 'time') {
    * ولی dateValue همچنان میلادی و مناسب API باقی می‌ماند.
    */
   const displayDateValue =
-    props.calendar === 'persian'
-      ? dateManager.miladiToShamsi(dateValue)
-      : dateValue
+    props.calendar === 'persian' ? dateManager.miladiToShamsi(dateValue) : dateValue
 
   displayDate.value = displayDateValue
   displayDateTime.value = `${displayDateValue} ${timeValue}`
@@ -583,10 +576,7 @@ function pad2 (value: number): string {
  * 2026-08-27 + 19:45:00 (local)
  * => 2026-08-27T16:15:00.000Z (UTC)
  */
-function localGregorianDateTimeToUtcIso (
-  gregorianDate: string,
-  time: string
-): string {
+function localGregorianDateTimeToUtcIso (gregorianDate: string, time: string): string {
   const [year, month, day] = gregorianDate.split('-').map(Number)
   const [hour = 0, minute = 0, second = 0] = time.split(':').map(Number)
 
@@ -594,14 +584,7 @@ function localGregorianDateTimeToUtcIso (
    * new Date(year, month - 1, ...) تاریخ را به عنوان زمان محلی سیستم می‌سازد.
    * سپس toISOString آن را به UTC تبدیل می‌کند.
    */
-  return new Date(
-    year,
-    month - 1,
-    day,
-    hour,
-    minute,
-    second
-  ).toISOString()
+  return new Date(year, month - 1, day, hour, minute, second).toISOString()
 }
 
 /**
@@ -646,10 +629,7 @@ watch(
       gregorianDate = localDateTime.date
       timeValue = localDateTime.time
     } else {
-      const [date, time = '00:00:00'] = newValue
-        .trim()
-        .replace('T', ' ')
-        .split(/\s+/)
+      const [date, time = '00:00:00'] = newValue.trim().replace('T', ' ').split(/\s+/)
 
       gregorianDate = date
       timeValue = time
@@ -669,9 +649,7 @@ watch(
     }
 
     const displayDateValue =
-      props.calendar === 'persian'
-        ? dateManager.miladiToShamsi(gregorianDate)
-        : gregorianDate
+      props.calendar === 'persian' ? dateManager.miladiToShamsi(gregorianDate) : gregorianDate
 
     displayDate.value = displayDateValue
     displayDateTime.value = `${displayDateValue} ${timeValue}`

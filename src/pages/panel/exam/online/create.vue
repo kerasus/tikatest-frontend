@@ -23,7 +23,7 @@
         <q-btn
           flat
           label="انصراف"
-          :to="{ name: 'Panel.OnlineExam.List' }" />
+          :to="{ name: 'Panel.Exam.Online.List' }" />
       </div>
     </q-form>
   </q-page>
@@ -48,7 +48,7 @@ const saving = ref(false)
 const categoryOptions = ref<any[]>([])
 const lessonOptions = ref<any[]>([])
 const { form, validate, buildFormData, resetForm } = useExamForm()
-
+form.delivery_mode = 'online'
 const loadCategories = async () => {
   try {
     const response = await examCategory.index({ length: 100 })
@@ -84,7 +84,7 @@ const onSubmit = async () => {
       color: 'positive'
     })
     resetForm()
-    router.push({ name: 'Panel.OnlineExam.List' })
+    router.push({ name: 'Panel.Exam.Online.List' })
   } catch (error: any) {
     const message = error?.response?.data?.message || 'خطا در ثبت آزمون.'
     $q.notify({
