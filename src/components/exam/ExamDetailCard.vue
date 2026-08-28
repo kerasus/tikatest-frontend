@@ -8,13 +8,13 @@
     <q-card-section>
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-4">
-          <div class="text-subtitle2">دسته‌بندی:</div>
           <q-select
             v-if="editable"
             v-model="exam.exam_category_id"
             :options="categoryOptions"
             option-value="id"
             option-label="title"
+            label="دسته‌بندی"
             outlined
             dense
             emit-value
@@ -25,10 +25,10 @@
             class="text-body1">{{ exam.category?.title || '-' }}</div>
         </div>
         <div class="col-12 col-md-4">
-          <div class="text-subtitle2">نام آزمون:</div>
           <q-input
             v-if="editable"
             v-model="exam.name"
+            label="نام آزمون"
             outlined
             dense />
           <div
@@ -44,24 +44,17 @@
           </div>
         </div>
         <div class="col-12 col-md-4">
-          <div class="text-subtitle2">درس:</div>
-          <q-select
+          <form-builder-select-lesson
             v-if="editable"
-            v-model="exam.lesson_id"
-            :options="lessonOptions"
-            option-value="id"
-            option-label="name"
+            v-model:value="exam.lesson_id"
+            label="درس"
             outlined
-            dense
-            emit-value
-            map-options
             clearable />
           <div
             v-else
             class="text-body1">{{ exam.lesson?.name || '-' }}</div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">حداقل نمره قبولی:</div>
           <q-input
             v-if="editable"
             v-model.number="exam.min_passing_score"
@@ -75,7 +68,6 @@
             class="text-body1">{{ exam.min_passing_score ?? '-' }}</div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">حداکثر نمره:</div>
           <q-input
             v-if="editable"
             v-model.number="exam.max_score"
@@ -211,7 +203,9 @@
       </template>
     </q-card-section>
   </q-card>
-  <q-card class="q-mb-md">
+  <q-card
+    v-if="!editable"
+    class="q-mb-md">
     <q-card-section>
       <div class="text-h6">اطلاعات ایجاد کننده</div>
     </q-card-section>
@@ -348,17 +342,12 @@
               <q-item-section>
                 <div class="row q-col-gutter-sm">
                   <div class="col-12 col-md-6">
-                    <q-select
+                    <form-builder-select-lesson
                       v-if="editable"
-                      v-model="booklet.lesson_id"
-                      :options="lessonOptions"
-                      option-value="id"
-                      option-label="name"
+                      v-model:value="booklet.lesson_id"
+                      label="درس"
                       outlined
-                      dense
-                      clearable
-                      emit-value
-                      map-options />
+                      clearable />
                     <span
                       v-else
                       class="text-body1">
@@ -437,16 +426,19 @@ import { computed } from 'vue'
 import { useDate } from 'src/composables/Date'
 import { ExamType } from 'src/repositories/exam'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 import ExamAnswerKeyEditor from 'src/components/exam/ExamAnswerKeyEditor.vue'
 import ContentEditor from 'src/components/ContentEditor.vue'
+import { ExamCategoryType } from 'src/repositories/examCategory'
+import { LessonType } from 'src/repositories/lesson'
 
 const exam = defineModel<ExamType>('exam')
 const props = defineProps<{
   editable?: boolean;
-  lessonOptions?: any[];
-  categoryOptions?: any[];
+  lessonOptions?: LessonType[];
+  categoryOptions?: ExamCategoryType[];
 }>()
 
 const dateManager = useDate()

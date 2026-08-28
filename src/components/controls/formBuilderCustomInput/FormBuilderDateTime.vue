@@ -2,6 +2,7 @@
   <div
     class="form-builder-date-time"
     :class="customClass">
+    <div v-text="label" />
     <q-input
       ref="input"
       v-model="displayDateTime"
@@ -16,7 +17,6 @@
       :rounded="rounded"
       :reverse-fill-mask="reverseFillMask"
       dir="ltr"
-      :label="label"
       :stack-label="!!placeholder"
       :placeholder="placeholder"
       :rules="localRules"
@@ -370,49 +370,81 @@ function updateDateTime (newValue: string, type: 'date' | 'time') {
   const systemTime = dateManager.now('HH:mm:ss')
 
   const displayTime = `${dateTime.hours}:${dateTime.minutes}:${dateTime.seconds}`
+
   const analysedShamsiDate = dateManager.validationShamsiDate(displayDate.value)
   const analysedTime = dateManager.validationTime(displayTime)
-  // TODO: should fix this for calender != persian
+
   const defaultDate = analysedShamsiDate.isValid
     ? dateManager.shamsiToMiladi(displayDate.value)
     : systemDate
-  const defaultTime = analysedTime.isValid ? displayTime : systemTime
 
-  const finalDate = newValue && type === 'date' ? newValue : defaultDate
-  const finalTime = newValue && type === 'time' ? newValue : defaultTime
-  const inputData = value.value ? value.value.replace('T', ' ') : `${finalDate} ${finalTime}`
-  const arrValue = inputData.trim().split(' ')
-  let timeValue = arrValue[1]
-  displayDate.value =
-    props.calendar === 'persian' ? dateManager.miladiToShamsi(arrValue[0]) : arrValue[0]
+  const defaultTime = analysedTime.isValid
+    ? displayTime
+    : systemTime
+
+  /*
+   * مقدار قبلی را بدون Z و بدون T می‌خوانیم.
+   * مهم: از Date / new Date استفاده نمی‌کنیم تا timezone ساعت را تغییر ندهد.
+   */
+  const rawValue = (value.value ?? '')
+    .trim()
+    .replace(/[zZ]$/, '')
+    .replace('T', ' ')
+
+  const [oldDate, oldTime] = rawValue.split(/\s+/)
+
+  let dateValue = oldDate || defaultDate
+  let timeValue = oldTime || defaultTime
 
   if (type === 'date') {
-    arrValue[0] = newValue.toString()
-    if (timeValue) {
-      const parsedTime = dateManager.parseTime(timeValue)
-      if (parsedTime) {
-        const cleanTime = `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
-        timeValue = cleanTime
-        arrValue[1] = cleanTime
-      }
-    }
-  } else if (type === 'time') {
-    const parsedTime = dateManager.parseTime(newValue || timeValue)
-    if (parsedTime) {
-      dateTime.hours = parsedTime.formattedHour
-      dateTime.minutes = parsedTime.formattedMinute
-      dateTime.seconds = parsedTime.formattedSecond
-    }
-    const cleanTime = parsedTime
-      ? `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
-      : (newValue || timeValue)
-    timeValue = cleanTime
-    arrValue[1] = cleanTime
+    dateValue = newValue || defaultDate
   }
 
-  const delimiter = props.iso8601 ? 'T' : ' '
-  displayDateTime.value = [displayDate.value, timeValue].join(' ')
-  value.value = arrValue.join(delimiter).replace(',', ' ')
+  if (type === 'time') {
+    timeValue = newValue || defaultTime
+  }
+
+  /*
+   * زمان را یک‌دست می‌کنیم؛ مثلاً:
+   * 19:45 => 19:45:00
+   */
+  const parsedTime = dateManager.parseTime(timeValue)
+
+  if (parsedTime) {
+    timeValue =
+      `${parsedTime.formattedHour}:` +
+      `${parsedTime.formattedMinute}:` +
+      `${parsedTime.formattedSecond}`
+
+    dateTime.hours = parsedTime.formattedHour
+    dateTime.minutes = parsedTime.formattedMinute
+    dateTime.seconds = parsedTime.formattedSecond
+  }
+
+  /*
+   * تاریخ نمایشی بر اساس calendar است،
+   * ولی dateValue همچنان میلادی و مناسب API باقی می‌ماند.
+   */
+  const displayDateValue =
+    props.calendar === 'persian'
+      ? dateManager.miladiToShamsi(dateValue)
+      : dateValue
+
+  displayDate.value = displayDateValue
+  displayDateTime.value = `${displayDateValue} ${timeValue}`
+
+  if (props.iso8601) {
+    /*
+     * displayDateTime:
+     * تاریخ شمسی + ساعت محلی کاربر
+     *
+     * value:
+     * معادل همان لحظه به UTC/Zulu
+     */
+    value.value = localGregorianDateTimeToUtcIso(dateValue, timeValue)
+  } else {
+    value.value = `${dateValue} ${timeValue}`
+  }
 }
 
 function onClear () {
@@ -541,18 +573,108 @@ function onMenuSecondInputUpdate () {
   onMenuTimeInputUpdate()
 }
 
+function pad2 (value: number): string {
+  return String(value).padStart(2, '0')
+}
+
+/**
+ * دریافت تاریخ و ساعت محلی میلادی و تولید مقدار واقعی UTC/Zulu
+ *
+ * 2026-08-27 + 19:45:00 (local)
+ * => 2026-08-27T16:15:00.000Z (UTC)
+ */
+function localGregorianDateTimeToUtcIso (
+  gregorianDate: string,
+  time: string
+): string {
+  const [year, month, day] = gregorianDate.split('-').map(Number)
+  const [hour = 0, minute = 0, second = 0] = time.split(':').map(Number)
+
+  /*
+   * new Date(year, month - 1, ...) تاریخ را به عنوان زمان محلی سیستم می‌سازد.
+   * سپس toISOString آن را به UTC تبدیل می‌کند.
+   */
+  return new Date(
+    year,
+    month - 1,
+    day,
+    hour,
+    minute,
+    second
+  ).toISOString()
+}
+
+/**
+ * تبدیل UTC ISO به تاریخ و ساعت محلی مرورگر.
+ *
+ * 2026-08-27T16:15:00.000Z
+ * => 2026-08-27 / 19:45:00  (برای timezone ایران)
+ */
+function utcIsoToLocalGregorianDateTime (isoDateTime: string): {
+  date: string;
+  time: string;
+} {
+  const date = new Date(isoDateTime)
+
+  return {
+    date: `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`,
+    time: `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`
+  }
+}
+
 watch(
   () => value.value,
   (newValue) => {
     if (!newValue) {
       displayDateTime.value = '____/__/__ __:__:__'
+      displayDate.value = ''
+      dateTime.hours = '__'
+      dateTime.minutes = '__'
+      dateTime.seconds = '__'
       return
     }
-    const normalizedDateTime = dateManager.getDateTimeFromIso8601DateString(newValue)
-    const newDate = normalizedDateTime.date.toString()
-    const newTime = normalizedDateTime.time.toString()
-    updateDateTime(newDate, 'date')
-    updateDateTime(newTime, 'time')
+
+    let gregorianDate: string
+    let timeValue: string
+
+    if (props.iso8601) {
+      /*
+       * مقدار API UTC است؛ باید برای نمایش به ساعت محلی مرورگر تبدیل شود.
+       */
+      const localDateTime = utcIsoToLocalGregorianDateTime(newValue)
+
+      gregorianDate = localDateTime.date
+      timeValue = localDateTime.time
+    } else {
+      const [date, time = '00:00:00'] = newValue
+        .trim()
+        .replace('T', ' ')
+        .split(/\s+/)
+
+      gregorianDate = date
+      timeValue = time
+    }
+
+    const parsedTime = dateManager.parseTime(timeValue)
+
+    if (parsedTime) {
+      timeValue =
+        `${parsedTime.formattedHour}:` +
+        `${parsedTime.formattedMinute}:` +
+        `${parsedTime.formattedSecond}`
+
+      dateTime.hours = parsedTime.formattedHour
+      dateTime.minutes = parsedTime.formattedMinute
+      dateTime.seconds = parsedTime.formattedSecond
+    }
+
+    const displayDateValue =
+      props.calendar === 'persian'
+        ? dateManager.miladiToShamsi(gregorianDate)
+        : gregorianDate
+
+    displayDate.value = displayDateValue
+    displayDateTime.value = `${displayDateValue} ${timeValue}`
   },
   { immediate: true }
 )
@@ -565,7 +687,7 @@ watch(
   { immediate: true }
 )
 
-watch(displayDateTime, (newVal) => {
+watch(displayDateTime, () => {
   if (!input.value) return
   onChangeInputDateTime()
 })

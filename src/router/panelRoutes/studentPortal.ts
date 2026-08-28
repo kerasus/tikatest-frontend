@@ -1,77 +1,5 @@
 export const index = [
   {
-    path: '',
-    name: 'Student.Dashboard',
-    meta: {
-      pageCategory: 'پیشخوان'
-    },
-    component: () => import('src/pages/panel/student/dashboard.vue')
-  },
-  {
-    path: 'grades',
-    name: 'Student.Grade.List',
-    meta: {
-      pageCategory: 'نمرات'
-    },
-    component: () => import('src/pages/panel/student/grades.vue')
-  },
-  {
-    path: 'report-card',
-    name: 'Student.ReportCard',
-    meta: {
-      pageCategory: 'کارنامه'
-    },
-    component: () => import('src/pages/panel/student/report-card.vue')
-  },
-  {
-    path: 'disciplinary',
-    name: 'Student.Disciplinary.List',
-    meta: {
-      pageCategory: 'موارد انضباطی'
-    },
-    component: () => import('src/pages/panel/student/disciplinary.vue')
-  },
-  {
-    path: 'absences',
-    name: 'Student.Absences',
-    meta: {
-      pageCategory: 'غیبت‌ها'
-    },
-    component: () => import('src/pages/panel/student/absences.vue')
-  },
-  {
-    path: 'messages',
-    name: 'Student.Message.List',
-    meta: {
-      pageCategory: 'مشاهده پیام‌ها'
-    },
-    component: () => import('src/pages/panel/student/messages.vue')
-  },
-  {
-    path: 'messages/send',
-    name: 'Student.Message.Create',
-    meta: {
-      pageCategory: 'ارسال پیام'
-    },
-    component: () => import('src/pages/panel/student/messages-send.vue')
-  },
-  {
-    path: 'messages/sent',
-    name: 'Student.Message.Sent',
-    meta: {
-      pageCategory: 'پیام‌های ارسال شده'
-    },
-    component: () => import('src/pages/panel/student/messages-sent.vue')
-  },
-  {
-    path: 'messages/received',
-    name: 'Student.Message.Received',
-    meta: {
-      pageCategory: 'پیام‌های دریافتی'
-    },
-    component: () => import('src/pages/panel/student/messages-received.vue')
-  },
-  {
     path: 'online-exams',
     name: 'Student.Exam.List',
     meta: {
@@ -132,6 +60,78 @@ export const index = [
       pageCategory: 'مشاهده تکلیف'
     },
     component: () => import('src/pages/panel/student/homework-view.vue')
+  },
+  {
+    path: 'my-grades',
+    name: 'Student.Grade.List',
+    meta: {
+      pageCategory: 'نمرات'
+    },
+    component: () => import('pages/panel/student/myGrades.vue')
+  },
+  {
+    path: '',
+    name: 'Student.Dashboard',
+    meta: {
+      pageCategory: 'پیشخوان'
+    },
+    component: () => import('src/pages/panel/student/dashboard.vue')
+  },
+  {
+    path: 'report-card',
+    name: 'Student.ReportCard',
+    meta: {
+      pageCategory: 'کارنامه'
+    },
+    component: () => import('src/pages/panel/student/report-card.vue')
+  },
+  {
+    path: 'disciplinary',
+    name: 'Student.Disciplinary.List',
+    meta: {
+      pageCategory: 'موارد انضباطی'
+    },
+    component: () => import('src/pages/panel/student/disciplinary.vue')
+  },
+  {
+    path: 'absences',
+    name: 'Student.Absences',
+    meta: {
+      pageCategory: 'غیبت‌ها'
+    },
+    component: () => import('src/pages/panel/student/absences.vue')
+  },
+  {
+    path: 'messages',
+    name: 'Student.Message.List',
+    meta: {
+      pageCategory: 'مشاهده پیام‌ها'
+    },
+    component: () => import('src/pages/panel/student/messages.vue')
+  },
+  {
+    path: 'messages/send',
+    name: 'Student.Message.Create',
+    meta: {
+      pageCategory: 'ارسال پیام'
+    },
+    component: () => import('src/pages/panel/student/messages-send.vue')
+  },
+  {
+    path: 'messages/sent',
+    name: 'Student.Message.Sent',
+    meta: {
+      pageCategory: 'پیام‌های ارسال شده'
+    },
+    component: () => import('src/pages/panel/student/messages-sent.vue')
+  },
+  {
+    path: 'messages/received',
+    name: 'Student.Message.Received',
+    meta: {
+      pageCategory: 'پیام‌های دریافتی'
+    },
+    component: () => import('src/pages/panel/student/messages-received.vue')
   },
   {
     path: 'study-sessions',

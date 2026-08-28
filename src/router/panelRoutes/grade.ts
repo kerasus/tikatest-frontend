@@ -5,7 +5,7 @@ export const index = [
     meta: {
       pageCategory: 'مدیریت نمرات'
     },
-    component: () => import('src/pages/panel/grade/create.vue')
+    component: () => import('pages/panel/exam/inPerson/create.vue')
   },
   {
     path: 'grades/:id',

@@ -29,11 +29,11 @@ export const useExamForm = (isUpdate = false) => {
 
   const form = reactive<ExamFormModel>({
     id: null,
-    name: null,
+    name: 'adfasdf',
     description: null,
     lesson_id: null,
-    min_passing_score: null,
-    max_score: null,
+    min_passing_score: 50,
+    max_score: 100,
     delivery_mode: 'in_person',
     exam_category_id: null,
     created_by: null,

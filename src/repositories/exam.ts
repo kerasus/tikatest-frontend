@@ -75,6 +75,17 @@ export type InPersonExamResultType = {
   updated_at: string | null;
 };
 
+export type StudentExamListType = ListType<ExamType>
+
+export type ExamScoreType = {
+  raw_score?: number | null;
+  scaled_score?: number | null;
+  z_score?: number | null;
+  score?: number | null;
+  percent?: number | null;
+  status?: string | null;
+}
+
 export type ExamType = {
   id: number | null;
   name: string | null;
@@ -99,6 +110,9 @@ export type ExamType = {
   online_exam_sessions?: OnlineExamSessionType[];
   latest_session?: OnlineExamSessionType | null;
   session_status?: OnlineExamSessionType['status'];
+  my_result?: InPersonExamResultType | null;
+  my_session?: OnlineExamSessionType | null;
+  score?: ExamScoreType | null;
 };
 
 export type StudentOnlineExamListType = ListType<ExamType>;
@@ -123,12 +137,20 @@ export default class ExamAPI extends BaseAPI<ExamType> {
       ...this.endpoints,
       storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results',
       storeWithOnlineDetail: '/exams/store-with-online-detail',
-      studentOnlineExams: '/student-portal/online-exams'
+      studentOnlineExams: '/student-portal/online-exams',
+      myExams: '/student-portal/my-exams'
     }
   }
 
   async studentOnlineExams (params?: { length?: number; page?: number }): Promise<StudentOnlineExamListType> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentOnlineExams!, { params })
+    return response.data
+  }
+
+  async myExams (params?: { length?: number; page?: number; sortation_field?: string; sortation_order?: string }): Promise<StudentExamListType> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myExams, {
+      params
+    })
     return response.data
   }
 

@@ -23,7 +23,7 @@
         <q-btn
           flat
           label="انصراف"
-          :to="{ name: 'Panel.Exam.List' }" />
+          :to="{ name: 'Panel.OnlineExam.List' }" />
       </div>
     </q-form>
   </q-page>
@@ -36,11 +36,11 @@ import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
 import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
-import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
+import ExamDetailCard from 'components/exam/ExamDetailCard.vue'
 import { useExamForm } from 'src/composables/useExamForm'
 
-const router = useRouter()
 const $q = useQuasar()
+const router = useRouter()
 const lessonApi = new LessonAPI()
 
 const saving = ref(false)
@@ -84,7 +84,7 @@ const onSubmit = async () => {
       color: 'positive'
     })
     resetForm()
-    router.push({ name: 'Panel.Exam.List' })
+    router.push({ name: 'Panel.OnlineExam.List' })
   } catch (error: any) {
     const message = error?.response?.data?.message || 'خطا در ثبت آزمون.'
     $q.notify({

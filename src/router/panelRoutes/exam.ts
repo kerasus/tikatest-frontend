@@ -1,19 +1,27 @@
 export const index = [
   {
-    path: 'exams',
-    name: 'Panel.Exam.List',
+    path: 'online-exams',
+    name: 'Panel.OnlineExam.List',
     meta: {
       pageCategory: 'مدیریت آزمون‌ها'
     },
-    component: () => import('src/pages/panel/exam/list.vue')
+    component: () => import('src/pages/panel/exam/online/list.vue')
   },
   {
     path: 'exams/create',
-    name: 'Panel.Exam.Create',
+    name: 'Panel.OnlineExam.Create',
     meta: {
       pageCategory: 'مدیریت آزمون‌ها'
     },
-    component: () => import('src/pages/panel/exam/create.vue')
+    component: () => import('pages/panel/exam/online/create.vue')
+  },
+  {
+    path: 'in-person-exams',
+    name: 'Panel.inPersonExamList.List',
+    meta: {
+      pageCategory: 'مدیریت آزمون‌ها'
+    },
+    component: () => import('pages/panel/exam/inPersonExamList.vue')
   },
   {
     path: 'exams/:id',

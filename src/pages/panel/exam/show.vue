@@ -8,7 +8,7 @@
         <q-btn
           flat
           label="بازگشت"
-          :to="{ name: 'Panel.Exam.List' }" />
+          :to="{ name: examListRouteName }" />
         <q-btn
           v-if="examItem?.delivery_mode === 'online'"
           color="secondary"
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam, ExamType } from 'src/repositories/exam'
@@ -86,6 +86,16 @@ const answerKeyColumns = [
   },
   { name: 'is_active', label: 'وضعیت', field: 'is_active', align: 'center' as const }
 ]
+
+const examListRouteName = computed(() => {
+  if (examItem.value.delivery_mode === 'online') {
+    return 'Panel.OnlineExam.List'
+  }
+  if (examItem.value.delivery_mode === 'in_person') {
+    return 'Panel.inPersonExamList.List'
+  }
+  return 'Panel.inPersonExamList.List'
+})
 
 onMounted(loadExam)
 

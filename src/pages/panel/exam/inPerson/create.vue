@@ -14,7 +14,7 @@
             <div class="col-12 col-md-6">
               <form-builder-select-school
                 v-model:value="form.school_id"
-                label="انتخاب مدرسه *"
+                label="انتخاب مدرسه"
                 outlined
                 :rules="[(v) => !!v || 'مدرسه الزامی است']"
                 @update:value="onSchoolChange" />
@@ -28,7 +28,7 @@
             <div class="col-12 col-md-6">
               <form-builder-select-academic-field
                 v-model:value="form.field_id"
-                label="انتخاب رشته *"
+                label="انتخاب رشته"
                 outlined
                 :disable="!form.school_id"
                 :rules="[(v) => !!v || 'رشته الزامی است']"
@@ -44,7 +44,7 @@
             <div class="col-12 col-md-6">
               <form-builder-select-academic-level
                 v-model:value="form.academic_level_id"
-                label="انتخاب پایه *"
+                label="انتخاب پایه"
                 outlined
                 :disable="!form.field_id"
                 :rules="[(v) => !!v || 'پایه الزامی است']"
@@ -61,7 +61,7 @@
             <div class="col-12 col-md-6">
               <form-builder-select-school-class
                 v-model:value="form.class_id"
-                label="انتخاب کلاس *"
+                label="انتخاب کلاس"
                 outlined
                 :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'کلاس الزامی است']"
@@ -73,7 +73,7 @@
             <div class="col-12 col-md-6">
               <form-builder-select-lesson
                 v-model:value="form.lesson_id"
-                label="انتخاب درس *"
+                label="انتخاب درس"
                 outlined
                 :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'درس الزامی است']"
@@ -91,21 +91,21 @@
               <div class="col-12 col-md-6">
                 <form-builder-date
                   v-model:value="form.exam_date"
-                  label="تاریخ آزمون *"
+                  label="تاریخ آزمون"
                   outlined
                   :rules="[() => !!form.exam_date || 'تاریخ الزامی است']" />
               </div>
               <div class="col-12 col-md-6">
                 <form-builder-select-exam-category
                   v-model:value="form.exam_category_id"
-                  label="دسته‌بندی آزمون *"
+                  label="دسته‌بندی آزمون"
                   outlined
                   :disable="!form.school_id" />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
                   v-model="examName"
-                  label="نام آزمون *"
+                  label="نام آزمون"
                   outlined
                   :rules="[(v) => !!v || 'نام آزمون الزامی است']" />
               </div>
@@ -214,18 +214,18 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
-import StudentAPI from 'src/repositories/student'
 import ExamAPI from 'src/repositories/exam'
-import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
-import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
-import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
-import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
-import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
+import StudentAPI from 'src/repositories/student'
+import FormBuilderDate from 'components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderSelectLesson from 'components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import FormBuilderSelectSchool from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectExamCategory from 'components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
+import FormBuilderSelectAcademicField from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 
-const studentApi = new StudentAPI()
 const examApi = new ExamAPI()
+const studentApi = new StudentAPI()
 
 const $q = useQuasar()
 
@@ -245,7 +245,7 @@ const form = reactive({
   academic_level_id: null as number | null,
   class_id: null as number | null,
   lesson_id: null as number | null,
-  exam_date: null as string | null,
+  exam_date: new Date().toISOString() as string | null,
   is_descriptive: false,
   min_passing_score: 10 as number | null,
   max_score: 20 as number | null,
@@ -282,7 +282,7 @@ function onSchoolChange (schoolId: number | null) {
   form.class_id = null
   form.lesson_id = null
   form.exam_category_id = null
-  form.exam_name = ''
+  form.exam_name = 'آزمون کلاسی'
   studentOptions.value = []
 }
 
