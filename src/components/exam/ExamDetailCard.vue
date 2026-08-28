@@ -1,6 +1,6 @@
 <template>
   <q-card class="q-mb-md">
-    <q-card-section style="margin-bottom: 1px;">
+    <q-card-section style="margin-bottom: 1px">
       <div class="flex justify-between">
         <div class="text-h6">جزئیات آزمون</div>
         <div class="actions">
@@ -23,10 +23,15 @@
             :to="{ name: editExamRouteName, params: { id: exam?.id } }"
             class="q-ml-sm" />
           <q-btn
-            v-if="editable"
+            v-if="editable && exam?.id"
             flat
             label="انصراف"
             :to="{ name: showExamRouteName, params: { id: exam?.id } }" />
+          <q-btn
+            v-if="editable && !exam?.id"
+            flat
+            label="انصراف"
+            :to="{ name: examListRouteName }" />
         </div>
       </div>
     </q-card-section>

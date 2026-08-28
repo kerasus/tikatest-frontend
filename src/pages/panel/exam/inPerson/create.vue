@@ -202,7 +202,7 @@
             <q-btn
               flat
               label="انصراف"
-              :to="{ name: 'Panel.Grade.List' }"
+              :to="{ name: 'Panel.Exam.InPerson.List' }"
               class="q-ml-sm" />
           </div>
         </q-form>

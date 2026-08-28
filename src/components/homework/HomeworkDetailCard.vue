@@ -8,12 +8,10 @@
     <q-card-section>
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-12">
-          <div class="text-subtitle2">عنوان تکلیف:</div>
           <q-input
             v-if="editable"
             v-model="homework.title"
-            outlined
-            dense
+            label="عنوان تکلیف"
             maxlength="255"
             required />
           <div
@@ -23,25 +21,19 @@
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">موعد تحویل:</div>
           <form-builder-date
             v-if="editable"
             v-model:value="homework.due_date"
-            label="موعد تحویل"
-            outlined
-            dense />
+            label="موعد تحویل" />
           <div
             v-else
             class="text-body1">{{ dueDateFormatted }}</div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">درس:</div>
           <form-builder-select-lesson
             v-if="editable"
             v-model:value="homework.lesson_id"
-            label="درس"
-            outlined
-            clearable />
+            label="درس" />
           <div
             v-else
             class="text-body1">
@@ -51,13 +43,10 @@
         <div
           v-if="editable || homework.description"
           class="col-12">
-          <div class="text-subtitle2">توضیحات:</div>
           <q-input
             v-if="editable"
             v-model="homework.description"
             label="توضیحات"
-            outlined
-            dense
             type="textarea"
             rows="3" />
           <div
@@ -70,7 +59,6 @@
 
       <div class="row q-col-gutter-md q-mt-md">
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">پایه‌ها:</div>
           <form-builder-select-academic-level
             v-if="editable"
             v-model:value="levelIds"
@@ -80,6 +68,7 @@
             multiple
             use-chips />
           <div v-else>
+            <div class="text-subtitle2">پایه‌ها:</div>
             <div class="q-gutter-xs">
               <q-chip
                 v-for="level in homework.academic_levels"
@@ -96,7 +85,6 @@
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-subtitle2">کلاس‌ها:</div>
           <form-builder-select-school-class
             v-if="editable"
             v-model:value="classIds"
@@ -106,6 +94,7 @@
             multiple
             use-chips />
           <div v-else>
+            <div class="text-subtitle2">کلاس‌ها:</div>
             <div class="q-gutter-xs">
               <q-chip
                 v-for="cls in homework.classes"

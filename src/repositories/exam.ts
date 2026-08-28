@@ -188,6 +188,11 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.storeWithInPersonDetailAndResults!, data)
     return response.data
   }
+
+  async examStudents (examId: number, params?: { length?: number }): Promise<ListType<UserType>> {
+    const response = await this.getAxiosInstanceWithToken().get(`exams/${examId}/students`, { params })
+    return response.data
+  }
 }
 
 export const exam = new ExamAPI()

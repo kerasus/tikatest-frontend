@@ -6,7 +6,7 @@
     :category-options="categoryOptions" />
 
   <q-card
-    v-if="exam?.delivery_mode === 'online' && exam.online_exam_detail"
+    v-if="exam.online_exam_detail"
     class="q-mb-md">
     <q-card-section>
       <div class="text-h6">جزئیات آزمون آنلاین</div>
@@ -77,7 +77,7 @@
   </q-card>
 
   <q-card
-    v-if="exam?.delivery_mode === 'online' && exam.online_exam_detail"
+    v-if="exam.online_exam_detail"
     class="q-mb-md">
     <q-card-section>
       <div class="text-h6">اطلاعات بیشتر آزمون</div>
@@ -141,129 +141,149 @@
         <div class="col-12">
           <div class="row q-col-gutter-md">
             <div class="col-md-6 col-12">
-              <div class="text-subtitle2 q-mb-sm">تصویر آزمون</div>
-              <content-editor
-                v-if="exam.online_exam_detail"
-                v-model:value="exam.online_exam_detail.content"
-                :editable="editable" />
+              <q-card class="inside">
+                <q-card-section>
+                  <div class="text-subtitle2">تصویر آزمون</div>
+                </q-card-section>
+                <q-card-section>
+                  <content-editor
+                    v-if="exam.online_exam_detail"
+                    v-model:value="exam.online_exam_detail.content"
+                    :editable="editable" />
+                </q-card-section>
+              </q-card>
             </div>
             <div class="col-md-6 col-12">
-              <div class="text-subtitle2 q-mb-sm">تصویر پاسخنامه</div>
-              <content-editor
-                v-if="exam.online_exam_detail"
-                v-model:value="exam.online_exam_detail.solution"
-                :editable="editable" />
+              <q-card class="inside">
+                <q-card-section>
+                  <div class="text-subtitle2">تصویر پاسخنامه</div>
+                </q-card-section>
+                <q-card-section>
+                  <content-editor
+                    v-if="exam.online_exam_detail"
+                    v-model:value="exam.online_exam_detail.solution"
+                    :editable="editable" />
+                </q-card-section>
+              </q-card>
             </div>
           </div>
         </div>
 
         <div class="col-12">
-          <div class="text-subtitle2 q-mb-sm">پاسخنامه کلیدی آزمون (بابل شیت)</div>
-          <exam-answer-key-editor
-            v-model:value="exam.answer_keys"
-            :readonly="!editable" />
+          <q-card class="inside">
+            <q-card-section>
+              <div class="text-subtitle2">پاسخنامه کلیدی آزمون</div>
+            </q-card-section>
+            <exam-answer-key-editor
+              v-model:value="exam.answer_keys"
+              :readonly="!editable" />
+          </q-card>
         </div>
 
         <div class="col-12">
-          <div class="row items-center q-mb-sm">
-            <div class="col">
-              <div class="text-subtitle2">دفترچه‌ها</div>
-            </div>
-            <div
-              v-if="editable && exam.online_exam_detail"
-              class="col-auto">
-              <q-btn
-                color="primary"
-                label="افزودن دفترچه"
-                @click="addBooklet" />
-            </div>
-          </div>
-          <q-list
-            v-if="exam.online_exam_detail?.booklets?.length"
-            bordered
-            separator>
-            <q-item
-              v-for="(booklet, index) in exam.online_exam_detail.booklets"
-              :key="index"
-              class="q-py-sm">
-              <q-item-section>
-                <div class="row q-col-gutter-sm">
-                  <div class="col-12 col-md-6">
-                    <form-builder-select-lesson
-                      v-if="editable"
-                      v-model:value="booklet.lesson_id"
-                      label="درس"
-                      outlined
-                      clearable />
-                    <span
-                      v-else
-                      class="text-body1">
-                      درس:
-                      {{ booklet.lesson?.name || booklet.lesson_id || '-' }}
-                    </span>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <q-input
-                      v-if="editable"
-                      v-model="booklet.title"
-                      label="عنوان *"
-                      outlined
-                      dense
-                      :rules="[(val) => !!val || 'عنوان الزامی است']" />
-                    <span
-                      v-else
-                      class="text-body1">
-                      عنوان دفترچه:
-                      {{ booklet.title || '-' }}
-                    </span>
-                  </div>
-                  <div class="col-6">
-                    <q-input
-                      v-if="editable"
-                      v-model.number="booklet.from_question"
-                      label="از سوال"
-                      outlined
-                      dense
-                      type="number"
-                      min="1" />
-                    <div v-else>
-                      <div class="text-subtitle2">از سوال:</div>
-                      <div class="text-body1">{{ booklet.from_question ?? '-' }}</div>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <q-input
-                      v-if="editable"
-                      v-model.number="booklet.to_question"
-                      label="تا سوال"
-                      outlined
-                      dense
-                      type="number"
-                      min="1" />
-                    <div v-else>
-                      <div class="text-subtitle2">تا سوال:</div>
-                      <div class="text-body1">{{ booklet.to_question ?? '-' }}</div>
-                    </div>
-                  </div>
+          <q-card class="inside">
+            <q-card-section>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <div class="text-subtitle2">دفترچه‌ها</div>
                 </div>
-              </q-item-section>
-              <q-item-section
-                v-if="editable"
-                side>
-                <q-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  size="sm"
-                  @click="removeBooklet(index)" />
-              </q-item-section>
-            </q-item>
-          </q-list>
-          <div
-            v-else
-            class="text-center q-pa-md text-grey">دفترچه‌ای ثبت نشده است.</div>
+                <div
+                  v-if="editable && exam.online_exam_detail"
+                  class="col-auto">
+                  <q-btn
+                    color="primary"
+                    label="افزودن دفترچه"
+                    @click="addBooklet" />
+                </div>
+              </div>
+            </q-card-section>
+            <q-list
+              v-if="exam.online_exam_detail?.booklets?.length"
+              bordered
+              separator>
+              <q-item
+                v-for="(booklet, index) in exam.online_exam_detail.booklets"
+                :key="index"
+                class="q-py-sm">
+                <q-item-section>
+                  <div class="row q-col-gutter-sm">
+                    <div class="col-12 col-md-6">
+                      <form-builder-select-lesson
+                        v-if="editable"
+                        v-model:value="booklet.lesson_id"
+                        label="درس"
+                        outlined
+                        clearable />
+                      <span
+                        v-else
+                        class="text-body1">
+                        درس:
+                        {{ booklet.lesson?.name || booklet.lesson_id || '-' }}
+                      </span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        v-if="editable"
+                        v-model="booklet.title"
+                        label="عنوان *"
+                        outlined
+                        dense
+                        :rules="[(val) => !!val || 'عنوان الزامی است']" />
+                      <span
+                        v-else
+                        class="text-body1">
+                        عنوان دفترچه:
+                        {{ booklet.title || '-' }}
+                      </span>
+                    </div>
+                    <div class="col-6">
+                      <q-input
+                        v-if="editable"
+                        v-model.number="booklet.from_question"
+                        label="از سوال"
+                        outlined
+                        dense
+                        type="number"
+                        min="1" />
+                      <div v-else>
+                        <div class="text-subtitle2">از سوال:</div>
+                        <div class="text-body1">{{ booklet.from_question ?? '-' }}</div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <q-input
+                        v-if="editable"
+                        v-model.number="booklet.to_question"
+                        label="تا سوال"
+                        outlined
+                        dense
+                        type="number"
+                        min="1" />
+                      <div v-else>
+                        <div class="text-subtitle2">تا سوال:</div>
+                        <div class="text-body1">{{ booklet.to_question ?? '-' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </q-item-section>
+                <q-item-section
+                  v-if="editable"
+                  side>
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    icon="delete"
+                    color="negative"
+                    size="sm"
+                    @click="removeBooklet(index)" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+            <q-card-section v-else>
+              <div class="text-center q-pa-md text-grey">دفترچه‌ای ثبت نشده است.</div>
+            </q-card-section>
+          </q-card>
         </div>
       </div>
     </q-card-section>
