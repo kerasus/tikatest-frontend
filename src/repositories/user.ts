@@ -1,7 +1,6 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
 
-export type WorkerRoleType = 'molding' | 'coloring' | 'fabric-cutter' | 'assembler'
 export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
 export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff' | 'Assembler' | 'MoldingWorker' | 'ColoringWorker' | 'FabricCutter'
 

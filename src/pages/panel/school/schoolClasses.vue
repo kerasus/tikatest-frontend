@@ -22,6 +22,7 @@
               color="primary"
               icon="list"
               label="لیست مدارس"
+              outline
               :to="{ name: 'Panel.School.List' }" />
           </div>
         </div>
@@ -53,7 +54,6 @@
           node-key="id"
           label-key="label"
           children-key="children"
-          default-expand-all
           class="academic-tree">
           <template #default-header="{ node }">
             <div class="row items-center q-col-gutter-sm full-width">

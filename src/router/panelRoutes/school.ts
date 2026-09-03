@@ -107,6 +107,23 @@ export const index = [
           ]
         },
         component: () => import('pages/panel/school/schoolClasses.vue')
+      },
+      {
+        path: ':school_id/terms',
+        name: 'Panel.School.Terms',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'مدیریت ترم‌ها',
+              to: { name: 'Panel.School.Terms' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolTerms.vue')
       }
     ]
   }

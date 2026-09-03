@@ -63,6 +63,40 @@
 
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
+            <form-builder-select-term
+              v-if="editable"
+              v-model:value="exam.term_id"
+              label="ترم"
+              outlined
+              dense
+              clearable />
+            <template v-else>
+              <div class="text-subtitle2">ترم:</div>
+              <div class="text-body1">{{ exam.term?.name || '-' }}</div>
+            </template>
+          </div>
+          <div class="col-12 col-md-6">
+            <template v-if="editable">
+              <q-input
+                v-model.number="exam.occurrence"
+                label="شمارهٔ برگزاری در ترم"
+                outlined
+                dense
+                type="number"
+                min="1"
+                hint="در صورت خالی گذاشتن، به‌صورت خودکار محاسبه می‌شود" />
+            </template>
+            <template v-else>
+              <div class="text-subtitle2">شمارهٔ برگزاری در ترم:</div>
+              <div class="text-body1">{{ exam.occurrence ?? '-' }}</div>
+            </template>
+          </div>
+        </div>
+
+        <q-separator class="q-my-md" />
+
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
             <div class="text-subtitle2">پایه های انتخابی:</div>
             <q-chip
               v-for="level in exam.academic_levels"

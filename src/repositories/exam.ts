@@ -5,6 +5,7 @@ import { SchoolClassType } from 'src/repositories/schoolClass'
 import { AcademicLevelType } from 'src/repositories/academicLevel'
 import { LessonType } from 'src/repositories/lesson'
 import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
+import { AcademicTermType } from 'src/repositories/academicTerm'
 
 export interface ContentType {
   type: 'text' | 'image' | 'pdf';
@@ -108,15 +109,18 @@ export type ExamType = {
   class_ids?: number[];
   academic_levels?: AcademicLevelType[];
   academic_level_ids?: number[];
-  in_person_exam_results?: InPersonExamResultType[];
-  grades?: any[];
-  online_exam_sessions?: OnlineExamSessionType[];
-  latest_session?: OnlineExamSessionType | null;
-  session_status?: OnlineExamSessionType['status'];
-  my_result?: InPersonExamResultType | null;
-  my_session?: OnlineExamSessionType | null;
-  score?: ExamScoreType | null;
-};
+   in_person_exam_results?: InPersonExamResultType[];
+   grades?: any[];
+   online_exam_sessions?: OnlineExamSessionType[];
+   latest_session?: OnlineExamSessionType | null;
+   session_status?: OnlineExamSessionType['status'];
+   my_result?: InPersonExamResultType | null;
+   my_session?: OnlineExamSessionType | null;
+   score?: ExamScoreType | null;
+   term?: AcademicTermType | null;
+   term_id?: number | null;
+   occurrence?: number | null;
+ };
 
 export type StudentOnlineExamListType = ListType<ExamType>;
 
@@ -179,6 +183,8 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     is_descriptive?: boolean
     class_ids?: number[]
     academic_level_ids?: number[]
+    term_id?: number | null
+    occurrence?: number | null
     results: {
       user_id: number
       raw_score?: number

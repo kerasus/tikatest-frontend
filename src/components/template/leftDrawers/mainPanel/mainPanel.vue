@@ -84,21 +84,19 @@ const topLinks = ref<ListItemType[]>([
     route: { name: 'Panel.Student.List' }
   },
   {
-    icon: 'grading',
-    title: 'نمرات',
+    icon: 'quiz',
+    title: 'آزمون ها',
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: '', title: 'ثبت نمره', route: { name: 'Panel.Exam.InPerson.Create' } },
-      { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Exam.InPerson.List' } }
-    ]
-  },
-  {
-    icon: 'quiz',
-    title: 'آزمون آنلاین',
-    forRoles: ['Manager', 'Teacher', 'Admin'],
-    child: [
-      { icon: '', title: 'ثبت آزمون', route: { name: 'Panel.Exam.Online.Create' } },
-      { icon: '', title: 'مشاهده آزمون ها', route: { name: 'Panel.Exam.Online.List' } }
+      { icon: '', title: 'مشاهده نمرات', route: { name: 'Panel.Exam.InPerson.List' } },
+      { icon: '', title: 'ثبت آزمون آنلاین', route: { name: 'Panel.Exam.Online.Create' } },
+      { icon: '', title: 'مشاهده آزمون های آنلاین', route: { name: 'Panel.Exam.Online.List' } },
+      {
+        icon: 'category',
+        title: 'دسته‌بندی آزمون ها',
+        route: { name: 'Panel.ExamCategory.List' }
+      }
     ]
   },
   {

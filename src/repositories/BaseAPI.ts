@@ -26,10 +26,6 @@ export interface MainFlagStates {
   active: boolean;
 }
 
-export enum MainFlagKeys {
-  ACTIVE = 1,
-}
-
 interface CacheEntry {
   data: any;
   expiry: number;

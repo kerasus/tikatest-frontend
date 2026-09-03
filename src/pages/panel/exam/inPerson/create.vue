@@ -141,6 +141,16 @@
                   outlined
                   dense />
               </div>
+              <div class="col-12 col-md-6">
+                <form-builder-select-term
+                  v-model:value="form.term_id"
+                  :school-id="form.school_id"
+                  active-only
+                  label="ترم"
+                  outlined
+                  dense
+                  clearable />
+              </div>
             </div>
 
             <q-separator class="q-my-md" />
@@ -231,6 +241,7 @@ import FormBuilderSelectSchoolClass from 'components/controls/formBuilderCustomI
 import FormBuilderSelectExamCategory from 'components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 import FormBuilderSelectAcademicField from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectTerm from 'components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const examApi = new ExamAPI()
 const studentApi = new StudentAPI()
@@ -258,6 +269,8 @@ const form = reactive({
   min_passing_score: 10 as number | null,
   max_score: 20 as number | null,
   results_visible_at: null as string | null,
+  term_id: null as number | null,
+  occurrence: null as number | null,
   exam_name: 'آزمون کلاسی',
   exam_category_id: null as number | null
 })
@@ -403,6 +416,8 @@ async function onSubmit () {
       held_at: form.exam_date,
       is_descriptive: form.is_descriptive,
       results_visible_at: form.results_visible_at,
+      term_id: form.term_id,
+      occurrence: form.occurrence,
       class_ids: [form.class_id],
       results
     }
