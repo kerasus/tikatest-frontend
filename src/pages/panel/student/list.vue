@@ -50,6 +50,7 @@ import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomIn
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 
 const studentAPI = new StudentAPI()
 const schoolAPI = new SchoolAPI()
@@ -58,6 +59,7 @@ const academicFieldAPI = new AcademicFieldAPI()
 const academicLevelAPI = new AcademicLevelAPI()
 
 const $q = useQuasar()
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
 const FormBuilderSelectSchoolComponent = shallowRef(FormBuilderSelectSchool)
 const FormBuilderSelectSchoolClassComponent = shallowRef(FormBuilderSelectSchoolClass)
 const FormBuilderSelectAcademicFieldComponent = shallowRef(FormBuilderSelectAcademicField)
@@ -146,31 +148,27 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'first_name',
     label: 'نام',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'last_name',
     label: 'نام خانوادگی',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'national_id',
     label: 'کدملی',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'username',
     label: 'نام کاربری',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   }
 ])

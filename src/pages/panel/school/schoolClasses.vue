@@ -323,12 +323,4 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.school-classes-page {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.academic-tree {
-  min-height: 400px;
-}
 </style>

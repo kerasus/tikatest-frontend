@@ -11,7 +11,12 @@ export const index = [
             path: '',
             name: 'Panel.Exam.Online.List',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت آزمون‌های آنلاین',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون ها'
+                }
+              ]
             },
             component: () => import('src/pages/panel/exam/online/list.vue')
           },
@@ -19,7 +24,16 @@ export const index = [
             path: 'create',
             name: 'Panel.Exam.Online.Create',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت آزمون‌های آنلاین',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون‌های آنلاین',
+                  to: { name: 'Panel.Exam.Online.List' }
+                },
+                {
+                  label: 'ساخت آزمون'
+                }
+              ]
             },
             component: () => import('pages/panel/exam/online/create.vue')
           },
@@ -27,7 +41,16 @@ export const index = [
             path: ':id',
             name: 'Panel.Exam.Online.Show',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت آزمون‌های آنلاین',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون‌های آنلاین',
+                  to: { name: 'Panel.Exam.Online.List' }
+                },
+                {
+                  label: 'مشاهده آزمون'
+                }
+              ]
             },
             component: () => import('pages/panel/exam/online/show.vue')
           },
@@ -35,7 +58,16 @@ export const index = [
             path: ':id/edit',
             name: 'Panel.Exam.Online.Edit',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت آزمون‌های آنلاین',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون‌های آنلاین',
+                  to: { name: 'Panel.Exam.Online.List' }
+                },
+                {
+                  label: 'ویرایش آزمون'
+                }
+              ]
             },
             component: () => import('src/pages/panel/exam/online/edit.vue')
           }
@@ -49,7 +81,12 @@ export const index = [
             path: '',
             name: 'Panel.Exam.InPerson.List',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت نمرات',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون ها'
+                }
+              ]
             },
             component: () => import('pages/panel/exam/inPerson/list.vue')
           },
@@ -57,7 +94,16 @@ export const index = [
             path: 'create',
             name: 'Panel.Exam.InPerson.Create',
             meta: {
-              pageCategory: 'مدیریت نمرات'
+              pageCategory: 'مدیریت نمرات',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون ها',
+                  to: { name: 'Panel.Exam.InPerson.List' }
+                },
+                {
+                  label: 'ساخت آزمون'
+                }
+              ]
             },
             component: () => import('pages/panel/exam/inPerson/create.vue')
           },
@@ -65,7 +111,16 @@ export const index = [
             path: ':id',
             name: 'Panel.Exam.InPerson.Show',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت نمرات',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون ها',
+                  to: { name: 'Panel.Exam.InPerson.List' }
+                },
+                {
+                  label: 'مشاهده آزمون'
+                }
+              ]
             },
             component: () => import('src/pages/panel/exam/inPerson/show.vue')
           },
@@ -73,7 +128,16 @@ export const index = [
             path: ':id/edit',
             name: 'Panel.Exam.InPerson.Edit',
             meta: {
-              pageCategory: 'مدیریت آزمون‌ها'
+              pageCategory: 'مدیریت نمرات',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون ها',
+                  to: { name: 'Panel.Exam.InPerson.List' }
+                },
+                {
+                  label: 'ویرایش آزمون'
+                }
+              ]
             },
             component: () => import('pages/panel/exam/inPerson/edit.vue')
           }

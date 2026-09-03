@@ -54,6 +54,7 @@ export type InPersonExamDetailType = {
   exam_id: number | null
   held_at: string | null
   is_descriptive: boolean
+  results_visible_at: string | null
   created_by: number | null
   created_at: string | null
   updated_at: string | null

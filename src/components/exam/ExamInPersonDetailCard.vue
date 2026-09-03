@@ -45,6 +45,18 @@
               </q-chip>
             </template>
           </div>
+          <div class="col-12 col-md-6">
+            <form-builder-date-time
+              v-if="editable"
+              v-model:value="exam.in_person_exam_detail.results_visible_at"
+              label="زمان نمایش نتایج به دانش‌آموزان"
+              outlined
+              dense />
+            <template v-else>
+              <div class="text-subtitle2">زمان نمایش نتایج به دانش‌آموزان:</div>
+              <div class="text-body1">{{ resultsVisibleAtFormatted }}</div>
+            </template>
+          </div>
         </div>
 
         <q-separator class="q-my-md" />
@@ -106,6 +118,12 @@ const dateManager = useDate()
 
 const heldAtFormatted = computed(() => {
   const raw = exam.value.in_person_exam_detail?.held_at
+  if (!raw) return '-'
+  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+})
+
+const resultsVisibleAtFormatted = computed(() => {
+  const raw = exam.value.in_person_exam_detail?.results_visible_at
   if (!raw) return '-'
   return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
 })

@@ -58,7 +58,6 @@
           node-key="id"
           label-key="label"
           children-key="children"
-          default-expand-all
           class="academic-tree">
           <template #default-header="{ node }">
             <div class="row items-center q-col-gutter-sm full-width">
@@ -436,14 +435,3 @@ onMounted(() => {
   loadTreeData()
 })
 </script>
-
-<style lang="scss" scoped>
-.academic-tree-page {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.academic-tree {
-  min-height: 400px;
-}
-</style>

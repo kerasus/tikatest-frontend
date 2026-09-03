@@ -53,13 +53,15 @@
 import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { exam, ExamType } from 'src/repositories/exam'
-import DeleteBtn from 'components/controls/deleteBtn.vue'
-import FormBuilderSelectLesson from 'components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import { useDate } from 'src/composables/Date'
+import { exam, ExamType } from 'src/repositories/exam'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 
 const $q = useQuasar()
 const dateManager = useDate()
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
 const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
 
 const examApi = exam
@@ -136,7 +138,7 @@ const inputs = ref([
     value: 'online'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'name',
     label: 'نام آزمون',
     placeholder: ' ',

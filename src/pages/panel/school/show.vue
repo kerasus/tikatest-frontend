@@ -4,10 +4,18 @@
       <q-card-section>
         <div class="row items-center justify-between">
           <div class="text-h6">جزئیات مدرسه</div>
-          <q-btn
-            color="primary"
-            label="ویرایش"
-            :to="{ name: 'Panel.School.Edit', params: { id: schoolData.id } }" />
+          <div>
+            <q-btn
+              color="primary"
+              label="لیست مدارس"
+              outline
+              :to="{ name: 'Panel.School.List' }"
+              class="q-mr-md" />
+            <q-btn
+              color="primary"
+              label="ویرایش"
+              :to="{ name: 'Panel.School.Edit', params: { id: schoolData.id } }" />
+          </div>
         </div>
       </q-card-section>
 
@@ -45,7 +53,7 @@
             <div class="text-subtitle2">لوگو:</div>
             <q-img
               :src="schoolData.logo_url"
-              style="max-width: 200px; max-height: 200px;"
+              style="max-width: 200px; max-height: 200px"
               contain />
           </div>
         </div>

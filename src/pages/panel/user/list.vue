@@ -36,17 +36,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import UserAPI from 'src/repositories/user'
 import { useDate } from 'src/composables/Date'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { type UserType, getUserRoleLabel, userRoleOptions } from 'src/repositories/user'
+import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 
 const $q = useQuasar()
 const userAPI = new UserAPI()
 const dateManager = useDate()
+
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
+
 const api = ref(userAPI.endpoints.base)
 const label = ref('کاربران')
 const createRouteName = ref('Panel.User.Create')
@@ -108,8 +112,14 @@ const table = ref({
       required: true,
       label: 'زمان ایجاد',
       align: 'left',
-      field: (row: UserType) => row.created_at
-        ? dateManager.miladiToShamsi(row.created_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') : '-'
+      field: (row: UserType) =>
+        row.created_at
+          ? dateManager.miladiToShamsi(
+            row.created_at,
+            'YYYY-MM-DDThh:mm:ss',
+            'hh:mm:ss jYYYY/jMM/jDD'
+          )
+          : '-'
     },
     {
       name: 'actions',
@@ -137,28 +147,25 @@ const inputs = ref([
     value: 30
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'first_name',
     label: 'نام',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'last_name',
     label: 'نام خانوادگی',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'username',
     label: 'نام کاربری',
-    placeholder: ' ',
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'mobile',
     label: 'موبایل',
     placeholder: ' ',
@@ -168,7 +175,6 @@ const inputs = ref([
     type: 'select',
     name: 'role',
     label: 'نقش',
-    placeholder: ' ',
     options: userRoleOptions,
     col: 'col-md-3 col-12'
   }

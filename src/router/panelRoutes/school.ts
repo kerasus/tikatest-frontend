@@ -1,60 +1,113 @@
-import type { RouteRecordRaw } from 'vue-router'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
 export const index = [
   {
     path: 'schools',
-    name: 'Panel.School.List',
+    component: () => import('src/layouts/BareLayout.vue'),
     meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
+      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])],
+      pageCategory: 'مدیریت مدارس'
     },
-    component: () => import('src/pages/panel/school/list.vue')
-  },
-  {
-    path: 'schools/create',
-    name: 'Panel.School.Create',
-    meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
-    },
-    component: () => import('src/pages/panel/school/create.vue')
-  },
-  {
-    path: 'schools/:id/edit',
-    name: 'Panel.School.Edit',
-    meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
-    },
-    component: () => import('src/pages/panel/school/edit.vue')
-  },
-  {
-    path: 'schools/:school_id/grades/create',
-    name: 'Panel.School.Grade.Create',
-    meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
-    },
-    component: () => import('src/pages/panel/grade/schoolCreate.vue')
-  },
-  {
-    path: 'schools/:school_id/classes',
-    name: 'Panel.School.Classes',
-    meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
-    },
-    component: () => import('pages/panel/school/schoolClasses.vue')
-  },
-  {
-    path: 'schools/:id',
-    name: 'Panel.School.Show',
-    meta: {
-      pageCategory: 'مدیریت مدارس',
-      middleware: [Authenticated, hasOneOfThisRoles(['Admin'])]
-    },
-    component: () => import('src/pages/panel/school/show.vue')
+    children: [
+      {
+        path: '',
+        name: 'Panel.School.List',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/list.vue')
+      },
+      {
+        path: 'create',
+        name: 'Panel.School.Create',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'تعریف مدرسه جدید',
+              to: { name: 'Panel.School.Create' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/create.vue')
+      },
+      {
+        path: ':id',
+        name: 'Panel.School.Show',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'مشاهده مدرسه',
+              to: { name: 'Panel.School.Show' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/show.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'Panel.School.Edit',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'ویرایش مدرسه',
+              to: { name: 'Panel.School.Edit' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/edit.vue')
+      },
+      {
+        path: ':school_id/academic-tree',
+        name: 'Panel.School.AcademicTree',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'مدیریت ساختار آموزشی',
+              to: { name: 'Panel.School.AcademicTree' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/academicTree.vue')
+      },
+      {
+        path: ':school_id/classes',
+        name: 'Panel.School.Classes',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'لیست مدارس',
+              to: { name: 'Panel.School.List' }
+            },
+            {
+              label: 'مدیریت کلاس ها',
+              to: { name: 'Panel.School.Classes' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolClasses.vue')
+      }
+    ]
   }
 ]

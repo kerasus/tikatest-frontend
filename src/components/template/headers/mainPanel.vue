@@ -20,7 +20,6 @@ const headerBreadCrumbsStore = useHeaderBreadCrumbs()
 const formattedDate = ref('')
 const formattedTime = ref('')
 
-
 function updateDateTime () {
   const now = moment()
   formattedDate.value = now.format('jYYYY/jMM/jDD')
@@ -87,18 +86,18 @@ function logout () {
               icon="menu"
               @click="toggleLeftDrawerVisible" />
           </div>
+          <div class="pageCategory">
+            {{ headerBreadCrumbsStore.pageCategory }}
+          </div>
           <div class="breadCrumbs">
             <q-breadcrumbs active-color="color-text2">
               <q-breadcrumbs-el
                 v-for="(breadCrumb, breadCrumbIndex) in headerBreadCrumbsStore.breadCrumbs"
                 :key="breadCrumbIndex"
                 :to="breadCrumb.to ? breadCrumb.to : undefined">
-                {{ (breadCrumb.label) }}
+                {{ breadCrumb.label }}
               </q-breadcrumbs-el>
             </q-breadcrumbs>
-          </div>
-          <div class="pageCategory">
-            {{ (headerBreadCrumbsStore.pageCategory) }}
           </div>
         </div>
         <div class="main-dashboard__center-section" />
@@ -135,7 +134,7 @@ function logout () {
                     </div>
                   </div>
                   <div class="profile-menu-user-roles text-blue-grey-7">
-                    ({{ userManager.me.roles.map(r=>translateRole(r.name)).join(', ') }})
+                    ({{ userManager.me.roles.map((r) => translateRole(r.name)).join(', ') }})
                   </div>
                 </div>
 
@@ -166,7 +165,7 @@ function logout () {
   //background: $gray-100;
   background: transparent;
   min-height: $header-height;
-  padding: $space-4 $space-4 $space-4 $space-10;
+  padding: $space-2;
   .main-dashboard {
     border-radius: 1rem;
     padding: $space-3 $space-4 $space-3 $space-16;
@@ -244,10 +243,8 @@ function logout () {
   }
   .profile-menu-user-info {
     .profile-menu-user-fullname {
-
     }
     .profile-menu-user-roles {
-
     }
   }
   .logout-btn {

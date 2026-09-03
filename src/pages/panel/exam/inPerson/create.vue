@@ -134,6 +134,13 @@
                   type="number"
                   step="0.01" />
               </div>
+              <div class="col-12 col-md-6">
+                <form-builder-date-time
+                  v-model:value="form.results_visible_at"
+                  label="زمان نمایش نتایج به دانش‌آموزان"
+                  outlined
+                  dense />
+              </div>
             </div>
 
             <q-separator class="q-my-md" />
@@ -217,6 +224,7 @@ import { useQuasar } from 'quasar'
 import ExamAPI from 'src/repositories/exam'
 import StudentAPI from 'src/repositories/student'
 import FormBuilderDate from 'components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderDateTime from 'components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
 import FormBuilderSelectLesson from 'components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchool from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 import FormBuilderSelectSchoolClass from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
@@ -249,6 +257,7 @@ const form = reactive({
   is_descriptive: false,
   min_passing_score: 10 as number | null,
   max_score: 20 as number | null,
+  results_visible_at: null as string | null,
   exam_name: 'آزمون کلاسی',
   exam_category_id: null as number | null
 })
@@ -393,6 +402,7 @@ async function onSubmit () {
       exam_category_id: form.exam_category_id,
       held_at: form.exam_date,
       is_descriptive: form.is_descriptive,
+      results_visible_at: form.results_visible_at,
       class_ids: [form.class_id],
       results
     }
