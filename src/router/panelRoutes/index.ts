@@ -6,6 +6,7 @@ import { index as homeworkRoutes } from './homework'
 import { index as messageRoutes } from './message'
 import { index as examRoutes } from './exam'
 import { index as examCategoryRoutes } from './examCategory'
+import { index as reportCardRoutes } from './reportCard'
 import { index as disciplinaryRoutes } from './disciplinary'
 import { index as studentPortalRoutes } from './studentPortal'
 import { index as calendarRoutes } from './calendar'
@@ -42,6 +43,7 @@ export const index: RouteRecordRaw[] = [
       ...messageRoutes,
       ...examRoutes,
       ...examCategoryRoutes,
+      ...reportCardRoutes,
       ...disciplinaryRoutes,
       ...studentPortalRoutes,
       ...calendarRoutes,

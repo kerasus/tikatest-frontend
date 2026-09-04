@@ -91,7 +91,11 @@ const topLinks = ref<ListItemType[]>([
       { icon: 'edit_note', title: 'ثبت نمره', route: { name: 'Panel.Exam.InPerson.Create' } },
       { icon: 'visibility', title: 'مشاهده نمرات', route: { name: 'Panel.Exam.InPerson.List' } },
       { icon: 'add', title: 'ثبت آزمون آنلاین', route: { name: 'Panel.Exam.Online.Create' } },
-      { icon: 'visibility', title: 'مشاهده آزمون های آنلاین', route: { name: 'Panel.Exam.Online.List' } }
+      {
+        icon: 'visibility',
+        title: 'مشاهده آزمون های آنلاین',
+        route: { name: 'Panel.Exam.Online.List' }
+      }
     ]
   },
   {
@@ -99,6 +103,12 @@ const topLinks = ref<ListItemType[]>([
     title: 'دسته‌بندی آزمون',
     forRoles: ['Manager', 'Admin'],
     route: { name: 'Panel.ExamCategory.List' }
+  },
+  {
+    icon: 'menu_book',
+    title: 'کارنامه ریز نمرات',
+    forRoles: ['Manager', 'Teacher', 'Admin'],
+    route: { name: 'Panel.ReportCard.Generate' }
   },
   {
     icon: 'assignment',
@@ -329,6 +339,9 @@ watch(
   width: 100%;
   height: 100%;
   position: relative;
+  &* {
+    user-select: none;
+  }
   .q-separator {
     background-image: linear-gradient(
       to right,
