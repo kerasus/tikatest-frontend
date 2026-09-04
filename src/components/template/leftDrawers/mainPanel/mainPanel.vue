@@ -109,10 +109,10 @@ const topLinks = ref<ListItemType[]>([
     title: 'کارنامه‌ها',
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
-      { icon: '', title: 'ریز نمرات', route: { name: 'Panel.ReportCard.Generate' } },
-      { icon: '', title: 'کارنامه جامع', route: { name: 'Panel.ReportCard.Comprehensive' } },
-      { icon: '', title: 'ماتریس نمرات', route: { name: 'Panel.ReportCard.GradeMatrix' } },
-      { icon: '', title: 'شیت نمرات کلاسی', route: { name: 'Panel.ReportCard.ClassGradeSheet' } }
+      { icon: 'description', title: 'ریز نمرات', route: { name: 'Panel.ReportCard.Generate' } },
+      { icon: 'analytics', title: 'کارنامه جامع', route: { name: 'Panel.ReportCard.Comprehensive' } },
+      { icon: 'grid_on', title: 'ماتریس نمرات', route: { name: 'Panel.ReportCard.GradeMatrix' } },
+      { icon: 'assignment', title: 'شیت نمرات کلاسی', route: { name: 'Panel.ReportCard.ClassGradeSheet' } }
     ]
   },
   {

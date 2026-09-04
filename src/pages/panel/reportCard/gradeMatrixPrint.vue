@@ -266,6 +266,37 @@ function printReport () {
   break-after: page;
 }
 
+
+  
+  .matrix-table {
+    overflow: visible;
+  }
+}
+
+
+:deep(.q-table) {
+  thead tr th {
+    font-size: 13px !important;
+    font-weight: 500;
+    line-height: 12px;
+    letter-spacing: 0.005em;
+    text-align: center;
+    height: 32px !important;
+    padding: 0 4px !important;
+  }
+  tbody tr td {
+    font-size: 11px !important;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.0025em;
+    color: #526075;
+    text-align: center;
+    height: 0px !important;
+    padding: 2px 4px !important;
+    border-bottom-width: 1px;
+  }
+}
+
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
@@ -275,12 +306,42 @@ function printReport () {
   .print-actions {
     display: none !important;
   }
-  .matrix-table {
-    overflow: visible;
+  .student-report-card,
+  .matrix-container,
+  .sheet-container {
+    page-break-after: always;
+    break-after: page;
+    border: 1px solid #999 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    padding: 8mm !important;
+  }
+  .lesson-section,
+  .chart-container,
+  table,
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .chart-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px !important;
+  }
+  .chart-container canvas,
+  .chart-container svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  .matrix-table,
+  .sheet-table {
+    overflow: visible !important;
   }
 }
+
 @page {
   size: A4 landscape;
-  margin: 8mm;
+  margin: 5mm;
 }
+
 </style>

@@ -33,7 +33,9 @@
           color="primary"
           label="چاپ"
           icon="print"
+          :loading="isPreparingPrint"
           @click="printReportCards" />
+
         <q-btn
           flat
           label="بازگشت"
@@ -147,8 +149,9 @@
               class="chart-container q-mt-sm">
               <v-chart
                 :option="buildLessonGradeChart(lesson)"
+                :init-options="{ renderer: 'svg' }"
                 :autoresize="true"
-                style="width: 100%; height: 260px" />
+                style="width: 1100px; height: 260px;" />
             </div>
 
             <!-- نمودار تراز آزمون‌های این درس -->
@@ -157,8 +160,9 @@
               class="chart-container q-mt-sm">
               <v-chart
                 :option="buildLessonTarazChart(lesson)"
+                :init-options="{ renderer: 'svg' }"
                 :autoresize="true"
-                style="width: 100%; height: 260px" />
+                style="width: 1100px; height: 260px;" />
             </div>
           </div>
 
@@ -173,11 +177,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import type { QTableColumn } from 'quasar'
 import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
+import { SVGRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
 import {
   TitleComponent,
@@ -188,7 +192,7 @@ import {
 import VChart from 'vue-echarts'
 
 use([
-  CanvasRenderer,
+  SVGRenderer,
   BarChart,
   LineChart,
   TitleComponent,
@@ -209,6 +213,7 @@ const dateManager = useDate()
 const reportCardStore = useReportCardStore()
 
 const loading = ref(false)
+const isPreparingPrint = ref(false)
 const reportCards = computed(() => reportCardStore.reportCards)
 const formSettings = computed(() => reportCardStore.formSettings)
 
@@ -351,7 +356,19 @@ function goBack () {
 }
 
 function printReportCards () {
-  window.print()
+  isPreparingPrint.value = true
+
+  // اجازه می‌دهیم Vue و ECharts چرخه رندر را در DOM تثبیت کنند
+  nextTick(() => {
+    setTimeout(() => {
+      isPreparingPrint.value = false
+      setTimeout(() => {
+        nextTick(() => {
+          window.print()
+        })
+      }, 500)
+    }, 1200) // ۱.۲ ثانیه برای رندر شدن SVGها کاملاً کافیست و کاربر هم معطل نمی‌شود
+  })
 }
 
 // پیکربندی نمودار نمرات درس
@@ -373,6 +390,7 @@ function buildLessonGradeChart (lesson: any) {
   const sortedScores = [...allScores].sort((a, b) => a - b)
 
   return {
+    animation: false,
     title: { text: 'نمودار نمرات', left: 'center', top: 5, textStyle: { fontSize: 14 } },
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     legend: { data: ['نمره‌ها', 'حداکثر', 'حداقل', 'میانگین'], left: 'center', top: 'bottom' },
@@ -415,6 +433,7 @@ function buildLessonTarazChart (lesson: any) {
   const avgScore = allScores.reduce((sum, s) => sum + s, 0) / allScores.length
 
   return {
+    animation: false,
     title: { text: 'نمودار تراز', left: 'center', top: 5, textStyle: { fontSize: 14 } },
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     legend: {
@@ -531,10 +550,80 @@ function buildLessonTarazChart (lesson: any) {
 }
 
 @media print {
+  /* ۱. برداشتن تمام قفل‌های ارتفاع و اسکرول مرورگر */
+  html,
+  body,
+  #q-app,
+  .print-page,
+  .print-container,
+  .cards-list {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+  }
+
+  /* ۲. مخفی کردن لایه‌های مزاحم احتمالی کوآزار */
+  .q-loading,
+  .q-loading__backdrop,
+  .print-actions {
+    display: none !important;
+  }
+
+  /* ۳. حفظ رنگ‌ها و کنتراست شفاف */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+    opacity: 1 !important; // مانع کدر شدن ناشی از ترنزیشن‌ها
+  }
+
+  /* ۴. صفحه‌بندی تمیز کارنامه‌ها */
+  .student-report-card {
+    page-break-after: always !important;
+    break-after: page !important;
+    border: 1px solid #999 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    padding: 8mm !important;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .student-report-card:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .lesson-section,
+  .chart-container,
+  table,
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .chart-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 260px !important;
+    display: block !important;
+    visibility: visible !important;
+    overflow: hidden !important;
+    direction: rtl !important;
+    .echarts,
+    svg {
+      $width: 400px;
+      position: relative !important;
+      display: block !important;
+      width: $width !important;
+      min-width: $width !important;
+      max-width: $width !important;
+      height: 260px !important;
+    }
   }
 
   .print-actions {
