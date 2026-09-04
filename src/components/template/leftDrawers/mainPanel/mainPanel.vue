@@ -106,9 +106,14 @@ const topLinks = ref<ListItemType[]>([
   },
   {
     icon: 'menu_book',
-    title: 'کارنامه ریز نمرات',
+    title: 'کارنامه‌ها',
     forRoles: ['Manager', 'Teacher', 'Admin'],
-    route: { name: 'Panel.ReportCard.Generate' }
+    child: [
+      { icon: '', title: 'ریز نمرات', route: { name: 'Panel.ReportCard.Generate' } },
+      { icon: '', title: 'کارنامه جامع', route: { name: 'Panel.ReportCard.Comprehensive' } },
+      { icon: '', title: 'ماتریس نمرات', route: { name: 'Panel.ReportCard.GradeMatrix' } },
+      { icon: '', title: 'شیت نمرات کلاسی', route: { name: 'Panel.ReportCard.ClassGradeSheet' } }
+    ]
   },
   {
     icon: 'assignment',

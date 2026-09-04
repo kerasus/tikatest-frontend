@@ -195,166 +195,33 @@
       </q-card>
     </q-form>
 
-    <!-- Dialog نمایش کارنامه‌ها -->
-    <q-dialog
-      v-model="showGenerationDialog"
-      full-screen>
-      <q-card class="report-card-dialog-card dialog">
-        <q-card-section class="flex justify-between items-center bg-primary text-white">
-          <div class="text-h6">
-            {{ generating ? 'در حال تولید کارنامه‌ها...' : 'کارنامه‌های کلاس' }}
-          </div>
-          <q-btn
-            flat
-            round
-            dense
-            icon="close"
-            @click="closeGenerationDialog" />
-        </q-card-section>
+    <div
+      v-if="generating"
+      class="text-center q-pa-lg">
+      <q-spinner
+        color="primary"
+        size="80px" />
+      <p class="q-mt-md text-grey">در حال بارگذاری کارنامه‌ها...</p>
+    </div>
 
-        <q-separator />
-
-        <q-card-section
-          v-if="generating"
-          class="text-center q-py-xl">
-          <q-spinner
-            color="primary"
-            size="80px" />
-          <p class="q-mt-md text-grey">
-            لطفاً صبر کنید. کارنامه‌های دانش‌آموزان در حال آماده‌سازی هستند...
-          </p>
-        </q-card-section>
-
-        <q-card-section
-          v-if="!generating && reportCards"
-          class="cards-list q-pa-md">
-          <div
-            v-for="studentReport in reportCards.students"
-            :key="studentReport.student.id"
-            class="student-report-card q-mb-xl q-pa-md shadow-2 rounded-borders">
-            <!-- هدر کارنامه -->
-            <div class="bg-grey-2 q-pa-md rounded-borders text-center q-mb-md">
-              <div class="text-h6 font-bold">{{ reportCards.school.name }}</div>
-              <div
-                v-if="reportCards.term"
-                class="text-subtitle2 text-grey-8">
-                ترم: {{ reportCards.term.name }}
-              </div>
-              <div
-                v-if="form.title"
-                class="text-subtitle1 font-bold text-primary q-mt-xs">
-                {{ form.title }}
-              </div>
-
-              <div class="row justify-between items-center q-mt-sm text-subtitle2 bg-white q-pa-sm rounded-borders">
-                <div>
-                  نام و نام خانوادگی:
-                  <b>{{ studentReport.student.name }} {{ studentReport.student.last_name }}</b>
-                </div>
-                <div v-if="studentReport.student.student_code">
-                  کد دانش‌آموزی: <b>{{ studentReport.student.student_code }}</b>
-                </div>
-                <div>
-                  کلاس: <b>{{ reportCards.class.name }}</b>
-                </div>
-              </div>
-            </div>
-
-            <!-- بخش دروس -->
-            <div
-              v-for="lesson in studentReport.lessons"
-              :key="lesson.id"
-              class="lesson-section q-mb-lg">
-              <div class="row items-center justify-between bg-blue-grey-1 q-pa-xs q-px-sm rounded-borders q-mb-xs">
-                <div class="text-subtitle1 font-bold text-blue-grey-9">
-                  {{ lesson.name }}
-                  <span class="text-caption text-grey-8">(ضریب: {{ lesson.coefficient }})</span>
-                </div>
-                <div
-                  v-if="lesson.results"
-                  class="text-subtitle2 text-positive">
-                  میانگین نمره دانش‌آموز در این درس: {{ lesson.results.avg_score }}
-                </div>
-              </div>
-
-              <!-- جدول ریز نمرات حضوری -->
-              <div
-                v-if="lesson.in_person_results && lesson.in_person_results.length > 0"
-                class="q-mb-md">
-                <q-table
-                  :rows="lesson.in_person_results"
-                  :columns="dynamicInPersonColumns"
-                  :rows-per-page-options="[0]"
-                  row-key="id"
-                  dense
-                  bordered
-                  flat
-                  separator="cell">
-                  <template #body-cell-row_number="props">
-                    <q-td>
-                      {{ props.rowIndex + 1 }}
-                    </q-td>
-                  </template>
-                </q-table>
-              </div>
-
-              <!-- جدول آزمون‌های آنلاین -->
-              <div
-                v-if="lesson.online_results && lesson.online_results.length > 0"
-                class="q-mb-md">
-                <q-table
-                  :rows="lesson.online_results"
-                  :columns="dynamicOnlineColumns"
-                  :rows-per-page-options="[0]"
-                  row-key="id"
-                  dense
-                  bordered
-                  flat
-                  separator="cell" />
-              </div>
-
-              <!-- نمودار نمرات آزمون‌های این درس -->
-              <div
-                v-if="form.show_grade_chart"
-                class="chart-container q-mt-sm">
-                <v-chart
-                  :option="buildLessonGradeChart(lesson)"
-                  :autoresize="true"
-                  style="width: 100%; height: 260px" />
-              </div>
-
-              <!-- نمودار تراز آزمون‌های این درس -->
-              <div
-                v-if="form.show_taraz_chart"
-                class="chart-container q-mt-sm">
-                <v-chart
-                  :option="buildLessonTarazChart(lesson)"
-                  :autoresize="true"
-                  style="width: 100%; height: 260px" />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions
-          v-if="!generating"
-          align="right"
-          class="bg-grey-1">
-          <q-btn
-            color="primary"
-            label="چاپ کارنامه‌ها"
-            icon="print"
-            @click="printReportCards" />
-          <q-btn
-            flat
-            label="بستن"
-            color="grey-8"
-            @click="closeGenerationDialog" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <q-card
+      v-if="reportCards"
+      class="q-mt-md">
+      <q-card-section>
+        <div class="text-h6 text-positive">کارنامه‌ها با موفقیت بارگذاری شدند</div>
+      </q-card-section>
+      <q-card-actions align="right">
+        <q-btn
+          color="primary"
+          label="مشاهده و چاپ کارنامه‌ها"
+          icon="print"
+          @click="goToPrint" />
+        <q-btn
+          flat
+          label="بازنشانی"
+          @click="resetForm" />
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 
@@ -394,13 +261,16 @@ import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCus
 import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import { reportCardAPI } from 'src/repositories/reportCard'
+import { useReportCardStore } from 'src/stores/reportCard'
+import { useRouter } from 'vue-router'
 import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()
 const dateManager = useDate()
+const router = useRouter()
+const reportCardStore = useReportCardStore()
 
 const generating = ref(false)
-const showGenerationDialog = ref(false)
 const reportCards = ref<any>(null)
 
 const form = ref({
@@ -409,7 +279,7 @@ const form = ref({
   academic_level_id: null as number | null,
   class_id: null as number | null,
   term_id: null as number | null,
-  title: 'کارنامه ریز نمرات و تراز' as string,
+  title: 'کارنامه ریز نمرات' as string,
   show_exam_row_number: true,
   show_exam_dates: true,
   show_exam_titles: true,
@@ -586,21 +456,41 @@ async function generateReportCards () {
   if (!canGenerate.value) return
 
   generating.value = true
-  showGenerationDialog.value = true
   reportCards.value = null
 
   try {
-    reportCards.value = await reportCardAPI.classReportCards({
+    const data = await reportCardAPI.classReportCards({
       school_id: form.value.school_id,
       term_id: form.value.term_id,
       class_id: form.value.class_id
     })
+    reportCards.value = data
+    reportCardStore.setReportCards(data)
+    reportCardStore.setFormSettings({
+      ...form.value
+    })
+    router.push({ name: 'Panel.ReportCard.Generate.Print' })
   } catch (e) {
     console.error(e)
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری کارنامه‌ها' })
   } finally {
     generating.value = false
   }
+}
+
+function goToPrint () {
+  router.push({ name: 'Panel.ReportCard.Generate.Print' })
+}
+
+function resetForm () {
+  reportCards.value = null
+  reportCardStore.clear()
+  form.value.school_id = null
+  form.value.field_id = null
+  form.value.academic_level_id = null
+  form.value.class_id = null
+  form.value.term_id = null
+  form.value.title = 'کارنامه ریز نمرات'
 }
 
 // پیکربندی آپشن‌های ECharts برای نمودار مقایسه‌ای نمرات
@@ -690,107 +580,15 @@ function buildLessonTarazChart (lesson: any) {
 }
 
 function printReportCards () {
-  // پرینت مستقیم از همین صفحه؛ بنابراین CSS، فونت، رنگ‌ها و نمودارها حفظ می‌شوند
   window.print()
-}
-
-function closeGenerationDialog () {
-  showGenerationDialog.value = false
 }
 </script>
 
 <style lang="scss" scoped>
-/* استایل‌های استاندارد نمایش */
-.student-report-card {
-  border: 1px solid #e0e0e0;
-  background: #ffffff;
-}
-
-/* ==============================================
-   استایل‌های اختصاصی پرینت (کلید طلایی حل مشکل)
-   ============================================== */
-@media print {
-  /* ۱. حفظ کامل رنگ‌ها و پس‌زمینه‌ها در مرورگر */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-  }
-
-  /* ۲. مخفی کردن تمام اجزای اضافه صفحه (هدرها، دکمه‌ها و پس‌زمینه دیالوگ) */
-  body * {
-    visibility: hidden;
-  }
-
-  /* ۳. نمایان کردن فقط بخش کارنامه‌ها */
-  .cards-list,
-  .cards-list * {
-    visibility: visible;
-  }
-
-  .cards-list {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* ۴. صفحه‌بندی: هر کارنامه دانش‌آموز دقیقا در یک صفحه مجزا چاپ شود */
-  .student-report-card {
-    page-break-after: always !important;
-    break-after: page !important;
-    border: 1px solid #999 !important;
-    box-shadow: none !important;
-    margin-bottom: 0 !important;
-    padding: 12mm !important;
-  }
-
-  /* ۵. جلوگیری از شکستن ناگهانی جداول و نمودارها وسط صفحه */
-  .lesson-section,
-  .chart-container,
-  table,
-  tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* ۶. تنظیم ابعاد دقیق نمودارها برای برگه A4 */
-  .chart-container {
-    width: 100% !important;
-  }
-}
-
-@page {
-  size: A4 portrait;
-  margin: 8mm;
-}
-
 .report-card-page {
   padding: 16px;
 }
-.student-report-card {
-  border: 1px solid #ddd;
-}
-.lesson-section {
-  border: 1px solid #eee;
-}
-.table-sm {
-  font-size: 12px;
-}
 .chart-container {
   direction: ltr;
-}
-
-.report-card-dialog-card {
-  padding: 0;
-  min-width: 100% !important;
-  max-width: 100% !important;
-  min-height: 100% !important;
-  max-height: 100% !important;
-  .cards-list {
-    overflow: auto;
-  }
 }
 </style>
