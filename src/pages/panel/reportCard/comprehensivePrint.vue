@@ -216,22 +216,6 @@ function printReport () {
 }
 
 
-  
-  .student-report-card {
-    page-break-after: always;
-    break-after: page;
-    border: 1px solid #999 !important;
-    box-shadow: none !important;
-    margin-bottom: 0 !important;
-    padding: 12mm !important;
-  }
-  .lesson-section,
-  table,
-  tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-}
 
 
 :deep(.q-table) {

@@ -50,47 +50,41 @@
           :key="studentReport.student.id"
           class="student-report-card q-mb-xl">
           <!-- هدر آموزشگاه -->
-          <div class="school-header bg-grey-2 q-pa-md rounded-borders text-center q-mb-md">
-            <div class="text-h6 font-bold">{{ reportCards.school.name }}</div>
-            <div
-              v-if="reportCards.school.address"
-              class="text-subtitle2 text-grey-8">
-              {{ reportCards.school.address }}
-            </div>
-            <div
-              v-if="reportCards.school.phone"
-              class="text-subtitle2 text-grey-8">
-              {{ reportCards.school.phone }}
-            </div>
-            <div
-              v-if="reportCards.term"
-              class="text-subtitle2">
-              ترم: {{ reportCards.term.name }}
-            </div>
-            <div class="text-subtitle1 font-bold text-primary q-mt-xs">
-              {{ formSettings.title || 'کارنامه ریز نمرات' }}
-            </div>
-          </div>
+          <header-type1
+            v-if="false"
+            :school="reportCards.school"
+            :student="studentReport.student"
+            :title="formSettings.title"
+            :term-name="reportCards.term?.name"
+            :class-name="reportCards.class?.name"
+            :academic-year="reportCards.academic_year?.name" />
 
-          <!-- اطلاعات هویتی دانش‌آموز -->
-          <div class="student-info bg-blue-grey-1 q-pa-sm rounded-borders q-mb-md">
-            <div class="row">
-              <div class="col">
-                <div class="text-subtitle2">
-                  نام و نام خانوادگی:
-                  <b>{{ studentReport.student.name }} {{ studentReport.student.last_name }}</b>
-                </div>
-                <div
-                  v-if="studentReport.student.student_code"
-                  class="text-subtitle2">
-                  کد دانش‌آموزی: <b>{{ studentReport.student.student_code }}</b>
-                </div>
-                <div class="text-subtitle2">
-                  کلاس: <b>{{ reportCards.class.name }}</b>
-                </div>
-              </div>
-            </div>
-          </div>
+          <header-type2
+            v-if="false"
+            :school="reportCards.school"
+            :student="studentReport.student"
+            :title="formSettings.title"
+            :term-name="reportCards.term?.name"
+            :class-name="reportCards.class?.name"
+            :academic-year="reportCards.academic_year?.name" />
+
+          <header-type3
+            v-if="true"
+            :school="reportCards.school"
+            :student="studentReport.student"
+            :title="formSettings.title"
+            :term-name="reportCards.term?.name"
+            :class-name="reportCards.class?.name"
+            :academic-year="reportCards.academic_year?.name" />
+
+          <header-type4
+            v-if="false"
+            :school="reportCards.school"
+            :student="studentReport.student"
+            :title="formSettings.title"
+            :term-name="reportCards.term?.name"
+            :class-name="reportCards.class?.name"
+            :academic-year="reportCards.academic_year?.name" />
 
           <!-- بخش دروس -->
           <div
@@ -151,7 +145,7 @@
                 :option="buildLessonGradeChart(lesson)"
                 :init-options="{ renderer: 'svg' }"
                 :autoresize="true"
-                style="width: 1100px; height: 260px;" />
+                style="width: 1100px; height: 260px" />
             </div>
 
             <!-- نمودار تراز آزمون‌های این درس -->
@@ -162,7 +156,7 @@
                 :option="buildLessonTarazChart(lesson)"
                 :init-options="{ renderer: 'svg' }"
                 :autoresize="true"
-                style="width: 1100px; height: 260px;" />
+                style="width: 1100px; height: 260px" />
             </div>
           </div>
 
@@ -183,6 +177,10 @@ import type { QTableColumn } from 'quasar'
 import { use } from 'echarts/core'
 import { SVGRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
+import HeaderType1 from 'src/components/reportCard/gradeDetail/headers/type1.vue'
+import HeaderType2 from 'src/components/reportCard/gradeDetail/headers/type2.vue'
+import HeaderType3 from 'src/components/reportCard/gradeDetail/headers/type3.vue'
+import HeaderType4 from 'src/components/reportCard/gradeDetail/headers/type4.vue'
 import {
   TitleComponent,
   TooltipComponent,
@@ -476,17 +474,29 @@ function buildLessonTarazChart (lesson: any) {
     ]
   }
 }
+
+function onLogoError (e: Event) {
+  const img = e.target as HTMLImageElement
+  img.src = '/images/logo.png'
+}
+
+function onStudentPhotoError (e: Event) {
+  const img = e.target as HTMLImageElement
+  img.src = '/images/blankProfile.png'
+}
 </script>
 
 <style lang="scss" scoped>
 .print-page {
   padding: 16px;
+  width: 100%;
   max-width: 100%;
-  min-width: 100%;
 }
+
 .print-container {
   background: #fff;
 }
+
 .print-actions {
   position: sticky;
   top: 0;
@@ -495,37 +505,36 @@ function buildLessonTarazChart (lesson: any) {
   padding: 12px 0;
   border-bottom: 1px solid #e0e0e0;
 }
+
 .cards-list {
   margin-top: 16px;
 }
+
 .student-report-card {
+  background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
   padding: 16px;
 }
-.school-header {
-  border-bottom: 2px solid #1976d2;
-}
-.student-info {
-  border: 1px solid #b0bec5;
-}
+
 .lesson-section {
+  background: #fafafa;
   border: 1px solid #eeeeee;
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 16px;
-  background: #fafafa;
 }
+
 .page-break {
   page-break-after: always;
   break-after: page;
 }
+
 .chart-container {
   direction: ltr;
 }
 
+/* ═══ تنظیمات جدول کوآزار ═══ */
 :deep(.q-table) {
   thead tr th {
     font-size: 14px !important;
@@ -534,8 +543,9 @@ function buildLessonTarazChart (lesson: any) {
     letter-spacing: 0.005em;
     text-align: center;
     height: 34px !important;
-    padding: 0 0 !important;
+    padding: 0 !important;
   }
+
   tbody tr td {
     font-size: 12px !important;
     font-weight: 400;
@@ -543,44 +553,41 @@ function buildLessonTarazChart (lesson: any) {
     letter-spacing: 0.0025em;
     color: #526075;
     text-align: center;
-    height: 0px !important;
-    padding: 0px 0px !important;
+    height: 0 !important;
+    padding: 0 !important;
     border-bottom-width: 1px;
   }
 }
 
+/* ═══ بهینه‌سازی چاپ و خروجی PDF ═══ */
 @media print {
-  /* ۱. برداشتن تمام قفل‌های ارتفاع و اسکرول مرورگر */
   html,
   body,
   #q-app,
   .print-page,
   .print-container,
   .cards-list {
+    width: 100% !important;
     height: auto !important;
     min-height: 100% !important;
     overflow: visible !important;
     position: static !important;
     transform: none !important;
-    width: 100% !important;
   }
 
-  /* ۲. مخفی کردن لایه‌های مزاحم احتمالی کوآزار */
   .q-loading,
   .q-loading__backdrop,
   .print-actions {
     display: none !important;
   }
 
-  /* ۳. حفظ رنگ‌ها و کنتراست شفاف */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
-    opacity: 1 !important; // مانع کدر شدن ناشی از ترنزیشن‌ها
+    opacity: 1 !important;
   }
 
-  /* ۴. صفحه‌بندی تمیز کارنامه‌ها */
   .student-report-card {
     page-break-after: always !important;
     break-after: page !important;
@@ -591,19 +598,29 @@ function buildLessonTarazChart (lesson: any) {
     display: block !important;
     width: 100% !important;
     box-sizing: border-box !important;
+
+    &:last-child {
+      page-break-after: auto !important;
+      break-after: auto !important;
+    }
   }
 
-  .student-report-card:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
-  }
-
-  .lesson-section,
-  .chart-container,
   table,
   tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  .lesson-section,
+  table,
+  tr {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    .row:first-child {
+      // نوار عنوان درس
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
   }
 
   .chart-container {
@@ -614,41 +631,19 @@ function buildLessonTarazChart (lesson: any) {
     visibility: visible !important;
     overflow: hidden !important;
     direction: rtl !important;
-    .echarts,
-    svg {
-      $width: 400px;
-      position: relative !important;
-      display: block !important;
-      width: $width !important;
-      min-width: $width !important;
-      max-width: $width !important;
-      height: 260px !important;
-    }
-  }
-
-  .print-actions {
-    display: none !important;
-  }
-
-  .student-report-card {
-    page-break-after: always;
-    break-after: page;
-    border: 1px solid #999 !important;
-    box-shadow: none !important;
-    margin-bottom: 0 !important;
-    padding: 0 !important;
-  }
-
-  .lesson-section,
-  .chart-container,
-  table,
-  tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-  }
 
-  .chart-container {
-    width: 100% !important;
+    .echarts,
+    svg {
+      $chart-width: 400px;
+      position: relative !important;
+      display: block !important;
+      width: $chart-width !important;
+      min-width: $chart-width !important;
+      max-width: $chart-width !important;
+      height: 260px !important;
+    }
   }
 }
 

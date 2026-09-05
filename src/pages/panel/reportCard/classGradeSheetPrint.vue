@@ -246,11 +246,6 @@ function printReport () {
 }
 
 
-  
-  .sheet-table {
-    overflow: visible;
-  }
-}
 
 
 :deep(.q-table) {

@@ -267,11 +267,6 @@ function printReport () {
 }
 
 
-  
-  .matrix-table {
-    overflow: visible;
-  }
-}
 
 
 :deep(.q-table) {
