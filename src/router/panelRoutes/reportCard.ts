@@ -16,7 +16,7 @@ export const index = [
             }
           ]
         },
-        component: () => import('src/pages/panel/reportCard/generate.vue')
+        component: () => import('pages/panel/reportCard/gradeDetail.vue')
       },
       {
         path: 'grade-detail/print',
@@ -34,7 +34,7 @@ export const index = [
             }
           ]
         },
-        component: () => import('src/pages/panel/reportCard/generatePrint.vue')
+        component: () => import('pages/panel/reportCard/gradeDetailPrint.vue')
       },
       {
         path: 'comprehensive',

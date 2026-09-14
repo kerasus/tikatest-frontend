@@ -45,8 +45,10 @@ export interface UserType {
   email: string | null;
   username: string | null;
   mobile: string | null;
+  national_id: string | null;
   roles_list: string[];
   roles: RoleType[];
+  permissions_list: string[]
   email_verified_at: string | null;
   mobile_verified_at: string | null;
   birth_date: string | null;
@@ -55,7 +57,7 @@ export interface UserType {
   picture: string | null;
   created_at: string | null;
   updated_at: string | null;
-};
+}
 
 export function getUserRoleLabel (roleName: string): string {
   const targetRole = userRoleOptions.find((item)=>item.value === roleName)
@@ -75,9 +77,11 @@ export default class UserAPI extends BaseAPI<UserType> {
       last_name: null,
       email: null,
       username: null,
+      national_id: null,
       mobile: null,
       roles: [],
       roles_list: [],
+      permissions_list: [],
       email_verified_at: null,
       mobile_verified_at: null,
       birth_date: null,

@@ -1,4 +1,5 @@
 import BaseAPI from './BaseAPI'
+import { StudentProfileType } from 'src/repositories/student'
 
 export type ReportCardLessonResult = {
   id: number
@@ -31,11 +32,14 @@ export type ReportCardLesson = {
   online_results: ReportCardLessonResult[]
 }
 
-export type ReportCardStudentInfoExtended = {
+export interface ReportCardStudentInfoExtended {
   id: number
-  name: string | null
+  first_name: string | null
   last_name: string | null
+  national_id: string | null
   student_code: string | null
+  picture: string | null
+  student_profile: StudentProfileType | null
   username: string | null
 }
 
@@ -54,6 +58,7 @@ export type ReportCardSchool = {
   id: number
   name: string | null
   address: string | null
+  logo_url: string | null
   phone: string | null
 }
 
@@ -81,12 +86,20 @@ export type ComprehensiveReportResponse = {
   class: ReportCardClass
   students: {
     student: ReportCardStudentInfoExtended
-    lessons: {
+    lessons:
+      {
       id: number
       name: string
       coefficient: number | null
       scores: { exam_id: number; exam_name: string | null; category: string | null; score: number | null; count: number }[]
       avg_score: number | null
+      max_score: number | null
+      min_score: number | null
+      class_avg: number | null
+      class_max: number | null
+      class_min: number | null
+      student_avg: number | null
+      student_score: number | null
     }[]
   }[]
 }
@@ -98,10 +111,12 @@ export type GradeMatrixResponse = {
   lesson: { id: number; name: string | null }
   exams: { id: number; name: string; category: string | null; held_at: string | null }[]
   students: {
-    student_id: number
-    name: string | null
+    id: number
+    first_name: string | null
     last_name: string | null
-    student_code: string | null
+    national_id: string | null
+    username: string | null
+    student_profile: StudentProfileType | null
     scores: (number | null)[]
     avg_score: number | null
   }[]
@@ -120,10 +135,10 @@ export type ClassGradeSheetResponse = {
   school: ReportCardSchool
   term: ReportCardTerm | null
   class: ReportCardClass
-  exams: { id: number; name: string; lesson_id: number; lesson_name: string | null; category: string | null }[]
+  exams: { id: number; name: string; held_at: string; lesson_id: number; lesson_name: string | null; category: string | null }[]
   students: {
     student_id: number
-    name: string | null
+    first_name: string | null
     last_name: string | null
     student_code: string | null
     scores: (number | null)[]

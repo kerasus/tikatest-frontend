@@ -228,7 +228,8 @@ async function generateReport () {
       category_id: form.value.category_id || undefined
     })
     reportData.value = data
-    reportCardStore.setReportCards(data as any)
+    // reportCardStore.setReportCards(data as any)
+    reportCardStore.setComprehensiveReports(data)
     reportCardStore.setFormSettings({ ...form.value, reportType: 'comprehensive' })
     router.push({ name: 'Panel.ReportCard.Comprehensive.Print' })
   } catch (e) {

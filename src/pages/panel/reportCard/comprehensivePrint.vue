@@ -24,6 +24,7 @@
           color="primary"
           label="چاپ"
           icon="print"
+          :loading="isPreparingPrint"
           @click="printReport" />
         <q-btn
           flat
@@ -38,34 +39,14 @@
           v-for="(studentReport, studentIndex) in reportData.students"
           :key="studentReport.student.id"
           class="student-report-card q-mb-xl">
-          <div class="school-header bg-grey-2 q-pa-md rounded-borders text-center q-mb-md">
-            <div class="text-h6 font-bold">{{ reportData.school.name }}</div>
-            <div
-              v-if="reportData.term"
-              class="text-subtitle2 text-grey-8">ترم: {{ reportData.term.name }}</div>
-            <div class="text-subtitle1 font-bold text-primary q-mt-xs">
-              {{ formSettings.title || 'کارنامه جامع' }}
-            </div>
-          </div>
 
-          <div class="student-info bg-blue-grey-1 q-pa-sm rounded-borders q-mb-md">
-            <div class="row">
-              <div class="col">
-                <div class="text-subtitle2">
-                  نام و نام خانوادگی:
-                  <b>{{ studentReport.student.name }} {{ studentReport.student.last_name }}</b>
-                </div>
-                <div
-                  v-if="studentReport.student.student_code"
-                  class="text-subtitle2">
-                  کد دانش‌آموزی: <b>{{ studentReport.student.student_code }}</b>
-                </div>
-                <div class="text-subtitle2">
-                  کلاس: <b>{{ reportData.class.name }}</b>
-                </div>
-              </div>
-            </div>
-          </div>
+          <header-type5
+            v-if="headerType === 5"
+            :school="reportData.school"
+            :student="studentReport.student"
+            :title="formSettings.title"
+            :term-name="reportData.term?.name"
+            :class-name="reportData.class?.name" />
 
           <q-table
             :rows="studentReport.lessons"
@@ -75,36 +56,16 @@
             bordered
             flat
             separator="cell"
-            class="lesson-matrix-table">
-            <template #body-cell-coefficient="props">
-              <q-td>{{ props.row.coefficient ?? '-' }}</q-td>
-            </template>
-            <template #body-cell-student_avg="props">
-              <q-td class="bg-blue-1">
-                <b>{{ props.row.student_avg ?? '-' }}</b>
-              </q-td>
-            </template>
-            <template #body-cell-class_avg="props">
-              <q-td>{{ props.row.class_avg ?? '-' }}</q-td>
-            </template>
-            <template #body-cell-class_max="props">
-              <q-td class="bg-green-1">{{ props.row.class_max ?? '-' }}</q-td>
-            </template>
-            <template #body-cell-class_min="props">
-              <q-td class="bg-red-1">{{ props.row.class_min ?? '-' }}</q-td>
-            </template>
-            <template #body-cell-student_score="props">
-              <q-td class="bg-yellow-1">
-                <b>{{ props.row.student_score ?? '-' }}</b>
-              </q-td>
-            </template>
-            <template #body-cell-max_score="props">
-              <q-td>{{ props.row.max_score ?? '-' }}</q-td>
-            </template>
-            <template #body-cell-min_score="props">
-              <q-td>{{ props.row.min_score ?? '-' }}</q-td>
-            </template>
-          </q-table>
+            class="lesson-matrix-table" />
+
+          <!-- بلوک نمودار مقایسه‌ای کارنامه -->
+          <div class="report-chart-section">
+            <v-chart
+              :option="getStudentChartOption(studentReport.lessons)"
+              :autoresize="true"
+              class="student-echart"
+              style="width: 170mm; height: 45mm" />
+          </div>
 
           <div
             v-if="studentIndex < reportData.students.length - 1"
@@ -116,18 +77,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart, BarChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
 import type { QTableColumn } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useReportCardStore } from 'src/stores/reportCard'
+import HeaderType5 from 'src/components/reportCard/gradeDetail/headers/type5.vue'
 import type { ComprehensiveReportResponse } from 'src/repositories/reportCard'
+import HeaderType4 from 'components/reportCard/gradeDetail/headers/type4.vue'
+
+use([CanvasRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent])
 
 const $q = useQuasar()
 const router = useRouter()
 const reportCardStore = useReportCardStore()
 
-const reportData = computed(() => reportCardStore.reportCards as ComprehensiveReportResponse | null)
+const headerType = ref<number>(5)
+const isPreparingPrint = ref(false)
+
+const reportData = computed(() => reportCardStore.comprehensiveReports)
 const formSettings = computed(() => reportCardStore.formSettings)
 
 const lessonColumns = computed<QTableColumn[]>(() => {
@@ -137,19 +115,39 @@ const lessonColumns = computed<QTableColumn[]>(() => {
   ]
 
   if (formSettings.value.show_student_grade !== false) {
-    cols.push({ name: 'student_avg', label: 'میانگین نمره دانش‌آموز', field: 'student_avg', align: 'center' })
+    cols.push({
+      name: 'student_avg',
+      label: 'نمره دانش‌آموز',
+      field: 'student_avg',
+      align: 'center'
+    })
   }
   if (formSettings.value.show_avg_grade !== false) {
-    cols.push({ name: 'class_avg', label: 'میانگین کلاس', field: 'class_avg', align: 'center' })
+    cols.push({ name: 'class_avg', label: 'میانگین', field: 'class_avg', align: 'center' })
   }
   if (formSettings.value.show_max_grade !== false) {
-    cols.push({ name: 'class_max', label: 'بیشترین نمره کلاس', field: 'class_max', align: 'center' })
+    cols.push({
+      name: 'class_max',
+      label: 'بیشترین',
+      field: 'class_max',
+      align: 'center'
+    })
   }
   if (formSettings.value.show_min_grade !== false) {
-    cols.push({ name: 'class_min', label: 'کمترین نمره کلاس', field: 'class_min', align: 'center' })
+    cols.push({
+      name: 'class_min',
+      label: 'کمترین',
+      field: 'class_min',
+      align: 'center'
+    })
   }
   if (formSettings.value.show_student_score !== false) {
-    cols.push({ name: 'student_score', label: 'تراز دانش‌آموز', field: 'student_score', align: 'center' })
+    cols.push({
+      name: 'student_score',
+      label: 'تراز دانش‌آموز',
+      field: 'student_score',
+      align: 'center'
+    })
   }
   if (formSettings.value.show_max_score !== false) {
     cols.push({ name: 'max_score', label: 'بیشترین تراز', field: 'max_score', align: 'center' })
@@ -161,48 +159,229 @@ const lessonColumns = computed<QTableColumn[]>(() => {
   return cols
 })
 
+
+// تبدیل ارقام به فارسی
+const toFarsi = (val: string | number | null | undefined): string => {
+  if (val === null || val === undefined || val === '') return '-'
+  return val.toString().replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d, 10)])
+}
+
+// تابع جنریت آپشن چارت متناسب با هر دانش‌آموز
+function getStudentChartOption (lessons: any[]) {
+  if (!lessons || lessons.length === 0) return {}
+
+
+  // مپر امن: undefined، null، '' و NaN رو همه به null تبدیل می‌کنه
+  const safeNum = (val: unknown): number | null => {
+    const n = Number(val)
+    return val !== null && val !== undefined && val !== '' && !Number.isNaN(n) ? n : null
+  }
+
+  // اگه ممکنه سرور کلیدهای مختلف بفرسته، fallback هم بذار
+  const pick = (l: any, ...keys: string[]) => {
+    for (const k of keys) {
+      if (l[k] !== undefined && l[k] !== null) return l[k]
+    }
+    return null
+  }
+
+  const lessonNames    = lessons.map((l) => l.name)
+  const studentGrades  = lessons.map((l) => safeNum(pick(l, 'student_avg')))
+  const classAverages  = lessons.map((l) => safeNum(pick(l, 'class_avg', 'avg')))
+  const classMaxGrades = lessons.map((l) => safeNum(pick(l, 'class_max', 'max')))
+  const classMinGrades = lessons.map((l) => safeNum(pick(l, 'class_min', 'min')))
+
+  const fmt = (val: number) => Math.round(val)
+
+  return {
+    animation: false, // خاموش بودن انیمیشن جهت رندر فوری در حالت پرینت و PDF
+    title: {
+      text: 'نمودار تحلیل و مقایسه عملکرد دروس با میانگین و رکورد کلاس',
+      left: 'center',
+      top: 2,
+      textStyle: { fontSize: 13, fontFamily: 'inherit', fontWeight: 'bold' }
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return ''
+        let result =
+          '<div style="direction: rtl; text-align: right; min-width: 140px; font-family: inherit; font-size: 11px;">'
+        result += `<div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; font-size: 12px;">${params[0].axisValue}</div>`
+        params.forEach((item: any) => {
+          const rawVal = typeof item.value === 'number' ? item.value : parseFloat(item.value || 0)
+          const formattedVal = fmt(rawVal).toLocaleString('fa-IR')
+          result += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+              <span style="display: inline-flex; align-items: center; gap: 6px;">
+                ${item.marker}
+                <span>${item.seriesName}</span>
+              </span>
+              <span style="font-weight: bold; direction: ltr; margin-left: 8px;">${formattedVal}</span>
+            </div>
+          `
+        })
+        result += '</div>'
+        return result
+      }
+    },
+    legend: {
+      data: ['نمره دانش‌آموز', 'میانگین', 'بالاترین', 'پایین‌ترین'],
+      bottom: 0,
+      textStyle: { fontSize: 11, fontFamily: 'inherit' },
+      itemWidth: 16,
+      itemHeight: 8
+    },
+    grid: {
+      left: '2%',
+      right: '2%',
+      top: 35,
+      bottom: 40,
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: true,
+      data: lessonNames,
+      axisTick: { alignWithLabel: true },
+      axisLine: { lineStyle: { color: '#94a3b8' } },
+      axisLabel: {
+        fontSize: 9.5,
+        color: '#1e293b',
+        interval: 0,
+        rotate: lessonNames.length > 7 ? 20 : 0
+      }
+    },
+    yAxis: {
+      type: 'value',
+      scale: true,
+      min: (value: { min: number }) => Math.max(0, Math.floor(value.min - 1)),
+      max: (value: { max: number }) => Math.min(20, Math.ceil(value.max + 1)),
+      axisLabel: {
+        fontSize: 10,
+        fontFamily: 'inherit',
+        color: '#64748b',
+        formatter: (val: number) => toFarsi(val)
+      },
+      splitLine: {
+        lineStyle: { color: '#f1f5f9', type: 'dashed' }
+      }
+    },
+    series: [
+      {
+        name: 'نمره دانش‌آموز',
+        type: 'bar',
+        barMaxWidth: 16,
+        itemStyle: {
+          color: '#2563eb', // آبی پررنگ شاخص
+          borderRadius: [4, 4, 0, 0]
+        },
+        data: studentGrades,
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 10,
+          color: '#1d4ed8',
+          fontWeight: 'bold',
+          formatter: (p: any) => fmt(p.value).toLocaleString('fa-IR')
+        }
+      },
+      {
+        name: 'میانگین',
+        type: 'bar',
+        barMaxWidth: 10,
+        itemStyle: {
+          color: '#60a5fa',
+          borderRadius: [3, 3, 0, 0]
+        },
+        data: classAverages
+      },
+      {
+        name: 'بالاترین',
+        type: 'bar',
+        barMaxWidth: 8,
+        symbol: 'triangle',
+        symbolSize: 5,
+        itemStyle: {
+          color: '#10b981', // آبی ملایم‌تر
+          borderRadius: [3, 3, 0, 0]
+        },
+        data: classMaxGrades
+      },
+      {
+        name: 'پایین‌ترین',
+        type: 'bar',
+        barMaxWidth: 8,
+        itemStyle: {
+          color: '#f87171',
+          borderRadius: [3, 3, 0, 0]
+        },
+        data: classMinGrades
+      }
+    ]
+  }
+}
+
 function goBack () {
   router.back()
 }
 
 function printReport () {
-  window.print()
+  isPreparingPrint.value = true
+
+  // اجازه می‌دهیم Vue و ECharts چرخه رندر را در DOM تثبیت کنند
+  nextTick(() => {
+    setTimeout(() => {
+      isPreparingPrint.value = false
+      setTimeout(() => {
+        nextTick(() => {
+          window.print()
+        })
+      }, 300)
+    }, 800)
+  })
 }
 </script>
 
 <style lang="scss" scoped>
 .print-page {
-  padding: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
 }
+
 .print-container {
   background: #fff;
 }
+
 .print-actions {
   position: sticky;
   top: 0;
   z-index: 10;
   background: #fff;
-  padding: 12px 0;
   border-bottom: 1px solid #e0e0e0;
 }
+
 .cards-list {
-  margin-top: 16px;
+  margin-top: 0;
 }
+
 .student-report-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
   overflow: hidden;
   background: #fff;
-  padding: 16px;
+  padding: 12px;
+  box-sizing: border-box;
+  .echarts {
+    margin: auto;
+  }
 }
+
 .school-header {
   border-bottom: 2px solid #1976d2;
 }
+
 .student-info {
   border: 1px solid #b0bec5;
 }
+
 .lesson-section {
   border: 1px solid #eeeeee;
   border-radius: 6px;
@@ -210,13 +389,11 @@ function printReport () {
   margin-bottom: 16px;
   background: #fafafa;
 }
+
 .page-break {
   page-break-after: always;
   break-after: page;
 }
-
-
-
 
 :deep(.q-table) {
   thead tr th {
@@ -241,42 +418,59 @@ function printReport () {
   }
 }
 
+.report-chart-section {
+  direction: ltr;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 4px;
+  margin-top: 10px;
+}
+
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
+
+  body {
+    margin: 0 !important;
+  }
+
   .print-actions {
     display: none !important;
   }
-  .student-report-card,
-  .matrix-container,
-  .sheet-container {
-    page-break-after: always;
-    break-after: page;
-    border: 1px solid #999 !important;
-    box-shadow: none !important;
-    margin-bottom: 0 !important;
-    padding: 8mm !important;
+
+  .print-container {
+    padding: 0 !important;
+    margin: 0 !important;
   }
+
+  .cards-list {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .student-report-card {
+    padding: 0 !important;
+    margin: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .student-report-card:not(:last-child) {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
   .lesson-section,
-  .chart-container,
+  .report-chart-section,
   table,
   tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
-  .chart-container {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 200px !important;
-  }
-  .chart-container canvas,
-  .chart-container svg {
-    max-width: 100% !important;
-    height: auto !important;
-  }
+
   .matrix-table,
   .sheet-table {
     overflow: visible !important;
@@ -284,8 +478,8 @@ function printReport () {
 }
 
 @page {
-  size: A4 landscape;
+  size: A4 portrait;
   margin: 5mm;
 }
-
 </style>
+

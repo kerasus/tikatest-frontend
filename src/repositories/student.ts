@@ -1,4 +1,5 @@
 import BaseAPI from './BaseAPI'
+import { UserType } from 'src/repositories/user'
 
 export type StudentProfileType = {
   id: number | null
@@ -48,25 +49,7 @@ export type StudentUserClassRegistrationType = {
   updated_at: string | null
 }
 
-export type StudentType = {
-  id: number | null
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  email: string | null
-  username: string | null
-  mobile: string | null
-  national_id: string | null
-  birth_date: string | null
-  address: string | null
-  description: string | null
-  picture: string | null
-  email_verified_at: string | null
-  mobile_verified_at: string | null
-  roles_list: string[]
-  permissions_list: string[]
-  created_at: string | null
-  updated_at: string | null
+export interface StudentType extends UserType {
   student_profile?: StudentProfileType | null
   guardian_records?: StudentGuardianType[] | null
   user_class_registrations?: StudentUserClassRegistrationType[] | null
@@ -79,7 +62,6 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       id: null,
       first_name: null,
       last_name: null,
-      full_name: null,
       email: null,
       username: null,
       mobile: null,
@@ -90,6 +72,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       picture: null,
       email_verified_at: null,
       mobile_verified_at: null,
+      roles: [],
       roles_list: [],
       permissions_list: [],
       created_at: null,

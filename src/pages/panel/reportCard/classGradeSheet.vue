@@ -214,7 +214,7 @@ async function generateReport () {
       lesson_ids: form.value.lesson_ids
     })
     reportData.value = data
-    reportCardStore.setReportCards(data as any)
+    reportCardStore.setClassGradeSheet(data)
     reportCardStore.setFormSettings({ ...form.value, reportType: 'classGradeSheet' })
     router.push({ name: 'Panel.ReportCard.ClassGradeSheet.Print' })
   } catch (e) {

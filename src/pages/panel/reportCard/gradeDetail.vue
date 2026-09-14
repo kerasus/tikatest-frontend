@@ -465,7 +465,7 @@ async function generateReportCards () {
       class_id: form.value.class_id
     })
     reportCards.value = data
-    reportCardStore.setReportCards(data)
+    reportCardStore.setGradeDetails(data)
     reportCardStore.setFormSettings({
       ...form.value
     })
