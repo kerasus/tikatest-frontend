@@ -11,12 +11,13 @@
     :edit-route-name="editRouteName"
     :show-expand-button="false"
     :after-load-input-data="afterLoadInputData" />
-  <q-separator class="q-my-md" />
-  <user-schools-manager
-    v-if="userData?.roles_list?.includes('student')"
-    :user-id="userId"
-    :readonly="true"
-    @update="onChangeUserRole" />
+  <template v-if="userData?.roles_list?.includes('student')">
+    <q-separator class="q-my-md" />
+    <user-schools-manager
+      :user-id="userId"
+      :readonly="true"
+      @update="onChangeUserRole" />
+  </template>
   <q-separator class="q-my-md" />
   <q-card>
     <q-card-section>

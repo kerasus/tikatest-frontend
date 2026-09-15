@@ -10,12 +10,13 @@
     :show-route-name="showRouteName"
     :show-expand-button="false"
     :after-load-input-data="afterLoadInputData" />
-  <q-separator class="q-my-md" />
-  <user-schools-manager
-    v-if="userData && userData.roles_list?.includes('student')"
-    :user-id="userId"
-    :school-users="userData.schools"
-    @updated="reloadUserData" />
+  <template v-if="userData && userData.roles_list?.includes('student')">
+    <q-separator class="q-my-md" />
+    <user-schools-manager
+      :user-id="userId"
+      :school-users="userData.schools"
+      @updated="reloadUserData" />
+  </template>
   <q-separator class="q-my-md" />
   <div class="row q-col-gutter-md">
     <div class="col-md-6 col-12">
