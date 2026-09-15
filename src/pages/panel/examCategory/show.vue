@@ -61,6 +61,12 @@
         </div>
       </div>
     </template>
+
+    <q-separator class="q-my-md" />
+
+    <exam-category-term-limits-panel
+      :exam-id="examId"
+      readonly />
   </q-page>
 </template>
 
@@ -70,21 +76,22 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { examCategory } from 'src/repositories/examCategory'
 import type { ExamCategoryType } from 'src/repositories/examCategory'
+import ExamCategoryTermLimitsPanel from 'src/components/examCategory/ExamCategoryTermLimitsPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 const examCategoryApi = examCategory
+const examId = Number(route.params.id)
 
 const loading = ref(false)
 const examCategoryData = ref<ExamCategoryType | null>(null)
 
 async function loadCategory () {
-  const id = parseInt(route.params.id as string)
-  if (!id || Number.isNaN(id)) return
+  if (!examId || Number.isNaN(examId)) return
   loading.value = true
   try {
-    examCategoryData.value = await examCategoryApi.get(id)
+    examCategoryData.value = await examCategoryApi.get(examId)
   } catch (e) {
     $q.notify({ type: 'negative', message: 'خطا در دریافت اطلاعات' })
   } finally {
@@ -108,8 +115,5 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .exam-category-show-page {
-  padding: 16px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 </style>

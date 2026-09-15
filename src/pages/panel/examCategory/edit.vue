@@ -51,6 +51,15 @@
         </div>
       </q-form>
     </q-card-section>
+
+    <template v-if="editingId">
+      <q-separator />
+      <q-card-section>
+        <exam-category-term-limits-panel
+          :exam-id="editingId"
+          :school-id="school?.id" />
+      </q-card-section>
+    </template>
   </q-card>
 </template>
 
@@ -60,6 +69,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { examCategory } from 'src/repositories/examCategory'
 import SchoolAPI, { type SchoolType } from 'src/repositories/school'
+import ExamCategoryTermLimitsPanel from 'src/components/examCategory/ExamCategoryTermLimitsPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -131,7 +141,5 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .exam-category-form-page {
-  max-width: 700px;
-  margin: 0 auto;
 }
 </style>
