@@ -51,7 +51,6 @@ export type AcademicTerm = {
   updated_at: string | null
 }
 
-
 export default class SchoolAPI extends BaseAPI<SchoolType> {
   constructor () {
     super('/schools')

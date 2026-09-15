@@ -13,6 +13,7 @@
     :after-load-input-data="afterLoadInputData" />
   <q-separator class="q-my-md" />
   <user-schools-manager
+    v-if="userData?.roles_list?.includes('student')"
     :user-id="userId"
     :readonly="true"
     @update="onChangeUserRole" />

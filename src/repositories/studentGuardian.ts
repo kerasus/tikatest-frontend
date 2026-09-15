@@ -42,6 +42,15 @@ export default class StudentGuardianAPI extends BaseAPI<StudentGuardianType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      createWithUser: '/student-guardians/create-with-user'
+    }
+  }
+
+  async createWithUser (data: any): Promise<StudentGuardianType> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.createWithUser!, data)
+    return response.data
   }
 }
 

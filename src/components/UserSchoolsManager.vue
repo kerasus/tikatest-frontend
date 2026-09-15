@@ -1,215 +1,345 @@
-<script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useQuasar } from 'quasar'
-import UserAPI from 'src/repositories/user'
-import SchoolAPI from 'src/repositories/school'
-
-const props = defineProps<{
-  userId: number
-  readonly?: boolean
-}>()
-
-const emit = defineEmits(['update'])
-
-const $q = useQuasar()
-const userAPI = new UserAPI()
-const schoolApi = new SchoolAPI()
-
-const userSchools = ref<any[]>([])
-const schoolLoading = ref(false)
-const selectedSchoolId = ref<number | null>(null)
-const selectedSchoolRole = ref<string | null>(null)
-const schoolOptions = ref<any[]>([])
-
-const roleOptions = [
-  { label: 'مدیر', value: 'admin' },
-  { label: 'مدیر', value: 'manager' },
-  { label: 'معلم', value: 'teacher' },
-  { label: 'دانش‌آموز', value: 'student' },
-  { label: 'کارمند', value: 'staff' }
-]
-
-const schoolColumns = [
-  { name: 'code', required: true, label: 'کد', align: 'right' as const, field: 'code' },
-  { name: 'name', required: true, label: 'نام مدرسه', align: 'right' as const, field: 'name' },
-  { name: 'role', label: 'نقش در مدرسه', align: 'right' as const, field: 'pivot.role' }
-]
-
-function getRoleLabel (role: string | undefined | null): string {
-  switch (role) {
-    case 'admin':
-      return 'مدیر'
-    case 'manager':
-      return 'مدیر'
-    case 'teacher':
-      return 'معلم'
-    case 'student':
-      return 'دانش‌آموز'
-    case 'staff':
-      return 'کارمند'
-    default:
-      return role || '-'
-  }
-}
-
-async function loadUserSchools () {
-  try {
-    userSchools.value = await userAPI.getSchools(props.userId)
-  } catch (error) {
-    console.error('Error loading user schools:', error)
-  }
-}
-
-async function loadSchools () {
-  try {
-    const result = await schoolApi.index({ length: 100 })
-    schoolOptions.value = result.data
-  } catch (error) {
-    console.error('Error loading schools:', error)
-  }
-}
-
-async function assignSchool () {
-  if (!selectedSchoolId.value || !props.userId) {
-    return
-  }
-
-  schoolLoading.value = true
-  try {
-    await userAPI.assignSchool(props.userId, selectedSchoolId.value, selectedSchoolRole.value || undefined)
-    $q.notify({
-      icon: 'check',
-      message: 'مدرسه با موفقیت اضافه شد.',
-      color: 'positive'
-    })
-    selectedSchoolId.value = null
-    selectedSchoolRole.value = null
-    await loadUserSchools()
-    emit('update')
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در افزودن مدرسه.',
-      color: 'negative'
-    })
-  } finally {
-    schoolLoading.value = false
-  }
-}
-
-async function removeSchool (schoolId: number) {
-  if (!props.userId) {
-    return
-  }
-
-  schoolLoading.value = true
-  try {
-    await userAPI.removeSchool(props.userId, schoolId)
-    $q.notify({
-      icon: 'check',
-      message: 'مدرسه با موفقیت حذف شد.',
-      color: 'positive'
-    })
-    await loadUserSchools()
-    emit('update')
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در حذف مدرسه.',
-      color: 'negative'
-    })
-  } finally {
-    schoolLoading.value = false
-  }
-}
-
-watch(() => props.userId, (newId) => {
-  if (newId) {
-    loadUserSchools()
-  }
-})
-
-onMounted(() => {
-  loadUserSchools()
-  if (!props.readonly) {
-    loadSchools()
-  }
-})
-</script>
-
 <template>
-  <q-card>
+  <q-card class="q-mb-md">
     <q-card-section>
-      <div class="text-subtitle1 q-mb-md">مدیریت مدارس کاربر</div>
+      <div class="text-h6">مدارس کاربر</div>
+    </q-card-section>
+    <q-separator />
+
+    <q-card-section v-if="!readonly">
+      <div class="text-subtitle2 q-mb-sm">افزودن مدرسه جدید</div>
+      <q-form @submit.prevent="onSubmitNew">
+        <div class="row q-col-gutter-md items-end">
+          <div class="col-12 col-md-3">
+            <form-builder-select-school
+              v-model:value="newForm.school_id"
+              label="مدرسه *"
+              outlined
+              :rules="[val => !!val || 'انتخاب مدرسه الزامی است']" />
+          </div>
+          <div class="col-12 col-md-3">
+            <q-input
+              v-model="newForm.personnel_code"
+              label="کد پرسنلی"
+              outlined
+              clearable />
+          </div>
+          <div class="col-12 col-md-2">
+            <form-builder-date
+              v-model:value="newForm.joined_at"
+              label="تاریخ شروع"
+              outlined />
+          </div>
+          <div class="col-12 col-md-2">
+            <form-builder-date
+              v-model:value="newForm.left_at"
+              label="تاریخ پایان"
+              outlined />
+          </div>
+          <div class="col-12 col-md-2 flex items-end">
+            <q-checkbox
+              v-model="newForm.is_active"
+              label="فعال" />
+          </div>
+          <div class="col-12">
+            <q-btn
+              type="submit"
+              color="primary"
+              label="افزودن"
+              :loading="saving" />
+          </div>
+        </div>
+      </q-form>
+    </q-card-section>
+
+    <q-card-section>
       <div
-        v-if="!readonly"
-        class="row q-col-gutter-md items-end q-mb-md">
-        <div class="col-12 col-md-4">
-          <q-select
-            v-model="selectedSchoolId"
-            :options="schoolOptions"
-            option-value="id"
-            option-label="name"
-            label="انتخاب مدرسه"
-            outlined
-            emit-value
-            map-options
-            clearable />
-        </div>
-        <div class="col-12 col-md-3">
-          <q-select
-            v-model="selectedSchoolRole"
-            :options="roleOptions"
-            label="نقش در مدرسه"
-            outlined
-            emit-value
-            map-options
-            clearable />
-        </div>
-        <div class="col-12 col-md-2">
-          <q-btn
-            color="primary"
-            icon="add"
-            label="افزودن"
-            :loading="schoolLoading"
-            @click="assignSchool" />
-        </div>
+        v-if="localSchoolUsers.length > 0"
+        class="text-subtitle2 q-mb-sm">
+        مدارس ثبت شده
       </div>
 
-      <q-table
-        v-if="userSchools.length > 0"
-        :rows="userSchools"
-        :columns="readonly ? schoolColumns : [...schoolColumns, { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'actions' }]"
-        row-key="id"
-        flat
-        bordered>
-        <template #body-cell-role="props">
-          <q-td :props="props">
-            {{ getRoleLabel(props.row.pivot?.role) }}
-          </q-td>
-        </template>
-        <template
-          v-if="!readonly"
-          #body-cell-actions="props">
-          <q-td :props="props">
-            <q-btn
-              flat
-              round
-              dense
-              color="negative"
-              icon="delete"
-              @click="removeSchool(props.row.id)" />
-          </q-td>
-        </template>
-      </q-table>
+      <q-list
+        v-if="localSchoolUsers.length > 0"
+        bordered
+        pop>
+        <q-expansion-item
+          v-for="item in localSchoolUsers"
+          :key="item.id"
+          dense
+          header-class="q-py-sm">
+          <template #header>
+            <q-item-section
+              side
+              top>
+              <q-avatar
+                icon="school"
+                color="primary"
+                text-color="white"
+                size="32px" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ item?.name || '-' }}</q-item-label>
+              <q-item-label caption>
+                {{ item?.code || '' }}
+                <template v-if="item.pivot?.personnel_code">
+                  - {{ item.pivot?.personnel_code }}
+                </template>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section
+              v-if="item.pivot?.is_active"
+              side>
+              <q-chip
+                color="positive"
+                text-color="white"
+                dense
+                square
+                size="sm">
+                فعال
+              </q-chip>
+            </q-item-section>
+            <q-item-section
+              v-else
+              side>
+              <q-chip
+                color="grey-4"
+                text-color="white"
+                dense
+                square
+                size="sm">
+                غیرفعال
+              </q-chip>
+            </q-item-section>
+            <q-item-section
+              v-if="!readonly"
+              side>
+              <q-btn
+                flat
+                dense
+                round
+                icon="delete"
+                color="negative"
+                size="sm"
+                @click.stop="confirmDelete(item)">
+                <q-tooltip>حذف</q-tooltip>
+              </q-btn>
+            </q-item-section>
+          </template>
+
+          <div class="row q-col-gutter-md q-px-md q-pb-md">
+            <div class="col-12 col-md-4">
+              <q-input
+                v-model="editForms[item.id!].personnel_code"
+                label="کد پرسنلی"
+                outlined
+                clearable />
+            </div>
+            <div class="col-12 col-md-4">
+              <form-builder-date
+                v-model:value="editForms[item.id!].joined_at"
+                label="تاریخ شروع"
+                outlined />
+            </div>
+            <div class="col-12 col-md-4">
+              <form-builder-date
+                v-model:value="editForms[item.id!].left_at"
+                label="تاریخ پایان"
+                outlined />
+            </div>
+            <div class="col-12 col-md-4">
+              <q-checkbox
+                v-model="editForms[item.id!].is_active"
+                label="فعال" />
+            </div>
+            <div class="col-12">
+              <q-btn
+                color="primary"
+                label="ذخیره"
+                :loading="savingId === item.id"
+                @click="saveSchoolUser(item)" />
+            </div>
+          </div>
+        </q-expansion-item>
+      </q-list>
+
       <div
-        v-else
-        class="text-grey-7">
-        این کاربر به هیچ مدرسه‌ای متصل نیست.
+        v-if="localSchoolUsers.length === 0"
+        class="text-center text-grey q-py-md">
+        هیچ مدرسه‌ای ثبت نشده است.
       </div>
     </q-card-section>
   </q-card>
 </template>
 
-<style scoped lang="scss">
-</style>
+<script setup lang="ts">
+import { ref, reactive, watch, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
+import { schoolUser } from 'src/repositories/schoolUser'
+import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import { UserSchoolPivoteType } from 'src/repositories/user'
+
+const props = defineProps({
+  userId: {
+    type: Number,
+    default: null
+  },
+  schoolUsers: {
+    type: Array as () => UserSchoolPivoteType[],
+    default: () => []
+  },
+  readonly: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const $q = useQuasar()
+const emit = defineEmits(['updated'])
+
+const localSchoolUsers = ref<UserSchoolPivoteType[]>([...props.schoolUsers])
+const editForms = ref<Record<number, {
+  personnel_code: string | null
+  is_active: boolean
+  joined_at: string | null
+  left_at: string | null
+}>>({})
+const savingId = ref<number | null>(null)
+const saving = ref(false)
+
+const newForm = reactive({
+  school_id: null as number | null,
+  personnel_code: null as string | null,
+  is_active: true,
+  joined_at: null as string | null,
+  left_at: null as string | null
+})
+
+async function loadSchoolUsers () {
+  localSchoolUsers.value = props.schoolUsers
+}
+
+function resetNewForm () {
+  newForm.school_id = null
+  newForm.personnel_code = null
+  newForm.is_active = true
+  newForm.joined_at = null
+  newForm.left_at = null
+}
+
+function initEditForms () {
+  editForms.value = {}
+  localSchoolUsers.value.forEach((item) => {
+    if (item.id) {
+      editForms.value[item.id] = {
+        personnel_code: item.pivot?.personnel_code ?? null,
+        is_active: item.pivot?.is_active ?? true,
+        joined_at: item.pivot?.joined_at ?? null,
+        left_at: item.pivot?.left_at ?? null
+      }
+    }
+  })
+}
+
+async function onSubmitNew () {
+  if (!newForm.school_id) {
+    $q.notify({
+      type: 'negative',
+      message: 'انتخاب مدرسه الزامی است.'
+    })
+    return
+  }
+
+  if (!props.userId) {
+    $q.notify({
+      type: 'negative',
+      message: 'شناسه کاربر یافت نشد.'
+    })
+    return
+  }
+
+  saving.value = true
+  try {
+    await schoolUser.create({
+      school_id: newForm.school_id,
+      user_id: props.userId,
+      personnel_code: newForm.personnel_code,
+      is_active: newForm.is_active,
+      joined_at: newForm.joined_at,
+      left_at: newForm.left_at
+    } as any)
+    $q.notify({
+      type: 'positive',
+      message: 'مدرسه با موفقیت افزوده شد.'
+    })
+    resetNewForm()
+    emit('updated')
+  } catch (error: any) {
+    $q.notify({
+      type: 'negative',
+      message: 'خطا در افزودن مدرسه.'
+    })
+  } finally {
+    saving.value = false
+  }
+}
+
+async function saveSchoolUser (item: UserSchoolPivoteType) {
+  savingId.value = item.id ?? null
+  try {
+    const form = editForms.value[item.id!]
+    await schoolUser.update(item.id!, {
+      personnel_code: form.personnel_code,
+      is_active: form.is_active,
+      joined_at: form.joined_at,
+      left_at: form.left_at
+    } as any)
+    $q.notify({
+      type: 'positive',
+      message: 'اطلاعات مدرسه با موفقیت به‌روزرسانی شد.'
+    })
+    emit('updated')
+  } catch (error: any) {
+    $q.notify({
+      type: 'negative',
+      message: 'خطا در به‌روزرسانی اطلاعات.'
+    })
+  } finally {
+    savingId.value = null
+  }
+}
+
+function confirmDelete (item: UserSchoolPivoteType) {
+  $q.dialog({
+    title: 'تایید حذف',
+    message: `مدرسه ${item?.name || item.id} از کاربر جدا شود؟`,
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    try {
+      await schoolUser.delete(item.id!)
+      $q.notify({
+        type: 'positive',
+        message: 'مدرسه با موفقیت حذف شد.'
+      })
+      emit('updated')
+    } catch (error: any) {
+      $q.notify({
+        type: 'negative',
+        message: 'خطا در حذف مدرسه.'
+      })
+    }
+  })
+}
+
+watch(() => props.schoolUsers, () => {
+  if (props.schoolUsers.length > 0) {
+    loadSchoolUsers()
+    initEditForms()
+  }
+}, { deep: true })
+
+onMounted(() => {
+  loadSchoolUsers()
+})
+</script>

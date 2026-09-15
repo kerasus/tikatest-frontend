@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
+import { SchoolType } from 'src/repositories/school'
 
 export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
 export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff' | 'Assembler' | 'MoldingWorker' | 'ColoringWorker' | 'FabricCutter'
@@ -38,6 +39,20 @@ export type UserSchoolType = {
   };
 }
 
+export interface UserSchoolPivoteType extends SchoolType {
+  pivot: {
+      id: number;
+      user_id: number;
+      school_id: number;
+      personnel_code: string | null;
+      is_active: boolean | null;
+      joined_at: string | null;
+      left_at: string | null;
+      created_at: string | null;
+      updated_at: string | null;
+  }
+}
+
 export interface UserType {
   id: number | null;
   first_name: string | null;
@@ -46,6 +61,7 @@ export interface UserType {
   username: string | null;
   mobile: string | null;
   national_id: string | null;
+  schools: UserSchoolPivoteType[];
   roles_list: string[];
   roles: RoleType[];
   permissions_list: string[]
@@ -82,6 +98,7 @@ export default class UserAPI extends BaseAPI<UserType> {
       roles: [],
       roles_list: [],
       permissions_list: [],
+      schools: [],
       email_verified_at: null,
       mobile_verified_at: null,
       birth_date: null,

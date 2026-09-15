@@ -1,11 +1,14 @@
 import BaseAPI from './BaseAPI'
 import { UserType } from 'src/repositories/user'
+import { SchoolClassType } from 'src/repositories/schoolClass'
+import { TermEnrollmentType } from 'src/repositories/termEnrollment'
 
 export type StudentProfileType = {
   id: number | null
   user_id: number | null
   code: string | null
   xp: number | null
+  guardians: StudentGuardianType[]
   deleted_at: string | null
   created_at: string | null
   updated_at: string | null
@@ -31,28 +34,10 @@ export type StudentGuardianType = {
   updated_at: string | null
 }
 
-export type StudentUserClassRegistrationType = {
-  id: number | null
-  user_id: number | null
-  class_id: number | null
-  school_class?: {
-    id: number | null
-    name: string | null
-    school_id: number | null
-    academic_level_id: number | null
-  } | null
-  class?: {
-    id: number | null
-    name: string | null
-  } | null
-  created_at: string | null
-  updated_at: string | null
-}
-
 export interface StudentType extends UserType {
   student_profile?: StudentProfileType | null
   guardian_records?: StudentGuardianType[] | null
-  user_class_registrations?: StudentUserClassRegistrationType[] | null
+  term_enrollments?: TermEnrollmentType[] | null
 }
 
 export default class StudentAPI extends BaseAPI<StudentType> {
@@ -72,6 +57,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       picture: null,
       email_verified_at: null,
       mobile_verified_at: null,
+      schools: [],
       roles: [],
       roles_list: [],
       permissions_list: [],
@@ -79,7 +65,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       updated_at: null,
       student_profile: null,
       guardian_records: null,
-      user_class_registrations: null
+      term_enrollments: null
     }
     this.endpoints = {
       ...this.endpoints,

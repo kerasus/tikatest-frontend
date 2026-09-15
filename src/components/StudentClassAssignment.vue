@@ -1,31 +1,94 @@
 <template>
   <q-card class="q-mb-md">
     <q-card-section>
-      <div class="text-h6">مدارس و کلاس‌ها</div>
+      <div class="text-h6">کلاس‌ها</div>
     </q-card-section>
     <q-separator />
     <q-card-section>
       <template v-if="!readonly">
         <div class="row q-col-gutter-md q-mb-md">
-          <div class="col-12 col-md-6">
-            <q-select
-              v-model="newClassId"
-              :options="classOptions"
-              option-value="id"
-              option-label="name"
+          <div class="col-12 col-md-4">
+            <form-builder-select-school
+              v-model:value="selectedSchoolId"
+              label="انتخاب مدرسه"
+              outlined
+              clearable
+              @update:value="onSchoolChange" />
+          </div>
+
+          <div
+            v-if="selectedSchoolId"
+            class="col-12 col-md-4">
+            <div
+              v-if="activeTermsLoading"
+              class="flex items-center q-py-md">
+              <q-spinner
+                color="primary"
+                size="24px" />
+            </div>
+            <div
+              v-else-if="singleActiveTerm"
+              class="rounded-borders bg-grey-2 q-pa-md">
+              <div class="text-caption text-grey-7">ترم فعال</div>
+              <div class="text-body1">{{ singleActiveTerm.name || '-' }}</div>
+            </div>
+            <form-builder-select-term
+              v-else
+              :key="selectedSchoolId"
+              v-model:value="selectedTermId"
+              :school-id="selectedSchoolId"
+              label="انتخاب ترم فعال"
+              active-only
+              outlined
+              clearable />
+          </div>
+
+          <div
+            v-if="selectedSchoolId"
+            class="col-12 col-md-4">
+            <form-builder-select-academic-field
+              :key="selectedSchoolId"
+              v-model:value="selectedFieldId"
+              :school-id="selectedSchoolId"
+              label="انتخاب رشته"
+              outlined
+              clearable
+              @update:value="onFieldChange" />
+          </div>
+          <div
+            v-if="selectedSchoolId && selectedFieldId"
+            class="col-12 col-md-4">
+            <form-builder-select-academic-level
+              :key="[selectedSchoolId, selectedFieldId].join('-')"
+              v-model:value="selectedLevelId"
+              :school-id="selectedSchoolId"
+              :field-id="selectedFieldId"
+              label="انتخاب پایه"
+              outlined
+              clearable
+              @update:value="onLevelChange" />
+          </div>
+          <div
+            v-if="selectedSchoolId && selectedFieldId && selectedLevelId"
+            class="col-12 col-md-4">
+            <form-builder-select-school-class
+              :key="[selectedSchoolId, selectedFieldId, selectedLevelId].join('-')"
+              v-model:value="newClassId"
+              :school-id="selectedSchoolId"
+              :field-id="selectedFieldId"
+              :level-id="selectedLevelId"
               label="انتخاب کلاس"
               outlined
-              dense
-              clearable
-              emit-value
-              map-options />
+              clearable />
           </div>
-          <div class="col-12 col-md-6 flex items-end">
+          <div
+            v-if="selectedSchoolId && selectedFieldId && selectedLevelId"
+            class="col-12 flex items-end">
             <q-btn
               color="primary"
               icon="add"
               label="افزودن کلاس"
-              :disable="!newClassId"
+              :disable="!newClassId || !selectedTermId"
               @click="assignClass" />
           </div>
         </div>
@@ -48,18 +111,24 @@
             :key="reg.id"
             dense>
             <q-item-section>
-              <q-item-label>{{ reg.school_class?.name || '-' }}</q-item-label>
+              <q-item-label>{{ enrollmentClass(reg)?.name || '-' }}</q-item-label>
               <q-item-label caption>
-                <template v-if="reg.school_class?.academic_level">
-                  پایه: {{ reg.school_class.academic_level?.name }}
+                <template v-if="enrollmentClass(reg)?.academic_level">
+                  پایه: {{ enrollmentClass(reg)?.academic_level?.name }}
                 </template>
-                <template v-if="reg.school_class?.academic_level?.academic_field">
-                  <span v-if="reg.school_class?.academic_level"> - </span>
-                  رشته: {{ reg.school_class.academic_level.academic_field?.name }}
+                <template v-if="enrollmentClass(reg)?.academic_level?.academic_field">
+                  <span v-if="enrollmentClass(reg)?.academic_level"> - </span>
+                  رشته: {{ enrollmentClass(reg)?.academic_level?.academic_field?.name }}
+                </template>
+                <template v-if="reg.term?.name">
+                  <span> - </span>
+                  ترم: {{ reg.term.name }}
                 </template>
               </q-item-label>
             </q-item-section>
-            <q-item-section side>
+            <q-item-section
+              v-if="!readonly"
+              side>
               <q-btn
                 flat
                 dense
@@ -83,19 +152,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import { userClassRegistration } from 'src/repositories/userClassRegistration'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import type { UserClassRegistrationType } from 'src/repositories/userClassRegistration'
+import { termEnrollment } from 'src/repositories/termEnrollment'
+import type { TermEnrollmentType } from 'src/repositories/termEnrollment'
+import { termAPI, type AcademicTermType } from 'src/repositories/academicTerm'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const props = defineProps({
   studentId: {
     type: Number,
     required: true
   },
-  registrations: {
-    type: Array as () => UserClassRegistrationType[],
+  termEnrollments: {
+    type: Array as () => TermEnrollmentType[],
     default: () => []
   },
   readonly: {
@@ -104,39 +178,88 @@ const props = defineProps({
   }
 })
 
-const schoolClassApi = new SchoolClassAPI()
-
 const $q = useQuasar()
 
 const loading = ref(false)
-const classOptions = ref<any[]>([])
+const activeTermsLoading = ref(false)
+const activeTerms = ref<AcademicTermType[]>([])
+const selectedSchoolId = ref<number | null>(null)
+const selectedTermId = ref<number | null>(null)
+const selectedFieldId = ref<number | null>(null)
+const selectedLevelId = ref<number | null>(null)
 const newClassId = ref<number | null>(null)
-const localRegistrations = ref<UserClassRegistrationType[]>([])
+const localRegistrations = ref<TermEnrollmentType[]>([])
+const singleActiveTerm = computed(() => activeTerms.value.length === 1 ? activeTerms.value[0] : null)
 
-function loadClasses () {
+async function onSchoolChange () {
+  selectedTermId.value = null
+  selectedFieldId.value = null
+  selectedLevelId.value = null
+  newClassId.value = null
+  await loadActiveTerms()
+}
+
+async function loadActiveTerms () {
+  const schoolId = selectedSchoolId.value
+  activeTerms.value = []
+  if (!schoolId) return
+
+  activeTermsLoading.value = true
   try {
-    schoolClassApi.index({ length: 100 }).then((result) => {
-      classOptions.value = result.data
+    const response = await termAPI.index({
+      school_id: schoolId,
+      is_active: 1,
+      length: 100
     })
+    if (selectedSchoolId.value !== schoolId) return
+    activeTerms.value = response.data
+    selectedTermId.value = response.data.length === 1 ? response.data[0]?.id ?? null : null
   } catch (error) {
-    console.error('Error loading classes:', error)
+    console.error(error)
+    $q.notify({
+      icon: 'error',
+      message: 'خطا در بارگذاری ترم‌های فعال.',
+      color: 'negative'
+    })
+  } finally {
+    if (selectedSchoolId.value === schoolId) activeTermsLoading.value = false
   }
+}
+
+function onFieldChange () {
+  selectedLevelId.value = null
+  newClassId.value = null
+}
+
+function onLevelChange () {
+  newClassId.value = null
+}
+
+function enrollmentClass (registration: TermEnrollmentType) {
+  return registration.school_class || registration.class || null
 }
 
 const emit = defineEmits(['updated'])
 
 async function assignClass () {
-  if (!newClassId.value) return
+  if (!selectedSchoolId.value || !selectedTermId.value || !newClassId.value) return
   try {
-    await userClassRegistration.create({
+    await termEnrollment.enroll({
       student_id: props.studentId,
+      school_id: selectedSchoolId.value,
+      term_id: selectedTermId.value,
       class_id: newClassId.value
-    } as any)
+    })
     $q.notify({
       icon: 'check',
       message: 'کلاس با موفقیت اضافه شد.',
       color: 'positive'
     })
+    activeTerms.value = []
+    selectedSchoolId.value = null
+    selectedTermId.value = null
+    selectedFieldId.value = null
+    selectedLevelId.value = null
     newClassId.value = null
     emit('updated')
   } catch (error) {
@@ -148,7 +271,7 @@ async function assignClass () {
   }
 }
 
-function confirmRemoveClass (reg: UserClassRegistrationType) {
+function confirmRemoveClass (reg: TermEnrollmentType) {
   $q.dialog({
     title: 'تایید حذف',
     message: 'آیا از این کلاس حذف شود؟',
@@ -156,7 +279,7 @@ function confirmRemoveClass (reg: UserClassRegistrationType) {
     persistent: true
   }).onOk(async () => {
     try {
-      await userClassRegistration.delete(reg.id!)
+      await termEnrollment.delete(reg.id!)
       $q.notify({
         icon: 'check',
         message: 'کلاس با موفقیت حذف شد.',
@@ -174,13 +297,12 @@ function confirmRemoveClass (reg: UserClassRegistrationType) {
 }
 
 function loadRegistrations () {
-  localRegistrations.value = props.registrations
+  localRegistrations.value = props.termEnrollments
 }
 
-onMounted(() => {
+watch(() => props.termEnrollments, () => {
   loadRegistrations()
-  if (!props.readonly) {
-    loadClasses()
-  }
+}, {
+  immediate: true
 })
 </script>

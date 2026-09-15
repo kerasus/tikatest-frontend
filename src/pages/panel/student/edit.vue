@@ -1,128 +1,146 @@
 <template>
-  <div class="student-form-page">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">ویرایش اطلاعات دانش آموز</div>
-      </q-card-section>
+  <entity-edit
+    v-model:value="inputs"
+    :title="label"
+    :api="api"
+    :entity-id-key="entityIdKey"
+    :entity-param-key="entityParamKey"
+    :index-route-name="indexRouteName"
+    :show-route-name="showRouteName"
+    :show-expand-button="false"
+    :after-load-input-data="afterLoadInputData" />
 
-      <q-separator />
+  <q-separator class="q-my-md" />
 
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit">
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.first_name"
-                label="نام"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.last_name"
-                label="نام خانوادگی"
-                outlined />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mobile"
-                label="تلفن همراه"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.national_id"
-                label="کد ملی"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.address"
-                label="آدرس"
-                outlined
-                type="textarea" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.email"
-                label="ایمیل"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.birth_date"
-                label="تاریخ تولد"
-                outlined
-                type="date"
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.class_id"
-                :options="classOptions"
-                option-value="id"
-                option-label="name"
-                label="کلاس"
-                outlined
-                dense
-                clearable
-                emit-value
-                map-options />
-            </div>
-          </div>
+  <student-class-assignment
+    :student-id="Number(studentId)"
+    :term-enrollments="studentData?.term_enrollments || []"
+    :readonly="false"
+    @updated="loadPage" />
 
-          <div class="q-mt-md">
-            <q-btn
-              type="submit"
-              color="primary"
-              label="ذخیره تغییرات"
-              :loading="saving" />
-            <q-btn
-              flat
-              label="انصراف"
-              :to="{ name: 'Panel.Student.Show', params: { id: route.params.id } }"
-              class="q-ml-sm" />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
-
-    <student-class-assignment
-      :student-id="Number(route.params.id)"
-      :registrations="studentData?.user_class_registrations || []"
-      :readonly="false" />
-  </div>
+  <student-guardian-manager
+    :student-profile-id="studentData?.student_profile?.id || null"
+    :guardians="studentData?.student_profile?.guardians || []"
+    :readonly="false"
+    @updated="loadPage" />
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import StudentAPI from 'src/repositories/student'
+import { EntityEdit } from 'quasar-crud'
+import StudentAPI, { StudentType } from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
+import StudentGuardianManager from 'src/components/StudentGuardianManager.vue'
 
 const studentApi = new StudentAPI()
 const schoolClassApi = new SchoolClassAPI()
 
+const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
-const $q = useQuasar()
 
-const studentData = ref<any>(null)
+const studentId = computed(() => route.params.id)
+
+const studentData = ref<StudentType | null>(null)
+const entityIdKey = ref('id')
+const entityParamKey = ref('id')
+const indexRouteName = ref('Panel.Student.List')
+const showRouteName = ref('Panel.Student.Show')
+
+const inputs = ref([
+  {
+    type: 'hidden',
+    name: 'id',
+    responseKey: 'id'
+  },
+  {
+    type: 'file',
+    name: 'picture',
+    responseKey: 'picture',
+    label: 'تصویر',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'space',
+    name: 'space',
+    responseKey: 'space',
+    col: 'col-12'
+  },
+  {
+    type: 'input',
+    name: 'first_name',
+    responseKey: 'first_name',
+    label: 'نام',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'input',
+    name: 'last_name',
+    responseKey: 'last_name',
+    label: 'نام خانوادگی',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'input',
+    name: 'national_id',
+    responseKey: 'national_id',
+    label: 'کد ملی',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'input',
+    name: 'mobile',
+    responseKey: 'mobile',
+    label: 'تلفن همراه',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'input',
+    name: 'email',
+    responseKey: 'email',
+    label: 'ایمیل',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'date',
+    name: 'birth_date',
+    responseKey: 'birth_date',
+    outsideLabel: 'تاریخ تولد',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: 'input',
+    name: 'address',
+    responseKey: 'address',
+    inputType: 'textarea',
+    label: 'آدرس',
+    placeholder: ' ',
+    col: 'col-md-12 col-12'
+  }
+])
+const api = ref(studentApi.endpoints.byId(Number(studentId.value)))
+const label = ref('اطلاعات دانش آموز')
 
 const form = reactive<{
-  first_name: string | null
-  last_name: string | null
-  mobile: string | null
-  national_id: string | null
-  birth_date: string | null
-  email: string | null
-  address: string | null
-  description: string | null
-  class_id: number | null
+  first_name: string | null;
+  last_name: string | null;
+  mobile: string | null;
+  national_id: string | null;
+  birth_date: string | null;
+  email: string | null;
+  address: string | null;
+  description: string | null;
+  class_id: number | null;
 }>({
   first_name: null,
   last_name: null,
@@ -140,7 +158,7 @@ const classOptions = ref<any[]>([])
 
 async function loadStudent () {
   try {
-    const result = await studentApi.get(Number(route.params.id))
+    const result = await studentApi.get(Number(studentId.value))
     studentData.value = result
     form.first_name = result.first_name
     form.last_name = result.last_name
@@ -164,13 +182,13 @@ async function loadStudent () {
 async function onSubmit () {
   saving.value = true
   try {
-    await studentApi.update(Number(route.params.id), form as any)
+    await studentApi.update(Number(studentId.value), form as any)
     $q.notify({
       icon: 'check',
       message: 'اطلاعات با موفقیت به‌روزرسانی شد.',
       color: 'positive'
     })
-    router.push({ name: 'Panel.Student.Show', params: { id: route.params.id } })
+    router.push({ name: 'Panel.Student.Show', params: { id: studentId.value } })
   } catch (error) {
     $q.notify({
       icon: 'error',
@@ -182,7 +200,7 @@ async function onSubmit () {
   }
 }
 
-onMounted(async () => {
+async function loadPage () {
   await Promise.all([
     loadStudent(),
     (async () => {
@@ -190,12 +208,18 @@ onMounted(async () => {
       classOptions.value = result.data
     })()
   ])
+}
+
+function afterLoadInputData (data: StudentType) {
+  studentData.value = data
+}
+
+onMounted(async () => {
+  loadPage()
 })
 </script>
 
 <style lang="scss" scoped>
 .student-form-page {
-  max-width: 900px;
-  margin: 0 auto;
 }
 </style>

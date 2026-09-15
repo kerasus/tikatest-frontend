@@ -1,6 +1,6 @@
 <template>
   <entity-edit
-    :key="entityEditKey"
+    ref="entityEditRef"
     v-model:value="inputs"
     :title="label"
     :api="api"
@@ -12,8 +12,10 @@
     :after-load-input-data="afterLoadInputData" />
   <q-separator class="q-my-md" />
   <user-schools-manager
+    v-if="userData && userData.roles_list?.includes('student')"
     :user-id="userId"
-    @update="onChangeUserRole" />
+    :school-users="userData.schools"
+    @updated="reloadUserData" />
   <q-separator class="q-my-md" />
   <div class="row q-col-gutter-md">
     <div class="col-md-6 col-12">
@@ -42,7 +44,7 @@
             v-if="userData"
             :user="userData"
             :edit-mode="true"
-            @change="onChangeUserRole" />
+            @change="reloadUserData" />
         </q-card-section>
       </q-card>
     </div>
@@ -63,8 +65,8 @@ const route = useRoute()
 const userAPI = new UserAPI()
 
 const entityCreateRef = ref()
+const entityEditRef = ref()
 const resetPasswordLoading = ref(false)
-const entityEditKey = ref(Date.now())
 const userData = ref<UserType | null>(null)
 
 const userId = computed(() => (route.params.id ? parseInt(route.params.id?.toString()) : 0))
@@ -154,10 +156,6 @@ function afterLoadInputData (data: UserType) {
   userData.value = data
 }
 
-function onChangeUserRole () {
-  entityEditKey.value = Date.now()
-}
-
 async function resetPassword () {
   resetPasswordLoading.value = true
   try {
@@ -170,4 +168,9 @@ async function resetPassword () {
     resetPasswordLoading.value = false
   }
 }
+
+async function reloadUserData () {
+  entityEditRef.value.getData()
+}
+
 </script>
