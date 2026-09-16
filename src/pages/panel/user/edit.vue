@@ -10,7 +10,7 @@
     :show-route-name="showRouteName"
     :show-expand-button="false"
     :after-load-input-data="afterLoadInputData" />
-  <template v-if="userData && userData.roles_list?.includes('student')">
+  <template v-if="canShowSchoolsManager">
     <q-separator class="q-my-md" />
     <user-schools-manager
       :user-id="userId"
@@ -71,6 +71,12 @@ const resetPasswordLoading = ref(false)
 const userData = ref<UserType | null>(null)
 
 const userId = computed(() => (route.params.id ? parseInt(route.params.id?.toString()) : 0))
+const canShowSchoolsManager = computed(() => {
+  return ['manager', 'teacher', 'student', 'staff'].find((r)=>{
+    return userData.value?.roles_list?.includes(r)
+  })
+})
+
 const api = ref(userAPI.endpoints.byId(userId.value))
 const label = ref('مشاهده کاربر')
 const indexRouteName = ref('Panel.User.List')

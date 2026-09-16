@@ -60,7 +60,7 @@ defineOptions({
 
 const props = defineProps({
   label: {
-    default: 'مقطع تحصیلی',
+    default: 'پایه ها',
     type: String
   },
   name: {

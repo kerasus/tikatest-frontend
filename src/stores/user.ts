@@ -28,8 +28,9 @@ export const useUser = defineStore('user', () => {
   const token = computed(() => state.token)
   const refreshTokenValue = computed(() => state.refresh)
   const me = computed(() => state.user ?? null)
-  const isManager = computed(() => hasRole(state.user, 'Manager'))
   const isAdmin = computed(() => hasRole(state.user, 'Admin'))
+
+  const isManager = computed(() => hasRole(state.user, 'Manager'))
   const isTeacher = computed(() => hasRole(state.user, 'Teacher'))
   const isStudent = computed(() => hasRole(state.user, 'Student'))
   const isStaff = computed(() => hasRole(state.user, 'Staff'))

@@ -7,7 +7,9 @@
         </q-card-section>
 
         <q-card-section>
-          <div class="row q-col-gutter-md q-mb-md">
+          <div
+            v-if="!currentSchoolId && isAdmin"
+            class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <form-builder-select-school
                 v-model:value="form.school_id"
@@ -169,10 +171,14 @@ import { reportCardAPI } from 'src/repositories/reportCard'
 import type { GradeMatrixResponse } from 'src/repositories/reportCard'
 import { useReportCardStore } from 'src/stores/reportCard'
 import { useRouter } from 'vue-router'
+import { useUser } from 'stores/user'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const router = useRouter()
+const { isAdmin } = useUser()
 const reportCardStore = useReportCardStore()
+const currentSchoolManager = useCurrentSchool()
 
 const generating = ref(false)
 const reportData = ref<GradeMatrixResponse | null>(null)
@@ -190,6 +196,7 @@ const form = ref({
 const canGenerate = computed(() => {
   return form.value.class_id !== null && form.value.lesson_id !== null && form.value.term_id !== null
 })
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
 
 function onSchoolChange () {
   form.value.field_id = null
@@ -256,6 +263,16 @@ function resetForm () {
   form.value.term_id = null
   form.value.title = 'ماتریس ریز نمرات'
 }
+
+function loadInputsForCurrentSchool () {
+  if (!currentSchoolId.value) {
+    return
+  }
+  form.value.school_id = currentSchoolId.value
+  onSchoolChange()
+}
+
+loadInputsForCurrentSchool()
 </script>
 
 <style lang="scss" scoped>

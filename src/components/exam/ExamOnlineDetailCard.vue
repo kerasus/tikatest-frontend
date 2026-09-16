@@ -1,9 +1,8 @@
 <template>
   <exam-detail-card
     :exam="exam"
-    :editable="editable"
-    :lesson-options="lessonOptions"
-    :category-options="categoryOptions" />
+    :school-id="schoolId"
+    :editable="editable" />
 
   <q-card
     v-if="exam.online_exam_detail"
@@ -92,6 +91,7 @@
                 v-if="editable"
                 v-model:value="levelIds"
                 label="پایه‌ها"
+                :school-id="schoolId"
                 outlined
                 clearable
                 multiple
@@ -116,6 +116,7 @@
                 v-if="editable"
                 v-model:value="classIds"
                 label="کلاس‌ها"
+                :school-id="schoolId"
                 outlined
                 clearable
                 multiple
@@ -301,14 +302,11 @@ import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCus
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 import ExamAnswerKeyEditor from 'src/components/exam/ExamAnswerKeyEditor.vue'
 import ContentEditor from 'src/components/ContentEditor.vue'
-import { ExamCategoryType } from 'src/repositories/examCategory'
-import { LessonType } from 'src/repositories/lesson'
 
 const exam = defineModel<ExamType>('exam')
-const props = defineProps<{
+defineProps<{
   editable?: boolean;
-  lessonOptions?: LessonType[];
-  categoryOptions?: ExamCategoryType[];
+  schoolId?: number;
 }>()
 
 const dateManager = useDate()

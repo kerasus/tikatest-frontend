@@ -58,7 +58,7 @@ async function removeRole (role: RoleType) {
         </q-item-label>
       </q-item-section>
       <q-item-section
-        v-if="userManager.isManager && editMode"
+        v-if="userManager.isAdmin && editMode"
         side>
         <div>
           <q-select
@@ -71,7 +71,7 @@ async function removeRole (role: RoleType) {
             style="width: 200px">
             <template #after>
               <q-btn
-                v-if="userManager.isManager"
+                v-if="userManager.isAdmin"
                 color="primary"
                 flat
                 icon="add"
@@ -96,11 +96,11 @@ async function removeRole (role: RoleType) {
           <q-item-label v-if="role.name">{{ getUserRoleLabel(role.name) }}</q-item-label>
         </q-item-section>
         <q-item-section
-          v-if="userManager.isManager"
+          v-if="userManager.isAdmin"
           side>
           <div>
             <delete-btn
-              v-if="userManager.isManager && editMode"
+              v-if="userManager.isAdmin && editMode"
               :row="role"
               :loading="loading"
               :change-status-promise="removeRole"

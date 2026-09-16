@@ -8,7 +8,9 @@
 
         <q-card-section>
           <!-- فیلترها (مدرسه، رشته، پایه، کلاس، ترم) -->
-          <div class="row q-col-gutter-md q-mb-md">
+          <div
+            v-if="!currentSchoolId && isAdmin"
+            class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <form-builder-select-school
                 v-model:value="form.school_id"
@@ -226,49 +228,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import type { QTableColumn } from 'quasar'
-
-// ایمپورت هسته ECharts و ماژول‌های مورد نیاز
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart } from 'echarts/charts'
-import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-} from 'echarts/components'
-import VChart from 'vue-echarts'
-
-// رجیستر کردن ماژول‌های ECharts جهت Tree-shaking بهینه
-use([
-  CanvasRenderer,
-  BarChart,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent
-])
-
-// کامپوننت‌های فرم و ابزارها
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUser } from 'src/stores/user'
+import { useReportCardStore } from 'src/stores/reportCard'
+import { reportCardAPI } from 'src/repositories/reportCard'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
-import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
-import { reportCardAPI } from 'src/repositories/reportCard'
-import { useReportCardStore } from 'src/stores/reportCard'
-import { useRouter } from 'vue-router'
-import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()
-const dateManager = useDate()
 const router = useRouter()
+const { isAdmin } = useUser()
 const reportCardStore = useReportCardStore()
+const currentSchoolManager = useCurrentSchool()
 
 const generating = ref(false)
 const reportCards = ref<any>(null)
@@ -303,6 +281,7 @@ const canGenerate = computed(() => {
     form.value.term_id
   )
 })
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
 
 function onSchoolChange () {
   form.value.field_id = null
@@ -323,134 +302,6 @@ function onLevelChange () {
 function onClassChange () {
   form.value.term_id = null
 }
-
-// تعریف داینامیک ستون‌های جدول آزمون‌های حضوری
-const dynamicInPersonColumns = computed<QTableColumn[]>(() => {
-  const cols: QTableColumn[] = []
-
-  if (form.value.show_exam_row_number) {
-    cols.push({
-      name: 'row_number',
-      label: '#',
-      field: '#',
-      align: 'center'
-    })
-  }
-  cols.push({ name: 'category', label: 'دسته‌بندی', field: 'category', align: 'left' })
-
-  if (form.value.show_exam_dates) {
-    cols.push({
-      name: 'held_at',
-      label: 'تاریخ',
-      field: (row) => (row.held_at ? dateManager.isoToLocalShamsiDate(row.held_at) : '-'),
-      align: 'center'
-    })
-  }
-
-  if (form.value.show_exam_titles) {
-    cols.push({ name: 'exam_name', label: 'عنوان آزمون', field: 'exam_name', align: 'left' })
-  }
-
-  if (form.value.show_student_grade) {
-    cols.push({
-      name: 'student_grade',
-      label: 'نمره دانش‌آموز',
-      field: 'student_grade',
-      align: 'center'
-    })
-  }
-
-  if (form.value.show_avg_grade) {
-    cols.push({ name: 'avg_grade', label: 'میانگین کلاس', field: 'avg_grade', align: 'center' })
-  }
-
-  if (form.value.show_max_grade) {
-    cols.push({ name: 'max_grade', label: 'بیشترین نمره', field: 'max_grade', align: 'center' })
-  }
-
-  if (form.value.show_min_grade) {
-    cols.push({ name: 'min_grade', label: 'کمترین نمره', field: 'min_grade', align: 'center' })
-  }
-
-  if (form.value.show_student_score) {
-    cols.push({
-      name: 'student_score',
-      label: 'تراز دانش‌آموز',
-      field: 'student_score',
-      align: 'center'
-    })
-  }
-
-  if (form.value.show_max_score) {
-    cols.push({ name: 'max_score', label: 'بیشترین تراز', field: 'max_score', align: 'center' })
-  }
-
-  if (form.value.show_min_score) {
-    cols.push({ name: 'min_score', label: 'کمترین تراز', field: 'min_score', align: 'center' })
-  }
-
-  return cols
-})
-
-// تعریف داینامیک ستون‌های جدول آزمون‌های آنلاین
-const dynamicOnlineColumns = computed<QTableColumn[]>(() => {
-  const cols: QTableColumn[] = []
-
-  if (form.value.show_exam_row_number) {
-    cols.push({
-      name: 'row_number',
-      label: '#',
-      field: '#',
-      align: 'center'
-    })
-  }
-  cols.push({ name: 'booklet_title', label: 'دفترچه', field: 'booklet_title', align: 'left' })
-
-  if (form.value.show_exam_dates) {
-    cols.push({
-      name: 'held_at',
-      label: 'تاریخ',
-      field: (row) => (row.held_at ? dateManager.isoToLocalShamsiDate(row.held_at) : '-'),
-      align: 'center'
-    })
-  }
-
-  if (form.value.show_exam_titles) {
-    cols.push({ name: 'exam_name', label: 'عنوان آزمون', field: 'exam_name', align: 'left' })
-  }
-
-  if (form.value.show_student_grade) {
-    cols.push({
-      name: 'student_grade',
-      label: 'نمره دانش‌آموز',
-      field: 'student_grade',
-      align: 'center'
-    })
-  }
-
-  if (form.value.show_avg_grade) {
-    cols.push({ name: 'avg_grade', label: 'میانگین کلاس', field: 'avg_grade', align: 'center' })
-  }
-
-  if (form.value.show_max_grade) {
-    cols.push({ name: 'max_grade', label: 'بیشترین نمره', field: 'max_grade', align: 'center' })
-  }
-
-  if (form.value.show_min_grade) {
-    cols.push({ name: 'min_grade', label: 'کمترین نمره', field: 'min_grade', align: 'center' })
-  }
-
-  if (form.value.show_student_score) {
-    cols.push({
-      name: 'student_score',
-      label: 'تراز دانش‌آموز',
-      field: 'student_score',
-      align: 'center'
-    })
-  }
-
-  return cols
-})
 
 async function generateReportCards () {
   if (!canGenerate.value) return
@@ -493,95 +344,15 @@ function resetForm () {
   form.value.title = 'کارنامه ریز نمرات'
 }
 
-// پیکربندی آپشن‌های ECharts برای نمودار مقایسه‌ای نمرات
-function buildLessonGradeChart (lesson: any) {
-  const allResults = [...(lesson.in_person_results || []), ...(lesson.online_results || [])]
-  if (allResults.length === 0) return { title: { text: 'بدون داده برای نمودار نمرات' } }
-
-  const categories = allResults.map((r, i) => r.exam_name || `آزمون ${i + 1}`)
-  const studentScores = allResults.map((r) => r.student_grade)
-  const avgScores = allResults.map((r) => r.avg_grade)
-  const maxScores = allResults.map((r) => r.max_grade)
-  const minScores = allResults.map((r) => r.min_grade)
-
-  return {
-    title: {
-      text: `نمودار مقایسه‌ای نمرات - ${lesson.name}`,
-      left: 'center',
-      top: 5,
-      textStyle: { fontSize: 13 }
-    },
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { data: ['نمره دانش‌آموز', 'میانگین کلاس', 'بیشترین نمره', 'کمترین نمره'], bottom: 0 },
-    grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-    xAxis: { type: 'category', data: categories },
-    yAxis: { type: 'value' },
-    series: [
-      { name: 'نمره دانش‌آموز', type: 'bar', data: studentScores, itemStyle: { color: '#21ba45' } },
-      {
-        name: 'میانگین کلاس',
-        type: 'line',
-        data: avgScores,
-        itemStyle: { color: '#1976d2' },
-        lineStyle: { width: 3 }
-      },
-      { name: 'بیشترین نمره', type: 'bar', data: maxScores, itemStyle: { color: '#26a69a' } },
-      { name: 'کمترین نمره', type: 'bar', data: minScores, itemStyle: { color: '#e53935' } }
-    ]
+function loadInputsForCurrentSchool () {
+  if (!currentSchoolId.value) {
+    return
   }
+  form.value.school_id = currentSchoolId.value
+  onSchoolChange()
 }
 
-// پیکربندی آپشن‌های ECharts برای نمودار تخصصی تراز
-function buildLessonTarazChart (lesson: any) {
-  const allResults = [...(lesson.in_person_results || []), ...(lesson.online_results || [])]
-  if (allResults.length === 0) return { title: { text: 'بدون داده برای نمودار تراز' } }
-
-  const categories = allResults.map((r, i) => r.exam_name || `آزمون ${i + 1}`)
-  const studentTaraz = allResults.map((r) => r.student_score)
-  const maxTaraz = allResults.map((r) => r.max_score)
-  const minTaraz = allResults.map((r) => r.min_score)
-
-  return {
-    title: {
-      text: `نمودار تراز دانش‌آموز - ${lesson.name}`,
-      left: 'center',
-      top: 5,
-      textStyle: { fontSize: 13 }
-    },
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['تراز دانش‌آموز', 'بالاترین تراز کلاس', 'پایین‌ترین تراز کلاس'], bottom: 0 },
-    grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-    xAxis: { type: 'category', data: categories },
-    yAxis: { type: 'value', min: 2000, max: 9000 },
-    series: [
-      {
-        name: 'تراز دانش‌آموز',
-        type: 'line',
-        data: studentTaraz,
-        itemStyle: { color: '#9c27b0' },
-        lineStyle: { width: 3 }
-      },
-      {
-        name: 'بالاترین تراز کلاس',
-        type: 'line',
-        data: maxTaraz,
-        itemStyle: { color: '#21ba45' },
-        lineStyle: { type: 'dashed' }
-      },
-      {
-        name: 'پایین‌ترین تراز کلاس',
-        type: 'line',
-        data: minTaraz,
-        itemStyle: { color: '#f44336' },
-        lineStyle: { type: 'dashed' }
-      }
-    ]
-  }
-}
-
-function printReportCards () {
-  window.print()
-}
+loadInputsForCurrentSchool()
 </script>
 
 <style lang="scss" scoped>

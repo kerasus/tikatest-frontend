@@ -44,10 +44,12 @@ import { useDate } from 'src/composables/Date'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { type UserType, getUserRoleLabel, userRoleOptions } from 'src/repositories/user'
 import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const userAPI = new UserAPI()
 const dateManager = useDate()
+const currentSchoolManager = useCurrentSchool()
 
 const FormBuilderInputComponent = shallowRef(FormBuilderInput)
 
@@ -144,7 +146,17 @@ const inputs = ref([
   {
     type: 'hidden',
     name: 'length',
-    value: 30
+    value: 10
+  },
+  {
+    type: 'hidden',
+    name: 'nonStudent',
+    value: 1
+  },
+  {
+    type: 'hidden',
+    name: 'school_id',
+    value: null
   },
   {
     type: FormBuilderInputComponent,
@@ -181,6 +193,17 @@ const inputs = ref([
 ])
 const entityIndexRef = ref()
 
+function loadInputs () {
+  if (!currentSchoolManager.currentSchool) {
+    return
+  }
+  inputs.value.forEach((item) => {
+    if (item.name === 'school_id') {
+      item.value = currentSchoolManager.currentSchool.id
+    }
+  })
+}
+
 function afterRemove () {
   entityIndexRef.value.reload()
   $q.notify({
@@ -188,4 +211,6 @@ function afterRemove () {
     type: 'positive'
   })
 }
+
+loadInputs()
 </script>

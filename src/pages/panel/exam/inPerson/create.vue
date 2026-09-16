@@ -10,7 +10,9 @@
       <q-card-section>
         <q-form @submit.prevent="onSubmit">
           <!-- Step 1: School -->
-          <div class="row q-col-gutter-md q-mb-md">
+          <div
+            v-if="!currentSchoolId && userStoreManager.isAdmin"
+            class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <form-builder-select-school
                 v-model:value="form.school_id"
@@ -233,20 +235,23 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import ExamAPI from 'src/repositories/exam'
 import StudentAPI from 'src/repositories/student'
-import FormBuilderDate from 'components/controls/formBuilderCustomInput/FormBuilderDate.vue'
-import FormBuilderDateTime from 'components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
-import FormBuilderSelectLesson from 'components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
-import FormBuilderSelectSchool from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
-import FormBuilderSelectSchoolClass from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectExamCategory from 'components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
-import FormBuilderSelectAcademicField from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
-import FormBuilderSelectAcademicLevel from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectTerm from 'components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
-
-const examApi = new ExamAPI()
-const studentApi = new StudentAPI()
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import { useUser } from 'stores/user'
 
 const $q = useQuasar()
+const examApi = new ExamAPI()
+const userStoreManager = useUser()
+const studentApi = new StudentAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const studentOptions = ref<any[]>([])
 const saving = ref(false)
@@ -283,6 +288,7 @@ const examName = computed({
     form.exam_name = val
   }
 })
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
 
 async function loadStudents (classId: number) {
   try {
@@ -298,7 +304,7 @@ async function loadStudents (classId: number) {
   }
 }
 
-function onSchoolChange (schoolId: number | null) {
+function onSchoolChange () {
   form.field_id = null
   form.academic_level_id = null
   form.class_id = null
@@ -349,6 +355,15 @@ async function onSubmit () {
         $q.notify({
           icon: 'error',
           message: 'حداقل نمره قبولی باید از حداکثر نمره کمتر باشد.',
+          color: 'negative'
+        })
+        return
+      }
+
+      if (!form.term_id) {
+        $q.notify({
+          icon: 'error',
+          message: 'ترم را انتخاب کنید',
           color: 'negative'
         })
         return
@@ -440,6 +455,17 @@ async function onSubmit () {
     saving.value = false
   }
 }
+
+function loadInputsForCurrentSchool () {
+  if (!currentSchoolId.value) {
+    return
+  }
+
+  form.school_id = currentSchoolId.value
+  onSchoolChange()
+}
+
+loadInputsForCurrentSchool()
 
 onMounted(() => {
   // No need to load schools - FormBuilderSelectSchool loads internally

@@ -125,6 +125,10 @@ const props = defineProps({
   readonly: {
     default: false,
     type: Boolean
+  },
+  schoolId: {
+    default: null,
+    type: Number
   }
 })
 
@@ -159,7 +163,8 @@ const optionValue = ref('id')
 const optionLabel = ref('title')
 
 async function getExamCategories (name: string | null) {
-  const examCategoriesList = await examCategoryAPI.index({ name })
+  const schoolId = props.schoolId
+  const examCategoriesList = await examCategoryAPI.index({ name, school_id: schoolId })
   return examCategoriesList.data
 }
 

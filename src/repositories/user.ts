@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios'
 import { SchoolType } from 'src/repositories/school'
 
 export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
-export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff' | 'Assembler' | 'MoldingWorker' | 'ColoringWorker' | 'FabricCutter'
+export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff'
 
 export const userRoleOptions = [
   { label: 'مدیرکل', value: 'admin' },

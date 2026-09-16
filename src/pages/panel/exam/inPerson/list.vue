@@ -53,16 +53,29 @@
 import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
+import { useDate } from 'src/composables/Date'
 import { exam, ExamType } from 'src/repositories/exam'
-import DeleteBtn from 'components/controls/deleteBtn.vue'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
-import { useDate } from 'src/composables/Date'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 
 const $q = useQuasar()
 const dateManager = useDate()
+const currentSchoolManager = useCurrentSchool()
+
 const FormBuilderInputComponent = shallowRef(FormBuilderInput)
 const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
+const FormBuilderSelectSchoolComponent = shallowRef(FormBuilderSelectSchool)
+const FormBuilderSelectSchoolClassComponent = shallowRef(FormBuilderSelectSchoolClass)
+const FormBuilderSelectExamCategoryComponent = shallowRef(FormBuilderSelectExamCategory)
+const FormBuilderSelectAcademicFieldComponent = shallowRef(FormBuilderSelectAcademicField)
+const FormBuilderSelectAcademicLevelComponent = shallowRef(FormBuilderSelectAcademicLevel)
 
 const examApi = exam
 
@@ -138,17 +151,46 @@ const inputs = ref([
     value: 'in_person'
   },
   {
+    type: FormBuilderSelectSchoolComponent,
+    name: 'inSchool',
+    label: 'مدرسه',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicFieldComponent,
+    name: 'field_id',
+    label: 'رشته',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicLevelComponent,
+    name: 'academic_level_id',
+    label: 'پایه',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectSchoolClassComponent,
+    name: 'class_id',
+    label: 'کلاس',
+    col: 'col-md-4 col-12'
+  },
+  {
     type: FormBuilderInputComponent,
     name: 'name',
     label: 'نام آزمون',
     placeholder: ' ',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   },
   {
     type: FormBuilderSelectLessonComponent,
     name: 'lesson_id',
     label: 'درس',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectExamCategoryComponent,
+    name: 'exam_category_id',
+    col: 'col-md-4 col-12'
   }
 ])
 
@@ -161,6 +203,34 @@ const afterRemove = () => {
     type: 'positive'
   })
 }
+
+function loadInputsForCurrentSchool () {
+  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  if (!currentSchoolId) {
+    return
+  }
+  inputs.value.forEach((item) => {
+    if (item.name === 'inSchool') {
+      item.type = 'hidden'
+      item.value = currentSchoolId
+    } else if (item.name === 'field_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'academic_level_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'class_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'lesson_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    }
+  })
+}
+
+loadInputsForCurrentSchool()
+
 </script>
 
 <style lang="scss" scoped>

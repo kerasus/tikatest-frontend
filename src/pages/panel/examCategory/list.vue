@@ -56,18 +56,20 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { useUser } from 'src/stores/user'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
-import { useUser } from 'src/stores/user'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { examCategory, ExamCategoryType } from 'src/repositories/examCategory'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const dateManager = useDate()
 const { isAdmin } = useUser()
 const examCategoryApi = examCategory
+const currentSchoolManager = useCurrentSchool()
 
 const api = ref(examCategory.endpoints.base)
 const label = ref('دسته‌بندی‌های آزمون')
@@ -138,7 +140,7 @@ const inputs = ref([
   },
   {
     type: FormBuilderSelectSchool,
-    name: 'school_id',
+    name: 'forSchoolOrGlobal',
     col: 'col-md-3 col-12'
   },
   {
@@ -159,6 +161,21 @@ const afterRemove = () => {
     type: 'positive'
   })
 }
+
+function loadInputsForCurrentSchool () {
+  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  if (!currentSchoolId) {
+    return
+  }
+  inputs.value.forEach((item) => {
+    if (item.name === 'forSchoolOrGlobal') {
+      item.type = 'hidden'
+      item.value = currentSchoolId
+    }
+  })
+}
+
+loadInputsForCurrentSchool()
 </script>
 
 <style lang="scss" scoped>

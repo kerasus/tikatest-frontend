@@ -11,7 +11,7 @@
     :edit-route-name="editRouteName"
     :show-expand-button="false"
     :after-load-input-data="afterLoadInputData" />
-  <template v-if="userData?.roles_list?.includes('student')">
+  <template v-if="canShowSchoolsManager">
     <q-separator class="q-my-md" />
     <user-schools-manager
       :user-id="userId"
@@ -42,6 +42,11 @@ const route = useRoute()
 const userAPI = new UserAPI()
 
 const userId = computed(() => (route.params.id ? parseInt(route.params.id?.toString()) : 0))
+const canShowSchoolsManager = computed(() => {
+  return ['manager', 'teacher', 'student', 'staff'].find((r)=>{
+    return userData.value?.roles_list?.includes(r)
+  })
+})
 
 const entityShowKey = ref(Date.now())
 const userData = ref<UserType | null>(null)

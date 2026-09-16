@@ -42,21 +42,23 @@ import { EntityIndex } from 'quasar-crud'
 import SchoolAPI from 'src/repositories/school'
 import StudentAPI from 'src/repositories/student'
 import SchoolClassAPI from 'src/repositories/schoolClass'
+import type { StudentType } from 'src/repositories/student'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
-import type { StudentType } from 'src/repositories/student'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 
 const studentAPI = new StudentAPI()
 const schoolAPI = new SchoolAPI()
 const schoolClassAPI = new SchoolClassAPI()
 const academicFieldAPI = new AcademicFieldAPI()
 const academicLevelAPI = new AcademicLevelAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const $q = useQuasar()
 const FormBuilderInputComponent = shallowRef(FormBuilderInput)
@@ -127,25 +129,25 @@ const inputs = ref([
     type: FormBuilderSelectSchoolComponent,
     name: 'school_id',
     label: 'مدرسه',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   },
   {
     type: FormBuilderSelectAcademicFieldComponent,
     name: 'field_id',
     label: 'رشته',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   },
   {
     type: FormBuilderSelectAcademicLevelComponent,
     name: 'academic_level_id',
     label: 'پایه',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   },
   {
     type: FormBuilderSelectSchoolClassComponent,
     name: 'class_id',
     label: 'کلاس',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   },
   {
     type: FormBuilderInputComponent,
@@ -325,6 +327,30 @@ function afterRemove () {
     type: 'positive'
   })
 }
+
+function loadInputsForCurrentSchool () {
+  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  if (!currentSchoolId) {
+    return
+  }
+  inputs.value.forEach((item) => {
+    if (item.name === 'school_id') {
+      item.type = 'hidden'
+      item.value = currentSchoolId
+    } else if (item.name === 'field_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'academic_level_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'class_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    }
+  })
+}
+
+loadInputsForCurrentSchool()
 
 onMounted(() => {
   loadSchools()

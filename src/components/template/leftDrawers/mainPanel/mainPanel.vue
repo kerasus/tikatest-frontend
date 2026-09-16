@@ -8,6 +8,8 @@ import { useAppConfig } from 'stores/appConfig'
 import ListItem from './components/listItem.vue'
 import { computed, ref, watch, Ref } from 'vue'
 import { UserRolesType } from 'src/repositories/user'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 
 const $q = useQuasar()
 const route = useRoute()
@@ -15,8 +17,10 @@ const i18nManager = useI18n()
 const userManager = useUser()
 const appLayoutStore = useAppLayout()
 const appConfigManager = useAppConfig()
+const currentSchoolManager = useCurrentSchool()
 
 const searchValue = ref('')
+const selectedSchool = ref(null)
 
 const allowedLinks = computed(() =>
   topLinks.value.filter((link) => {
@@ -95,14 +99,14 @@ const topLinks = ref<ListItemType[]>([
         icon: 'visibility',
         title: 'مشاهده آزمون های آنلاین',
         route: { name: 'Panel.Exam.Online.List' }
+      },
+      {
+        icon: 'category',
+        title: 'دسته‌بندی آزمون',
+        forRoles: ['Manager', 'Admin'],
+        route: { name: 'Panel.ExamCategory.List' }
       }
     ]
-  },
-  {
-    icon: 'category',
-    title: 'دسته‌بندی آزمون',
-    forRoles: ['Manager', 'Admin'],
-    route: { name: 'Panel.ExamCategory.List' }
   },
   {
     icon: 'menu_book',
@@ -234,25 +238,14 @@ const bottomLinks: Ref<Array<ListItemType>> = ref([
   // { icon: 'ph:chats-circle', title: 'menu.leftDrawer.forum', route: { name: 'Panel.Forum' } }
 ])
 
+function onSchoolChange () {
+  currentSchoolManager.currentSchool = selectedSchool.value
+}
 // function toggleLeftDrawer() {
 //   appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md;
 //   appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini;
 //   // appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
 // }
-
-function getWorkerProductionPageTitle (userRole: UserRolesType): string {
-  if (userRole === 'Assembler') {
-    return 'ثبت مونتاژ کاری جدید'
-  } else if (userRole === 'MoldingWorker') {
-    return 'ثبت اتوکاری جدید'
-  } else if (userRole === 'ColoringWorker') {
-    return 'ثبت رنگ کاری جدید'
-  } else if (userRole === 'FabricCutter') {
-    return 'ثبت برش کاری جدید'
-  }
-
-  return '-'
-}
 
 watch(
   currentRouteName,
@@ -289,9 +282,19 @@ watch(
         <div class="left-drawer__logo-section-img">
           <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />
         </div>
-        <div
-          v-if="false"
-          class="left-drawer__logo-section-title" />
+        <div class="left-drawer__logo-section-title">
+          <template v-if="currentSchoolManager.currentSchool">
+            {{ currentSchoolManager.currentSchool.name }}
+          </template>
+          <template v-else>
+            <form-builder-select-school
+              v-model:value="selectedSchool"
+              label="انتخاب مدرسه"
+              outlined
+              :rules="[(v) => !!v || 'مدرسه الزامی است']"
+              @update:value="onSchoolChange" />
+          </template>
+        </div>
       </div>
       <q-separator />
       <q-scroll-area class="scroll-area">
@@ -365,20 +368,14 @@ watch(
     display: flex;
     flex-flow: column;
     .left-drawer__logo-section {
-      display: flex;
-      flex-flow: row;
-      justify-content: flex-start;
-      gap: $space-2;
-      margin-bottom: $space-9;
+      margin-bottom: $space-3;
       min-height: $space-7;
-      padding-left: $space-4;
       .left-drawer__logo-section-img {
         width: 100%;
       }
       .left-drawer__logo-section-title {
-        //color: $neutral-100;
-        display: flex;
-        align-items: center;
+        text-align: center;
+        @include typo-title-1;
       }
     }
     :deep(.scroll-area) {
@@ -410,7 +407,7 @@ watch(
         justify-content: center;
         padding: unset;
         .left-drawer__logo-section-img {
-          width: $space-10;
+          width: 100%;
         }
         .left-drawer__logo-section-title {
           display: none;

@@ -63,6 +63,7 @@
             v-if="editable"
             v-model:value="levelIds"
             label="پایه‌ها"
+            :school-id="schoolId"
             outlined
             clearable
             multiple
@@ -89,6 +90,7 @@
             v-if="editable"
             v-model:value="classIds"
             label="کلاس‌ها"
+            :school-id="schoolId"
             outlined
             clearable
             multiple
@@ -180,7 +182,7 @@ import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderC
 const homework = defineModel<Partial<HomeworkType>>('homework')
 defineProps<{
   editable?: boolean;
-  classOptions?: unknown[];
+  schoolId?: number;
 }>()
 
 const dateManager = useDate()

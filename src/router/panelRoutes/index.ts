@@ -19,7 +19,7 @@ import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
 export const index: RouteRecordRaw[] = [
   {
-    path: 'panel',
+    path: ':schoolName',
     meta: {
       middleware: [Authenticated],
       layoutConfig: {}

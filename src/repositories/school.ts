@@ -5,6 +5,7 @@ import { axiosInstanceManager } from 'src/boot/axios'
 export type SchoolType = {
   id: number | null
   code: string | null
+  slug: string | null
   name: string | null
   address: string | null
   website: string | null
@@ -58,6 +59,7 @@ export default class SchoolAPI extends BaseAPI<SchoolType> {
       id: null,
       code: null,
       name: null,
+      slug: null,
       address: null,
       website: null,
       logo_url: null,

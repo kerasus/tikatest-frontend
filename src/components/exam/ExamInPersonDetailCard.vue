@@ -2,9 +2,7 @@
   <div>
     <exam-detail-card
       :exam="exam"
-      :editable="editable"
-      :lesson-options="lessonOptions"
-      :category-options="categoryOptions" />
+      :editable="editable" />
 
     <q-card
       v-if="exam.in_person_exam_detail"

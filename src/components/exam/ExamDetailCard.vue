@@ -41,17 +41,10 @@
     <q-card-section>
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-4">
-          <q-select
+          <form-builder-select-exam-category
             v-if="editable"
-            v-model="exam.exam_category_id"
-            :options="categoryOptions"
-            option-value="id"
-            option-label="title"
-            label="دسته‌بندی"
-            outlined
-            dense
-            emit-value
-            map-options
+            v-model:value="exam.exam_category_id"
+            :school-id="schoolId"
             clearable />
           <div v-else>
             <div class="text-subtitle2">دسته‌بندی:</div>
@@ -82,8 +75,7 @@
           <form-builder-select-lesson
             v-if="editable"
             v-model:value="exam.lesson_id"
-            label="درس"
-            outlined
+            :school-id="schoolId"
             clearable />
           <div v-else>
             <div class="text-subtitle2">درس:</div>
@@ -164,17 +156,15 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { ExamType } from 'src/repositories/exam'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
-import { ExamCategoryType } from 'src/repositories/examCategory'
-import { LessonType } from 'src/repositories/lesson'
-import { computed } from 'vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 
 const exam = defineModel<ExamType>('exam')
-const props = defineProps<{
+defineProps<{
   editable?: boolean;
-  lessonOptions?: LessonType[];
-  categoryOptions?: ExamCategoryType[];
+  schoolId?: number;
 }>()
 
 const examListRouteName = computed(() => {

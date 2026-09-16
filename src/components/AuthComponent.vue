@@ -42,12 +42,15 @@ import { useRouter } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import { useAppConfig } from 'src/stores/appConfig'
 import { axiosInstanceManager } from 'src/boot/axios'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const router = useRouter()
 const userManager = useUser()
 const i18nManager = useI18n()
 const appConfigManager = useAppConfig()
+const currentSchoolManager = useCurrentSchool()
+
 const loginLoading = ref(false)
 const username = ref<string | null>(null)
 const password = ref<string | null>(null)
@@ -103,25 +106,12 @@ function onClickLoginBtn () {
 }
 
 async function redirectAfterLogin () {
-  let defaultRoute = { name: 'Panel.Dashboard', params: {} }
+  const schoolName = currentSchoolManager.currentSchoolName.value
+  let defaultRoute = { name: 'Panel.Dashboard', params: { schoolName } }
   if (userManager.isManager) {
-    defaultRoute = { name: 'Panel.Dashboard', params: {} }
-  } else if (userManager.isAccountant) {
-    defaultRoute = { name: 'Panel.AccountantDashboard', params: {} }
-  } else if (userManager.isMiddleWorker) {
-    defaultRoute = { name: 'Panel.Transfer.Create', params: {} }
-  } else if (userManager.isWarehouseKeeper) {
-    defaultRoute = { name: 'Panel.Transfer.Create', params: {} }
-  } else if (userManager.isFabricCutter) {
-    defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'fabric-cutter' } }
-  } else if (userManager.isColoringWorker) {
-    defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'coloring' } }
-  } else if (userManager.isMoldingWorker) {
-    defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'molding' } }
-  } else if (userManager.isAssembler) {
-    defaultRoute = { name: 'Panel.Production.Create', params: { worker_role: 'assembler' } }
+    defaultRoute = { name: 'Panel.Dashboard', params: { schoolName } }
   } else if (userManager.isStudent) {
-    defaultRoute = { name: 'Student.Exam.List', params: {} }
+    defaultRoute = { name: 'Student.Exam.List', params: { schoolName } }
   }
 
   const redirectLocation = appConfigManager.redirectAfterLogin || defaultRoute

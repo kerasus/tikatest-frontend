@@ -14,7 +14,8 @@
 
     <homework-detail-card
       v-model:homework="homeworkForm"
-      :editable="true" />
+      :editable="true"
+      :school-id="currentSchoolId" />
 
     <div class="row q-mt-md">
       <div class="col-12">
@@ -34,19 +35,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import HomeworkAPI from 'src/repositories/homework'
 import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
-import { buildHomeworkFormData, createEmptyHomework, validateHomework } from 'src/composables/useHomeworkForm'
+import {
+  buildHomeworkFormData,
+  createEmptyHomework,
+  validateHomework
+} from 'src/composables/useHomeworkForm'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
-const homeworkApi = new HomeworkAPI()
-const router = useRouter()
 const $q = useQuasar()
+const router = useRouter()
+const homeworkApi = new HomeworkAPI()
+const currentSchoolManager = useCurrentSchool()
 
-const homeworkForm = ref(createEmptyHomework())
 const saving = ref(false)
+const homeworkForm = ref(createEmptyHomework())
+
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
 
 async function onSubmit () {
   if (!validateHomework(homeworkForm.value)) {

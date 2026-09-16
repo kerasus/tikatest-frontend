@@ -9,9 +9,8 @@
     <q-form @submit.prevent="onSubmit">
       <exam-online-detail-card
         :exam="form"
-        :editable="true"
-        :lesson-options="lessonOptions"
-        :category-options="categoryOptions" />
+        :school-id="currentSchoolId"
+        :editable="true" />
 
       <div class="q-mt-lg">
         <q-btn
@@ -30,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
@@ -38,10 +37,12 @@ import { examCategory } from 'src/repositories/examCategory'
 import LessonAPI from 'src/repositories/lesson'
 import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 import { useExamForm } from 'src/composables/useExamForm'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const router = useRouter()
 const lessonApi = new LessonAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const saving = ref(false)
 
@@ -49,6 +50,9 @@ const categoryOptions = ref<any[]>([])
 const lessonOptions = ref<any[]>([])
 const { form, validate, buildFormData, resetForm } = useExamForm()
 form.delivery_mode = 'online'
+
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+
 const loadCategories = async () => {
   try {
     const response = await examCategory.index({ length: 100 })
