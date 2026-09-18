@@ -1,190 +1,124 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="col">
-        <h4 class="q-ma-none">گزارش ساعت مطالعه - کلی</h4>
-      </div>
-    </div>
-
-    <q-card class="q-mb-md">
-      <q-card-section>
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-4">
-            <q-input
-              v-model="filters.date_from"
-              label="از تاریخ"
-              outlined
-              dense
-              mask="date">
-              <template #append>
-                <q-icon
-                  name="event"
-                  class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale">
-                    <q-date
-                      v-model="filters.date_from"
-                      color="primary" />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-          <div class="col-12 col-md-4">
-            <q-input
-              v-model="filters.date_to"
-              label="تا تاریخ"
-              outlined
-              dense
-              mask="date">
-              <template #append>
-                <q-icon
-                  name="event"
-                  class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale">
-                    <q-date
-                      v-model="filters.date_to"
-                      color="primary" />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-          <div class="col-12 col-md-4">
-            <q-btn
-              color="primary"
-              label="فیلتر"
-              :loading="loading"
-              class="full-height"
-              @click="loadReport" />
-          </div>
-        </div>
-      </q-card-section>
-    </q-card>
-
-    <q-card
-      v-if="totalMinutes !== null"
-      class="q-mb-md">
-      <q-card-section>
-        <div class="row q-col-gutter-md text-center">
-          <div class="col-6 col-md-4">
-            <q-chip
-              color="primary"
-              text-color="white"
-              class="full-width">
-              <div class="column">
-                <span class="text-h6">{{ totalMinutes }}</span>
-                <span class="text-caption">کل دقیقه</span>
-              </div>
-            </q-chip>
-          </div>
-          <div class="col-6 col-md-4">
-            <q-chip
-              color="green"
-              text-color="white"
-              class="full-width">
-              <div class="column">
-                <span class="text-h6">{{ totalHours }}</span>
-                <span class="text-caption">کل ساعت</span>
-              </div>
-            </q-chip>
-          </div>
-        </div>
-      </q-card-section>
-    </q-card>
-
-    <q-card>
-      <q-card-section>
-        <q-table
-          :rows="sessions"
-          :columns="columns"
-          row-key="id"
-          :loading="loading"
-          :pagination="pagination"
-          @request="onTableRequest">
-          <template #body-cell-student="props">
-            <q-td :props="props">
-              {{ props.row.student?.name }} {{ props.row.student?.last_name }}
-            </q-td>
-          </template>
-          <template #body-cell-lesson="props">
-            <q-td :props="props">
-              {{ props.row.lesson?.name || '-' }}
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-  </q-page>
+  <entity-index
+    ref="entityIndexRef"
+    :value="inputs"
+    :title="label"
+    :api="api"
+    :table="table"
+    :table-keys="tableKeys"
+    :create-route-name="createRouteName"
+    :show-route-name="showRouteName"
+    :show-close-button="false"
+    :show-expand-button="false"
+    :show-reload-button="false"
+    :show-search-button="true"
+    :row-key="itemIdentifyKey">
+    <template #entity-index-table-cell="{ inputData }">
+      <template v-if="inputData.col.name === 'lesson'">
+        {{ inputData.row.lesson?.name || '-' }}
+      </template>
+      <template v-else-if="inputData.col.name === 'term'">
+        {{ inputData.row.term?.name || '-' }}
+      </template>
+      <template v-else>
+        {{ inputData.col.value }}
+      </template>
+    </template>
+  </entity-index>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useQuasar } from 'quasar'
+import { ref } from 'vue'
+import { EntityIndex } from 'quasar-crud'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import { studySession } from 'src/repositories/studySession'
 
-const $q = useQuasar()
+const FormBuilderInputComponent = ref(FormBuilderInput)
+const FormBuilderSelectSchoolComponent = ref(FormBuilderSelectSchool)
+const FormBuilderSelectAcademicLevelComponent = ref(FormBuilderSelectAcademicLevel)
+const FormBuilderSelectAcademicFieldComponent = ref(FormBuilderSelectAcademicField)
+const FormBuilderSelectSchoolClassComponent = ref(FormBuilderSelectSchoolClass)
 
-const sessions = ref<any[]>([])
-const loading = ref(false)
-const totalMinutes = ref<number | null>(null)
-const totalHours = ref<number | null>(null)
+const api = studySession.endpoints.base
+const label = ref('ساعات مطالعه')
+const createRouteName = ref('Panel.StudySessions.Create')
+const showRouteName = ref('Panel.Student.StudySessions.List')
+const itemIdentifyKey = ref('id')
 
-const filters = reactive({
-  date_from: null as string | null,
-  date_to: null as string | null,
-  length: 20,
-  page: 1
+const tableKeys = ref({
+  data: 'data',
+  total: 'total',
+  currentPage: 'current_page',
+  perPage: 'per_page',
+  pageKey: 'page'
 })
 
-const pagination = ref({
-  page: 1,
-  rowsPerPage: 20,
-  rowsNumber: 0
+const table = ref({
+  columns: [
+    {
+      name: 'lesson',
+      label: 'درس',
+      align: 'center' as const,
+      field: 'lesson',
+      sortable: true
+    },
+    {
+      name: 'term',
+      label: 'ترم',
+      align: 'center' as const,
+      field: 'term',
+      sortable: true
+    },
+    { name: 'started_at', label: 'شروع', align: 'center' as const, field: 'started_at' },
+    { name: 'ended_at', label: 'پایان', align: 'center' as const, field: 'ended_at' },
+    { name: 'description', label: 'توضیحات', align: 'center' as const, field: 'description' },
+    { name: 'source', label: 'منبع', align: 'center' as const, field: 'source' }
+  ]
 })
 
-const columns = [
-  { name: 'student', label: 'دانش آموز', align: 'center' as const, field: 'student' },
-  { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
-  { name: 'started_at', label: 'زمان شروع', align: 'center' as const, field: 'started_at' },
-  { name: 'duration_minutes', label: 'مدت زمان (دقیقه)', align: 'center' as const, field: 'duration_minutes' }
-]
-
-const loadReport = async () => {
-  loading.value = true
-  try {
-    const params: any = {
-      length: pagination.value.rowsPerPage,
-      page: pagination.value.page
-    }
-    if (filters.date_from) params.date_from = filters.date_from
-    if (filters.date_to) params.date_to = filters.date_to
-
-    const result = await studySession.generalReport(params)
-    sessions.value = result.sessions?.data || result.sessions || []
-    totalMinutes.value = result.total_minutes
-    totalHours.value = result.total_hours
-  } catch (error: any) {
-    $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری گزارش' })
-  } finally {
-    loading.value = false
+const inputs = ref([
+  {
+    type: 'hidden',
+    name: 'length',
+    value: 20
+  },
+  {
+    type: FormBuilderSelectSchoolComponent,
+    name: 'school_id',
+    label: 'مدرسه',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicLevelComponent,
+    name: 'academic_level_id',
+    label: 'پایه',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectAcademicFieldComponent,
+    name: 'academic_field_id',
+    label: 'رشته',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectSchoolClassComponent,
+    name: 'class_id',
+    label: 'کلاس',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'student_id',
+    label: 'دانش آموز',
+    col: 'col-md-4 col-12'
   }
-}
+])
 
-const onTableRequest = (props: any) => {
-  pagination.value.page = props.pagination.page
-  pagination.value.rowsPerPage = props.pagination.rowsPerPage
-  loadReport()
-}
-
-onMounted(() => {
-  loadReport()
-})
+const entityIndexRef = ref()
 </script>
 
 <style scoped>

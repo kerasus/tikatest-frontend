@@ -106,12 +106,20 @@ function onClickLoginBtn () {
 }
 
 async function redirectAfterLogin () {
-  const schoolName = currentSchoolManager.currentSchoolName.value
-  let defaultRoute = { name: 'Panel.Dashboard', params: { schoolName } }
-  if (userManager.isManager) {
-    defaultRoute = { name: 'Panel.Dashboard', params: { schoolName } }
+  const currentSchoolName = currentSchoolManager.currentSchoolName.value
+  let defaultRoute = { name: 'Panel.AdminDashboard', params: { school: currentSchoolName, role: 'student' } }
+  if (userManager.isAdmin) {
+    defaultRoute = { name: 'Panel.AdminDashboard', params: { school: 'system', role: 'admin' } }
+  } else if (
+    userManager.isManager
+    || userManager.isTeacher
+    || userManager.isStaff
+  ) {
+    const role = userManager.isManager ? 'manager'
+      : userManager.isTeacher ? 'teacher' : 'staff'
+    defaultRoute = { name: 'Panel.SchoolDashboard', params: { school: currentSchoolName, role } }
   } else if (userManager.isStudent) {
-    defaultRoute = { name: 'Student.Exam.List', params: { schoolName } }
+    defaultRoute = { name: 'Student.Dashboard', params: { school: currentSchoolName, role: 'student' } }
   }
 
   const redirectLocation = appConfigManager.redirectAfterLogin || defaultRoute

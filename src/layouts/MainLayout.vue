@@ -1,68 +1,68 @@
 <template>
   <q-layout
     class="main-layout"
+    :class="appLayoutStore.layoutCustomClass"
     :view="appLayoutStore.layoutView">
-    <q-no-ssr>
-      <q-header
-        v-if="appLayoutStore.layoutHeader"
-        :reveal="appLayoutStore.layoutHeaderReveal"
-        :elevated="appLayoutStore.layoutHeaderElevated"
-        :bordered="appLayoutStore.layoutHeaderBordered"
-        :class="appLayoutStore.headerCustomClass">
-        <header-component :floated="headerFloated" />
-      </q-header>
+    <q-header
+      v-if="appLayoutStore.layoutHeader"
+      :reveal="appLayoutStore.layoutHeaderReveal"
+      :elevated="appLayoutStore.layoutHeaderElevated"
+      :bordered="appLayoutStore.layoutHeaderBordered"
+      :class="appLayoutStore.headerCustomClass">
+      <header-component :floated="headerFloated" />
+    </q-header>
 
-      <q-drawer
-        v-if="appLayoutStore.layoutLeftDrawer"
-        v-model="appLayoutStore.layoutLeftDrawerVisible"
-        :overlay="appLayoutStore.layoutLeftDrawerOverlay"
-        :elevated="appLayoutStore.layoutLeftDrawerElevated"
-        :bordered="appLayoutStore.layoutLeftDrawerBordered"
-        :class="appLayoutStore.layoutLeftDrawerCustomClass"
-        :mini="appLayoutStore.layoutLeftDrawerMini"
-        :mini-width="appLayoutStore.layoutLeftDrawerMiniWidth"
-        :mini-to-overlay="appLayoutStore.layoutLeftDrawerMiniToOverlay"
-        :behavior="appLayoutStore.layoutLeftDrawerBehavior"
-        :width="appLayoutStore.layoutLeftDrawerWidth"
-        :show-if-above="appLayoutStore.layoutLeftDrawerShowIfAbove"
-        side="left"
-        class="main-layout__left-drawer">
-        <left-drawer-component />
-      </q-drawer>
+    <q-drawer
+      v-if="appLayoutStore.layoutLeftDrawer"
+      v-model="appLayoutStore.layoutLeftDrawerVisible"
+      :overlay="appLayoutStore.layoutLeftDrawerOverlay"
+      :elevated="appLayoutStore.layoutLeftDrawerElevated"
+      :bordered="appLayoutStore.layoutLeftDrawerBordered"
+      :class="appLayoutStore.layoutLeftDrawerCustomClass"
+      :mini="appLayoutStore.layoutLeftDrawerMini"
+      :mini-width="appLayoutStore.layoutLeftDrawerMiniWidth"
+      :mini-to-overlay="appLayoutStore.layoutLeftDrawerMiniToOverlay"
+      :behavior="appLayoutStore.layoutLeftDrawerBehavior"
+      :width="appLayoutStore.layoutLeftDrawerWidth"
+      :show-if-above="appLayoutStore.layoutLeftDrawerShowIfAbove"
+      side="left"
+      class="main-layout__left-drawer">
+      <left-drawer-component />
+    </q-drawer>
 
-      <q-drawer
-        v-if="appLayoutStore.layoutRightDrawer"
-        v-model="appLayoutStore.layoutRightDrawerVisible"
-        :overlay="appLayoutStore.layoutRightDrawerOverlay"
-        :elevated="appLayoutStore.layoutRightDrawerElevated"
-        :bordered="appLayoutStore.layoutRightDrawerBordered"
-        :class="appLayoutStore.rightDrawerCustomClass"
-        :behavior="appLayoutStore.layoutRightDrawerBehavior"
-        :width="appLayoutStore.rightDrawerWidth"
-        :show-if-above="appLayoutStore.layoutRightDrawerShowIfAbove"
-        side="right"
-        class="main-layout__right-drawer">
-        <right-drawer-component />
-      </q-drawer>
+    <q-drawer
+      v-if="appLayoutStore.layoutRightDrawer"
+      v-model="appLayoutStore.layoutRightDrawerVisible"
+      :overlay="appLayoutStore.layoutRightDrawerOverlay"
+      :elevated="appLayoutStore.layoutRightDrawerElevated"
+      :bordered="appLayoutStore.layoutRightDrawerBordered"
+      :class="appLayoutStore.rightDrawerCustomClass"
+      :behavior="appLayoutStore.layoutRightDrawerBehavior"
+      :width="appLayoutStore.rightDrawerWidth"
+      :show-if-above="appLayoutStore.layoutRightDrawerShowIfAbove"
+      side="right"
+      class="main-layout__right-drawer">
+      <right-drawer-component />
+    </q-drawer>
 
-      <q-page-container>
-        <q-page
-          v-scroll="onContentInsideScroll"
-          :style-fn="myTweak">
-          <router-view />
-        </q-page>
-      </q-page-container>
+    <q-page-container>
+      <q-page
+        v-scroll="onContentInsideScroll"
+        :class="appLayoutStore.pageCustomClass"
+        :style-fn="myTweak">
+        <router-view />
+      </q-page>
+    </q-page-container>
 
-      <q-footer
-        v-if="appLayoutStore.layoutFooter"
-        ref="footerRef"
-        :reveal="appLayoutStore.layoutFooterReveal"
-        :elevated="appLayoutStore.layoutFooterElevated"
-        :bordered="appLayoutStore.layoutFooterBordered"
-        :class="appLayoutStore.footerCustomClass">
-        <footer-component />
-      </q-footer>
-    </q-no-ssr>
+    <q-footer
+      v-if="appLayoutStore.layoutFooter"
+      ref="footerRef"
+      :reveal="appLayoutStore.layoutFooterReveal"
+      :elevated="appLayoutStore.layoutFooterElevated"
+      :bordered="appLayoutStore.layoutFooterBordered"
+      :class="appLayoutStore.footerCustomClass">
+      <footer-component />
+    </q-footer>
   </q-layout>
 </template>
 
@@ -197,7 +197,6 @@ onUnmounted(() => {
   .q-page {
     display: flex;
     flex-direction: column;
-    padding: $space-4;
   }
 }
 </style>

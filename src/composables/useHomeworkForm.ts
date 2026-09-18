@@ -6,6 +6,7 @@ export function buildHomeworkFormData (homework: Partial<HomeworkType>): FormDat
   fd.append('title', homework.title || '')
   if (homework.description) fd.append('description', homework.description)
   if (homework.lesson_id) fd.append('lesson_id', String(homework.lesson_id))
+  if (homework.term_id) fd.append('term_id', String(homework.term_id))
   if (homework.due_date) fd.append('due_date', homework.due_date)
 
   const levelIds = homework.academic_level_ids ||
@@ -42,6 +43,7 @@ export function createEmptyHomework (): Partial<HomeworkType> {
     title: null,
     description: null,
     lesson_id: null,
+    term_id: null,
     due_date: null,
     created_by: null,
     academic_levels: [],

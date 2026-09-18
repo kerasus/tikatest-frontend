@@ -1,5 +1,6 @@
 import BaseAPI from './BaseAPI'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
+import type { AcademicTermType } from 'src/repositories/academicTerm'
 import type { ContentType } from 'src/repositories/exam'
 import type { LessonType } from 'src/repositories/lesson'
 import type { SchoolClassType } from 'src/repositories/schoolClass'
@@ -22,6 +23,7 @@ export type HomeworkType = {
   title: string | null;
   description: string | null;
   lesson_id: number | null;
+  term_id: number | null;
   due_date: string | null;
   created_by: number | null;
   created_at: string | null;
@@ -29,6 +31,7 @@ export type HomeworkType = {
   deleted_at: string | null;
   createdBy?: UserType | null;
   lesson?: LessonType | null;
+  term?: AcademicTermType | null;
   attachments?: HomeworkAttachmentType[];
   academic_levels?: AcademicLevelType[];
   classes?: SchoolClassType[];
@@ -59,6 +62,7 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
       id: null,
       title: null,
       lesson_id: null,
+      term_id: null,
       description: null,
       due_date: null,
       created_by: null,

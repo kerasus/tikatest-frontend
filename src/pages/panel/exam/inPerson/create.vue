@@ -139,9 +139,7 @@
               <div class="col-12 col-md-6">
                 <form-builder-date-time
                   v-model:value="form.results_visible_at"
-                  label="زمان نمایش نتایج به دانش‌آموزان"
-                  outlined
-                  dense />
+                  label="زمان نمایش نتایج به دانش‌آموزان" />
               </div>
               <div class="col-12 col-md-6">
                 <form-builder-select-term

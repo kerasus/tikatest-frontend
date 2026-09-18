@@ -60,6 +60,7 @@ import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomIn
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const $q = useQuasar()
 const dateManager = useDate()
@@ -71,6 +72,7 @@ const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
 const FormBuilderSelectSchoolClassComponent = shallowRef(FormBuilderSelectSchoolClass)
 const FormBuilderSelectAcademicFieldComponent = shallowRef(FormBuilderSelectAcademicField)
 const FormBuilderSelectAcademicLevelComponent = shallowRef(FormBuilderSelectAcademicLevel)
+const FormBuilderSelectTermComponent = shallowRef(FormBuilderSelectTerm)
 
 const homeworkApi = homework
 
@@ -161,6 +163,12 @@ const inputs = ref([
     col: 'col-md-4 col-12'
   },
   {
+    type: FormBuilderSelectTermComponent,
+    name: 'term_id',
+    label: 'ترم',
+    col: 'col-md-4 col-12'
+  },
+  {
     type: FormBuilderInputComponent,
     name: 'title',
     label: 'عنوان تکلیف',
@@ -205,6 +213,9 @@ function loadInputsForCurrentSchool () {
       // @ts-ignore
       item.schoolId = currentSchoolId
     } else if (item.name === 'lesson_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolId
+    } else if (item.name === 'term_id') {
       // @ts-ignore
       item.schoolId = currentSchoolId
     }

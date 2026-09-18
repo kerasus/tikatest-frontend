@@ -90,6 +90,20 @@ const inputs = ref([
     responseKey: 'id'
   },
   {
+    type: 'file',
+    name: 'picture',
+    responseKey: 'picture',
+    label: 'تصویر',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'space',
+    name: 'space',
+    responseKey: 'space',
+    col: 'col-12'
+  },
+  {
     type: 'input',
     name: 'first_name',
     responseKey: 'first_name',

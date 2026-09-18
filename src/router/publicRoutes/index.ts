@@ -21,7 +21,7 @@ export const index: RouteRecordRaw[] = [
     component: () => import('src/pages/IndexPage.vue')
   },
   {
-    path: ':schoolName/auth',
+    path: ':school/:role/auth',
     meta: {
       layoutConfig: {
         layoutHeader: false,

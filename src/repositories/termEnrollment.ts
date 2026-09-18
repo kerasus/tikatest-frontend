@@ -44,7 +44,7 @@ export default class TermEnrollmentAPI extends BaseAPI<TermEnrollmentType> {
     }
   }
 
-  async enroll (payload: TermEnrollmentPayload): Promise<number> {
+  async enroll (payload: TermEnrollmentPayload): Promise<TermEnrollmentType> {
     return this.create({
       ...this.defaultObject,
       ...payload,

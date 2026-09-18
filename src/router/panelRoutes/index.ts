@@ -19,21 +19,41 @@ import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
 export const index: RouteRecordRaw[] = [
   {
-    path: ':schoolName',
+    path: ':school/:role',
     meta: {
       middleware: [Authenticated],
-      layoutConfig: {}
+      layoutConfig: {
+        pageCustomClass: 'q-pa-md'
+      }
     },
     component: () => import('src/layouts/BareLayout.vue'),
     children: [
       {
         path: 'dashboard',
-        name: 'Panel.Dashboard',
+        name: 'Panel.AdminDashboard',
         meta: {
           pageCategory: 'داشبورد',
           middleware: [hasOneOfThisRoles(['Manager', 'Admin', 'Teacher'])]
         },
-        component: () => import('src/pages/panel/dashboard.vue')
+        component: () => import('pages/panel/adminDashboard.vue')
+      },
+      {
+        path: 'dashboard',
+        name: 'Panel.SchoolDashboard',
+        meta: {
+          pageCategory: 'داشبورد',
+          middleware: [hasOneOfThisRoles(['Manager', 'Staff', 'Teacher'])]
+        },
+        component: () => import('src/pages/panel/schoolDashboard.vue')
+      },
+      {
+        path: 'profile',
+        name: 'Panel.Profile',
+        meta: {
+          pageCategory: 'پروفایل',
+          middleware: [hasOneOfThisRoles(['Admin', 'Manager', 'Staff', 'Teacher'])]
+        },
+        component: () => import('src/pages/panel/user/profile.vue')
       },
 
       ...userRoutes,
@@ -45,17 +65,13 @@ export const index: RouteRecordRaw[] = [
       ...examCategoryRoutes,
       ...reportCardRoutes,
       ...disciplinaryRoutes,
-      ...studentPortalRoutes,
       ...calendarRoutes,
       ...studyHoursRoutes,
       ...schoolRoutes,
       ...studentProfileRoutes,
-      ...studentGuardianRoutes
-    ]
-  },
+      ...studentGuardianRoutes,
 
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
+      ...studentPortalRoutes
+    ]
   }
 ]

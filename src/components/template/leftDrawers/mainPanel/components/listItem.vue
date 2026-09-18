@@ -149,7 +149,7 @@ watch(
       z-index: 2;
     }
     .q-item__section--avatar {
-      background-image: linear-gradient(310deg, #82d616 0%, #82d616 100%);
+      background-image: $linear-gradient;
     }
     .q-icon {
       font-size: 12px;

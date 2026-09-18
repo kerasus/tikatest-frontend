@@ -28,6 +28,11 @@
             :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
         </div>
       </template>
+      <template v-else-if="inputData.col.name === 'picture'">
+        <q-avatar>
+          <q-img :src="inputData.props.row.picture ?? '/images/blankProfile.png'" />
+        </q-avatar>
+      </template>
       <template v-else>
         {{ inputData.col.value }}
       </template>
@@ -67,6 +72,10 @@ const tableKeys = ref({
 })
 const table = ref({
   columns: [
+    {
+      name: 'picture',
+      label: 'تصویر'
+    },
     {
       name: 'first_name',
       required: true,

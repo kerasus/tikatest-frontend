@@ -32,8 +32,11 @@
             <template #body-cell-lesson="props">
               <q-td :props="props">{{ props.row.lesson?.name || '-' }}</q-td>
             </template>
-            <template #body-cell-duration="props">
-              <q-td :props="props">{{ props.row.duration_minutes || 0 }} دقیقه</q-td>
+            <template #body-cell-term="props">
+              <q-td :props="props">{{ props.row.term?.name || '-' }}</q-td>
+            </template>
+            <template #body-cell-source="props">
+              <q-td :props="props">{{ sourceLabel(props.row.source) }}</q-td>
             </template>
           </q-table>
           <div
@@ -52,27 +55,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { student } from 'src/repositories/student'
+import { useUser } from 'src/stores/user'
+import { studySession } from 'src/repositories/studySession'
+import type { StudySessionType } from 'src/repositories/studySession'
 
 const $q = useQuasar()
+const userStore = useUser()
 const loading = ref(false)
-const sessions = ref<any[]>([])
+const sessions = ref<StudySessionType[]>([])
+
+const studentId = computed(() => userStore.me?.id ?? null)
+
+const sourceLabels: Record<string, string> = {
+  manual: 'دستی',
+  lms: 'سیستم مدیریت یادگیری',
+  online_class: 'کلاس آنلاین'
+}
+
+function sourceLabel (source: string | null): string {
+  return sourceLabels[source ?? ''] ?? source ?? '-'
+}
 
 const columns = [
   { name: 'lesson', label: 'درس', field: 'lesson', align: 'center' as const },
+  { name: 'term', label: 'ترم', field: 'term', align: 'center' as const },
   { name: 'started_at', label: 'شروع', field: 'started_at', align: 'center' as const },
   { name: 'ended_at', label: 'پایان', field: 'ended_at', align: 'center' as const },
-  { name: 'duration', label: 'مدت (دقیقه)', field: 'duration', align: 'center' as const },
-  { name: 'notes', label: 'یادداشت', field: 'notes', align: 'center' as const }
+  { name: 'description', label: 'توضیحات', field: 'description', align: 'center' as const },
+  { name: 'source', label: 'منبع', field: 'source', align: 'center' as const }
 ]
 
 onMounted(async () => {
   loading.value = true
   try {
-    const response = await student.studySessions()
-    sessions.value = response.data.data || response.data
+    const response = await studySession.index({
+      student_id: studentId.value,
+      length: 100
+    })
+    sessions.value = response.data ?? []
   } catch (error: any) {
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری ساعات مطالعه' })
   } finally {

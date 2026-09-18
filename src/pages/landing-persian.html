@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه هوشمند تیکاتست | پنل دانش‌آموزی، آزمون‌های آنلاین و برنامه‌ریزی تحصیلی</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-[#0b0f19] text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- هدر و ناوبری -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-[#0b0f19]/80 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+
+      <!-- لوگو و برند -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 font-black text-xl text-white">
+          T
+        </div>
+        <span class="text-2xl font-extrabold tracking-tight text-white">تیکا<span class="text-indigo-400">تست</span></span>
+      </div>
+
+      <!-- منو و دسته‌بندی‌ها -->
+      <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#features" class="hover:text-indigo-400 transition-colors">امکانات پنل دانش‌آموز</a>
+        <a href="#exams" class="hover:text-indigo-400 transition-colors">بانک و آزمون آنلاین</a>
+        <a href="#method" class="hover:text-indigo-400 transition-colors">سیستم مطالعه هوشمند</a>
+        <a href="#pricing" class="hover:text-indigo-400 transition-colors">اشتراک‌ها و مدارس</a>
+      </nav>
+
+      <!-- جستجو در آزمون‌ها و مباحث -->
+      <div class="hidden md:flex flex-1 max-w-xs items-center relative">
+        <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute right-3 pointer-events-none"></i>
+        <input type="text" placeholder="جستجوی درس، مبحث یا آزمون..."
+          class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pr-10 pl-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+      </div>
+
+      <!-- دکمه ورود / ثبت نام -->
+      <div class="flex items-center gap-3">
+        <a href="/login" class="px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-sm font-medium text-slate-200 transition-all">
+          ورود به پنل کاربری
+        </a>
+        <a href="/register" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition-all">
+          عضویت رایگان
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- هیرو سکشن (معرفی اصلی پنل) -->
+  <section class="relative pt-20 pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-7 space-y-6 text-right">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          نسل نو پلتفرم سنجش و تحلیل آموزشی دانش‌آموزی
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
+          مسیر موفقیت تحصیلی‌ات را با
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+            تیکاتست هوشمند بساز!
+          </span>
+        </h1>
+
+        <p class="text-slate-400 text-base sm:text-lg leading-relaxed max-w-2xl">
+          پنل اختصاصی دانش‌آموزان برای شرکت در آزمون‌های تستی و تشریحی، کارنامه آنی و تحلیلی با تراز کشوری، دفتر برنامه‌ریزی درسی روزانه، و ارتباط مستقیم با مشاوران و دبیران مدرسه.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+          <a href="/student/dashboard" class="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold text-center shadow-xl shadow-indigo-600/25 transition-transform hover:-translate-y-0.5">
+            شروع آزمون و ورود به پنل
+          </a>
+          <a href="#features" class="px-8 py-4 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-300 font-medium text-center transition-colors">
+            مشاهده امکانات دانش‌آموزی
+          </a>
+        </div>
+
+        <div class="flex items-center gap-6 pt-4 text-xs text-slate-400">
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            تصحیح آنی پاسخ‌برگ تستی
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            تحلیل نقاط ضعف و قوت مبحثی
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            بدون قطعی و کرش وسط آزمون
+          </div>
+        </div>
+      </div>
+
+      <!-- تصویر و کارت شبیه‌ساز ماک‌آپ پنل -->
+      <div class="lg:col-span-5 relative">
+        <div class="rounded-3xl p-3 bg-gradient-to-br from-indigo-500/20 via-slate-800/40 to-purple-500/20 border border-slate-800 shadow-2xl backdrop-blur-xl">
+          <div class="bg-slate-900/90 rounded-2xl p-6 border border-slate-800 space-y-5">
+            <!-- هدر کارت دانش‌آموز -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center font-bold text-indigo-300">
+                  علی
+                </div>
+                <div>
+                  <div class="text-sm font-bold text-white">علی اسماعیلی</div>
+                  <div class="text-xs text-slate-400">پایه دوازدهم ریاضی • دبیرستان نمونه</div>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold">تراز: ۷۲۵۰</span>
+            </div>
+
+            <!-- وضعیت آزمون‌ها -->
+            <div class="space-y-3">
+              <div class="text-xs text-slate-400 font-medium">آزمون در حال برگزاری:</div>
+              <div class="p-3.5 rounded-xl bg-slate-950/70 border border-indigo-500/30 flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-white">جامع حسابان و دیفرانسیل</div>
+                  <div class="text-xs text-slate-400 mt-0.5">۳۰ سوال • ۴۵ دقیقه زمان باقی‌مانده</div>
+                </div>
+                <button class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition-colors">
+                  ادامه آزمون
+                </button>
+              </div>
+            </div>
+
+            <!-- نوار درصد پیشرفت هدف هفتگی -->
+            <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-2">
+              <div class="flex justify-between text-xs font-medium">
+                <span class="text-slate-300">پیشرفت مطالعه هفتگی (هدف: ۳۵ ساعت)</span>
+                <span class="text-indigo-400 font-bold">۸۲٪</span>
+              </div>
+              <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[82%] rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ویژگی‌های برتر پنل (Dark Feature Section) -->
+  <section class="py-20 bg-slate-900/50 border-y border-slate-800/60 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-6 space-y-6">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white">
+          آزمون آنلاین بدون استرس، دقیقاً مثل جلسه کنکور و نهایی
+        </h2>
+        <p class="text-slate-400 leading-relaxed">
+          محیط پاسخ‌دهی تیکاتست به گونه‌ای طراحی شده که حتی در صورت قطعی چندثانیه‌ای اینترنت، آخرین انتخاب‌های شما حفظ شده و با بازگشت اینترنت، بدون هیچ تاخیری سینک می‌شود.
+        </p>
+
+        <ul class="space-y-4 text-sm text-slate-300">
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">✓</div>
+            پشتیبانی از فرمول‌های پیشرفته ریاضی و فیزیک با کیفیت برداری بدون افت وضوح
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">✓</div>
+            پاسخ‌نامه کاملاً تشریحی و راهنمای گام‌به‌گام برای تمام سوالات بلافاصله پس از اتمام زمان
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">✓</div>
+            شناسایی هوشمند درصد شک و خطاهای محاسباتی در روند پاسخ‌گویی
+          </li>
+        </ul>
+
+        <div class="pt-4">
+          <a href="/exams/demo" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all">
+            شرکت در آزمون آزمایشی نمونه
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 grid grid-cols-2 gap-4">
+        <div class="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <i data-lucide="file-check-2" class="w-8 h-8 text-indigo-400"></i>
+          <h3 class="font-bold text-white text-base">کارنامه لحظه‌ای و تحلیلی</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">مشاهده رتبه در کلاس، مدرسه و منطقه، درصد خام و نمودار مقایسه‌ای با رتبه برترها.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <i data-lucide="calendar" class="w-8 h-8 text-purple-400"></i>
+          <h3 class="font-bold text-white text-base">برنامه‌ریزی درسی هوشمند</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">ثبت ساعات مطالعه روزانه، تست‌های کار شده و دریافت گزارش پیشرفت هفتگی از مشاور.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <i data-lucide="message-square" class="w-8 h-8 text-emerald-400"></i>
+          <h3 class="font-bold text-white text-base">پیام‌رسان مستقیم کلاسی</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">رفع اشکال با اساتید، دریافت تکالیف جدید و ارتباط با مسئولین مدرسه بدون هیچ برنامه اضافی.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <i data-lucide="smartphone" class="w-8 h-8 text-pink-400"></i>
+          <h3 class="font-bold text-white text-base">طراحی مدرن و ریسپانسیو</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">تجربه بی‌نقص و روان در موبایل، تبلت و کامپیوتر بدون نیاز به نصب اپلیکیشن سنگین.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- بخش متدولوژی ۴ مرحله‌ای تیکاتست -->
+  <section id="method" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+      <div class="text-indigo-400 font-bold text-xs uppercase tracking-widest">متد مطالعه تیکاتست</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">۴ مرحله تا تثبیت کامل مطالب و جهش تراز</h2>
+      <p class="text-slate-400 text-sm">چرخه یادگیری استاندارد از اولین تست آموزشی تا کارنامه جامع کشوری</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
+        <div class="text-3xl font-black text-indigo-500/40 mb-3">۰۱</div>
+        <h3 class="font-bold text-white mb-2">تعیین سطح و پیش‌آزمون</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">آزمون کوتاه ۱۰ دقیقه‌ای برای سنجش پیش‌نیازها و شناسایی خلاء‌های یادگیری قبلی قبل از شروع درس.</p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
+        <div class="text-3xl font-black text-indigo-500/40 mb-3">۰۲</div>
+        <h3 class="font-bold text-white mb-2">تست آموزشی و زمان‌دار</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">پاسخ به سوالات طبقه‌بندی شده با درجه دشواری آسان، متوسط و سخت همراه با کرنومتر هوشمند.</p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
+        <div class="text-3xl font-black text-indigo-500/40 mb-3">۰۳</div>
+        <h3 class="font-bold text-white mb-2">تحلیل آزمون و یادداشت‌برداری</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">ثبت نکات دام‌دار در دفترچه مجازی سوالات برگزیده و تفکیک خطای علمی از بی‌دقتی محاسباتی.</p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
+        <div class="text-3xl font-black text-indigo-500/40 mb-3">۰۴</div>
+        <h3 class="font-bold text-white mb-2">مرور دوره‌ای با نمودار فراموشی</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">یادآوری خودکار سوالات غلط و نزده در روزهای ۳، ۷ و ۳۰ ام جهت انتقال اطلاعات به حافظه بلندمدت.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- نظرات دانش‌آموزان و رتبه‌برترها (Testimonials) -->
+  <section class="py-20 bg-slate-900/30 border-t border-slate-800/60 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl font-extrabold text-white mb-4">تجربه دانش‌آموزانی که با تیکاتست جهش تراز داشتند</h2>
+        <p class="text-slate-400 text-sm">داستان واقعی بچه‌هایی که روش مطالعه و آزمون دادنشون رو متحول کردند</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
+          <p class="text-slate-300 text-sm leading-relaxed">
+            «قبلاً کارنامه‌ها فقط یه درصد خشک و خالی بود. ولی توی تیکاتست متوجه شدم دقیقاً توی کدوم مباحث فیزیک به‌خاطر منفی‌ها ترازم افت می‌کرد. توی ۳ ماه ترازم از ۵۴۰۰ به ۶۷۰۰ رسید!»
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm">م‌ر</div>
+            <div>
+              <div class="text-sm font-bold text-white">مهدی رضایی</div>
+              <div class="text-xs text-slate-400">رتبه ۳۴ کنکور تجربی ۱۴۰۳</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
+          <p class="text-slate-300 text-sm leading-relaxed">
+            «سیستم پیام‌رسان داخلی و ثبت تکلیفش عالیه. دیگه نیازی نیست برای تکالیف مدرسه و پرسیدن رفع اشکال بریم سراغ تلگرام و شاد که کلی تمرکزمون به هم بریزه. همه چیز توی تیکاتست مجتمعه.»
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center text-sm">س‌م</div>
+            <div>
+              <div class="text-sm font-bold text-white">سارا محمدی</div>
+              <div class="text-xs text-slate-400">دانش‌آموز دوازدهم ریاضی</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
+          <p class="text-slate-300 text-sm leading-relaxed">
+            «دفتر برنامه‌ریزی تیکاتست مشاورم رو همیشه در جریان تلاشم می‌ذاشت. هر شب نمودار تست و مطالعه ثبت می‌شد و وقتی آزمون جمعه رو می‌دادیم، دقیقاً معلوم بود علت نمره چی بوده.»
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <div class="w-10 h-10 rounded-full bg-pink-500/20 text-pink-400 font-bold flex items-center justify-center text-sm">پ‌ا</div>
+            <div>
+              <div class="text-sm font-bold text-white">پرهام اسدی</div>
+              <div class="text-xs text-slate-400">دانش‌آموز پایه یازدهم تجربی</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- پلن‌های عضویت و اشتراک (Pricing) -->
+  <section id="pricing" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">طرح‌های متناسب با نیاز هر دانش‌آموز و مدرسه</h2>
+      <p class="text-slate-400 text-sm">از آمادگی انفرادی برای امتحانات نهایی تا مدیریت آزمون‌های جامع کل مدرسه</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+      <!-- پلن پایه -->
+      <div class="p-8 rounded-3xl bg-slate-900/40 border border-slate-800 flex flex-col justify-between">
+        <div>
+          <div class="text-sm font-bold text-indigo-400 mb-2">طرح پایه دانش‌آموزی</div>
+          <h3 class="text-2xl font-black text-white mb-2">شروع موفقیت</h3>
+          <p class="text-xs text-slate-400 mb-6">مناسب برای سنجش فردی و شرکت در آزمون‌های کلاسی دبیران</p>
+          <div class="text-3xl font-black text-white mb-6">رایگان</div>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li class="flex items-center gap-2">✓ شرکت در آزمون‌های ارسال شده توسط مدرسه</li>
+            <li class="flex items-center gap-2">✓ مشاهده کارنامه درصدی و پاسخ‌نامه تشریحی</li>
+            <li class="flex items-center gap-2">✓ پیام‌رسان کلاسی و دریافت تکالیف</li>
+          </ul>
+        </div>
+        <a href="/register" class="mt-8 block text-center py-3 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors">
+          شروع رایگان
+        </a>
+      </div>
+
+      <!-- پلن حرفه‌ای دانش‌آموز (ویژه کنکور) -->
+      <div class="p-8 rounded-3xl bg-gradient-to-b from-indigo-900/40 to-slate-900/90 border-2 border-indigo-500 flex flex-col justify-between relative shadow-2xl shadow-indigo-500/20">
+        <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[11px] font-bold">
+          محبوب‌ترین ویژه کنکوری‌ها
+        </div>
+        <div>
+          <div class="text-sm font-bold text-indigo-300 mb-2">طرح VIP تیکاتست</div>
+          <h3 class="text-2xl font-black text-white mb-2">پک جامع سنجش هوشمند</h3>
+          <p class="text-xs text-slate-300 mb-6">دسترسی نامحدود به تمامی امکانات تحلیلی و دفتر برنامه‌ریزی</p>
+          <div class="text-3xl font-black text-white mb-6">۲۹۰,۰۰۰ <span class="text-xs font-normal text-slate-400">تومان / ماهانه</span></div>
+          <ul class="space-y-3 text-xs text-slate-200">
+            <li class="flex items-center gap-2">✓ تمامی امکانات طرح پایه</li>
+            <li class="flex items-center gap-2">✓ کارنامه تحلیلی هوشمند با محاسبه تراز کشوری</li>
+            <li class="flex items-center gap-2">✓ دفتر برنامه‌ریزی آنلاین با تایید مشاور تحصیلی</li>
+            <li class="flex items-center gap-2">✓ آزمون‌ساز شخصی از بانک سوالات تفکیک شده</li>
+            <li class="flex items-center gap-2">✓ جعبه لایتنر هوشمند برای سوالات غلط و نزده</li>
+          </ul>
+        </div>
+        <a href="/checkout/vip" class="mt-8 block text-center py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg transition-transform hover:-translate-y-0.5">
+          ارتقا به پنل VIP
+        </a>
+      </div>
+
+      <!-- پلن سازمانی مدارس -->
+      <div class="p-8 rounded-3xl bg-slate-900/40 border border-slate-800 flex flex-col justify-between">
+        <div>
+          <div class="text-sm font-bold text-purple-400 mb-2">پنل مدارس و آموزشگاه‌ها</div>
+          <h3 class="text-2xl font-black text-white mb-2">یکپارچه‌سازی آموزش</h3>
+          <p class="text-xs text-slate-400 mb-6">ویژه مدیران، معلمان و مدارس چندشعبه‌ای</p>
+          <div class="text-2xl font-black text-white mb-6">تماس با واحد فروش</div>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li class="flex items-center gap-2">✓ تعریف نامحدود کلاس، معلم و دانش‌آموز</li>
+            <li class="flex items-center gap-2">✓ بانک اختصاصی مدرسه با سیستم تصحیح تستی و تشریحی</li>
+            <li class="flex items-center gap-2">✓ پنل نظارت اولیا بر روند تحصیلی و پیامک نمرات</li>
+            <li class="flex items-center gap-2">✓ دامین و برندینگ اختصاصی مدرسه</li>
+          </ul>
+        </div>
+        <a href="/contact-sales" class="mt-8 block text-center py-3 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors">
+          درخواست دموی حضوری و آنلاین
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- فوتر -->
+  <footer class="border-t border-slate-800 bg-[#070a11] py-12 px-4 sm:px-6 lg:px-8 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm">پنل‌های تیکاتست</h4>
+        <ul class="space-y-2">
+          <li><a href="/student" class="hover:text-white transition-colors">پنل دانش‌آموزی</a></li>
+          <li><a href="/teacher" class="hover:text-white transition-colors">پنل دبیران</a></li>
+          <li><a href="/school" class="hover:text-white transition-colors">پنل مدیریت مدرسه</a></li>
+          <li><a href="/parent" class="hover:text-white transition-colors">پنل اولیاء</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm">امکانات کلیدی</h4>
+        <ul class="space-y-2">
+          <li><a href="#exams" class="hover:text-white transition-colors">برگزاری آزمون تستی</a></li>
+          <li><a href="#exams" class="hover:text-white transition-colors">تصحیح آزمون تشریحی</a></li>
+          <li><a href="#method" class="hover:text-white transition-colors">دفتر برنامه‌ریزی هوشمند</a></li>
+          <li><a href="/report-card" class="hover:text-white transition-colors">صدور کارنامه تحلیلی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm">پشتیبانی و راهنما</h4>
+        <ul class="space-y-2">
+          <li><a href="/faq" class="hover:text-white transition-colors">سوالات متداول آزمون</a></li>
+          <li><a href="/guide" class="hover:text-white transition-colors">راهنمای تصویری ورود دانش‌آموز</a></li>
+          <li><a href="/support" class="hover:text-white transition-colors">پشتیبانی آنلاین تیکاتست</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm">درباره سامانه</h4>
+        <p class="leading-relaxed text-slate-500 mb-3">
+          تیکاتست بستر یکپارچه سنجش و ارزیابی مدارس سراسر کشور است که فرآیند آزمون، تحلیل و پیشرفت تحصیلی دانش‌آموزان را متحول می‌کند.
+        </p>
+        <div class="text-slate-400">تلفن پشتیبانی: ۰۲۱-۸۸۸۸۸۸۸۸</div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© ۱۴۰۳ سامانه هوشمند آزمون و آموزش تیکاتست (TikaTest). تمامی حقوق محفوظ است.</div>
+      <div class="flex items-center gap-4">
+        <span>نسخه ۳.۵.۰</span>
+        <span>طراحی شده با عشق برای یادگیری بهتر ❤️</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

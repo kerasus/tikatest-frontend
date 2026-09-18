@@ -40,6 +40,18 @@
             {{ homework.lesson?.name || '-' }}
           </div>
         </div>
+        <div class="col-12 col-md-6">
+          <form-builder-select-term
+            v-if="editable"
+            v-model:value="homework.term_id"
+            :school-id="schoolId"
+            label="ترم" />
+          <div
+            v-else
+            class="text-body1">
+            {{ homework.term?.name || '-' }}
+          </div>
+        </div>
         <div
           v-if="editable || homework.description"
           class="col-12">
@@ -178,6 +190,7 @@ import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/Form
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const homework = defineModel<Partial<HomeworkType>>('homework')
 defineProps<{

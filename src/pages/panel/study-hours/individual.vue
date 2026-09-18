@@ -220,10 +220,10 @@ const loadReport = async () => {
     if (filters.date_from) params.date_from = filters.date_from
     if (filters.date_to) params.date_to = filters.date_to
 
-    const result = await studySession.studentReport(selectedStudent.value, params)
-    sessions.value = result.sessions?.data || result.sessions || []
-    totalMinutes.value = result.total_minutes
-    totalHours.value = result.total_hours
+    // const result = await studySession.studentReport(selectedStudent.value, params)
+    // sessions.value = result.sessions?.data || result.sessions || []
+    // totalMinutes.value = result.total_minutes
+    // totalHours.value = result.total_hours
   } catch (error: any) {
     $q.notify({ color: 'negative', message: error.response?.data?.message || 'خطا در بارگذاری گزارش' })
   } finally {

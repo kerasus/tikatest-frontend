@@ -28,6 +28,11 @@
             :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
         </div>
       </template>
+      <template v-else-if="inputData.col.name === 'picture'">
+        <q-avatar>
+          <q-img :src="inputData.props.row.picture ?? '/images/blankProfile.png'" />
+        </q-avatar>
+      </template>
       <template v-else>
         {{ inputData.col.value }}
       </template>
@@ -41,10 +46,7 @@ import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import SchoolAPI from 'src/repositories/school'
 import StudentAPI from 'src/repositories/student'
-import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { StudentType } from 'src/repositories/student'
-import AcademicFieldAPI from 'src/repositories/academicField'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
@@ -53,11 +55,8 @@ import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCus
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 
-const studentAPI = new StudentAPI()
 const schoolAPI = new SchoolAPI()
-const schoolClassAPI = new SchoolClassAPI()
-const academicFieldAPI = new AcademicFieldAPI()
-const academicLevelAPI = new AcademicLevelAPI()
+const studentAPI = new StudentAPI()
 const currentSchoolManager = useCurrentSchool()
 
 const $q = useQuasar()
@@ -81,6 +80,10 @@ const tableKeys = ref({
 })
 const table = ref({
   columns: [
+    {
+      name: 'picture',
+      label: 'تصویر'
+    },
     {
       name: 'first_name',
       required: true,
@@ -178,9 +181,6 @@ const entityIndexRef = ref()
 
 const students = ref<StudentType[]>([])
 const schoolOptions = ref<any[]>([])
-const fieldOptions = ref<any[]>([])
-const levelOptions = ref<any[]>([])
-const classOptions = ref<any[]>([])
 const loading = ref(false)
 
 const filters = reactive({
@@ -237,87 +237,6 @@ async function loadSchools () {
   } catch (error) {
     console.error('Error loading schools:', error)
   }
-}
-
-async function loadFields (schoolId: number) {
-  try {
-    const result = await academicFieldAPI.index({ length: 100, school_id: schoolId })
-    fieldOptions.value = result.data
-    filters.field_id = null
-    filters.academic_level_id = null
-    filters.class_id = null
-    levelOptions.value = []
-    classOptions.value = []
-    loadStudents()
-  } catch (error) {
-    console.error('Error loading fields:', error)
-  }
-}
-
-async function loadLevels (fieldId: number) {
-  try {
-    const result = await academicLevelAPI.index({ length: 100, field_id: fieldId })
-    levelOptions.value = result.data
-    filters.academic_level_id = null
-    filters.class_id = null
-    classOptions.value = []
-    loadStudents()
-  } catch (error) {
-    console.error('Error loading levels:', error)
-  }
-}
-
-async function loadClasses (levelId: number) {
-  try {
-    const result = await schoolClassAPI.index({ length: 100, academic_level_id: levelId })
-    classOptions.value = result.data
-    filters.class_id = null
-    loadStudents()
-  } catch (error) {
-    console.error('Error loading classes:', error)
-  }
-}
-
-function onSchoolChange (schoolId: number | null) {
-  if (schoolId) {
-    loadFields(schoolId)
-  } else {
-    fieldOptions.value = []
-    levelOptions.value = []
-    classOptions.value = []
-    filters.field_id = null
-    filters.academic_level_id = null
-    filters.class_id = null
-    loadStudents()
-  }
-}
-
-function onFieldChange (fieldId: number | null) {
-  if (fieldId) {
-    loadLevels(fieldId)
-  } else {
-    levelOptions.value = []
-    classOptions.value = []
-    filters.academic_level_id = null
-    filters.class_id = null
-    loadStudents()
-  }
-}
-
-function onLevelChange (levelId: number | null) {
-  if (levelId) {
-    loadClasses(levelId)
-  } else {
-    classOptions.value = []
-    filters.class_id = null
-    loadStudents()
-  }
-}
-
-function onRequest (props: any) {
-  pagination.value.page = props.pagination.page
-  pagination.value.rowsPerPage = props.pagination.rowsPerPage
-  loadStudents()
 }
 
 function afterRemove () {

@@ -183,13 +183,13 @@ export default class BaseAPI<T> {
     return item
   }
 
-  async create (data: T | FormData): Promise<number> {
+  async create (data: T | FormData): Promise<T> {
     try {
-      const response: AxiosResponse<{ id: number }> = await this.getAxiosInstanceWithToken().post(
+      const response: AxiosResponse<T> = await this.getAxiosInstanceWithToken().post(
         this.endpoints.base,
         data
       )
-      return response.data.id
+      return response.data
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message) // Access the message property

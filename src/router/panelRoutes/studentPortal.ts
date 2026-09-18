@@ -1,5 +1,21 @@
 export const index = [
   {
+    path: 'dashboard11',
+    name: 'Student.Dashboard',
+    meta: {
+      pageCategory: 'پیشخوان'
+    },
+    component: () => import('src/pages/panel/student/dashboard.vue')
+  },
+  {
+    path: 'profile11',
+    name: 'Student.Profile',
+    meta: {
+      pageCategory: 'پروفایل'
+    },
+    component: () => import('src/pages/panel/student/profile.vue')
+  },
+  {
     path: 'online-exams',
     name: 'Student.Exam.List',
     meta: {
@@ -68,14 +84,6 @@ export const index = [
       pageCategory: 'نمرات'
     },
     component: () => import('pages/panel/student/myGrades.vue')
-  },
-  {
-    path: '',
-    name: 'Student.Dashboard',
-    meta: {
-      pageCategory: 'پیشخوان'
-    },
-    component: () => import('src/pages/panel/student/dashboard.vue')
   },
   {
     path: 'report-card',

@@ -39,14 +39,23 @@
           </q-item-section>
 
           <q-item-section side>
-            نام کاربری:
-            <q-badge
-              v-if="studentData.username"
-              color="grey-3"
-              text-color="grey-9"
-              class="q-pa-xs">
-              {{ studentData.username }}
-            </q-badge>
+            <div class="flex">
+              <span class="q-mr-sm">
+                نام کاربری:
+              </span>
+              <q-badge
+                v-if="studentData.username"
+                color="grey-3"
+                text-color="grey-9"
+                class="q-pa-xs">
+                {{ studentData.username }}
+              </q-badge>
+              <q-btn
+                flat
+                dense
+                icon="content_copy"
+                @click="copyText(studentData.username)" />
+            </div>
           </q-item-section>
         </q-item>
 

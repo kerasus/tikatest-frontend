@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 
 export interface State {
   layoutView: string,
+  layoutCustomClass: string,
+  pageCustomClass: string,
   layoutHeader: boolean,
   layoutHeaderType: string,
   layoutHeaderVisible: boolean,
@@ -32,7 +34,6 @@ export interface State {
   layoutRightDrawerShowIfAbove: boolean,
   rightDrawerCustomClass: string,
   rightDrawerWidth: number,
-  pageContainerCustomClass: string,
   layoutFooter: boolean,
   layoutFooterHeight: number,
   layoutFooterType: string,
@@ -53,6 +54,8 @@ export const useAppLayout = defineStore('appLayout', {
   state: (): State => {
     return {
       layoutView: 'lHh Lpr lFf',
+      layoutCustomClass: '',
+      pageCustomClass: '',
       layoutHeader: false,
       layoutHeaderType: 'mainPanel',
       layoutHeaderVisible: false,
@@ -83,7 +86,6 @@ export const useAppLayout = defineStore('appLayout', {
       layoutRightDrawerShowIfAbove: false,
       rightDrawerCustomClass: '',
       rightDrawerWidth: 300,
-      pageContainerCustomClass: '',
       layoutFooter: false,
       layoutFooterHeight: 0,
       layoutFooterType: 'mainPanel',

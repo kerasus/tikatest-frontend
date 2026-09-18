@@ -110,6 +110,7 @@ export default class UserAPI extends BaseAPI<UserType> {
     }
     this.endpoints = {
       ...this.endpoints,
+      me: `${this.baseEndpoint}/me`,
       assignRole: (userId: number) => `${this.baseEndpoint}/${userId}/assign-role`,
       removeRole: (userId: number) => `${this.baseEndpoint}/${userId}/remove-role`,
       resetPassword: (userId: number) => `${this.baseEndpoint}/${userId}/reset-password`,
@@ -159,6 +160,11 @@ export default class UserAPI extends BaseAPI<UserType> {
         throw new Error('An unknown error occurred on getSchools')
       }
     }
+  }
+
+  async me (): Promise<UserType> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.me)
+    return response.data
   }
 
   async assignSchool (userId: number, schoolId: number, role?: string): Promise<{ message: string, data: { user: UserType }}> {
