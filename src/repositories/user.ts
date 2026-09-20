@@ -28,7 +28,7 @@ export type UserSchoolType = {
   name: string | null;
   address: string | null;
   website: string | null;
-  logo_url: string | null;
+  logo: string | null;
   type: 'school' | 'institute' | null;
   account_url: string | null;
   created_at: string | null;

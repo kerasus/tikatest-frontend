@@ -79,11 +79,10 @@
             </q-item-section>
             <q-item-section>
               <q-item-label>{{ item?.name || '-' }}</q-item-label>
-              <q-item-label caption>
-                {{ item?.code || '' }}
-                <template v-if="item.pivot?.personnel_code">
-                  - {{ item.pivot?.personnel_code }}
-                </template>
+              <q-item-label
+                v-if="item.pivot?.personnel_code"
+                caption>
+                {{ item.pivot?.personnel_code }}
               </q-item-label>
             </q-item-section>
             <q-item-section

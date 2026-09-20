@@ -46,8 +46,8 @@ import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const router = useRouter()
-const userManager = useUser()
 const i18nManager = useI18n()
+const userStoreManager = useUser()
 const appConfigManager = useAppConfig()
 const currentSchoolManager = useCurrentSchool()
 
@@ -106,23 +106,24 @@ function onClickLoginBtn () {
 }
 
 async function redirectAfterLogin () {
-  const currentSchoolName = currentSchoolManager.currentSchoolName.value
-  let defaultRoute = { name: 'Panel.AdminDashboard', params: { school: currentSchoolName, role: 'student' } }
-  if (userManager.isAdmin) {
-    defaultRoute = { name: 'Panel.AdminDashboard', params: { school: 'system', role: 'admin' } }
+  let routeName = 'Student.Dashboard'
+  let routeParamSchool = currentSchoolManager.currentSchoolName.value
+  let routeParamRole = userStoreManager.mainRoleForPath
+  if (userStoreManager.isAdmin) {
+    routeName = 'Panel.AdminDashboard'
   } else if (
-    userManager.isManager
-    || userManager.isTeacher
-    || userManager.isStaff
+    userStoreManager.isManager
+    || userStoreManager.isTeacher
+    || userStoreManager.isStaff
   ) {
-    const role = userManager.isManager ? 'manager'
-      : userManager.isTeacher ? 'teacher' : 'staff'
-    defaultRoute = { name: 'Panel.SchoolDashboard', params: { school: currentSchoolName, role } }
-  } else if (userManager.isStudent) {
-    defaultRoute = { name: 'Student.Dashboard', params: { school: currentSchoolName, role: 'student' } }
+    routeName = 'Panel.SchoolDashboard'
+  } else if (userStoreManager.isStudent) {
+    routeName = 'Student.Dashboard'
   }
 
-  const redirectLocation = appConfigManager.redirectAfterLogin || defaultRoute
+  const redirectLocation = appConfigManager.redirectAfterLogin
+    || { name: routeName, params: { school: routeParamSchool, role: routeParamRole } }
+
   await router.push(redirectLocation)
 }
 

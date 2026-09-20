@@ -4,12 +4,11 @@ import { axiosInstanceManager } from 'src/boot/axios'
 
 export type SchoolType = {
   id: number | null
-  code: string | null
   slug: string | null
   name: string | null
   address: string | null
   website: string | null
-  logo_url: string | null
+  logo: string | null
   type: SchoolTypeEnum | null
   account_url: string | null
   created_at: string | null
@@ -57,12 +56,11 @@ export default class SchoolAPI extends BaseAPI<SchoolType> {
     super('/schools')
     this.defaultObject = {
       id: null,
-      code: null,
       name: null,
       slug: null,
       address: null,
       website: null,
-      logo_url: null,
+      logo: null,
       type: null,
       account_url: null,
       created_at: null,

@@ -81,6 +81,11 @@
           </q-btn>
         </div>
       </template>
+      <template v-else-if="inputData.col.name === 'logo'">
+        <q-avatar>
+          <q-img :src="inputData.props.row.logo ?? '/images/blankProfile.png'" />
+        </q-avatar>
+      </template>
       <template v-else-if="inputData.col.name === 'type'">
         <q-chip
           :color="typeChipColor(inputData.props.row.type)"
@@ -141,11 +146,11 @@ const tableKeys = ref({
 const table = ref({
   columns: [
     {
-      name: 'code',
+      name: 'logo',
       required: true,
-      label: 'کد',
+      label: 'لوگو',
       align: 'right' as const,
-      field: 'code',
+      field: 'logo',
       sortable: true
     },
     {
@@ -162,7 +167,6 @@ const table = ref({
       align: 'center' as const,
       field: (row: SchoolType) => t(`schoolType.${row.type}`)
     },
-    { name: 'address', label: 'آدرس', align: 'right' as const, field: 'address' },
     {
       name: 'actions',
       required: true,

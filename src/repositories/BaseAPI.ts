@@ -215,21 +215,19 @@ export default class BaseAPI<T> {
     return this.getNormalizedItem(this.normalize(response.data, this.defaultObject))
   }
 
-  async update (id: number, data: T | FormData): Promise<void | Error> {
-    try {
-      const endpoint = this.endpoints.byId(id)
-
-      // PHP does not parse multipart file uploads sent with a real PUT request.
-      // Use Laravel's method override so FormData files reach the controller.
-      if (data instanceof FormData) {
-        data.append('_method', 'PUT')
-        await this.getAxiosInstanceWithToken().post(endpoint, data)
-      } else {
-        await this.getAxiosInstanceWithToken().put(endpoint, data)
-      }
-    } catch {
-      return new Error()
+  async update (id: number, data: T | FormData): Promise<T> {
+    const endpoint = this.endpoints.byId(id)
+    let response = null
+    // PHP does not parse multipart file uploads sent with a real PUT request.
+    // Use Laravel's method override so FormData files reach the controller.
+    if (data instanceof FormData) {
+      data.append('_method', 'PUT')
+      response = await this.getAxiosInstanceWithToken().post(endpoint, data)
+    } else {
+      response = await this.getAxiosInstanceWithToken().put(endpoint, data)
     }
+
+    return response.data
   }
 
   async delete (id: number): Promise<void | Error> {

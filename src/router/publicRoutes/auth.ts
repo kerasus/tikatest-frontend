@@ -2,16 +2,42 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const authRoutes: RouteRecordRaw[] = [
   {
-    path: 'login',
-    name: 'Auth.Login',
-    component: () => import('src/pages/Auth.vue')
+    path: 'auth',
+    meta: {
+      layoutConfig: {
+        layoutHeader: false,
+        layoutLeftDrawer: false,
+        layoutRightDrawer: false,
+        layoutFooter: false
+      }
+    },
+    component: () => import('src/layouts/BareLayout.vue'),
+    children: [
+      {
+        path: 'login',
+        name: 'PublicAuth.Login',
+        component: () => import('src/pages/Auth.vue')
+      }
+    ]
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('src/pages/ErrorNotFound.vue')
+    path: ':school/:role/auth',
+    meta: {
+      layoutConfig: {
+        layoutHeader: false,
+        layoutLeftDrawer: false,
+        layoutRightDrawer: false,
+        layoutFooter: false
+      }
+    },
+    component: () => import('src/layouts/BareLayout.vue'),
+    children: [
+      {
+        path: 'login',
+        name: 'Auth.Login',
+        component: () => import('src/pages/Auth.vue')
+      }
+    ]
   }
 ]
 

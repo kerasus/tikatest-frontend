@@ -310,11 +310,7 @@ async function saveProfile () {
     }
 
     // ارسال به آدرس /api/users/{id}
-    const response = await userAPI.getAxiosInstanceWithToken().post(
-      userAPI.endpoints.byId(user.value.id),
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    )
+    const newUserData = await userAPI.update(user.value.id, formData)
 
     $q.notify({
       type: 'positive',
@@ -322,8 +318,8 @@ async function saveProfile () {
     })
 
     // سینک اطلاعات با استور Pinia تا عکس در هدر هم بلافاصله عوض شود
-    if (response.data?.data) {
-      userManager.setUser(response.data)
+    if (newUserData) {
+      userManager.setUser(newUserData)
     }
 
     selectedFile.value = null
@@ -342,6 +338,10 @@ async function refreshProfile () {
   const freshData = await userAPI.me()
   userManager.setUser(freshData)
 }
+
+onMounted(() => {
+  refreshProfile()
+})
 </script>
 
 <style scoped lang="scss">

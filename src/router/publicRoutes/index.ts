@@ -20,24 +20,5 @@ export const index: RouteRecordRaw[] = [
     // }
     component: () => import('src/pages/IndexPage.vue')
   },
-  {
-    path: ':school/:role/auth',
-    meta: {
-      layoutConfig: {
-        layoutHeader: false,
-        layoutLeftDrawer: false,
-        layoutRightDrawer: false,
-        layoutFooter: false
-      }
-    },
-    component: () => import('src/layouts/BareLayout.vue'),
-    children: [...authRoutes]
-  },
-
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
-  }
+  ...authRoutes
 ]

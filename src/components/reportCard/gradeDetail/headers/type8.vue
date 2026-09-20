@@ -134,7 +134,7 @@ import { computed, ref, watch } from 'vue'
 
 export interface SchoolInfo {
   name?: string;
-  logo_url?: string | null;
+  logo?: string | null;
   phone?: string | null;
   address?: string | null;
 }
@@ -171,10 +171,10 @@ const props = withDefaults(
   }
 )
 
-const schoolLogoSrc = ref<string>(props.school?.logo_url || props.defaultLogo)
+const schoolLogoSrc = ref<string>(props.school?.logo || props.defaultLogo)
 
 watch(
-  () => props.school?.logo_url,
+  () => props.school?.logo,
   (newVal) => {
     schoolLogoSrc.value = newVal || props.defaultLogo
   }

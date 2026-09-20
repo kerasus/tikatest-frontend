@@ -223,8 +223,8 @@
                       text-color="primary"
                       class="shadow-1">
                       <img
-                        v-if="sch.logo_url"
-                        :src="sch.logo_url">
+                        v-if="sch.logo"
+                        :src="sch.logo">
                       <q-icon
                         v-else
                         name="account_balance"

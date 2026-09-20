@@ -58,7 +58,7 @@ export type ReportCardSchool = {
   id: number
   name: string | null
   address: string | null
-  logo_url: string | null
+  logo: string | null
   phone: string | null
 }
 

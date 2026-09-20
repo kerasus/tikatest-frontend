@@ -98,12 +98,13 @@
           class="sm:inline-block text-xs font-semibold text-slate-600 hover:text-indigo-600 px-3 py-2">
           مدارس و موسسات
         </a>
-        <a
-          href="/login"
+        <router-link
+          :to="{ name: 'PublicAuth.Login' }"
           class="px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
           ورود به پنل
-        </a>
+        </router-link>
         <a
+          v-if="false"
           href="/register"
           class="px-4 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm transition-colors">
           ثبت‌نام رایگان

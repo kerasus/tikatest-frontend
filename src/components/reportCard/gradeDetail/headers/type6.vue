@@ -60,7 +60,7 @@
 import { computed, ref, watch } from 'vue'
 
 // (Interface definitions same as before...)
-export interface SchoolInfo { name?: string; logo_url?: string | null; phone?: string | null; }
+export interface SchoolInfo { name?: string; logo?: string | null; phone?: string | null; }
 export interface StudentInfo { name?: string; last_name?: string; full_name?: string; student_code?: string; picture?: string | null; }
 
 const props = defineProps<{
@@ -70,7 +70,7 @@ const props = defineProps<{
 }>()
 
 const studentPhotoSrc = ref(props.student?.picture || '/images/blankProfile.png')
-const schoolLogoSrc = ref(props.school?.logo_url || '/images/logo.png')
+const schoolLogoSrc = ref(props.school?.logo || '/images/logo.png')
 
 const studentFullName = computed(() => props.student?.full_name || `${props.student?.name || ''} ${props.student?.last_name || ''}`.trim() || 'دانش‌آموز گرامی')
 

@@ -140,14 +140,14 @@
               <div class="col-12">
                 <q-input
                   v-model="dialog.form.name"
-                  label="نام ترم *"
+                  label="نام ترم"
                   outlined
                   :rules="[(v) => !!v || 'نام ترم الزامی است']" />
               </div>
               <div class="col-12">
                 <q-select
                   v-model="dialog.form.type"
-                  label="نوع ترم *"
+                  label="نوع ترم"
                   :options="termTypeOptions"
                   emit-value
                   map-options

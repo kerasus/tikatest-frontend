@@ -70,7 +70,7 @@ const defaultAvatar = '/images/blankProfile.png'
 const defaultLogo = '/images/logo.png'
 
 const studentPhotoSrc = ref(props.student?.picture || defaultAvatar)
-const schoolLogoSrc = ref(props.school?.logo_url || defaultLogo)
+const schoolLogoSrc = ref(props.school?.logo || defaultLogo)
 
 const handleImgError = () => {
   studentPhotoSrc.value = defaultAvatar
