@@ -71,6 +71,7 @@
               </div>
               <div class="col-auto">
                 <q-btn
+                  v-if="node.type !== 'lesson'"
                   flat
                   dense
                   round
@@ -78,7 +79,15 @@
                   icon="add"
                   color="positive"
                   @click.stop="addChild(node)">
-                  <q-tooltip>افزودن</q-tooltip>
+                  <q-tooltip>
+                    افزودن
+                    <template v-if="node.type === 'field'">
+                      پایه
+                    </template>
+                    <template v-if="node.type === 'level'">
+                      درس
+                    </template>
+                  </q-tooltip>
                 </q-btn>
                 <q-btn
                   flat
