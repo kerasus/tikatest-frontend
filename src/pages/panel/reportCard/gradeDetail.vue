@@ -281,7 +281,7 @@ const canGenerate = computed(() => {
     form.value.term_id
   )
 })
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 function onSchoolChange () {
   form.value.field_id = null

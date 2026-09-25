@@ -50,7 +50,15 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
+    meta: {
+      layoutConfig: {
+        layoutHeader: false,
+        layoutLeftDrawer: false,
+        layoutRightDrawer: false,
+        layoutFooter: false
+      }
+    },
+    component: () => import('src/pages/ErrorNotFound.vue')
   }
 ]
 

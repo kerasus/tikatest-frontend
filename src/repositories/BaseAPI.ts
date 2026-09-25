@@ -179,7 +179,6 @@ export default class BaseAPI<T> {
   }
 
   getNormalizedItem (item: any) {
-    item.flagStates = this.parseFlag()
     return item
   }
 

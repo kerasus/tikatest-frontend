@@ -1,7 +1,8 @@
+import type { RouteRecordRaw } from 'vue-router'
 import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
-export const index = [
+export const index: RouteRecordRaw[] = [
   {
     path: 'schools',
     component: () => import('src/layouts/BareLayout.vue'),
@@ -75,7 +76,7 @@ export const index = [
         component: () => import('src/pages/panel/school/edit.vue')
       },
       {
-        path: ':school_id/academic-tree',
+        path: ':id/academic-tree',
         name: 'Panel.School.AcademicTree',
         meta: {
           breadCrumbs: [
@@ -92,7 +93,7 @@ export const index = [
         component: () => import('pages/panel/school/academicTree.vue')
       },
       {
-        path: ':school_id/classes',
+        path: ':id/classes',
         name: 'Panel.School.Classes',
         meta: {
           breadCrumbs: [
@@ -109,7 +110,7 @@ export const index = [
         component: () => import('pages/panel/school/schoolClasses.vue')
       },
       {
-        path: ':school_id/terms',
+        path: ':id/terms',
         name: 'Panel.School.Terms',
         meta: {
           breadCrumbs: [
@@ -120,6 +121,81 @@ export const index = [
             {
               label: 'مدیریت ترم‌ها',
               to: { name: 'Panel.School.Terms' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolTerms.vue')
+      }
+    ]
+  },
+  {
+    path: 'current-school',
+    component: () => import('src/layouts/BareLayout.vue'),
+    meta: {
+      middleware: [Authenticated, hasOneOfThisRoles(['Manager', 'Staff'])],
+      pageCategory: 'مدیریت مدارس'
+    },
+    children: [
+      {
+        path: '',
+        name: 'Panel.CurrentSchool.Show',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'مشاهده مدرسه',
+              to: { name: 'Panel.CurrentSchool.Show' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/show.vue')
+      },
+      {
+        path: 'edit',
+        name: 'Panel.CurrentSchool.Edit',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'ویرایش مدرسه',
+              to: { name: 'Panel.CurrentSchool.Edit' }
+            }
+          ]
+        },
+        component: () => import('src/pages/panel/school/edit.vue')
+      },
+      {
+        path: 'academic-tree',
+        name: 'Panel.CurrentSchool.AcademicTree',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'مدیریت ساختار آموزشی',
+              to: { name: 'Panel.CurrentSchool.AcademicTree' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/academicTree.vue')
+      },
+      {
+        path: 'classes',
+        name: 'Panel.CurrentSchool.Classes',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'مدیریت کلاس‌ها',
+              to: { name: 'Panel.CurrentSchool.Classes' }
+            }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolClasses.vue')
+      },
+      {
+        path: 'terms',
+        name: 'Panel.CurrentSchool.Terms',
+        meta: {
+          breadCrumbs: [
+            {
+              label: 'مدیریت ترم‌ها',
+              to: { name: 'Panel.CurrentSchool.Terms' }
             }
           ]
         },

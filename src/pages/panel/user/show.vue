@@ -16,6 +16,7 @@
     <user-schools-manager
       :user-id="userId"
       :readonly="true"
+      :school-users="userData.schools"
       @update="onChangeUserRole" />
   </template>
   <q-separator class="q-my-md" />

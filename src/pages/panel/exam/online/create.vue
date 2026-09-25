@@ -29,15 +29,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
 import { exam } from 'src/repositories/exam'
-import { examCategory } from 'src/repositories/examCategory'
+import { ref, onMounted, computed } from 'vue'
 import LessonAPI from 'src/repositories/lesson'
-import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 import { useExamForm } from 'src/composables/useExamForm'
+import { examCategory } from 'src/repositories/examCategory'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -51,7 +51,7 @@ const lessonOptions = ref<any[]>([])
 const { form, validate, buildFormData, resetForm } = useExamForm()
 form.delivery_mode = 'online'
 
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 const loadCategories = async () => {
   try {

@@ -14,6 +14,7 @@
 
   <student-class-assignment
     :student-id="Number(studentId)"
+    :school-id="currentSchoolManager.currentSchool.value?.id"
     :term-enrollments="studentData?.term_enrollments || []"
     :readonly="false"
     @updated="loadPage" />
@@ -26,17 +27,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { EntityEdit } from 'quasar-crud'
-import StudentAPI, { StudentType } from 'src/repositories/student'
+import { useRoute, useRouter } from 'vue-router'
+import { ref, reactive, onMounted, computed } from 'vue'
 import SchoolClassAPI from 'src/repositories/schoolClass'
+import StudentAPI, { StudentType } from 'src/repositories/student'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
 import StudentGuardianManager from 'src/components/StudentGuardianManager.vue'
 
 const studentApi = new StudentAPI()
 const schoolClassApi = new SchoolClassAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const $q = useQuasar()
 const route = useRoute()

@@ -7,7 +7,9 @@
     <q-card-section>
       <template v-if="!readonly">
         <div class="row q-col-gutter-md q-mb-md">
-          <div class="col-12 col-md-4">
+          <div
+            v-if="!schoolId"
+            class="col-12 col-md-4">
             <form-builder-select-school
               v-model:value="selectedSchoolId"
               label="انتخاب مدرسه"
@@ -152,21 +154,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { computed, onMounted, ref, watch } from 'vue'
 import { termEnrollment } from 'src/repositories/termEnrollment'
 import type { TermEnrollmentType } from 'src/repositories/termEnrollment'
-import { termAPI, type AcademicTermType } from 'src/repositories/academicTerm'
+import AcademicTermAPI, { type AcademicTermType } from 'src/repositories/academicTerm'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
+import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const props = defineProps({
   studentId: {
     type: Number,
     required: true
+  },
+  schoolId: {
+    type: Number,
+    required: false
   },
   termEnrollments: {
     type: Array as () => TermEnrollmentType[],
@@ -206,7 +212,8 @@ async function loadActiveTerms () {
 
   activeTermsLoading.value = true
   try {
-    const response = await termAPI.index({
+    const academicTermAPI = new AcademicTermAPI(schoolId)
+    const response = await academicTermAPI.index({
       school_id: schoolId,
       is_active: 1,
       length: 100
@@ -304,5 +311,9 @@ watch(() => props.termEnrollments, () => {
   loadRegistrations()
 }, {
   immediate: true
+})
+
+onMounted(() => {
+  selectedSchoolId.value = props.schoolId
 })
 </script>

@@ -179,7 +179,7 @@ const form = ref({
 const canGenerate = computed(() => {
   return form.value.class_id !== null && form.value.term_id !== null
 })
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 function onSchoolChange () {
   form.value.field_id = null

@@ -13,7 +13,9 @@
           <div
             v-if="!currentSchoolId && userStoreManager.isAdmin"
             class="row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-6">
+            <div
+              v-if="form.school_id"
+              class="col-12">
               <form-builder-select-school
                 v-model:value="form.school_id"
                 label="انتخاب مدرسه"
@@ -23,11 +25,11 @@
             </div>
           </div>
 
-          <!-- Step 2: Academic Field -->
-          <div
-            v-if="form.school_id"
-            class="row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-6">
+          <div class="row q-col-gutter-md q-mb-md">
+            <!-- Step 2: Academic Field -->
+            <div
+              v-if="form.school_id"
+              class="col-12 col-md-6">
               <form-builder-select-academic-field
                 v-model:value="form.field_id"
                 label="انتخاب رشته"
@@ -37,13 +39,10 @@
                 :school-id="form.school_id"
                 @update:value="onFieldChange" />
             </div>
-          </div>
-
-          <!-- Step 3: Academic Level -->
-          <div
-            v-if="form.field_id"
-            class="row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-6">
+            <!-- Step 3: Academic Level -->
+            <div
+              v-if="form.field_id"
+              class="col-12 col-md-6">
               <form-builder-select-academic-level
                 v-model:value="form.academic_level_id"
                 label="انتخاب پایه"
@@ -55,6 +54,7 @@
                 @update:value="onLevelChange" />
             </div>
           </div>
+
 
           <!-- Step 4: Class and Lesson -->
           <div
@@ -286,7 +286,7 @@ const examName = computed({
     form.exam_name = val
   }
 })
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 async function loadStudents (classId: number) {
   try {

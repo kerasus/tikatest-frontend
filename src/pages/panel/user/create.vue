@@ -11,11 +11,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { EntityCreate } from 'quasar-crud'
 import UserAPI from 'src/repositories/user'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 
 const userAPI = new UserAPI()
+
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
+
 const api = ref(userAPI.endpoints.base)
 const label = ref('کاربر جدید')
 const indexRouteName = ref('Panel.User.List')
@@ -24,7 +28,7 @@ const entityIdKey = ref('id')
 const entityParamKey = ref('id')
 const inputs = ref([
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'first_name',
     responseKey: 'first_name',
     label: 'نام',
@@ -32,7 +36,7 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'last_name',
     responseKey: 'last_name',
     label: 'نام خانوادگی',
@@ -40,7 +44,7 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'employee_code',
     responseKey: 'employee_code',
     label: 'کد پرسنلی',
@@ -49,7 +53,7 @@ const inputs = ref([
   },
   { type: 'separator', name: 'space', size: '0', col: 'col-md-12' },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'username',
     responseKey: 'username',
     label: 'نام کاربری',
@@ -57,7 +61,7 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'password',
     responseKey: 'password',
     label: 'کلمه عبور',
@@ -65,7 +69,7 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'mobile',
     responseKey: 'mobile',
     label: 'تلفن همراه',
@@ -73,7 +77,7 @@ const inputs = ref([
     col: 'col-md-3 col-12'
   },
   {
-    type: 'input',
+    type: FormBuilderInputComponent,
     name: 'email',
     responseKey: 'email',
     label: 'ایمیل',

@@ -122,7 +122,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { termAPI, type AcademicTermType } from 'src/repositories/academicTerm'
+import AcademicTermAPI, { type AcademicTermType } from 'src/repositories/academicTerm'
 import {
   examCategoryTermLimit,
   type ExamCategoryTermLimitPayload,
@@ -228,7 +228,8 @@ async function loadTerms (name = '') {
     const filters: Record<string, number | string> = { length: 100 }
     if (props.schoolId) filters.school_id = props.schoolId
     if (name) filters.name = name
-    const response = await termAPI.index(filters)
+    const academicTermAPI = new AcademicTermAPI(props.schoolId)
+    const response = await academicTermAPI.index(filters)
     termOptions.value = response.data.filter((term) => !existingTermIds.value.has(term.id))
   } catch (error) {
     console.error(error)

@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { AcademicTermType, termAPI } from 'src/repositories/academicTerm'
+import AcademicTermAPI, { type AcademicTermType } from 'src/repositories/academicTerm'
 
 defineOptions({
   name: 'FormBuilderSelectTerm'
@@ -92,7 +92,8 @@ async function getTerms (name: string | null) {
   if (name) payload.name = name
   if (props.schoolId) payload.school_id = props.schoolId
   if (props.activeOnly) payload.is_active = 1
-  const list = await termAPI.index(payload)
+  const academicTermAPI = new AcademicTermAPI(payload.school_id)
+  const list = await academicTermAPI.index(payload)
   return list.data
 }
 

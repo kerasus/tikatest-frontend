@@ -1,5 +1,4 @@
 import type { RouteRecordRaw } from 'vue-router'
-import Authenticated from 'src/router/middleware/Authenticated'
 import hasOneOfThisRoles from 'src/router/middleware/hasOneOfThisRoles'
 
 export const index: RouteRecordRaw[] = [
@@ -7,7 +6,8 @@ export const index: RouteRecordRaw[] = [
     path: 'users',
     name: 'Panel.User',
     meta: {
-      pageCategory: 'کاربران'
+      pageCategory: 'کاربران',
+      middleware: [hasOneOfThisRoles(['Admin', 'Manager', 'Staff'])]
     },
     component: () => import('src/layouts/BareLayout.vue'),
     children: [
@@ -60,12 +60,5 @@ export const index: RouteRecordRaw[] = [
         component: () => import('src/pages/panel/user/edit.vue')
       }
     ]
-  },
-
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
   }
 ]

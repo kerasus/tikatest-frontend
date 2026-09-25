@@ -1,180 +1,122 @@
 <template>
-  <div class="student-form-page">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">ثبت دانش آموز جدید</div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit">
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.first_name"
-                label="نام *"
-                outlined
-                required />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.last_name"
-                label="نام خانوادگی *"
-                outlined
-                required />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.username"
-                label="نام کاربری *"
-                outlined
-                required
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.password"
-                label="کلمه عبور *"
-                type="password"
-                outlined
-                required />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.mobile"
-                label="تلفن همراه"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.national_id"
-                label="کد ملی"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.student_code"
-                label="کد دانش آموزی"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.email"
-                label="ایمیل"
-                outlined
-                dir="ltr" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.birth_date"
-                label="تاریخ تولد"
-                outlined
-                mask="####/##/##" />
-            </div>
-            <div class="col-12">
-              <q-input
-                v-model="form.address"
-                label="آدرس"
-                outlined
-                type="textarea" />
-            </div>
-
-            <div class="col-12 col-md-6">
-              <q-select
-                v-model="form.class_id"
-                :options="classOptions"
-                option-value="id"
-                option-label="name"
-                label="کلاس"
-                outlined
-                emit-value
-                map-options
-                clearable />
-            </div>
-          </div>
-
-          <div class="q-mt-md">
-            <q-btn
-              type="submit"
-              color="primary"
-              label="ثبت دانش آموز"
-              :loading="saving" />
-            <q-btn
-              flat
-              label="انصراف"
-              :to="{ name: 'Panel.Student.List' }"
-              class="q-ml-sm" />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
-  </div>
+  <entity-create
+    v-model:value="inputs"
+    :title="label"
+    :api="api"
+    :entity-id-key="entityIdKey"
+    :entity-param-key="entityParamKey"
+    :index-route-name="indexRouteName"
+    :show-route-name="showRouteName"
+    :show-expand-button="false" />
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
+import { ref, shallowRef } from 'vue'
+import { EntityCreate } from 'quasar-crud'
 import StudentAPI from 'src/repositories/student'
-import SchoolClassAPI from 'src/repositories/schoolClass'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectClasses from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectClasses.vue'
 
-const studentApi = new StudentAPI()
-const schoolClassApi = new SchoolClassAPI()
+const studentAPI = new StudentAPI()
+const currentSchoolManager = useCurrentSchool()
 
-const router = useRouter()
-const $q = useQuasar()
+const FormBuilderDateComponent = shallowRef(FormBuilderDate)
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
+const FormBuilderSelectClassesComponent = shallowRef(FormBuilderSelectClasses)
 
-const form = reactive({
-  first_name: null as string | null,
-  last_name: null as string | null,
-  username: null as string | null,
-  password: null as string | null,
-  mobile: null as string | null,
-  national_id: null as string | null,
-  student_code: null as string | null,
-  birth_date: null as string | null,
-  email: null as string | null,
-  address: null as string | null,
-  class_id: null as number | null
-})
-
-const classOptions = ref<any[]>([])
-const saving = ref(false)
-
-async function onSubmit () {
-  saving.value = true
-  try {
-    await studentApi.create(form as any)
-    $q.notify({
-      icon: 'check',
-      message: 'دانش آموز با موفقیت ثبت شد.',
-      color: 'positive'
-    })
-    router.push({ name: 'Panel.Student.List' })
-  } catch (error) {
-    $q.notify({
-      icon: 'error',
-      message: 'خطا در ثبت دانش آموز.',
-      color: 'negative'
-    })
-  } finally {
-    saving.value = false
+const api = ref(studentAPI.endpoints.base)
+const label = ref('ثبت دانش آموز جدید')
+const indexRouteName = ref('Panel.Student.List')
+const showRouteName = ref('Panel.Student.Show')
+const entityIdKey = ref('id')
+const entityParamKey = ref('id')
+const inputs = ref([
+  {
+    type: FormBuilderInputComponent,
+    name: 'first_name',
+    responseKey: 'first_name',
+    label: 'نام',
+    col: 'col-md-6 col-12',
+    required: true
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'last_name',
+    responseKey: 'last_name',
+    label: 'نام خانوادگی',
+    col: 'col-md-6 col-12',
+    required: true
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'username',
+    responseKey: 'username',
+    label: 'نام کاربری',
+    col: 'col-md-6 col-12',
+    required: true
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'password',
+    responseKey: 'password',
+    label: 'کلمه عبور',
+    col: 'col-md-6 col-12',
+    required: true
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'mobile',
+    responseKey: 'mobile',
+    label: 'تلفن همراه',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'national_id',
+    responseKey: 'national_id',
+    label: 'کد ملی',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'student_code',
+    responseKey: 'student_code',
+    label: 'کد دانش آموزی',
+    placeholder: ' ',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: FormBuilderInputComponent,
+    name: 'email',
+    responseKey: 'email',
+    label: 'ایمیل',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: FormBuilderDateComponent,
+    name: 'birth_date',
+    responseKey: 'birth_date',
+    label: 'تاریخ تولد',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: 'input',
+    name: 'address',
+    responseKey: 'address',
+    label: 'آدرس',
+    inputType: 'textarea',
+    col: 'col-md-12'
+  },
+  {
+    type: FormBuilderSelectClassesComponent,
+    name: 'class_ids',
+    responseKey: 'class_ids',
+    schoolId: currentSchoolManager.currentSchool.value?.id,
+    label: 'کلاس ها',
+    col: 'col-md-12'
   }
-}
-
-onMounted(async () => {
-  const result = await schoolClassApi.index({ length: 100 })
-  classOptions.value = result.data
-})
+])
 </script>
-
-<style lang="scss" scoped>
-.student-form-page {
-  max-width: 900px;
-  margin: 0 auto;
 }
-</style>

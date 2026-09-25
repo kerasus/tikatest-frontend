@@ -205,7 +205,7 @@ const afterRemove = () => {
 }
 
 function loadInputsForCurrentSchool () {
-  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  const currentSchoolId = currentSchoolManager?.currentSchool.value?.id
   if (!currentSchoolId) {
     return
   }

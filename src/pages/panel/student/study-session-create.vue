@@ -92,20 +92,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
 import { useUser } from 'src/stores/user'
-import { studySession } from 'src/repositories/studySession'
-import type { StudySessionSourceEnum } from 'src/repositories/studySession'
+import { ref, reactive, onMounted } from 'vue'
 import { lesson } from 'src/repositories/lesson'
-import { termAPI } from 'src/repositories/academicTerm'
 import type { LessonType } from 'src/repositories/lesson'
+import AcademicTermAPI from 'src/repositories/academicTerm'
+import { studySession } from 'src/repositories/studySession'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import type { AcademicTermType } from 'src/repositories/academicTerm'
+import type { StudySessionSourceEnum } from 'src/repositories/studySession'
 
-const router = useRouter()
 const $q = useQuasar()
+const router = useRouter()
 const userStore = useUser()
+const currentSchoolManager = useCurrentSchool()
+
 const saving = ref(false)
 const lessonOptions = ref<LessonType[]>([])
 const termOptions = ref<AcademicTermType[]>([])
@@ -157,9 +160,10 @@ async function onSubmit () {
 
 onMounted(async () => {
   try {
+    const academicTermAPI = new AcademicTermAPI(currentSchoolManager.currentSchool.value.id)
     const [lessonsRes, termsRes] = await Promise.all([
       lesson.index({ length: 1000 }),
-      termAPI.index({ length: 1000 })
+      academicTermAPI.index({ length: 1000 })
     ])
     lessonOptions.value = lessonsRes.data ?? []
     termOptions.value = termsRes.data ?? []

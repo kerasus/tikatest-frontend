@@ -62,11 +62,11 @@ import { studySession } from 'src/repositories/studySession'
 import type { StudySessionType } from 'src/repositories/studySession'
 
 const $q = useQuasar()
-const userStore = useUser()
+const userStoreManager = useUser()
 const loading = ref(false)
 const sessions = ref<StudySessionType[]>([])
 
-const studentId = computed(() => userStore.me?.id ?? null)
+const studentId = computed(() => userStoreManager.me?.id ?? null)
 
 const sourceLabels: Record<string, string> = {
   manual: 'دستی',

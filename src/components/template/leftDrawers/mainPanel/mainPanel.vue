@@ -95,7 +95,7 @@ const topLinks = ref<ListItemType[]>([
   },
   {
     icon: 'quiz',
-    title: 'آزمون ها',
+    title: 'نمرات و آزمون‌ها',
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: 'edit_note', title: 'ثبت نمره', route: { name: 'Panel.Exam.InPerson.Create' } },
@@ -177,6 +177,37 @@ const topLinks = ref<ListItemType[]>([
     child: [
       { icon: '', title: 'گزارش کلی', route: { name: 'Panel.StudyHours.General' } },
       { icon: '', title: 'گزارش انفرادی', route: { name: 'Panel.StudyHours.Individual' } }
+    ]
+  },
+  {
+    icon: 'quiz',
+    title: 'اطلاعات پایه مدرسه',
+    forRoles: ['Manager', 'Teacher', 'Admin'],
+    child: [
+      {
+        icon: 'school',
+        title: 'اطلاعات کلی',
+        forRoles: ['Manager', 'Staff'],
+        route: { name: 'Panel.CurrentSchool.Show' }
+      },
+      {
+        icon: 'school',
+        title: 'ساختار آموزشی',
+        forRoles: ['Manager', 'Staff'],
+        route: { name: 'Panel.CurrentSchool.AcademicTree' }
+      },
+      {
+        icon: 'school',
+        title: 'کلاس‌ها',
+        forRoles: ['Manager', 'Staff'],
+        route: { name: 'Panel.CurrentSchool.Classes' }
+      },
+      {
+        icon: 'school',
+        title: 'ترم‌ها',
+        forRoles: ['Manager', 'Staff'],
+        route: { name: 'Panel.CurrentSchool.Terms' }
+      }
     ]
   },
   {
@@ -286,11 +317,12 @@ watch(
     <div class="left-drawer__inner">
       <div class="left-drawer__logo-section">
         <div class="left-drawer__logo-section-img">
-          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />
+          <!--          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />-->
+          <q-img :src="currentSchoolManager.currentSchool.value?.logo ?? '/images/logo.png'" />
         </div>
         <div class="left-drawer__logo-section-title">
           <template v-if="currentSchoolManager.currentSchool">
-            {{ currentSchoolManager.currentSchool.name }}
+            {{ currentSchoolManager.currentSchool.value?.name }}
           </template>
           <template v-else>
             <form-builder-select-school

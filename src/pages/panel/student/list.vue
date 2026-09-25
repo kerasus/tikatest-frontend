@@ -132,7 +132,7 @@ const inputs = ref([
     type: FormBuilderSelectSchoolComponent,
     name: 'school_id',
     label: 'مدرسه',
-    col: 'col-md-4 col-12'
+    col: 'col-12'
   },
   {
     type: FormBuilderSelectAcademicFieldComponent,
@@ -248,7 +248,7 @@ function afterRemove () {
 }
 
 function loadInputsForCurrentSchool () {
-  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  const currentSchoolId = currentSchoolManager?.currentSchool.value?.id
   if (!currentSchoolId) {
     return
   }

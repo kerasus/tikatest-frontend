@@ -179,7 +179,7 @@ const inputs = ref([
 
 const entityIndexRef = ref()
 
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 const afterRemove = () => {
   entityIndexRef.value.reload()
@@ -195,7 +195,7 @@ const formatDate = (value: string | null | undefined): string => {
 }
 
 function loadInputsForCurrentSchool () {
-  const currentSchoolId = currentSchoolManager?.currentSchool?.id
+  const currentSchoolId = currentSchoolManager?.currentSchool.value?.id
   if (!currentSchoolId) {
     return
   }

@@ -17,7 +17,9 @@
               :loading="loading"
               @click="loadTreeData" />
           </div>
-          <div class="col-auto">
+          <div
+            v-if="userManager.isAdmin"
+            class="col-auto">
             <q-btn
               color="primary"
               icon="list"
@@ -146,33 +148,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
+import { useUser } from 'src/stores/user'
+import { ref, reactive, onMounted, computed } from 'vue'
 import SchoolAPI from 'src/repositories/school'
-import AcademicFieldAPI from 'src/repositories/academicField'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
 import ClassAPI from 'src/repositories/schoolClass'
 import type { SchoolType } from 'src/repositories/school'
+import AcademicFieldAPI from 'src/repositories/academicField'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import type { SchoolClassType } from 'src/repositories/schoolClass'
 import type { AcademicFieldType } from 'src/repositories/academicField'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
-import type { SchoolClassType } from 'src/repositories/schoolClass'
 
-const route = useRoute()
 const $q = useQuasar()
+const route = useRoute()
 
+const userManager = useUser()
+const classApi = new ClassAPI()
 const schoolApi = new SchoolAPI()
 const fieldApi = new AcademicFieldAPI()
 const levelApi = new AcademicLevelAPI()
-const classApi = new ClassAPI()
+const currentSchoolManager = useCurrentSchool()
 
-const schoolId = parseInt(route.params.school_id as string)
 const loading = ref(false)
 const saving = ref(false)
 const selectedNode = ref(null)
 const treeData = ref<any[]>([])
 
 const school = ref<SchoolType | null>(null)
+
+const schoolId = computed(() => {
+  if (route.name === 'Panel.School.Classes') {
+    return route.params.id ? parseInt(route.params.id.toString()) : 0
+  } else if (currentSchoolManager?.currentSchool.value) {
+    return currentSchoolManager?.currentSchool.value?.id
+  }
+
+  return null
+})
 
 const dialog = reactive({
   show: false,
@@ -181,7 +196,7 @@ const dialog = reactive({
   node: null as any,
   form: {
     id: null as number | null,
-    school_id: schoolId,
+    school_id: schoolId.value,
     academic_level_id: null as number | null,
     name: null as string | null
   }
@@ -220,10 +235,10 @@ async function loadTreeData () {
   loading.value = true
   try {
     const [schoolRes, fieldsRes, levelsRes, classesRes] = await Promise.all([
-      schoolApi.get(schoolId),
-      fieldApi.index({ length: 1000, school_id: schoolId }),
-      levelApi.index({ length: 1000, school_id: schoolId }),
-      classApi.index({ length: 1000, school_id: schoolId })
+      schoolApi.get(schoolId.value),
+      fieldApi.index({ length: 1000, school_id: schoolId.value }),
+      levelApi.index({ length: 1000, school_id: schoolId.value }),
+      classApi.index({ length: 1000, school_id: schoolId.value })
     ])
 
     school.value = schoolRes
@@ -245,7 +260,7 @@ function addClass (node: any) {
   dialog.title = 'افزودن کلاس'
   dialog.form = {
     id: null,
-    school_id: schoolId,
+    school_id: schoolId.value,
     academic_level_id: node.data.id,
     name: null
   }
@@ -258,7 +273,7 @@ function editClass (node: any) {
   dialog.title = 'ویرایش کلاس'
   dialog.form = {
     id: node.data.id,
-    school_id: schoolId,
+    school_id: schoolId.value,
     academic_level_id: node.data.academic_level_id,
     name: node.data.name
   }
@@ -322,5 +337,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -2,7 +2,7 @@
   <div class="wrapper">
     <q-btn
       color="primary"
-      :to="{name: 'HomePage'}">
+      :to="homeRoute">
       بازگشت به خانه
     </q-btn>
     <svg
@@ -401,6 +401,39 @@
     </svg>
   </div>
 </template>
+
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useUser } from 'src/stores/user'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+
+const userStoreManager = useUser()
+const currentSchoolManager = useCurrentSchool()
+
+const homeRoute = computed(() => {
+  if (!currentSchoolManager.currentSchool.value) {
+    return { name: 'HomePage' }
+  }
+
+  let routeName = 'Student.Dashboard'
+  let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
+  let routeParamRole = userStoreManager.mainRoleForPath
+  if (userStoreManager.isAdmin) {
+    routeName = 'Panel.AdminDashboard'
+  } else if (
+    userStoreManager.isManager
+    || userStoreManager.isTeacher
+    || userStoreManager.isStaff
+  ) {
+    routeName = 'Panel.SchoolDashboard'
+  } else if (userStoreManager.isStudent) {
+    routeName = 'Student.Dashboard'
+  }
+
+  return { name: routeName, params: { school: routeParamSchool, role: routeParamRole } }
+})
+</script>
 
 <style lang="scss" scoped>
 .wrapper {

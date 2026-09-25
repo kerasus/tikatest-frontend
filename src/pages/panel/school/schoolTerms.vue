@@ -26,6 +26,7 @@
           </div>
           <div class="col-auto">
             <q-btn
+              v-if="userStoreManager.isAdmin"
               color="primary"
               icon="list"
               label="لیست مدارس"
@@ -245,18 +246,43 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
-import { ref, reactive, onMounted } from 'vue'
 import SchoolAPI from 'src/repositories/school'
-import { TERM_TYPE_LABELS } from 'src/repositories/school'
-import type { SchoolType, AcademicTerm, AcademicTermType } from 'src/repositories/school'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { TERM_TYPE_LABELS } from 'src/repositories/academicTerm'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import AcademicTermAPI, {
+  type AcademicTermTypeType,
+  type AcademicTermType
+} from 'src/repositories/academicTerm'
+import { useUser } from 'src/stores/user'
+import type { SchoolType } from 'src/repositories/school'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 
-const route = useRoute()
 const $q = useQuasar()
+const route = useRoute()
+const userStoreManager = useUser()
+const currentSchoolManager = useCurrentSchool()
+
+const schoolIdFromRouteParam = computed<number>(() => {
+  if (route.params.id) {
+    return parseInt(route.params.school_id as string)
+  }
+
+  return null
+})
+
+const schoolId = computed(() => {
+  if (schoolIdFromRouteParam.value) {
+    return schoolIdFromRouteParam.value
+  } else if (currentSchoolManager?.currentSchool.value) {
+    return currentSchoolManager?.currentSchool.value?.id
+  }
+
+  return null
+})
 
 const schoolApi = new SchoolAPI()
 
-const schoolId = parseInt(route.params.school_id as string)
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -270,11 +296,11 @@ const dialog = reactive({
   show: false,
   title: '',
   edit: false,
-  node: null as AcademicTerm | null,
+  node: null as AcademicTermType | null,
   form: {
     id: null as number | null,
     name: null as string | null,
-    type: null as AcademicTermType | null,
+    type: null as AcademicTermTypeType | null,
     academic_year: null as string | null,
     season: null as string | null,
     period: null as number | null,
@@ -287,15 +313,15 @@ const dialog = reactive({
 
 const deleteConfirm = reactive({
   show: false,
-  node: null as AcademicTerm | null
+  node: null as AcademicTermType | null
 })
 
 const termTypeOptions = Object.entries(TERM_TYPE_LABELS).map(([value, label]) => ({
   label,
-  value: value as AcademicTermType
+  value: value as AcademicTermTypeType
 }))
 
-function termTypeLabel (type: AcademicTermType | null): string {
+function termTypeLabel (type: AcademicTermTypeType | null): string {
   if (!type) return 'ناشناس'
   return TERM_TYPE_LABELS[type] || type
 }
@@ -303,13 +329,14 @@ function termTypeLabel (type: AcademicTermType | null): string {
 async function loadTreeData () {
   loading.value = true
   try {
+    const academicTermAPI = new AcademicTermAPI(schoolId.value)
     const [schoolRes, terms] = await Promise.all([
-      schoolApi.get(schoolId),
-      schoolApi.termsIndex(schoolId)
+      schoolApi.get(schoolId.value),
+      academicTermAPI.index()
     ])
     school.value = schoolRes
-    treeData.value = buildTermTree(terms)
-    expanded.value = collectExpandedIds(terms)
+    treeData.value = buildTermTree(terms.data)
+    expanded.value = collectExpandedIds(terms.data)
   } catch (e) {
     console.error(e)
     $q.notify({ type: 'negative', message: 'خطا در بارگذاری ترم‌ها' })
@@ -318,11 +345,11 @@ async function loadTreeData () {
   }
 }
 
-function buildTermTree (terms: AcademicTerm[]): any[] {
+function buildTermTree (terms: AcademicTermType[]): any[] {
   return terms.map((term) => normalizeTermNode(term))
 }
 
-function normalizeTermNode (term: AcademicTerm): any {
+function normalizeTermNode (term: AcademicTermType): any {
   return {
     id: term.id,
     label: term.name || 'بدون نام',
@@ -330,11 +357,13 @@ function normalizeTermNode (term: AcademicTerm): any {
     type: 'term',
     is_active: term.is_active ?? false,
     data: term,
-    children: Array.isArray(term.children) ? term.children.map((child) => normalizeTermNode(child)) : []
+    children: Array.isArray(term.children)
+      ? term.children.map((child) => normalizeTermNode(child))
+      : []
   }
 }
 
-function collectExpandedIds (terms: AcademicTerm[]): number[] {
+function collectExpandedIds (terms: AcademicTermType[]): number[] {
   const ids: number[] = []
   terms.forEach((term) => {
     if (term.id) ids.push(term.id)
@@ -425,12 +454,13 @@ async function onSubmitDialog () {
       ends_at: dialog.form.ends_at
     }
 
+    const academicTermAPI = new AcademicTermAPI(schoolId.value)
     if (dialog.edit) {
-      await schoolApi.termsUpdate(schoolId, dialog.form.id!, payload)
+      await academicTermAPI.update(dialog.form.id!, payload)
       $q.notify({ type: 'positive', message: 'ترم بروزرسانی شد' })
     } else {
       payload.parent_id = dialog.form.id ? null : (dialog.form as any).parent_id
-      await schoolApi.termsStore(schoolId, payload)
+      await academicTermAPI.create(payload)
       $q.notify({ type: 'positive', message: 'ترم ثبت شد' })
     }
 
@@ -448,7 +478,8 @@ async function confirmDelete () {
   if (!deleteConfirm.node?.id) return
   deleting.value = true
   try {
-    await schoolApi.termsDestroy(schoolId, deleteConfirm.node.id)
+    const academicTermAPI = new AcademicTermAPI(schoolId.value)
+    await academicTermAPI.delete(deleteConfirm.node.id)
     deleteConfirm.show = false
     $q.notify({ type: 'positive', message: 'ترم حذف شد' })
     await loadTreeData()

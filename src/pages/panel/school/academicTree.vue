@@ -22,7 +22,9 @@
               :loading="loading"
               @click="loadTreeData" />
           </div>
-          <div class="col-auto">
+          <div
+            v-if="userManager.isAdmin"
+            class="col-auto">
             <q-btn
               color="primary"
               icon="list"
@@ -189,25 +191,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import AcademicFieldAPI from 'src/repositories/academicField'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
+import { useRoute } from 'vue-router'
+import { useUser } from 'src/stores/user'
 import LessonAPI from 'src/repositories/lesson'
-import SchoolAPI from 'src/repositories/school'
-import type { SchoolType } from 'src/repositories/school'
-import type { AcademicFieldType } from 'src/repositories/academicField'
-import type { AcademicLevelType } from 'src/repositories/academicLevel'
+import { ref, reactive, onMounted, computed } from 'vue'
 import type { LessonType } from 'src/repositories/lesson'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
+import AcademicFieldAPI from 'src/repositories/academicField'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import type { AcademicLevelType } from 'src/repositories/academicLevel'
+import type { AcademicFieldType } from 'src/repositories/academicField'
 
-const route = useRoute()
 const $q = useQuasar()
+const route = useRoute()
 
-const schoolApi = new SchoolAPI()
+const userManager = useUser()
+const lessonApi = new LessonAPI()
 const fieldApi = new AcademicFieldAPI()
 const levelApi = new AcademicLevelAPI()
-const lessonApi = new LessonAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -216,7 +219,15 @@ const treeData = ref<any[]>([])
 const fieldOptions = ref<AcademicFieldType[]>([])
 const levelOptions = ref<AcademicLevelType[]>([])
 
-const schoolId = parseInt(route.params.school_id as string)
+const schoolId = computed(() => {
+  if (route.name === 'Panel.School.AcademicTree') {
+    return route.params.id ? parseInt(route.params.id.toString()) : 0
+  } else if (currentSchoolManager?.currentSchool.value) {
+    return currentSchoolManager?.currentSchool.value?.id
+  }
+
+  return null
+})
 
 const dialog = reactive({
   show: false,
@@ -225,7 +236,7 @@ const dialog = reactive({
   edit: false,
   node: null as any,
   form: {
-    school_id: schoolId,
+    school_id: schoolId.value,
     field_id: null as number | null,
     academic_level_id: null as number | null,
     name: null as string | null,
@@ -268,8 +279,8 @@ async function loadTreeData () {
   loading.value = true
   try {
     const [fieldsRes, levelsRes, lessonsRes] = await Promise.all([
-      fieldApi.index({ length: 1000, school_id: schoolId }),
-      levelApi.index({ length: 1000, school_id: schoolId }),
+      fieldApi.index({ length: 1000, school_id: schoolId.value }),
+      levelApi.index({ length: 1000, school_id: schoolId.value }),
       lessonApi.index({ length: 1000 })
     ])
 
@@ -291,7 +302,7 @@ function addRootField () {
   dialog.type = 'field'
   dialog.title = 'افزودن رشته'
   dialog.form = {
-    school_id: schoolId,
+    school_id: schoolId.value,
     field_id: null,
     academic_level_id: null,
     name: null,
@@ -307,7 +318,7 @@ function addChild (node: any) {
   dialog.type = node.type === 'field' ? 'level' : 'lesson'
   dialog.title = dialog.type === 'level' ? 'افزودن مقطع' : 'افزودن درس'
   dialog.form = {
-    school_id: schoolId,
+    school_id: schoolId.value,
     field_id: null,
     academic_level_id: node.type === 'level' ? node.data.id : null,
     name: null,
@@ -331,7 +342,7 @@ function editNode (node: any) {
   dialog.title =
     node.type === 'field' ? 'ویرایش رشته' : node.type === 'level' ? 'ویرایش مقطع' : 'ویرایش درس'
   dialog.form = {
-    school_id: schoolId,
+    school_id: schoolId.value,
     field_id: null,
     academic_level_id: node.data.academic_level_id || null,
     name: node.data.name,
@@ -413,7 +424,7 @@ async function onSubmitDialog () {
 
 async function loadFieldOptions () {
   try {
-    const result = await fieldApi.index({ length: 1000, school_id: schoolId })
+    const result = await fieldApi.index({ length: 1000, school_id: schoolId.value })
     fieldOptions.value = result.data
   } catch (error) {
     console.error('Error loading fields:', error)
@@ -422,7 +433,7 @@ async function loadFieldOptions () {
 
 async function loadLevelOptions (fieldId?: number) {
   try {
-    const params: any = { length: 1000, school_id: schoolId }
+    const params: any = { length: 1000, school_id: schoolId.value }
     if (fieldId) params.field_id = fieldId
     const result = await levelApi.index(params)
     levelOptions.value = result.data

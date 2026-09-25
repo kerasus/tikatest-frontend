@@ -55,7 +55,7 @@ const currentSchoolManager = useCurrentSchool()
 const saving = ref(false)
 const homeworkForm = ref(createEmptyHomework())
 
-const currentSchoolId = computed(() => currentSchoolManager?.currentSchool?.id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 async function onSubmit () {
   if (!validateHomework(homeworkForm.value)) {

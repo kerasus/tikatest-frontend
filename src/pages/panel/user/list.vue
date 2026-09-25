@@ -208,7 +208,7 @@ function loadInputs () {
   }
   inputs.value.forEach((item) => {
     if (item.name === 'school_id') {
-      item.value = currentSchoolManager.currentSchool.id
+      item.value = currentSchoolManager.currentSchool.value?.id
     }
   })
 }

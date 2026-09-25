@@ -7,4 +7,16 @@
       background-color: transparent;
     }
   }
+  .q-card__section {
+    .q-expansion-item {
+      .q-expansion-item__container {
+        .q-item {
+          display: flex;
+        }
+        & > .q-item {
+          display: none;
+        }
+      }
+    }
+  }
 }

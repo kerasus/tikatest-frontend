@@ -70,12 +70,13 @@
           <template #header>
             <q-item-section
               side
+              class="q-mr-md"
               top>
               <q-avatar
-                icon="school"
-                color="primary"
                 text-color="white"
-                size="32px" />
+                size="32px">
+                <q-img :src="item.logo ?? '/images/blankProfile.png'" />
+              </q-avatar>
             </q-item-section>
             <q-item-section>
               <q-item-label>{{ item?.name || '-' }}</q-item-label>
@@ -125,7 +126,9 @@
             </q-item-section>
           </template>
 
-          <div class="row q-col-gutter-md q-px-md q-pb-md">
+          <div
+            v-if="editForms[item.id!]"
+            class="row q-col-gutter-md q-px-md q-pb-md">
             <div class="col-12 col-md-4">
               <q-input
                 v-model="editForms[item.id!].personnel_code"

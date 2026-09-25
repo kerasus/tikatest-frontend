@@ -50,7 +50,11 @@ export const useUser = defineStore('user', () => {
     if (isAdmin.value) {
       return 'admin'
     }
-    if (isManager.value) {
+    if (
+      isManager.value
+      || isTeacher.value
+      || isStudent.value
+    ) {
       return 'staff'
     }
     if (isTeacher.value) {
