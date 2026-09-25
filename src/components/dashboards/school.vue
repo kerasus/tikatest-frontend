@@ -48,19 +48,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
-import StudentAPI from 'src/repositories/student'
-import SchoolClassAPI from 'src/repositories/schoolClass'
+import { ref, onMounted } from 'vue'
 import ExamAPI from 'src/repositories/exam'
+import StudentAPI from 'src/repositories/student'
 import HomeworkAPI from 'src/repositories/homework'
+import SchoolClassAPI from 'src/repositories/schoolClass'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
-const studentAPI = new StudentAPI()
-const schoolClassAPI = new SchoolClassAPI()
 const examAPI = new ExamAPI()
+const studentAPI = new StudentAPI()
 const homeworkAPI = new HomeworkAPI()
+const schoolClassAPI = new SchoolClassAPI()
 
 const $q = useQuasar()
+const currentSchoolManager = useCurrentSchool()
 
 const stats = ref({
   students: 0,
@@ -72,10 +74,10 @@ const stats = ref({
 onMounted(async () => {
   try {
     const [studentsRes, classesRes, examsRes, homeworkRes] = await Promise.all([
-      studentAPI.index({ length: 1 }),
-      schoolClassAPI.index({ length: 1 }),
-      examAPI.index({ length: 1 }),
-      homeworkAPI.index({ length: 1 })
+      studentAPI.index({ length: 1, school_id: currentSchoolManager.currentSchool.value?.id }),
+      schoolClassAPI.index({ length: 1, school_id: currentSchoolManager.currentSchool.value?.id }),
+      examAPI.index({ length: 1, school_id: currentSchoolManager.currentSchool.value?.id }),
+      homeworkAPI.index({ length: 1, school_id: currentSchoolManager.currentSchool.value?.id })
     ])
     stats.value.students = studentsRes.total
     stats.value.classes = classesRes.total

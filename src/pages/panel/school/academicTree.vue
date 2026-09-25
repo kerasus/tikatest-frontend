@@ -56,13 +56,16 @@
         <q-tree
           v-else
           v-model:selected="selectedNode"
+          v-model:expanded="expandedNodes"
           :nodes="treeData"
           node-key="id"
           label-key="label"
           children-key="children"
           class="academic-tree">
           <template #default-header="{ node }">
-            <div class="row items-center q-col-gutter-sm full-width">
+            <div
+              class="row items-center q-col-gutter-sm full-width"
+              @click.stop="toggleNode(node)">
               <div class="col">
                 <div class="text-subtitle2">{{ node.label }}</div>
                 <div
@@ -224,6 +227,18 @@ const currentSchoolManager = useCurrentSchool()
 const loading = ref(false)
 const saving = ref(false)
 const selectedNode = ref(null)
+const expandedNodes = ref<any[]>([])
+
+function toggleNode (node: any) {
+  if (!node || node.type === 'lesson') return
+  const key = node.id
+  const index = expandedNodes.value.findIndex((item) => item === key)
+  if (index >= 0) {
+    expandedNodes.value.splice(index, 1)
+  } else {
+    expandedNodes.value.push(key)
+  }
+}
 const treeData = ref<any[]>([])
 const fieldOptions = ref<AcademicFieldType[]>([])
 const levelOptions = ref<AcademicLevelType[]>([])

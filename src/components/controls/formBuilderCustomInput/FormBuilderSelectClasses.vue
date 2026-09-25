@@ -82,6 +82,7 @@ import FormBuilderSelectSchool from './FormBuilderSelectSchool.vue'
 import FormBuilderSelectAcademicField from './FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from './FormBuilderSelectAcademicLevel.vue'
 import FormBuilderSelectSchoolClass from './FormBuilderSelectSchoolClass.vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { SchoolClassType } from 'src/repositories/schoolClass'
 
@@ -111,6 +112,14 @@ const selectedClasses = ref<SchoolClassType[]>([])
 
 const schoolClassAPI = new SchoolClassAPI()
 
+const { normalizeIds } = useEntitySelector<SchoolClassType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions: selectedClasses,
+  entityName: 'classes',
+  fetchByIds: (params) => schoolClassAPI.index(params)
+})
+
 watch(localSchoolId, () => {
   fieldId.value = null
   levelId.value = null
@@ -125,14 +134,6 @@ watch(fieldId, () => {
 watch(levelId, () => {
   selectedClass.value = null
 })
-
-async function fetchClassData (id: number): Promise<SchoolClassType | null> {
-  try {
-    return await schoolClassAPI.get(id)
-  } catch {
-    return null
-  }
-}
 
 async function addClass () {
   if (!selectedClass.value) return
@@ -164,4 +165,13 @@ function removeClass (classId: number) {
 onMounted(() => {
   localSchoolId.value = props.schoolId
 })
+
+watch(
+  () => props.value,
+  (value) => {
+    const ids = new Set(normalizeIds(value))
+    selectedClasses.value = selectedClasses.value.filter((item) => item.id !== null && ids.has(item.id))
+  },
+  { deep: true }
+)
 </script>

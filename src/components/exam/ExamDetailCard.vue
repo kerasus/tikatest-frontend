@@ -1,8 +1,8 @@
 <template>
   <q-card class="q-mb-md">
-    <q-card-section style="margin-bottom: 1px">
+    <q-card-section>
       <div class="flex justify-between">
-        <div class="text-h6">جزئیات آزمون</div>
+        <div class="text-h6">اطلاعات کلی آزمون</div>
         <div class="actions">
           <q-btn
             v-if="!editable"
@@ -40,7 +40,7 @@
 
     <q-card-section>
       <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
           <form-builder-select-exam-category
             v-if="editable"
             v-model:value="exam.exam_category_id"
@@ -51,7 +51,7 @@
             <div class="text-body1">{{ exam.category?.title || '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
           <q-input
             v-if="editable"
             v-model="exam.name"
@@ -71,7 +71,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
           <form-builder-select-lesson
             v-if="editable"
             v-model:value="exam.lesson_id"
@@ -82,7 +82,22 @@
             <div class="text-body1">{{ exam.lesson?.name || '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-3">
+          <form-builder-select-term
+            v-if="editable"
+            v-model:value="exam.term_id"
+            :school-id="schoolId"
+            active-only
+            label="ترم"
+            outlined
+            dense
+            clearable />
+          <div v-else>
+            <div class="text-subtitle2">ترم:</div>
+            <div class="text-body1">{{ exam.term?.name || '-' }}</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
           <q-input
             v-if="editable"
             v-model.number="exam.min_passing_score"
@@ -96,7 +111,7 @@
             <div class="text-body1">{{ exam.min_passing_score ?? '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
           <q-input
             v-if="editable"
             v-model.number="exam.max_score"
@@ -109,6 +124,18 @@
             <div class="text-subtitle2">حداکثر نمره:</div>
             <div class="text-body1">{{ exam.max_score ?? '-' }}</div>
           </div>
+        </div>
+        <div
+          v-if="!editable"
+          class="col-12 col-md-4">
+          <div class="text-subtitle2">ایجاد کننده:</div>
+          {{ `${exam.created_by?.first_name} ${exam.created_by?.last_name}` }}
+          <q-chip
+            v-if="exam.created_by?.username"
+            color="primary"
+            text-color="white">
+            {{ exam.created_by?.username }}
+          </q-chip>
         </div>
         <div
           v-if="exam.description"
@@ -130,29 +157,6 @@
       </div>
     </q-card-section>
   </q-card>
-
-  <q-card
-    v-if="!editable"
-    class="q-mb-md">
-    <q-card-section>
-      <div class="text-h6">اطلاعات ایجاد کننده</div>
-    </q-card-section>
-    <q-separator />
-    <q-card-section>
-      <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-6">
-          <div class="text-subtitle2">نام و نام خانوادگی:</div>
-          <div class="text-body1">
-            {{ `${exam.created_by?.first_name} ${exam.created_by?.last_name}` }}
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="text-subtitle2">نام کاربری:</div>
-          <div class="text-body1">{{ exam.created_by?.username || '-' }}</div>
-        </div>
-      </div>
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup lang="ts">
@@ -160,6 +164,7 @@ import { computed } from 'vue'
 import { ExamType } from 'src/repositories/exam'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
+import FormBuilderSelectTerm from 'components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const exam = defineModel<ExamType>('exam')
 defineProps<{

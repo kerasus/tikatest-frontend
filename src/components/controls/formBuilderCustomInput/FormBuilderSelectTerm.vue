@@ -38,7 +38,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import AcademicTermAPI, { type AcademicTermType } from 'src/repositories/academicTerm'
+import type { ExamCategoryType } from 'src/repositories/examCategory'
 
 defineOptions({
   name: 'FormBuilderSelectTerm'
@@ -87,12 +89,27 @@ const filteredOptions = ref<AcademicTermType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
 
+function getSchoolId (): number | null {
+  const school = props.schoolId
+
+  if (typeof school === 'number') return school
+  if (typeof school === 'string' && school.trim() !== '') return Number(school)
+  if (school && typeof school === 'object' && 'id' in school) {
+    const id = (school as { id?: unknown }).id
+    if (typeof id === 'number') return id
+    if (typeof id === 'string' && id.trim() !== '') return Number(id)
+  }
+
+  return null
+}
+
 async function getTerms (name: string | null) {
   const payload: any = { length: 100 }
+  const schoolId = getSchoolId()
   if (name) payload.name = name
-  if (props.schoolId) payload.school_id = props.schoolId
-  if (props.activeOnly) payload.is_active = 1
-  const academicTermAPI = new AcademicTermAPI(payload.school_id)
+  if (schoolId) payload.school_id = schoolId
+  if (props.activeOnly) payload.is_active = true
+  const academicTermAPI = new AcademicTermAPI(schoolId as number)
   const list = await academicTermAPI.index(payload)
   return list.data
 }
@@ -102,6 +119,18 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getTerms(value || null)
   })
 }
+
+useEntitySelector<AcademicTermType>({
+  value: () => props.value,
+  schoolId: getSchoolId,
+  filteredOptions,
+  entityName: 'academic terms',
+  fetchByIds: async (params) => {
+    const schoolId = getSchoolId()
+    if (!schoolId) return []
+    return new AcademicTermAPI(schoolId).index(params)
+  }
+})
 </script>
 
 <style scoped></style>

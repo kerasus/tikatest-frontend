@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import AcademicLevelAPI, { type AcademicLevelType } from 'src/repositories/academicLevel'
 
 defineOptions({
@@ -185,8 +186,21 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
   })
 }
 
+useEntitySelector<AcademicLevelType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions,
+  entityName: 'academic levels',
+  fetchByIds: (params) => academicLevelAPI.index({
+    ...params,
+    field_id: props.fieldId ?? undefined
+  })
+})
+
 onMounted(async () => {
-  filteredOptions.value = await getAcademicLevels(null)
+  const items = await getAcademicLevels(null)
+  const existingIds = new Set(filteredOptions.value.map((option) => option.id))
+  filteredOptions.value = [...filteredOptions.value, ...items.filter((item) => !existingIds.has(item.id))]
 })
 </script>
 

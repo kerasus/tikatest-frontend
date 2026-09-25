@@ -155,21 +155,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { ref, computed } from 'vue'
+import { useUser } from 'stores/user'
+import { useRouter } from 'vue-router'
+import { useReportCardStore } from 'src/stores/reportCard'
+import { reportCardAPI } from 'src/repositories/reportCard'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import type { ComprehensiveReportResponse } from 'src/repositories/reportCard'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
+import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
-import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
-import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
-import { reportCardAPI } from 'src/repositories/reportCard'
-import type { ComprehensiveReportResponse } from 'src/repositories/reportCard'
-import { useReportCardStore } from 'src/stores/reportCard'
-import { useRouter } from 'vue-router'
-import { useUser } from 'stores/user'
-import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const router = useRouter()

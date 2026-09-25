@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import SchoolAPI, { type SchoolType } from 'src/repositories/school'
 
 defineOptions({
@@ -155,6 +156,13 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getSchools(value || null)
   })
 }
+
+useEntitySelector<SchoolType>({
+  value: () => props.value,
+  filteredOptions,
+  entityName: 'schools',
+  fetchByIds: (params) => schoolAPI.index(params)
+})
 </script>
 
 <style scoped></style>

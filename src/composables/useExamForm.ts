@@ -19,6 +19,7 @@ export interface ExamFormModel {
   in_person_exam_detail: any | null
   answer_keys: any[]
   class_ids: number[]
+  term_id?: number | null
   academic_level_ids: number[]
   classes: any[]
   academic_levels: any[]
@@ -60,6 +61,7 @@ export const useExamForm = (isUpdate = false) => {
     in_person_exam_detail: null,
     answer_keys: [],
     class_ids: [],
+    term_id: null,
     academic_level_ids: [],
     classes: [],
     academic_levels: []
@@ -219,6 +221,7 @@ export const useExamForm = (isUpdate = false) => {
     form.created_by = exam.created_by ?? null
     form.created_at = exam.created_at
     form.updated_at = exam.updated_at
+    form.term_id = exam.term_id
     form.classes = exam.classes || []
     form.academic_levels = exam.academic_levels || []
     form.class_ids = (exam.classes || []).map((c: any) => c.id)

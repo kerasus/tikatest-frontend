@@ -8,7 +8,7 @@
     v-if="exam.online_exam_detail"
     class="q-mb-md">
     <q-card-section>
-      <div class="text-h6">جزئیات آزمون آنلاین</div>
+      <div class="text-h6">اطلاعات زمانی آزمون</div>
     </q-card-section>
     <q-separator />
     <q-card-section>
@@ -34,22 +34,6 @@
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <q-input
-            v-if="editable"
-            v-model.number="exam.online_exam_detail.time_limit_minutes"
-            label="زمان محدودیت (دقیقه)"
-            outlined
-            dense
-            type="number"
-            min="1" />
-          <div v-else>
-            <div class="text-subtitle2">زمان محدودیت (دقیقه):</div>
-            <div class="text-body1">
-              {{ exam.online_exam_detail.time_limit_minutes ?? '-' }}
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
           <form-builder-date-time
             v-if="editable"
             v-model:value="exam.online_exam_detail.visible_at"
@@ -71,6 +55,22 @@
             <div class="text-body1">{{ answersVisibleAtFormatted }}</div>
           </div>
         </div>
+        <div class="col-12 col-md-6">
+          <q-input
+            v-if="editable"
+            v-model.number="exam.online_exam_detail.time_limit_minutes"
+            label="زمان محدودیت (دقیقه)"
+            outlined
+            dense
+            type="number"
+            min="1" />
+          <div v-else>
+            <div class="text-subtitle2">زمان محدودیت (دقیقه):</div>
+            <div class="text-body1">
+              {{ exam.online_exam_detail.time_limit_minutes ?? '-' }}
+            </div>
+          </div>
+        </div>
       </div>
     </q-card-section>
   </q-card>
@@ -79,7 +79,7 @@
     v-if="exam.online_exam_detail"
     class="q-mb-md">
     <q-card-section>
-      <div class="text-h6">اطلاعات بیشتر آزمون</div>
+      <div class="text-h6">جزییات آزمون</div>
     </q-card-section>
     <q-separator />
     <q-card-section>

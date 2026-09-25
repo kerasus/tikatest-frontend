@@ -11,6 +11,7 @@
     <template v-else-if="!isResultMode && form.delivery_mode">
       <exam-in-person-detail-card
         :exam="form"
+        :school-id="currentSchoolId"
         :editable="true"
         :lesson-options="lessonOptions"
         :category-options="categoryOptions" />
@@ -77,24 +78,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
-import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
-import { examCategory } from 'src/repositories/examCategory'
+import { useRoute, useRouter } from 'vue-router'
 import LessonAPI from 'src/repositories/lesson'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import ExamInPersonDetailCard from 'components/exam/ExamInPersonDetailCard.vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useExamForm } from 'src/composables/useExamForm'
+import SchoolClassAPI from 'src/repositories/schoolClass'
+import { examCategory } from 'src/repositories/examCategory'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
+import ExamInPersonDetailCard from 'components/exam/ExamInPersonDetailCard.vue'
 
-const router = useRouter()
-const route = useRoute()
 const $q = useQuasar()
+const route = useRoute()
+const router = useRouter()
 const lessonApi = new LessonAPI()
-const academicLevelApi = new AcademicLevelAPI()
 const schoolClassApi = new SchoolClassAPI()
+const academicLevelApi = new AcademicLevelAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -105,6 +108,7 @@ const academicLevelOptions = ref<any[]>([])
 const schoolClassOptions = ref<any[]>([])
 
 const isResultMode = computed(() => !!route.query.result_id)
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 const { form, validate, buildFormData, loadFromExam } = useExamForm(true)
 

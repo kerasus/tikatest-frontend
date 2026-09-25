@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import { computed, defineProps, defineEmits, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import UserAPI, { getUserRoleLabel, type UserType } from 'src/repositories/user'
 
 defineOptions({
@@ -196,6 +197,13 @@ function filterFn (val: string, update: (cb: () => Promise<void>) => void) {
     filteredOptions.value = await getUsers(val)
   })
 }
+
+useEntitySelector<UserType>({
+  value: () => props.value,
+  filteredOptions,
+  entityName: 'users',
+  fetchByIds: (params) => userAPI.index(params)
+})
 </script>
 
 <style scoped></style>

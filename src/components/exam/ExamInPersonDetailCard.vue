@@ -2,6 +2,7 @@
   <div>
     <exam-detail-card
       :exam="exam"
+      :school-id="schoolId"
       :editable="editable" />
 
     <q-card
@@ -13,7 +14,7 @@
       <q-separator />
       <q-card-section>
         <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
+          <div class="col-12 col-md-4">
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.in_person_exam_detail.held_at"
@@ -24,7 +25,19 @@
               v-else
               class="text-body1">{{ heldAtFormatted }}</div>
           </div>
-          <div class="col-12 col-md-6">
+          <div class="col-12 col-md-4">
+            <form-builder-date-time
+              v-if="editable"
+              v-model:value="exam.in_person_exam_detail.results_visible_at"
+              label="زمان نمایش نتایج به دانش‌آموزان"
+              outlined
+              dense />
+            <template v-else>
+              <div class="text-subtitle2">زمان نمایش نتایج به دانش‌آموزان:</div>
+              <div class="text-body1">{{ resultsVisibleAtFormatted }}</div>
+            </template>
+          </div>
+          <div class="col-12 col-md-4">
             <q-toggle
               v-if="editable"
               v-model="exam.in_person_exam_detail.is_descriptive"
@@ -41,18 +54,6 @@
                 dense>
                 {{ exam.in_person_exam_detail.is_descriptive ? 'بله' : 'خیر' }}
               </q-chip>
-            </template>
-          </div>
-          <div class="col-12 col-md-6">
-            <form-builder-date-time
-              v-if="editable"
-              v-model:value="exam.in_person_exam_detail.results_visible_at"
-              label="زمان نمایش نتایج به دانش‌آموزان"
-              outlined
-              dense />
-            <template v-else>
-              <div class="text-subtitle2">زمان نمایش نتایج به دانش‌آموزان:</div>
-              <div class="text-body1">{{ resultsVisibleAtFormatted }}</div>
             </template>
           </div>
         </div>
@@ -132,16 +133,16 @@
 import { computed } from 'vue'
 import { useDate } from 'src/composables/Date'
 import { ExamType } from 'src/repositories/exam'
+import { LessonType } from 'src/repositories/lesson'
+import { ExamCategoryType } from 'src/repositories/examCategory'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
-import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
-import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import { ExamCategoryType } from 'src/repositories/examCategory'
-import { LessonType } from 'src/repositories/lesson'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const exam = defineModel<ExamType>('exam')
 const props = defineProps<{
   editable?: boolean;
+  schoolId?: number;
   lessonOptions?: LessonType[];
   categoryOptions?: ExamCategoryType[];
 }>()

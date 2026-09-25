@@ -50,6 +50,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import AcademicFieldAPI, { type AcademicFieldType } from 'src/repositories/academicField'
 
 defineOptions({
@@ -175,6 +176,14 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getAcademicFields(value || null)
   })
 }
+
+useEntitySelector<AcademicFieldType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions,
+  entityName: 'academic fields',
+  fetchByIds: (params) => academicFieldAPI.index(params)
+})
 </script>
 
 <style scoped></style>

@@ -110,8 +110,7 @@
           separator>
           <q-item
             v-for="reg in localRegistrations"
-            :key="reg.id"
-            dense>
+            :key="reg.id">
             <q-item-section>
               <q-item-label>{{ enrollmentClass(reg)?.name || '-' }}</q-item-label>
               <q-item-label caption>

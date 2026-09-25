@@ -420,7 +420,7 @@ const homeRoute = computed(() => {
   let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
   let routeParamRole = userStoreManager.mainRoleForPath
   if (userStoreManager.isAdmin) {
-    routeName = 'Panel.AdminDashboard'
+    routeName = 'Panel.Dashboard'
   } else if (
     userStoreManager.isManager
     || userStoreManager.isTeacher

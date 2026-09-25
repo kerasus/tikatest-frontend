@@ -109,18 +109,18 @@ export type ExamType = {
   class_ids?: number[];
   academic_levels?: AcademicLevelType[];
   academic_level_ids?: number[];
-   in_person_exam_results?: InPersonExamResultType[];
-   grades?: any[];
-   online_exam_sessions?: OnlineExamSessionType[];
-   latest_session?: OnlineExamSessionType | null;
-   session_status?: OnlineExamSessionType['status'];
-   my_result?: InPersonExamResultType | null;
-   my_session?: OnlineExamSessionType | null;
-   score?: ExamScoreType | null;
-   term?: AcademicTermType | null;
-   term_id?: number | null;
-   occurrence?: number | null;
- };
+  in_person_exam_results?: InPersonExamResultType[];
+  grades?: any[];
+  online_exam_sessions?: OnlineExamSessionType[];
+  latest_session?: OnlineExamSessionType | null;
+  session_status?: OnlineExamSessionType['status'];
+  my_result?: InPersonExamResultType | null;
+  my_session?: OnlineExamSessionType | null;
+  score?: ExamScoreType | null;
+  term?: AcademicTermType | null;
+  term_id?: number | null;
+  occurrence?: number | null;
+};
 
 export type StudentOnlineExamListType = ListType<ExamType>;
 

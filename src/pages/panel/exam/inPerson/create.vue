@@ -100,6 +100,7 @@
               <div class="col-12 col-md-6">
                 <form-builder-select-exam-category
                   v-model:value="form.exam_category_id"
+                  :school-id="currentSchoolId"
                   label="دسته‌بندی آزمون"
                   outlined
                   :disable="!form.school_id" />
@@ -466,6 +467,9 @@ function loadInputsForCurrentSchool () {
 loadInputsForCurrentSchool()
 
 onMounted(() => {
+  if (currentSchoolId.value) {
+    form.school_id = currentSchoolId.value
+  }
   // No need to load schools - FormBuilderSelectSchool loads internally
 })
 </script>

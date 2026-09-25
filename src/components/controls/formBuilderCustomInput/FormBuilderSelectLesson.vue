@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import LessonAPI, { type LessonType } from 'src/repositories/lesson'
 
 defineOptions({
@@ -193,5 +194,16 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getLessons(value || null)
   })
 }
-</script>
 
+useEntitySelector<LessonType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions,
+  entityName: 'lessons',
+  fetchByIds: (params) => lessonAPI.index({
+    ...params,
+    field_id: props.fieldId ?? undefined,
+    academic_level_id: props.levelId ?? undefined
+  })
+})
+</script>

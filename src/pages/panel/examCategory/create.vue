@@ -12,7 +12,7 @@
           <div class="col-12">
             <q-input
               v-model="form.title"
-              label="عنوان دسته‌بندی *"
+              label="عنوان دسته‌بندی"
               outlined
               :rules="[(v) => !!v || 'عنوان الزامی است']" />
           </div>
@@ -51,13 +51,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
 import { examCategory } from 'src/repositories/examCategory'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
-const router = useRouter()
 const $q = useQuasar()
+const router = useRouter()
 const examCategoryApi = examCategory
+const currentSchoolManager = useCurrentSchool()
 
 const submitting = ref(false)
 
@@ -74,6 +76,7 @@ async function onSubmit () {
   submitting.value = true
   try {
     await examCategoryApi.create({
+      school_id: currentSchoolManager.currentSchool.value?.id,
       title: form.value.title,
       term_number: form.value.term_number,
       sort_order: form.value.sort_order,

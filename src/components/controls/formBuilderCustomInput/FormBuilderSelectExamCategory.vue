@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import ExamCategoryAPI, { type ExamCategoryType } from 'src/repositories/examCategory'
 
 defineOptions({
@@ -173,6 +174,14 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
     filteredOptions.value = await getExamCategories(value || null)
   })
 }
+
+useEntitySelector<ExamCategoryType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions,
+  entityName: 'exam categories',
+  fetchByIds: (params) => examCategoryAPI.index(params)
+})
 </script>
 
 <style scoped></style>

@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 import SchoolClassAPI, { type SchoolClassType } from 'src/repositories/schoolClass'
 import { getUserRoleLabel } from 'src/repositories/user'
 
@@ -203,8 +204,22 @@ function filterFn (value: string, update: (callback: () => Promise<void>) => voi
   })
 }
 
+useEntitySelector<SchoolClassType>({
+  value: () => props.value,
+  schoolId: () => props.schoolId,
+  filteredOptions,
+  entityName: 'school classes',
+  fetchByIds: (params) => schoolClassAPI.index({
+    ...params,
+    field_id: props.fieldId ?? undefined,
+    academic_level_id: props.levelId ?? undefined
+  })
+})
+
 onMounted(async () => {
-  filteredOptions.value = await getSchoolClasses(null)
+  const items = await getSchoolClasses(null)
+  const existingIds = new Set(filteredOptions.value.map((option) => option.id))
+  filteredOptions.value = [...filteredOptions.value, ...items.filter((item) => !existingIds.has(item.id))]
 })
 </script>
 

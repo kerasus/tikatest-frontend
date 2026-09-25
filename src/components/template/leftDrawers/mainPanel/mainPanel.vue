@@ -67,7 +67,7 @@ const topLinks = ref<ListItemType[]>([
     icon: 'dashboard',
     title: 'پیشخوان',
     forRoles: ['Admin'],
-    route: { name: 'Panel.AdminDashboard' }
+    route: { name: 'Panel.Dashboard' }
   },
   {
     icon: 'dashboard',
