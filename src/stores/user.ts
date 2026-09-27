@@ -53,11 +53,11 @@ export const useUser = defineStore('user', () => {
     if (
       isManager.value
       || isTeacher.value
-      || isStudent.value
+      || isStaff.value
     ) {
       return 'staff'
     }
-    if (isTeacher.value) {
+    if (isStudent.value) {
       return 'student'
     }
     return null

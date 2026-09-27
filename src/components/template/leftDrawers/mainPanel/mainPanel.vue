@@ -1,3 +1,78 @@
+<template>
+  <div class="left-drawer__toggle-mini">
+    <!-- <q-btn
+      class="icon-button drawer-btn"
+      color="primary"
+      flat
+      :icon="
+        appLayoutStore.layoutLeftDrawerMini
+          ? 'keyboard_double_arrow_left'
+          : 'keyboard_double_arrow_right'
+      "
+      @click="toggleLeftDrawer"
+    /> -->
+  </div>
+  <div
+    class="left-drawer"
+    :class="{ 'left-drawer--mini': appLayoutStore.layoutLeftDrawerMini }">
+    <div class="left-drawer__inner">
+      <div class="left-drawer__logo-section">
+        <div class="left-drawer__logo-section-img">
+          <!--          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />-->
+          <q-img :src="currentSchoolManager.currentSchool.value?.logo ?? '/images/logo.png'" />
+        </div>
+        <div class="left-drawer__logo-section-title">
+          <template v-if="currentSchoolManager.currentSchool">
+            {{ currentSchoolManager.currentSchool.value?.name }}
+          </template>
+          <template v-else>
+            <form-builder-select-school
+              v-model:value="selectedSchool"
+              label="انتخاب مدرسه"
+              outlined
+              :rules="[(v) => !!v || 'مدرسه الزامی است']"
+              @update:value="onSchoolChange" />
+          </template>
+        </div>
+      </div>
+      <q-separator />
+      <q-scroll-area class="scroll-area">
+        <q-list padding>
+          <list-item
+            :items="filterLinks"
+            :mini="appLayoutStore.layoutLeftDrawerMini" />
+        </q-list>
+        <q-list padding>
+          <q-item
+            v-for="link in bottomLinks"
+            :key="link.title"
+            v-ripple
+            exact
+            :to="link.route"
+            clickable
+            class="menu-item">
+            <q-item-section avatar>
+              <q-icon
+                :name="link.icon"
+                :color="link.iconColor" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ link.title }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
+      <div class="left-drawer__copyright-section">
+        <div class="app-version">v: {{ appConfigManager.version }}</div>
+        <div class="copy-right">
+          <span> Copyright TikaTest co. </span>
+          <span> &copy; {{ new Date().getFullYear() }} </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
@@ -204,12 +279,6 @@ const topLinks = ref<ListItemType[]>([
     ]
   },
   {
-    icon: 'dashboard',
-    title: 'پیشخوان',
-    forRoles: ['Student'],
-    route: { name: 'Student.Dashboard' }
-  },
-  {
     icon: 'quiz',
     title: 'آزمون آنلاین',
     forRoles: ['Student'],
@@ -289,81 +358,6 @@ watch(
   }
 )
 </script>
-
-<template>
-  <div class="left-drawer__toggle-mini">
-    <!-- <q-btn
-      class="icon-button drawer-btn"
-      color="primary"
-      flat
-      :icon="
-        appLayoutStore.layoutLeftDrawerMini
-          ? 'keyboard_double_arrow_left'
-          : 'keyboard_double_arrow_right'
-      "
-      @click="toggleLeftDrawer"
-    /> -->
-  </div>
-  <div
-    class="left-drawer"
-    :class="{ 'left-drawer--mini': appLayoutStore.layoutLeftDrawerMini }">
-    <div class="left-drawer__inner">
-      <div class="left-drawer__logo-section">
-        <div class="left-drawer__logo-section-img">
-          <!--          <q-img :src="appLayoutStore.layoutLeftDrawerMini ? '/images/logo.png' : '/images/logo.png'" />-->
-          <q-img :src="currentSchoolManager.currentSchool.value?.logo ?? '/images/logo.png'" />
-        </div>
-        <div class="left-drawer__logo-section-title">
-          <template v-if="currentSchoolManager.currentSchool">
-            {{ currentSchoolManager.currentSchool.value?.name }}
-          </template>
-          <template v-else>
-            <form-builder-select-school
-              v-model:value="selectedSchool"
-              label="انتخاب مدرسه"
-              outlined
-              :rules="[(v) => !!v || 'مدرسه الزامی است']"
-              @update:value="onSchoolChange" />
-          </template>
-        </div>
-      </div>
-      <q-separator />
-      <q-scroll-area class="scroll-area">
-        <q-list padding>
-          <list-item
-            :items="filterLinks"
-            :mini="appLayoutStore.layoutLeftDrawerMini" />
-        </q-list>
-        <q-list padding>
-          <q-item
-            v-for="link in bottomLinks"
-            :key="link.title"
-            v-ripple
-            exact
-            :to="link.route"
-            clickable
-            class="menu-item">
-            <q-item-section avatar>
-              <q-icon
-                :name="link.icon"
-                :color="link.iconColor" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.title }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-scroll-area>
-      <div class="left-drawer__copyright-section">
-        <div class="app-version">v: {{ appConfigManager.version }}</div>
-        <div class="copy-right">
-          <span> Copyright TikaTest co. </span>
-          <span> &copy; {{ new Date().getFullYear() }} </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style scoped lang="scss">
 .left-drawer__toggle-mini {

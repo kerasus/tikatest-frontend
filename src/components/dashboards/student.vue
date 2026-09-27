@@ -13,8 +13,10 @@
         <q-card class="dashboard-card">
           <q-card-section>
             <div class="text-h6">مطالعه این ماه</div>
-            <div class="text-h4 text-primary">{{ stats.total_study_minutes_this_month }}</div>
-            <div class="text-caption text-grey-7">دقیقه</div>
+            <div class="text-h4 text-primary flex align-center">
+              {{ stats.total_study_minutes_this_month }}
+              <span class="text-caption text-grey-7 flex content-center q-ml-sm">دقیقه</span>
+            </div>
           </q-card-section>
         </q-card>
       </div>

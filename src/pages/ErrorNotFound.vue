@@ -416,7 +416,7 @@ const homeRoute = computed(() => {
     return { name: 'HomePage' }
   }
 
-  let routeName = 'Student.Dashboard'
+  let routeName = 'Panel.Dashboard'
   let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
   let routeParamRole = userStoreManager.mainRoleForPath
 

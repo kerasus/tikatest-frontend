@@ -70,6 +70,23 @@ export const index = [
               ]
             },
             component: () => import('src/pages/panel/exam/online/edit.vue')
+          },
+          {
+            path: ':id/sessions',
+            name: 'Panel.Exam.Online.Sessions',
+            meta: {
+              pageCategory: 'جلسات آزمون آنلاین',
+              breadCrumbs: [
+                {
+                  label: 'لیست آزمون‌های آنلاین',
+                  to: { name: 'Panel.Exam.Online.List' }
+                },
+                {
+                  label: 'جلسات آزمون آنلاین'
+                }
+              ]
+            },
+            component: () => import('pages/panel/exam/online/sessions.vue')
           }
         ]
       },
@@ -144,13 +161,5 @@ export const index = [
         ]
       }
     ]
-  },
-  {
-    path: 'exams/:id/sessions',
-    name: 'Panel.Exam.Sessions',
-    meta: {
-      pageCategory: 'مدیریت آزمون‌ها'
-    },
-    component: () => import('src/pages/panel/exam/sessions.vue')
   }
 ]

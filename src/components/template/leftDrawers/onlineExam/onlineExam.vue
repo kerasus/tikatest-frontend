@@ -1,188 +1,3 @@
-<script setup lang="ts">
-import { useQuasar } from 'quasar'
-import { useRoute, useRouter } from 'vue-router'
-import { computed, watch, onMounted, nextTick } from 'vue'
-import { useAppLayout } from 'stores/appLayout'
-import { useAppConfig } from 'stores/appConfig'
-import { useOnlineExamSession } from 'src/stores/onlineExamSession'
-import OnlineExamSessionAPI from 'src/repositories/onlineExamSession'
-import moment from 'jalali-moment'
-
-const $q = useQuasar()
-const route = useRoute()
-const router = useRouter()
-const appLayoutStore = useAppLayout()
-const appConfigManager = useAppConfig()
-const startAPI = new OnlineExamSessionAPI()
-const onlineExamStore = useOnlineExamSession()
-
-const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
-
-const session = computed(() => onlineExamStore.sessionData)
-const answerKeys = computed(() => onlineExamStore.answerKeys ?? null)
-const isReadonly = computed(
-  () => route.name === 'Student.Exam.Result' || !onlineExamStore.isActive
-)
-
-const answerColumns = computed(() => {
-  const cols = [
-    {
-      name: 'question_number',
-      label: 'شماره سوال',
-      field: 'question_number',
-      align: 'center' as const
-    }
-  ]
-  for (let i = 0; i < effectiveChoiceCount.value; i++) {
-    cols.push({
-      name: String(i + 1),
-      label: optionLabels[i],
-      field: String(i + 1),
-      align: 'center' as const
-    })
-  }
-  return cols
-})
-
-const currentRouteName = computed(() => route.name)
-
-const effectiveChoiceCount = computed(() => {
-  if (!answerKeys.value) return 4
-  const maxFromKeys = answerKeys.value.reduce((max, key) => {
-    const n = Number(key.number_of_choices) || 0
-    return n > max ? n : max
-  }, 0)
-  return Math.max(maxFromKeys, 2)
-})
-
-function toggleLeftDrawer () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
-  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
-}
-
-function toggleLeftDrawerVisible () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
-  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
-}
-
-const isChoiceEnabled = (row: any, choiceIndex: number) => {
-  const maxChoices = Number(row.number_of_choices) || effectiveChoiceCount.value
-  return choiceIndex >= 1 && choiceIndex <= maxChoices
-}
-
-const selectOption = (row: any, option: string) => {
-  if (isReadonly.value) return
-
-  const previous = row.submitted_option
-  row.submitted_option = previous === option ? null : option
-
-  submitAnswer(row.question_number, row.submitted_option)
-}
-
-const choiceIcon = (row: any, option: string) => {
-  const isSelected = row.submitted_option === option
-  const isCorrect = row.correct_option === option
-
-  if (isSelected && isCorrect) return 'check_circle'
-  if (isSelected) return 'cancel'
-  if (isCorrect) return 'check_circle_outline'
-  return 'radio_button_unchecked'
-}
-
-const choiceColor = (row: any, option: string) => {
-  if (row.correct_option === option) return 'positive'
-  if (row.submitted_option === option) return 'negative'
-  return 'grey-4'
-}
-
-const submitAnswer = async (questionNumber: number, submittedOption: string | null) => {
-  try {
-    await startAPI.submitAnswer(session.value.id, questionNumber, submittedOption || undefined)
-  } catch (err: any) {
-    $q.notify({ type: 'negative', message: 'خطا در ذخیره پاسخ' })
-  }
-}
-
-const confirmSubmit = () => {
-  $q.dialog({
-    title: 'تایید ثبت آزمون',
-    message: 'آیا مطمئن هستید که می‌خواهید آزمون را ثبت کنید؟',
-    cancel: true,
-    persistent: true
-  }).onOk(() => {
-    submitSession()
-  })
-}
-
-const submitSession = async () => {
-  try {
-    const currentSession = session.value
-    await startAPI.submitSession(currentSession.id)
-    $q.notify({ type: 'positive', message: 'آزمون با موفقیت ثبت شد' })
-    onlineExamStore.clearSession()
-    router.push({
-      name: 'Student.Exam.Result',
-      params: { id: currentSession.exam?.id ?? route.params.id }
-    })
-  } catch (err: any) {
-    $q.notify({ type: 'negative', message: 'خطا در ثبت آزمون' })
-  }
-}
-
-function checkLayoutLeftDrawerOverlay () {
-  appLayoutStore.layoutLeftDrawerOverlay = !$q.screen.gt.md
-}
-
-watch(
-  currentRouteName,
-  () => {
-    if ($q.screen.lt.md) {
-      appLayoutStore.layoutLeftDrawerVisible = false
-    }
-  },
-  {
-    immediate: true
-  }
-)
-
-const formatSessionDateTime = (value: string | null | undefined) => {
-  if (!value) return '-'
-  return moment(value).locale('fa').format('jYYYY/jMM/jDD HH:mm:ss')
-}
-
-watch(
-  () => $q.screen.gt.md,
-  () => {
-    requestAnimationFrame(() => {
-      checkLayoutLeftDrawerOverlay()
-    })
-  },
-  { immediate: true }
-)
-
-onMounted(async () => {
-  await nextTick()
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  checkLayoutLeftDrawerOverlay()
-                })
-              })
-            })
-          })
-        })
-      })
-    })
-  })
-})
-</script>
-
 <template>
   <div
     class="left-drawer"
@@ -212,6 +27,7 @@ onMounted(async () => {
             separator="cell"
             hide-pagination>
             <template #body-cell="cellProps">
+              <!-- ۱. شماره سوال -->
               <q-td
                 v-if="cellProps.col.name === 'question_number'"
                 :props="cellProps">
@@ -219,6 +35,28 @@ onMounted(async () => {
                   {{ cellProps.row.question_number }}
                 </div>
               </q-td>
+
+              <!-- ۳. ستون بی‌پاسخ (جدید) -->
+              <q-td
+                v-else-if="cellProps.col.name === 'unanswered'"
+                :props="cellProps"
+                :class="{
+                  'cursor-pointer': !isReadonly && !!cellProps.row.submitted_option
+                }"
+                @click="resetOption(cellProps.row)">
+                <div class="text-center">
+                  <q-icon
+                    :name="!cellProps.row.submitted_option ? 'radio_button_checked' : 'radio_button_unchecked'"
+                    :color="
+                      isReadonly
+                        ? (!cellProps.row.submitted_option ? 'amber-8' : 'grey-4')
+                        : (!cellProps.row.submitted_option ? 'primary' : 'grey-4')
+                    "
+                    size="24px" />
+                </div>
+              </q-td>
+
+              <!-- ۳. گزینه‌های الف، ب، ج، د ... -->
               <q-td
                 v-else
                 :props="cellProps"
@@ -333,6 +171,206 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useQuasar } from 'quasar'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, watch, onMounted, nextTick } from 'vue'
+import { useAppLayout } from 'stores/appLayout'
+import { useAppConfig } from 'stores/appConfig'
+import { useOnlineExamSession } from 'src/stores/onlineExamSession'
+import OnlineExamSessionAPI from 'src/repositories/onlineExamSession'
+import moment from 'jalali-moment'
+
+const $q = useQuasar()
+const route = useRoute()
+const router = useRouter()
+const appLayoutStore = useAppLayout()
+const appConfigManager = useAppConfig()
+const startAPI = new OnlineExamSessionAPI()
+const onlineExamStore = useOnlineExamSession()
+
+const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
+
+const session = computed(() => onlineExamStore.sessionData)
+const answerKeys = computed(() => onlineExamStore.answerKeys ?? null)
+const isReadonly = computed(
+  () => route.name === 'Student.Exam.Result' || !onlineExamStore.isActive
+)
+
+const answerColumns = computed(() => {
+  const cols = [
+    {
+      name: 'question_number',
+      label: 'شماره سوال',
+      field: 'question_number',
+      align: 'center' as const
+    }
+  ]
+  for (let i = 0; i < effectiveChoiceCount.value; i++) {
+    cols.push({
+      name: String(i + 1),
+      label: optionLabels[i],
+      field: String(i + 1),
+      align: 'center' as const
+    })
+  }
+  cols.push({
+    name: 'unanswered',
+    label: 'بی‌پاسخ',
+    field: 'unanswered',
+    align: 'center' as const
+  })
+  return cols
+})
+
+const currentRouteName = computed(() => route.name)
+
+const effectiveChoiceCount = computed(() => {
+  if (!answerKeys.value) return 4
+  const maxFromKeys = answerKeys.value.reduce((max, key) => {
+    const n = Number(key.number_of_choices) || 0
+    return n > max ? n : max
+  }, 0)
+  return Math.max(maxFromKeys, 2)
+})
+
+function toggleLeftDrawer () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
+  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
+}
+
+function toggleLeftDrawerVisible () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
+  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
+}
+
+const isChoiceEnabled = (row: any, choiceIndex: number) => {
+  const maxChoices = Number(row.number_of_choices) || effectiveChoiceCount.value
+  return choiceIndex >= 1 && choiceIndex <= maxChoices
+}
+
+const selectOption = (row: any, option: string) => {
+  if (isReadonly.value) return
+
+  const previous = row.submitted_option
+  row.submitted_option = previous === option ? null : option
+
+  submitAnswer(row.question_number, row.submitted_option)
+}
+
+const choiceIcon = (row: any, option: string) => {
+  const isSelected = row.submitted_option === option
+  const isCorrect = row.correct_option === option
+
+  if (isSelected && isCorrect) return 'check_circle'
+  if (isSelected) return 'cancel'
+  if (isCorrect) return 'check_circle_outline'
+  return 'radio_button_unchecked'
+}
+
+const choiceColor = (row: any, option: string) => {
+  if (row.correct_option === option) return 'positive'
+  if (row.submitted_option === option) return 'negative'
+  return 'grey-4'
+}
+
+const submitAnswer = async (questionNumber: number, submittedOption: string | null) => {
+  try {
+    await startAPI.submitAnswer(session.value.id, questionNumber, submittedOption || undefined)
+  } catch (err: any) {
+    $q.notify({ type: 'negative', message: 'خطا در ذخیره پاسخ' })
+  }
+}
+
+const confirmSubmit = () => {
+  $q.dialog({
+    title: 'تایید ثبت آزمون',
+    message: 'آیا مطمئن هستید که می‌خواهید آزمون را ثبت کنید؟',
+    cancel: true,
+    persistent: true
+  }).onOk(() => {
+    submitSession()
+  })
+}
+
+const submitSession = async () => {
+  try {
+    const currentSession = session.value
+    await startAPI.submitSession(currentSession.id)
+    $q.notify({ type: 'positive', message: 'آزمون با موفقیت ثبت شد' })
+    onlineExamStore.clearSession()
+    router.push({
+      name: 'Student.Exam.Result',
+      params: { id: currentSession.exam?.id ?? route.params.id }
+    })
+  } catch (err: any) {
+    $q.notify({ type: 'negative', message: 'خطا در ثبت آزمون' })
+  }
+}
+
+function checkLayoutLeftDrawerOverlay () {
+  appLayoutStore.layoutLeftDrawerOverlay = !$q.screen.gt.md
+}
+
+watch(
+  currentRouteName,
+  () => {
+    if ($q.screen.lt.md) {
+      appLayoutStore.layoutLeftDrawerVisible = false
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+const formatSessionDateTime = (value: string | null | undefined) => {
+  if (!value) return '-'
+  return moment(value).locale('fa').format('jYYYY/jMM/jDD HH:mm:ss')
+}
+
+const resetOption = (row: any) => {
+  if (isReadonly.value) return
+  if (!row.submitted_option) return
+
+  row.submitted_option = null
+  submitAnswer(row.question_number, null)
+}
+
+
+watch(
+  () => $q.screen.gt.md,
+  () => {
+    requestAnimationFrame(() => {
+      checkLayoutLeftDrawerOverlay()
+    })
+  },
+  { immediate: true }
+)
+
+onMounted(async () => {
+  await nextTick()
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  checkLayoutLeftDrawerOverlay()
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+})
+</script>
 
 <style scoped lang="scss">
 .left-drawer {

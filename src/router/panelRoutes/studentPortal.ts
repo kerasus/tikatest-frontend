@@ -1,13 +1,5 @@
 export const index = [
   {
-    path: 'dashboard',
-    name: 'Student.Dashboard',
-    meta: {
-      pageCategory: 'پیشخوان'
-    },
-    component: () => import('src/pages/panel/dashboard.vue')
-  },
-  {
     path: 'profile11',
     name: 'Student.Profile',
     meta: {

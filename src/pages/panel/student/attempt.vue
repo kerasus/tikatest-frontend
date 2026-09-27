@@ -1,58 +1,56 @@
 <template>
-  <q-page class="q-pa-md">
-    <div
-      v-if="loading"
-      class="text-center q-pa-lg">
-      <q-spinner
-        color="primary"
-        size="100px" />
-    </div>
+  <div
+    v-if="loading"
+    class="text-center q-pa-lg">
+    <q-spinner
+      color="primary"
+      size="100px" />
+  </div>
 
-    <div
-      v-else-if="error"
-      class="text-center q-pa-lg">
-      <q-icon
-        name="error"
-        size="100px"
-        color="negative" />
-      <p class="text-subtitle1 q-mt-md">{{ error }}</p>
-      <q-btn
-        label="بازگشت"
-        icon="arrow_back"
-        @click="goBack" />
-    </div>
+  <div
+    v-else-if="error"
+    class="text-center q-pa-lg">
+    <q-icon
+      name="error"
+      size="100px"
+      color="negative" />
+    <p class="text-subtitle1 q-mt-md">{{ error }}</p>
+    <q-btn
+      label="بازگشت"
+      icon="arrow_back"
+      @click="goBack" />
+  </div>
 
-    <div
-      v-else
-      class="exam-attempt-page">
-      <q-card class="q-mb-md">
-        <q-card-section>
-          <div
-            v-if="examContent"
-            class="exam-content-body">
-            <template v-if="examContent.type === 'text'">
-              <div v-html="examContent.body || ''" />
-            </template>
-            <template v-else-if="examContent.type === 'image'">
-              <q-img
-                :src="examContent.path ? `storage/${examContent.path}` : ''"
-                alt="تصویر آزمون"
-                style="max-width: 100%; display: block" />
-            </template>
-            <template v-else-if="examContent.type === 'pdf'">
-              <iframe
-                v-if="examContent.path"
-                :src="`storage/${examContent.path}`"
-                style="width: 100%; height: 600px; border: none;" />
-            </template>
-          </div>
-          <div
-            v-else
-            class="text-grey">محتوای سوال بارگذاری نشد.</div>
-        </q-card-section>
-      </q-card>
-    </div>
-  </q-page>
+  <div
+    v-else
+    class="exam-attempt-page">
+    <q-card class="q-mb-md">
+      <q-card-section>
+        <div
+          v-if="examContent"
+          class="exam-content-body">
+          <template v-if="examContent.type === 'text'">
+            <div v-html="examContent.body || ''" />
+          </template>
+          <template v-else-if="examContent.type === 'image'">
+            <q-img
+              :src="examContent.path ? `storage/${examContent.path}` : ''"
+              alt="تصویر آزمون"
+              style="max-width: 100%; display: block" />
+          </template>
+          <template v-else-if="examContent.type === 'pdf'">
+            <iframe
+              v-if="examContent.path"
+              :src="`storage/${examContent.path}`"
+              style="width: 100%; height: 600px; border: none;" />
+          </template>
+        </div>
+        <div
+          v-else
+          class="text-grey">محتوای سوال بارگذاری نشد.</div>
+      </q-card-section>
+    </q-card>
+  </div>
 </template>
 
 <script setup lang="ts">

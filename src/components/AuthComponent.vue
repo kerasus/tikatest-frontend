@@ -106,7 +106,7 @@ function onClickLoginBtn () {
 }
 
 async function redirectAfterLogin () {
-  let routeName = 'Student.Dashboard'
+  let routeName = 'Panel.Dashboard'
   let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
   let routeParamRole = userStoreManager.mainRoleForPath
 

@@ -14,7 +14,7 @@
             color="secondary"
             label="جلسات آزمون"
             icon="menu_book"
-            :to="{ name: 'Panel.Exam.Sessions', params: { id: exam?.id } }"
+            :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam?.id } }"
             class="q-ml-sm" />
           <q-btn
             v-if="!editable"
@@ -51,7 +51,7 @@
             <div class="text-body1">{{ exam.category?.title || '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-9">
           <q-input
             v-if="editable"
             v-model="exam.name"
@@ -72,17 +72,6 @@
           </div>
         </div>
         <div class="col-12 col-md-3">
-          <form-builder-select-lesson
-            v-if="editable"
-            v-model:value="exam.lesson_id"
-            :school-id="schoolId"
-            clearable />
-          <div v-else>
-            <div class="text-subtitle2">درس:</div>
-            <div class="text-body1">{{ exam.lesson?.name || '-' }}</div>
-          </div>
-        </div>
-        <div class="col-12 col-md-3">
           <form-builder-select-term
             v-if="editable"
             v-model:value="exam.term_id"
@@ -97,7 +86,18 @@
             <div class="text-body1">{{ exam.term?.name || '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
+          <form-builder-select-lesson
+            v-if="editable"
+            v-model:value="exam.lesson_id"
+            :school-id="schoolId"
+            clearable />
+          <div v-else>
+            <div class="text-subtitle2">درس:</div>
+            <div class="text-body1">{{ exam.lesson?.name || '-' }}</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
           <q-input
             v-if="editable"
             v-model.number="exam.min_passing_score"
@@ -111,7 +111,7 @@
             <div class="text-body1">{{ exam.min_passing_score ?? '-' }}</div>
           </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
           <q-input
             v-if="editable"
             v-model.number="exam.max_score"
