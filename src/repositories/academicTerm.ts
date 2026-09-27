@@ -1,6 +1,6 @@
 import BaseAPI from './BaseAPI'
 import { axiosInstanceManager } from 'src/boot/axios'
-import { SchoolType } from 'src/repositories/school'
+import type { SchoolType } from 'src/repositories/school'
 
 export type AcademicTermTypeType = 'school_year' | 'seasonal' | 'sub_term'
 

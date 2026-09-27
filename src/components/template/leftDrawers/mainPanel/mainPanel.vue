@@ -6,8 +6,8 @@ import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
 import { useAppConfig } from 'stores/appConfig'
 import ListItem from './components/listItem.vue'
-import { computed, ref, watch, Ref } from 'vue'
-import { UserRolesType } from 'src/repositories/user'
+import { computed, ref, watch, type Ref } from 'vue'
+import type { UserRolesType } from 'src/repositories/user'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 
@@ -66,14 +66,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'dashboard',
     title: 'پیشخوان',
-    forRoles: ['Admin'],
     route: { name: 'Panel.Dashboard' }
-  },
-  {
-    icon: 'dashboard',
-    title: 'پیشخوان',
-    forRoles: ['Manager', 'Teacher', 'Staff'],
-    route: { name: 'Panel.SchoolDashboard' }
   },
   {
     icon: 'school',

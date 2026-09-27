@@ -20,14 +20,6 @@
       <template v-else-if="inputData.col.name === 'category'">
         {{ inputData.props.row.category?.title || '-' }}
       </template>
-      <template v-else-if="inputData.col.name === 'delivery_mode'">
-        <q-chip
-          :color="inputData.props.row.delivery_mode === 'online' ? 'primary' : 'secondary'"
-          text-color="white"
-          dense>
-          {{ inputData.props.row.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
-        </q-chip>
-      </template>
       <template v-else-if="inputData.col.name === 'actions'">
         <div class="action-column-entity-index">
           <delete-btn
@@ -54,7 +46,7 @@ import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
-import { exam, ExamType } from 'src/repositories/exam'
+import { exam, type ExamType } from 'src/repositories/exam'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
@@ -104,7 +96,6 @@ const table = ref({
     },
     { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
     { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
-    { name: 'delivery_mode', label: 'نوع تحویل', align: 'center' as const, field: 'delivery_mode' },
     {
       name: 'created_at',
       required: true,

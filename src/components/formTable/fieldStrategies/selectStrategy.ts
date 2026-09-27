@@ -1,5 +1,5 @@
 import * as shvl from 'shvl'
-import { type Row, type FormTableInputType } from '../filedTextStrategy'
+import type { Row, FormTableInputType } from '../filedTextStrategy'
 
 export const selectStrategy = (input: FormTableInputType) => (row: Row) => {
   if (input.tableFiled) {

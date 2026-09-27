@@ -206,7 +206,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar, copyToClipboard, Notify  } from 'quasar'
-import { student, StudentType } from 'src/repositories/student'
+import { student, type StudentType } from 'src/repositories/student'
 import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
 import { useDate } from 'src/composables/Date'
 import StudentGuardianManager from 'src/components/StudentGuardianManager.vue'

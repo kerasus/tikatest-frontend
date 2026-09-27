@@ -1,7 +1,7 @@
 import BaseAPI from './BaseAPI'
-import { UserType } from 'src/repositories/user'
+import type { UserType } from 'src/repositories/user'
 import { SchoolClassType } from 'src/repositories/schoolClass'
-import { TermEnrollmentType } from 'src/repositories/termEnrollment'
+import type { TermEnrollmentType } from 'src/repositories/termEnrollment'
 
 export type StudentProfileType = {
   id: number | null

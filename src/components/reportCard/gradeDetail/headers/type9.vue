@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import {
+import type {
   ReportCardSchool,
   ReportCardStudentInfoExtended
 } from 'src/repositories/reportCard'

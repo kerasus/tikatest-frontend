@@ -22,7 +22,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { exam, ExamType } from 'src/repositories/exam'
+import { exam, type ExamType } from 'src/repositories/exam'
 import ExamOnlineDetailCard from 'components/exam/ExamOnlineDetailCard.vue'
 import ExamResultsCard from 'components/exam/ExamResultsCard.vue'
 

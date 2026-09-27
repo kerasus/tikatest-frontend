@@ -64,4 +64,4 @@ export const index: RouteRecordRaw[] = [
       ...studentPortalRoutes
     ]
   }
-]
+]  as RouteRecordRaw[]

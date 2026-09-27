@@ -16,7 +16,7 @@ import { ref, computed } from 'vue'
 import { getInputs } from './inputs'
 import { useRoute } from 'vue-router'
 import { EntityEdit } from 'quasar-crud'
-import SchoolAPI, { SchoolType } from 'src/repositories/school'
+import SchoolAPI, { type SchoolType } from 'src/repositories/school'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const route = useRoute()

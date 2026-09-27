@@ -1,6 +1,6 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
-import { SchoolType } from 'src/repositories/school'
+import type { SchoolType } from 'src/repositories/school'
 
 export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
 export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff'

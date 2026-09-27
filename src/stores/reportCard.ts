@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import {
+import type {
   ClassGradeSheetResponse,
   ComprehensiveReportResponse,
   GradeMatrixResponse,

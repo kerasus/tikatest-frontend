@@ -6,11 +6,11 @@
     <!--    localErrorData ? $t(localErrorData.message, localErrorData.namedValue) : undefined-->
     <!--    "-->
     <q-input
-      v-model="displayDateTime"
+      v-model="localDisplayDateTime"
       :name="name"
       :loading="loading"
       :filled="filled"
-      :mask="mask"
+      :mask="localMask"
       :fill-mask="fillMask"
       :reverse-fill-mask="reverseFillMask"
       dir="ltr"
@@ -40,12 +40,12 @@
         <q-icon
           name="oms:clock"
           class="cursor-pointer"
-          @click="toggleMenu" />
+          @click="toggleMenuFn" />
       </template>
     </q-input>
     <q-menu
       v-model="popupTime"
-      :persistent="persistentMenu"
+      :persistent="localPersistentMenu"
       no-parent-event
       anchor="bottom left"
       self="top left"
@@ -106,8 +106,8 @@ import { useI18n } from 'vue-i18n'
 import type { ComputedRef } from 'vue'
 import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
-import { type FormBuilderInputType } from 'src/types'
-import { type LocalErrorDataType } from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import type { FormBuilderInputType } from 'src/types'
+import type { LocalErrorDataType } from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 import { type ComponentPublicInstance, computed, type ModelRef, nextTick, reactive, ref, type Ref, watch } from 'vue'
 
 defineOptions({
@@ -156,10 +156,10 @@ const props = withDefaults(defineProps<FormBuilderInputType>(), {
   loading: false
 })
 
-const mask = ref('##:##:##')
-const displayDateTime: Ref<string> = ref('')
+const localMask = ref('##:##:##')
+const localDisplayDateTime: Ref<string> = ref('')
 const popupTime = ref(false)
-const persistentMenu = ref(false)
+const localPersistentMenu = ref(false)
 const input = ref<HTMLInputElement | null>(null)
 const inputHour = ref<any>(null)
 const inputMinute = ref<HTMLInputElement | null>(null)
@@ -175,13 +175,13 @@ const dateTime = reactive<DateTimeObject>({
   seconds: '__'
 })
 
-const value: ModelRef<string | null> = defineModel('value', {
+const localValue: ModelRef<string | null> = defineModel('value', {
   type: String,
   default: null
 })
 
 const customClass = computed(() => props.class)
-const showClearAble = computed(() => displayDateTime.value !== '__:__:__')
+const showClearAble = computed(() => localDisplayDateTime.value !== '__:__:__')
 
 const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() => {
   if (!localErrorMessage.value) {
@@ -201,7 +201,7 @@ const localRules = computed(() =>
       const ruleName = rule.ruleName
       const ruleParams = rule.ruleParams
       rule = (): boolean | string => {
-        if (displayDateTime.value === '__:__:__') {
+        if (localDisplayDateTime.value === '__:__:__') {
           return rawT('error.validation.required', { field: props.label })
         } else return !localErrorMessage.value
       }
@@ -215,10 +215,10 @@ const localRules = computed(() =>
 )
 
 watch(
-  () => value.value,
+  () => localValue.value,
   (newValue) => {
     if (!newValue) {
-      displayDateTime.value = '__:__:__'
+      localDisplayDateTime.value = '__:__:__'
       return
     }
     onChangeTime(newValue)
@@ -232,7 +232,7 @@ function onChangeInputTime (newValue: string | number | null) {
     return
   }
   dateTime.time = newValue
-  const analysedShamsiTime = dateManager.validationTime(displayDateTime.value)
+  const analysedShamsiTime = dateManager.validationTime(localDisplayDateTime.value)
 
   if (analysedShamsiTime.isValid && analysedShamsiTime.validTime) {
     localErrorMessage.value = null
@@ -252,16 +252,16 @@ function onChangeTime (newValue: string) {
 }
 
 function updateDateTime (newValue: string) {
-  displayDateTime.value = newValue || ''
-  value.value = newValue ? newValue.toString() : newValue
+  localDisplayDateTime.value = newValue || ''
+  localValue.value = newValue ? newValue.toString() : newValue
 }
 function onClear () {
-  displayDateTime.value = '__:__:__'
-  value.value = null
+  localDisplayDateTime.value = '__:__:__'
+  localValue.value = null
 }
 
 function openMenu () {
-  persistentMenu.value = true
+  localPersistentMenu.value = true
   popupTime.value = true
   input.value?.focus()
 }
@@ -345,7 +345,7 @@ function onKeydownSecond (e: KeyboardEvent) {
 }
 
 function onMenuTimeInputUpdate () {
-  displayDateTime.value = dateTime.hours + ':' + dateTime.minutes + ':' + dateTime.seconds
+  localDisplayDateTime.value = dateTime.hours + ':' + dateTime.minutes + ':' + dateTime.seconds
 }
 
 function onMenuHourInputUpdate () {
@@ -364,11 +364,11 @@ function onMenuSecondInputUpdate () {
   onMenuTimeInputUpdate()
 }
 
-function toggleMenu () {
+function toggleMenuFn () {
   popupTime.value = !popupTime.value
 }
 
-watch(displayDateTime, onChangeInputTime)
+watch(localDisplayDateTime, onChangeInputTime)
 
 watch(
   () => props.errorMessage,

@@ -1,11 +1,11 @@
-import BaseAPI, { ListType } from './BaseAPI'
-import { UserType } from 'src/repositories/user'
-import { ExamCategoryType } from 'src/repositories/examCategory'
-import { SchoolClassType } from 'src/repositories/schoolClass'
-import { AcademicLevelType } from 'src/repositories/academicLevel'
-import { LessonType } from 'src/repositories/lesson'
-import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
-import { AcademicTermType } from 'src/repositories/academicTerm'
+import BaseAPI, { type ListType } from './BaseAPI'
+import type { UserType } from 'src/repositories/user'
+import type { ExamCategoryType } from 'src/repositories/examCategory'
+import type { SchoolClassType } from 'src/repositories/schoolClass'
+import type { AcademicLevelType } from 'src/repositories/academicLevel'
+import type { LessonType } from 'src/repositories/lesson'
+import type { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
+import type { AcademicTermType } from 'src/repositories/academicTerm'
 
 export interface ContentType {
   type: 'text' | 'image' | 'pdf';

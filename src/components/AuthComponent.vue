@@ -109,17 +109,6 @@ async function redirectAfterLogin () {
   let routeName = 'Student.Dashboard'
   let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
   let routeParamRole = userStoreManager.mainRoleForPath
-  if (userStoreManager.isAdmin) {
-    routeName = 'Panel.Dashboard'
-  } else if (
-    userStoreManager.isManager
-    || userStoreManager.isTeacher
-    || userStoreManager.isStaff
-  ) {
-    routeName = 'Panel.SchoolDashboard'
-  } else if (userStoreManager.isStudent) {
-    routeName = 'Student.Dashboard'
-  }
 
   const redirectLocation = appConfigManager.redirectAfterLogin
     || { name: routeName, params: { school: routeParamSchool, role: routeParamRole } }

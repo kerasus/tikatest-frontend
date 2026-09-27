@@ -1,5 +1,5 @@
 import BaseAPI from './BaseAPI'
-import { StudentProfileType } from 'src/repositories/student'
+import type { StudentProfileType } from 'src/repositories/student'
 
 export type ReportCardLessonResult = {
   id: number

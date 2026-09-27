@@ -179,7 +179,7 @@ import { useQuasar } from 'quasar'
 import { schoolUser } from 'src/repositories/schoolUser'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
-import { UserSchoolPivoteType } from 'src/repositories/user'
+import type { UserSchoolPivoteType } from 'src/repositories/user'
 
 const props = defineProps({
   userId: {

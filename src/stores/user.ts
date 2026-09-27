@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import { reactive, computed } from 'vue'
-import { UserRolesForPathType, UserRolesType, type UserType } from 'src/repositories/user'
+import type { UserRolesForPathType, UserRolesType, UserType } from 'src/repositories/user'
 
 const userKey = 'user-data'
 

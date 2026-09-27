@@ -1,6 +1,6 @@
 import BaseAPI from './BaseAPI'
-import { SkyroomRoomType } from './skyroomRoom'
-import { AcademicLevelType } from 'src/repositories/academicLevel'
+import type { SkyroomRoomType } from './skyroomRoom'
+import type { AcademicLevelType } from 'src/repositories/academicLevel'
 
 export type { ListType } from './BaseAPI'
 export type SchoolClassType = {

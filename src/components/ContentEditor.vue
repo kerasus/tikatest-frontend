@@ -176,7 +176,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { ContentType } from 'src/repositories/exam'
+import type { ContentType } from 'src/repositories/exam'
 
 const modelValue = defineModel<ContentType | null>('value')
 

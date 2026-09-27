@@ -155,23 +155,81 @@
           </div>
         </div>
       </div>
+      <q-separator class="q-my-md" />
+
+      <div class="col-12">
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <form-builder-select-academic-level
+              v-if="editable"
+              v-model:value="levelIds"
+              label="پایه‌ها"
+              :school-id="schoolId"
+              outlined
+              clearable
+              multiple
+              use-chips />
+            <div v-else>
+              <div class="text-subtitle2">پایه های انتخابی:</div>
+              <q-chip
+                v-for="level in exam.academic_levels"
+                :key="level.id"
+                color="primary"
+                text-color="white"
+                dense>
+                {{ level.name || '-' }}
+              </q-chip>
+              <span
+                v-if="!exam.academic_levels?.length"
+                class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <form-builder-select-school-class
+              v-if="editable"
+              v-model:value="classIds"
+              label="کلاس‌ها"
+              :school-id="schoolId"
+              outlined
+              clearable
+              multiple
+              use-chips />
+            <div v-else>
+              <div class="text-subtitle2">کلاس های انتخابی:</div>
+              <q-chip
+                v-for="cls in exam.classes"
+                :key="cls.id"
+                color="secondary"
+                text-color="white"
+                dense>
+                {{ cls.name || '-' }}
+              </q-chip>
+              <span
+                v-if="!exam.classes?.length"
+                class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ExamType } from 'src/repositories/exam'
+import type { ExamType } from 'src/repositories/exam'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 import FormBuilderSelectTerm from 'components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
+import FormBuilderSelectSchoolClass from 'components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
+import FormBuilderSelectAcademicLevel
+  from 'components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 
-const exam = defineModel<ExamType>('exam')
 defineProps<{
   editable?: boolean;
   schoolId?: number;
 }>()
-
+const exam = defineModel<ExamType>('exam')
 const examListRouteName = computed(() => {
   if (exam.value?.delivery_mode === 'online') {
     return 'Panel.Exam.Online.List'
@@ -194,6 +252,22 @@ const showExamRouteName = computed(() => {
   }
 
   return 'Panel.Exam.InPerson.Show'
+})
+
+const levelIds = computed({
+  get: () => exam.value.academic_levels?.map((l: any) => l.id) || [],
+  set: (val: any[]) => {
+    exam.value.academic_level_ids = val || []
+    exam.value.academic_levels = (val || []).map((id) => ({ id })) as any[]
+  }
+})
+
+const classIds = computed({
+  get: () => exam.value.classes?.map((c: any) => c.id) || [],
+  set: (val: any[]) => {
+    exam.value.class_ids = val || []
+    exam.value.classes = (val || []).map((id) => ({ id })) as any[]
+  }
 })
 </script>
 

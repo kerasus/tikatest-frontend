@@ -180,7 +180,7 @@
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { exam, ExamScoreType, ExamType } from 'src/repositories/exam'
+import { exam, type ExamScoreType, type ExamType } from 'src/repositories/exam'
 import { useDate } from 'src/composables/Date'
 
 const $q = useQuasar()

@@ -257,7 +257,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useUser } from 'src/stores/user'
-import { type UserType } from 'src/repositories/user'
+import type { UserType } from 'src/repositories/user'
 
 const userManager = useUser()
 

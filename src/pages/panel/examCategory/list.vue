@@ -17,14 +17,6 @@
       <template v-if="inputData.col.name === 'school'">
         {{ inputData.props.row.school?.name || '-' }}
       </template>
-      <template v-else-if="inputData.col.name === 'is_system'">
-        <q-chip
-          :color="inputData.props.row.is_system ? 'positive' : 'grey'"
-          text-color="white"
-          dense>
-          {{ inputData.props.row.is_system ? 'سیستمی' : 'سفارشی' }}
-        </q-chip>
-      </template>
       <template v-else-if="inputData.col.name === 'actions'">
         <div class="action-column-entity-index">
           <q-btn
@@ -60,7 +52,7 @@ import { useUser } from 'src/stores/user'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
-import { examCategory, ExamCategoryType } from 'src/repositories/examCategory'
+import { examCategory, type ExamCategoryType } from 'src/repositories/examCategory'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
@@ -96,8 +88,7 @@ const table = ref({
       sortable: true
     },
     { name: 'term_number', label: 'شماره ترم', align: 'center', field: 'term_number' },
-    { name: 'school', label: 'مدرسه', align: 'center', field: 'school' },
-    { name: 'is_system', label: 'نوع', align: 'center', field: 'is_system' },
+    // { name: 'school', label: 'مدرسه', align: 'center', field: 'school' },
     {
       name: 'created_at',
       required: true,

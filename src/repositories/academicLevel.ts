@@ -1,5 +1,5 @@
 import BaseAPI from './BaseAPI'
-import { AcademicFieldType } from 'src/repositories/academicField'
+import type { AcademicFieldType } from 'src/repositories/academicField'
 
 export type AcademicLevelType = {
   id: number | null;

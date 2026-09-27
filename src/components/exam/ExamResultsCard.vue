@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { ExamType } from 'src/repositories/exam'
+import type { ExamType } from 'src/repositories/exam'
 import { exam as examApi } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
 import { useQuasar } from 'quasar'

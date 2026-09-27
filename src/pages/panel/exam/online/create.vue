@@ -1,11 +1,5 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="col">
-        <h4 class="q-ma-none">ثبت آزمون آنلاین جدید</h4>
-      </div>
-    </div>
-
     <q-form @submit.prevent="onSubmit">
       <exam-online-detail-card
         :exam="form"

@@ -5,7 +5,7 @@ import { ref, shallowRef } from 'vue'
 import { useUser } from 'src/stores/user'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
-import { type UserRolesType } from 'src/repositories/user'
+import type { UserRolesType } from 'src/repositories/user'
 import TransferAPI, { transferStatusOptions, type TransferType } from 'src/repositories/transfer'
 import FormBuilderSelectUser from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectUser.vue'
 

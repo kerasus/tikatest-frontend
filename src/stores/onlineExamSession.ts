@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { OnlineExamSessionType, StartExamResponseType } from 'src/repositories/onlineExamSession'
+import { OnlineExamSessionType, type StartExamResponseType } from 'src/repositories/onlineExamSession'
 
 const SESSION_STATUS_LABELS: Record<string, string> = {
   not_started: 'شرکت نکرده',

@@ -100,7 +100,7 @@ import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useDate } from 'src/composables/Date'
 import { exam } from 'src/repositories/exam'
-import OnlineExamSessionAPI, { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
+import OnlineExamSessionAPI, { type OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
 const route = useRoute()
 const $q = useQuasar()

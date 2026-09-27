@@ -1,4 +1,4 @@
-import { UserRolesType } from 'src/repositories/user'
+import type { UserRolesType } from 'src/repositories/user'
 import { tokenDataKeyInLocalstorage } from 'src/boot/axios'
 
 export default function hasOneOfThisRoles (roleNames: UserRolesType[]) {

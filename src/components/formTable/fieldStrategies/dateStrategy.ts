@@ -1,6 +1,6 @@
 import * as shvl from 'shvl'
 import { useDate } from 'src/composables/Date'
-import { type Row, type FormTableInputType } from '../filedTextStrategy'
+import type { Row, FormTableInputType } from '../filedTextStrategy'
 
 export const dateStrategy = (input: FormTableInputType) => (row: Row) => {
   const dateManager = useDate()

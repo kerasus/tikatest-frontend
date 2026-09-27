@@ -2,7 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import SchoolAPI from 'src/repositories/school'
-import { type UserSchoolPivoteType } from 'src/repositories/user'
+import type { UserSchoolPivoteType } from 'src/repositories/user'
 
 export const SYSTEM_SCHOOL_SLUG = 'system'
 

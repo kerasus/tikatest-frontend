@@ -84,60 +84,6 @@
     <q-separator />
     <q-card-section>
       <div class="row q-col-gutter-md">
-        <div class="col-12">
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <form-builder-select-academic-level
-                v-if="editable"
-                v-model:value="levelIds"
-                label="پایه‌ها"
-                :school-id="schoolId"
-                outlined
-                clearable
-                multiple
-                use-chips />
-              <div v-else>
-                <div class="text-subtitle2">پایه های انتخابی:</div>
-                <q-chip
-                  v-for="level in exam.academic_levels"
-                  :key="level.id"
-                  color="primary"
-                  text-color="white"
-                  dense>
-                  {{ level.name || '-' }}
-                </q-chip>
-                <span
-                  v-if="!exam.academic_levels?.length"
-                  class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <form-builder-select-school-class
-                v-if="editable"
-                v-model:value="classIds"
-                label="کلاس‌ها"
-                :school-id="schoolId"
-                outlined
-                clearable
-                multiple
-                use-chips />
-              <div v-else>
-                <div class="text-subtitle2">کلاس های انتخابی:</div>
-                <q-chip
-                  v-for="cls in exam.classes"
-                  :key="cls.id"
-                  color="secondary"
-                  text-color="white"
-                  dense>
-                  {{ cls.name || '-' }}
-                </q-chip>
-                <span
-                  v-if="!exam.classes?.length"
-                  class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="col-12">
           <div class="row q-col-gutter-md">
@@ -294,7 +240,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useDate } from 'src/composables/Date'
-import { ExamType } from 'src/repositories/exam'
+import type { ExamType } from 'src/repositories/exam'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
@@ -303,12 +249,11 @@ import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderC
 import ExamAnswerKeyEditor from 'src/components/exam/ExamAnswerKeyEditor.vue'
 import ContentEditor from 'src/components/ContentEditor.vue'
 
-const exam = defineModel<ExamType>('exam')
 defineProps<{
   editable?: boolean;
   schoolId?: number;
 }>()
-
+const exam = defineModel<ExamType>('exam')
 const dateManager = useDate()
 
 const startsAtFormatted = computed(() => {
@@ -333,22 +278,6 @@ const answersVisibleAtFormatted = computed(() => {
   const raw = exam.value.online_exam_detail?.answers_visible_at
   if (!raw) return '-'
   return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
-})
-
-const classIds = computed({
-  get: () => exam.value.classes?.map((c: any) => c.id) || [],
-  set: (val: any[]) => {
-    exam.value.class_ids = val || []
-    exam.value.classes = (val || []).map((id) => ({ id })) as any[]
-  }
-})
-
-const levelIds = computed({
-  get: () => exam.value.academic_levels?.map((l: any) => l.id) || [],
-  set: (val: any[]) => {
-    exam.value.academic_level_ids = val || []
-    exam.value.academic_levels = (val || []).map((id) => ({ id })) as any[]
-  }
 })
 
 function addBooklet () {

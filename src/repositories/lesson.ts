@@ -1,5 +1,5 @@
 import BaseAPI from './BaseAPI'
-import { AcademicLevelType } from 'src/repositories/academicLevel'
+import type { AcademicLevelType } from 'src/repositories/academicLevel'
 
 export type { ListType } from './BaseAPI'
 export type LessonType = {

@@ -1,6 +1,6 @@
 import { reactive, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { ContentType, OnlineExamDetailType, ExamType } from 'src/repositories/exam'
+import { ContentType, type OnlineExamDetailType, type ExamType } from 'src/repositories/exam'
 import type { UserType } from 'src/repositories/user'
 
 export interface ExamFormModel {
@@ -119,6 +119,7 @@ export const useExamForm = (isUpdate = false) => {
     const fd = new FormData()
 
     fd.append('name', form.name || '')
+    fd.append('term_id', String(form.term_id ?? ''))
     fd.append('description', form.description || '')
     fd.append('lesson_id', String(form.lesson_id ?? ''))
     fd.append('min_passing_score', String(form.min_passing_score ?? ''))

@@ -1,5 +1,5 @@
 import * as shvl from 'shvl'
-import { type Row, type FormTableInputType } from '../filedTextStrategy'
+import type { Row, FormTableInputType } from '../filedTextStrategy'
 
 export const fileStrategy = (input: FormTableInputType) => (row: Row) => {
   const inputValue = shvl.get(row, input.responseKey, null)

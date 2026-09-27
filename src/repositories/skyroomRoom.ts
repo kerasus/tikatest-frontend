@@ -1,5 +1,5 @@
 import BaseAPI from './BaseAPI'
-import { SchoolClassType } from './schoolClass'
+import type { SchoolClassType } from './schoolClass'
 import type { SkyroomRoomScheduleType } from './skyroomRoomSchedule'
 
 export type SkyroomRoomType = {

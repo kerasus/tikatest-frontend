@@ -90,8 +90,8 @@ import { ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { exam, ExamType } from 'src/repositories/exam'
-import { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
+import { exam, type ExamType } from 'src/repositories/exam'
+import type { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
 const router = useRouter()
 const $q = useQuasar()

@@ -58,72 +58,6 @@
           </div>
         </div>
 
-        <q-separator class="q-my-md" />
-
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <form-builder-select-term
-              v-if="editable"
-              v-model:value="exam.term_id"
-              label="ترم"
-              outlined
-              dense
-              clearable />
-            <template v-else>
-              <div class="text-subtitle2">ترم:</div>
-              <div class="text-body1">{{ exam.term?.name || '-' }}</div>
-            </template>
-          </div>
-          <div class="col-12 col-md-6">
-            <template v-if="editable">
-              <q-input
-                v-model.number="exam.occurrence"
-                label="شمارهٔ برگزاری در ترم"
-                outlined
-                dense
-                type="number"
-                min="1"
-                hint="در صورت خالی گذاشتن، به‌صورت خودکار محاسبه می‌شود" />
-            </template>
-            <template v-else>
-              <div class="text-subtitle2">شمارهٔ برگزاری در ترم:</div>
-              <div class="text-body1">{{ exam.occurrence ?? '-' }}</div>
-            </template>
-          </div>
-        </div>
-
-        <q-separator class="q-my-md" />
-
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <div class="text-subtitle2">پایه های انتخابی:</div>
-            <q-chip
-              v-for="level in exam.academic_levels"
-              :key="level.id"
-              color="primary"
-              text-color="white"
-              dense>
-              {{ level.name || '-' }}
-            </q-chip>
-            <span
-              v-if="!exam.academic_levels?.length"
-              class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
-          </div>
-          <div class="col-12 col-md-6">
-            <div class="text-subtitle2">کلاس های انتخابی:</div>
-            <q-chip
-              v-for="cls in exam.classes"
-              :key="cls.id"
-              color="secondary"
-              text-color="white"
-              dense>
-              {{ cls.name || '-' }}
-            </q-chip>
-            <span
-              v-if="!exam.classes?.length"
-              class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
-          </div>
-        </div>
       </q-card-section>
     </q-card>
   </div>
@@ -132,21 +66,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useDate } from 'src/composables/Date'
-import { ExamType } from 'src/repositories/exam'
-import { LessonType } from 'src/repositories/lesson'
-import { ExamCategoryType } from 'src/repositories/examCategory'
+import type { ExamType } from 'src/repositories/exam'
+import type { LessonType } from 'src/repositories/lesson'
+import type { ExamCategoryType } from 'src/repositories/examCategory'
 import ExamDetailCard from 'src/components/exam/ExamDetailCard.vue'
 import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
-const exam = defineModel<ExamType>('exam')
 const props = defineProps<{
   editable?: boolean;
   schoolId?: number;
   lessonOptions?: LessonType[];
   categoryOptions?: ExamCategoryType[];
 }>()
-
+const exam = defineModel<ExamType>('exam')
 const dateManager = useDate()
 
 const heldAtFormatted = computed(() => {
