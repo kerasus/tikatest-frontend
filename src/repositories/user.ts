@@ -1,6 +1,7 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
 import type { SchoolType } from 'src/repositories/school'
+import type { TermEnrollmentType } from 'src/repositories/termEnrollment'
 
 export type UserRolesForPathType = 'admin' | 'manager' | 'teacher' | 'student' | 'staff'
 export type UserRolesType = 'Admin' | 'Manager' | 'Teacher' | 'Student' | 'Staff'
@@ -62,6 +63,7 @@ export interface UserType {
   mobile: string | null;
   national_id: string | null;
   schools: UserSchoolPivoteType[];
+  term_enrollments: TermEnrollmentType[];
   roles_list: string[];
   roles: RoleType[];
   permissions_list: string[]
@@ -99,6 +101,7 @@ export default class UserAPI extends BaseAPI<UserType> {
       roles_list: [],
       permissions_list: [],
       schools: [],
+      term_enrollments: [],
       email_verified_at: null,
       mobile_verified_at: null,
       birth_date: null,

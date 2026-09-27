@@ -53,8 +53,8 @@
     <!--              <div class="text-body1">{{ gradeData?.scaled_score ?? gradeData?.calculated_grade ?? '-' }}</div>-->
     <!--            </div>-->
     <!--            <div class="col-12 col-md-6">-->
-    <!--              <div class="text-subtitle2">نمره Z:</div>-->
-    <!--              <div class="text-body1">{{ gradeData?.z_score ?? '-' }}</div>-->
+    <!--              <div class="text-subtitle2">نمره تراز:</div>-->
+    <!--              <div class="text-body1">{{ gradeData?.t_score ?? '-' }}</div>-->
     <!--            </div>-->
     <!--            <div-->
     <!--              v-if="gradeData?.explanation"-->

@@ -57,7 +57,13 @@ export const index = [
     path: 'my-homeworks',
     name: 'Student.Homework.List',
     meta: {
-      pageCategory: 'تکالیف'
+      pageCategory: 'تکالیف',
+      breadCrumbs: [
+        {
+          label: 'تکالیف',
+          to: { name: 'Student.Homework.List' }
+        }
+      ]
     },
     component: () => import('pages/panel/student/myHomeworks.vue')
   },
@@ -65,7 +71,16 @@ export const index = [
     path: 'my-homeworks/:id',
     name: 'Student.Homework.Show',
     meta: {
-      pageCategory: 'مشاهده تکلیف'
+      pageCategory: 'مشاهده تکلیف',
+      breadCrumbs: [
+        {
+          label: 'تکالیف',
+          to: { name: 'Student.Homework.List' }
+        },
+        {
+          label: 'مشاهده تکلیف'
+        }
+      ]
     },
     component: () => import('src/pages/panel/student/homework-view.vue')
   },

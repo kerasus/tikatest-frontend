@@ -28,7 +28,7 @@
               <template v-if="row.result">
                 <q-item-label caption>
                   نمره خام: {{ row.result.raw_score ?? '-' }} | نمره محاسبه شده:
-                  {{ row.result.scaled_score ?? '-' }} | Z نمره: {{ row.result.z_score ?? '-' }}
+                  {{ row.result.scaled_score ?? '-' }} | نمره تراز: {{ row.result.t_score ?? '-' }}
                 </q-item-label>
                 <q-item-label
                   v-if="editingId === row.result.id"
@@ -125,13 +125,13 @@ import { exam as examApi } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
 import { useQuasar } from 'quasar'
 
-const $q = useQuasar()
-
 const props = defineProps<{
   exam: ExamType;
 }>()
 
 const emit = defineEmits(['result-updated'])
+
+const $q = useQuasar()
 
 const editingId = ref<number | null>(null)
 const editScore = ref<number | null>(null)

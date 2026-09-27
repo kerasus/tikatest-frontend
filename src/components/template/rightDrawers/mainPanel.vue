@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <div class="right-drawer">
     <q-list
@@ -62,6 +60,8 @@
     </q-list>
   </div>
 </template>
+
+<script setup lang="ts"></script>
 
 <style scoped lang="scss">
 .right-drawer {

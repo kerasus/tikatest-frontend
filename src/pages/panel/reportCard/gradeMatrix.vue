@@ -80,7 +80,8 @@
                 :rules="[(v) => !!v || 'درس الزامی است']"
                 :school-id="form.school_id"
                 :field-id="form.field_id"
-                :level-id="form.academic_level_id" />
+                :level-id="form.academic_level_id"
+                :class-id="form.class_id" />
             </div>
           </div>
 

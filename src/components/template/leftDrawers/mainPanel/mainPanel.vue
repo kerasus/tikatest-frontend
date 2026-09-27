@@ -158,7 +158,7 @@ const topLinks = ref<ListItemType[]>([
   {
     icon: 'school',
     title: 'دانش آموزان',
-    forRoles: ['Manager', 'Teacher', 'Admin'],
+    forRoles: ['Manager', 'Admin'],
     route: { name: 'Panel.Student.List' }
   },
   {

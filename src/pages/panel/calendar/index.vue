@@ -688,7 +688,7 @@ async function onSubmitEvent () {
   if (
     eventDialog.form.ends_at &&
     new Date(eventDialog.form.ends_at).getTime() <
-      new Date(eventDialog.form.starts_at).getTime()
+    new Date(eventDialog.form.starts_at).getTime()
   ) {
     Notify.create({
       type: 'warning',

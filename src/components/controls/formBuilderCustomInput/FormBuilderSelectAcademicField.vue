@@ -163,7 +163,11 @@ const optionValue = ref('id')
 const optionLabel = ref('name')
 
 async function getAcademicFields (name: string | null) {
-  const params: any = { name }
+  const params: any = {
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
+    name
+  }
   if (props.schoolId) {
     params.school_id = props.schoolId
   }
@@ -182,7 +186,11 @@ useEntitySelector<AcademicFieldType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'academic fields',
-  fetchByIds: (params) => academicFieldAPI.index(params)
+  fetchByIds: (params) => academicFieldAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 </script>
 

@@ -72,7 +72,9 @@
                 :level-id="form.academic_level_id"
                 @update:value="onClassChange" />
             </div>
-            <div class="col-12 col-md-6">
+            <div
+              v-if="form.class_id"
+              class="col-12 col-md-6">
               <form-builder-select-lesson
                 v-model:value="form.lesson_id"
                 label="انتخاب درس"
@@ -81,7 +83,8 @@
                 :rules="[(v) => !!v || 'درس الزامی است']"
                 :school-id="form.school_id"
                 :field-id="form.field_id"
-                :level-id="form.academic_level_id" />
+                :level-id="form.academic_level_id"
+                :class-id="form.class_id" />
             </div>
           </div>
 
@@ -413,7 +416,7 @@ async function onSubmit () {
           user_id: s.id,
           raw_score: rawScore,
           scaled_score: scaledScore,
-          z_score: null
+          t_score: null
         }
       })
       .filter(

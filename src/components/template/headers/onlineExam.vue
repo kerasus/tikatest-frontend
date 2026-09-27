@@ -1,99 +1,3 @@
-<script setup lang="ts">
-import { useQuasar } from 'quasar'
-import moment from 'jalali-moment'
-import { useRouter } from 'vue-router'
-import { useUser } from 'src/stores/user'
-import { useAppLayout } from 'stores/appLayout'
-import { userRoleOptions } from 'src/repositories/user'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useOnlineExamSession } from 'src/stores/onlineExamSession'
-
-withDefaults(defineProps<{ floated?: boolean }>(), {
-  floated: false
-})
-
-const $q = useQuasar()
-const router = useRouter()
-const userManager = useUser()
-const appLayoutStore = useAppLayout()
-const onlineExamStore = useOnlineExamSession()
-
-const formattedDate = ref('')
-
-function updateDateTime () {
-  const now = moment()
-  formattedDate.value = now.format('jYYYY/jMM/jDD')
-}
-
-function translateRole (roleName: string): string {
-  const target = userRoleOptions.find((role) => role.value === roleName)
-  if (!target) {
-    return '-'
-  }
-
-  return target.label
-}
-
-let timer: any
-onMounted(() => {
-  updateDateTime()
-  timer = setInterval(updateDateTime, 60000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
-
-function toggleLeftDrawerMini () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
-  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
-}
-
-function toggleLeftDrawerVisible () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
-  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
-}
-
-function logout () {
-  userManager.logout()
-  router.push({ name: 'Auth.Login' })
-}
-
-const layoutFooterHeight = computed(() => appLayoutStore.layoutFooterHeight + 'px')
-const remainingTimeText = computed(() => {
-  const remaining = onlineExamStore.remainingTime
-  if (remaining == null) return '--:--'
-  const safe = Math.max(0, Math.floor(remaining))
-  const mins = Math.floor(safe / 60)
-  const secs = safe % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-})
-
-const progressPercent = computed(() => {
-  const total = onlineExamStore.durationLimit
-  const remaining = onlineExamStore.remainingTime
-  if (!total || remaining == null) return 0
-  const elapsed = Math.max(0, total - remaining)
-  return Math.min(100, Math.max(0, (elapsed / total) * 100))
-})
-
-const session = computed(() => onlineExamStore.sessionData)
-
-const formatDuration = (seconds: number | null | undefined) => {
-  if (seconds == null) return '-'
-  const safe = Math.max(0, Math.floor(seconds))
-  const hours = Math.floor(safe / 3600)
-  const mins = Math.floor((safe % 3600) / 60)
-  const secs = safe % 60
-
-  return [hours, mins, secs].map((part) => part.toString().padStart(2, '0')).join(':')
-}
-
-function goToExamList () {
-  router.push({ name: 'Student.Exam.List' })
-}
-</script>
-
 <template>
   <div
     class="main-dashboard-wrapper"
@@ -226,6 +130,102 @@ function goToExamList () {
     </q-toolbar>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useQuasar } from 'quasar'
+import moment from 'jalali-moment'
+import { useRouter } from 'vue-router'
+import { useUser } from 'src/stores/user'
+import { useAppLayout } from 'stores/appLayout'
+import { userRoleOptions } from 'src/repositories/user'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useOnlineExamSession } from 'src/stores/onlineExamSession'
+
+withDefaults(defineProps<{ floated?: boolean }>(), {
+  floated: false
+})
+
+const $q = useQuasar()
+const router = useRouter()
+const userManager = useUser()
+const appLayoutStore = useAppLayout()
+const onlineExamStore = useOnlineExamSession()
+
+const formattedDate = ref('')
+
+function updateDateTime () {
+  const now = moment()
+  formattedDate.value = now.format('jYYYY/jMM/jDD')
+}
+
+function translateRole (roleName: string): string {
+  const target = userRoleOptions.find((role) => role.value === roleName)
+  if (!target) {
+    return '-'
+  }
+
+  return target.label
+}
+
+let timer: any
+onMounted(() => {
+  updateDateTime()
+  timer = setInterval(updateDateTime, 60000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
+
+function toggleLeftDrawerMini () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
+  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
+}
+
+function toggleLeftDrawerVisible () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
+  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
+}
+
+function logout () {
+  userManager.logout()
+  router.push({ name: 'Auth.Login' })
+}
+
+const layoutFooterHeight = computed(() => appLayoutStore.layoutFooterHeight + 'px')
+const remainingTimeText = computed(() => {
+  const remaining = onlineExamStore.remainingTime
+  if (remaining == null) return '--:--'
+  const safe = Math.max(0, Math.floor(remaining))
+  const mins = Math.floor(safe / 60)
+  const secs = safe % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+})
+
+const progressPercent = computed(() => {
+  const total = onlineExamStore.durationLimit
+  const remaining = onlineExamStore.remainingTime
+  if (!total || remaining == null) return 0
+  const elapsed = Math.max(0, total - remaining)
+  return Math.min(100, Math.max(0, (elapsed / total) * 100))
+})
+
+const session = computed(() => onlineExamStore.sessionData)
+
+const formatDuration = (seconds: number | null | undefined) => {
+  if (seconds == null) return '-'
+  const safe = Math.max(0, Math.floor(seconds))
+  const hours = Math.floor(safe / 3600)
+  const mins = Math.floor((safe % 3600) / 60)
+  const secs = safe % 60
+
+  return [hours, mins, secs].map((part) => part.toString().padStart(2, '0')).join(':')
+}
+
+function goToExamList () {
+  router.push({ name: 'Student.Exam.List' })
+}
+</script>
 
 <style scoped lang="scss">
 .main-dashboard-wrapper {

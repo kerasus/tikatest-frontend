@@ -147,7 +147,11 @@ const optionValue = ref('id')
 const optionLabel = ref('name')
 
 async function getSchools (name: string | null) {
-  const schoolsList = await schoolAPI.index({ name })
+  const schoolsList = await schoolAPI.index({
+    name,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
   return schoolsList.data
 }
 
@@ -161,7 +165,11 @@ useEntitySelector<SchoolType>({
   value: () => props.value,
   filteredOptions,
   entityName: 'schools',
-  fetchByIds: (params) => schoolAPI.index(params)
+  fetchByIds: (params) => schoolAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 </script>
 

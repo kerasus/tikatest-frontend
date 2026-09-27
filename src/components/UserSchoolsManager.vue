@@ -196,9 +196,8 @@ const props = defineProps({
   }
 })
 
-const $q = useQuasar()
 const emit = defineEmits(['updated'])
-
+const $q = useQuasar()
 const localSchoolUsers = ref<UserSchoolPivoteType[]>([...props.schoolUsers])
 const editForms = ref<Record<number, {
   personnel_code: string | null

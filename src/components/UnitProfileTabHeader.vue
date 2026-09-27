@@ -104,9 +104,9 @@ const props = defineProps<{
   balanceLoading: boolean;
 }>()
 
-const tab = defineModel<'actions' | 'invoices' | 'transactions'>('tab')
-
 const emits = defineEmits(['updateBalance'])
+
+const tab = defineModel<'actions' | 'invoices' | 'transactions'>('tab')
 
 const tabs = ref([
   {

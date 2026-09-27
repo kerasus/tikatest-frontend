@@ -18,6 +18,7 @@
 import { ref, defineEmits, computed } from 'vue'
 import { useAppLayout } from 'stores/appLayout'
 
+const emits = defineEmits(['click-icon'])
 const value = defineModel('value', {
   type: String,
   default: ''
@@ -25,8 +26,6 @@ const value = defineModel('value', {
 const input = ref<HTMLInputElement | null>(null)
 const appLayoutStore = useAppLayout()
 const menuToggle = computed(() => appLayoutStore.layoutLeftDrawerMini)
-const emits = defineEmits(['click-icon'])
-
 function atClickSearchIcon () {
   if (menuToggle.value) {
     emits('click-icon')

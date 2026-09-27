@@ -1,36 +1,3 @@
-<script setup lang="ts">
-// @ts-nocheck
-import { ref } from 'vue'
-import Portlet from 'src/components/cards/portlet.vue'
-import DeleteBtn from 'src/components/controls/deleteBtn.vue'
-import ProductPartAPI, { type ProductParRequirementType } from 'src/repositories/productPart'
-
-const emit = defineEmits(['remove'])
-
-const props = defineProps<{
-  productPartId: number,
-  requirements: ProductParRequirementType[],
-  editMode: boolean
-}>()
-
-const productPartAPI = new ProductPartAPI()
-const loading = ref(false)
-
-async function removeRequirement (requirement: ProductParRequirementType) {
-  if (!props.productPartId) {
-    return
-  }
-
-  try {
-    loading.value = true
-    await productPartAPI.removeRequirement(props.productPartId, requirement.id)
-  } finally {
-    loading.value = false
-    emit('remove')
-  }
-}
-</script>
-
 <template>
   <portlet title="لیست نیازمندی ها">
     <q-list
@@ -74,6 +41,39 @@ async function removeRequirement (requirement: ProductParRequirementType) {
     </q-list>
   </portlet>
 </template>
+
+<script setup lang="ts">
+// @ts-nocheck
+import { ref } from 'vue'
+import Portlet from 'src/components/cards/portlet.vue'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import ProductPartAPI, { type ProductParRequirementType } from 'src/repositories/productPart'
+
+const props = defineProps<{
+  productPartId: number,
+  requirements: ProductParRequirementType[],
+  editMode: boolean
+}>()
+
+const emit = defineEmits(['remove'])
+
+const productPartAPI = new ProductPartAPI()
+const loading = ref(false)
+
+async function removeRequirement (requirement: ProductParRequirementType) {
+  if (!props.productPartId) {
+    return
+  }
+
+  try {
+    loading.value = true
+    await productPartAPI.removeRequirement(props.productPartId, requirement.id)
+  } finally {
+    loading.value = false
+    emit('remove')
+  }
+}
+</script>
 
 <style scoped lang="scss">
 

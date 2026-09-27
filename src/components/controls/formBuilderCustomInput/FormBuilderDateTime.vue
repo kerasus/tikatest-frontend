@@ -129,17 +129,6 @@ defineOptions({
   name: 'FormBuilderDateTime'
 })
 
-const i18n = useI18n()
-const dateManager = useDate()
-
-interface DateTimeObject {
-  date: string;
-  time: string;
-  hours: string;
-  minutes: string;
-  seconds: string;
-}
-
 const props = defineProps({
   name: {
     default: '',
@@ -256,6 +245,20 @@ const props = defineProps({
     type: Boolean
   }
 })
+const value: ModelRef<string | null> = defineModel('value', {
+  type: String,
+  default: null
+})
+const i18n = useI18n()
+const dateManager = useDate()
+
+interface DateTimeObject {
+  date: string;
+  time: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
 
 const displayDateTime: Ref<string> = ref('')
 const displayDate: Ref<string | undefined> = ref('')
@@ -275,11 +278,6 @@ const dateTime = reactive<DateTimeObject>({
   hours: '__',
   minutes: '__',
   seconds: '__'
-})
-
-const value: ModelRef<string | null> = defineModel('value', {
-  type: String,
-  default: null
 })
 
 const customClass = computed(() => props.class)

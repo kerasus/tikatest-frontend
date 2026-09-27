@@ -169,7 +169,11 @@ const optionValue = ref('id')
 const optionLabel = ref('name')
 
 async function getAcademicLevels (name: string | null) {
-  const params: any = { name }
+  const params: any = {
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
+    name
+  }
   if (props.schoolId) {
     params.school_id = props.schoolId
   }
@@ -193,6 +197,8 @@ useEntitySelector<AcademicLevelType>({
   entityName: 'academic levels',
   fetchByIds: (params) => academicLevelAPI.index({
     ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
     field_id: props.fieldId ?? undefined
   })
 })

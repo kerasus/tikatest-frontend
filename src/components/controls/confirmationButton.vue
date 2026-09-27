@@ -1,3 +1,25 @@
+<template>
+  <q-btn
+    :color="btnColor"
+    :label="btnTitle"
+    :loading="loading"
+    @click="onClickConfirmationButton" />
+  <q-dialog
+    v-model="showDialog"
+    :persistent="loading">
+    <confirmation
+      :title="confirmationTitle"
+      :message="confirmationMessage"
+      :submit-label="confirmationSubmitLabel"
+      :cancel-label="confirmationCancelLabel"
+      :icon="confirmationIcon"
+      :title-color="confirmationTitleColor"
+      :loading="loading"
+      @submit="onAccept"
+      @cancel="onCancel" />
+  </q-dialog>
+</template>
+
 <script setup lang="ts">
 import { defineEmits, ref } from 'vue'
 import Confirmation from 'src/components/cards/confirmation.vue'
@@ -15,13 +37,13 @@ export interface ConfirmationButtonProps {
 }
 
 withDefaults(defineProps<ConfirmationButtonProps>(),
-  {
-    btnColor: 'primary',
-    confirmationIcon: 'dangerous',
-    confirmationTitleColor: 'error',
-    confirmationSubmitLabel: 'بله',
-    confirmationCancelLabel: 'انصراف'
-  })
+             {
+               btnColor: 'primary',
+               confirmationIcon: 'dangerous',
+               confirmationTitleColor: 'error',
+               confirmationSubmitLabel: 'بله',
+               confirmationCancelLabel: 'انصراف'
+             })
 
 const emit = defineEmits(['accept', 'cancel', 'click'])
 
@@ -47,25 +69,3 @@ async function onCancel () {
 }
 
 </script>
-
-<template>
-  <q-btn
-    :color="btnColor"
-    :label="btnTitle"
-    :loading="loading"
-    @click="onClickConfirmationButton" />
-  <q-dialog
-    v-model="showDialog"
-    :persistent="loading">
-    <confirmation
-      :title="confirmationTitle"
-      :message="confirmationMessage"
-      :submit-label="confirmationSubmitLabel"
-      :cancel-label="confirmationCancelLabel"
-      :icon="confirmationIcon"
-      :title-color="confirmationTitleColor"
-      :loading="loading"
-      @submit="onAccept"
-      @cancel="onCancel" />
-  </q-dialog>
-</template>

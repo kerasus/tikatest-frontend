@@ -135,7 +135,14 @@
               <div
                 v-if="dialog.type === 'level'"
                 class="col-12">
+                <q-input
+                  v-if="!dialog.edit"
+                  :model-value="dialog.node?.label"
+                  label="رشته"
+                  outlined
+                  readonly />
                 <q-select
+                  v-else
                   v-model="dialog.form.field_id"
                   :options="fieldOptions"
                   option-value="id"
@@ -343,7 +350,7 @@ function addChild (node: any) {
   dialog.title = dialog.type === 'level' ? 'افزودن مقطع' : 'افزودن درس'
   dialog.form = {
     school_id: schoolId.value,
-    field_id: null,
+    field_id: node.type === 'field' ? node.data.id : null,
     academic_level_id: node.type === 'level' ? node.data.id : null,
     name: null,
     order: 0,
@@ -352,8 +359,6 @@ function addChild (node: any) {
 
   if (dialog.type === 'lesson') {
     loadLevelOptions(node.data.field_id)
-  } else if (dialog.type === 'level') {
-    loadFieldOptions()
   }
 
   dialog.show = true

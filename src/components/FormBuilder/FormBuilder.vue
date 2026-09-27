@@ -75,18 +75,6 @@ import {
   defineExpose
 } from 'vue'
 
-// export type SubmitterType = 'submitAndNew' | 'submit';
-
-const inputs = defineModel('inputs', {
-  type: Array as PropType<FormBuilderInputType[]>,
-  default: () => []
-})
-const formData = defineModel('formData', {
-  type: Object,
-  required: true
-})
-const i18nManager = useI18n()
-
 const props = defineProps({
   submitBtnLabel: {
     type: String,
@@ -141,6 +129,18 @@ const props = defineProps({
     default: true
   }
 })
+const emit = defineEmits(['submit', 'cancel', 'on-failed-validation', 'mounted'])
+// export type SubmitterType = 'submitAndNew' | 'submit';
+
+const inputs = defineModel('inputs', {
+  type: Array as PropType<FormBuilderInputType[]>,
+  default: () => []
+})
+const formData = defineModel('formData', {
+  type: Object,
+  required: true
+})
+const i18nManager = useI18n()
 
 interface InputRef {
   type?: string;
@@ -168,8 +168,6 @@ const FormBuilderInputComponent = shallowRef(FormBuilderInput)
 const validation = useValidation()
 const formRef = ref<any>(null)
 const formBuilderRef = ref<InstanceType<typeof FormBuilder> | null>(null)
-const emit = defineEmits(['submit', 'cancel', 'on-failed-validation', 'mounted'])
-
 function onChangeInput () {
   formData.value = Object.assign(formData.value, FormBuilderAssist.getFormData(inputs.value))
 }

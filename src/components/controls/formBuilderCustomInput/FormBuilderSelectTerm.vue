@@ -104,7 +104,11 @@ function getSchoolId (): number | null {
 }
 
 async function getTerms (name: string | null) {
-  const payload: any = { length: 100 }
+  const payload: any = {
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
+    length: 100
+  }
   const schoolId = getSchoolId()
   if (name) payload.name = name
   if (schoolId) payload.school_id = schoolId
@@ -128,7 +132,11 @@ useEntitySelector<AcademicTermType>({
   fetchByIds: async (params) => {
     const schoolId = getSchoolId()
     if (!schoolId) return []
-    return new AcademicTermAPI(schoolId).index(params)
+    return new AcademicTermAPI(schoolId).index({
+      ...params,
+      sortation_field: 'created_at',
+      sortation_order: 'desc'
+    })
   }
 })
 </script>

@@ -219,10 +219,9 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['updated'])
 const $q = useQuasar()
 const router = useRouter()
-const emit = defineEmits(['updated'])
-
 const localGuardians = ref<StudentGuardianType[]>([...props.guardians])
 const editForms = ref<
   Record<

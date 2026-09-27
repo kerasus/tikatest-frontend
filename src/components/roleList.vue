@@ -1,5 +1,71 @@
+<template>
+  <q-list
+    bordered
+    separator
+    class="role-list">
+    <q-item>
+      <q-item-section>
+        <q-item-label>
+          نقش ها
+        </q-item-label>
+      </q-item-section>
+      <q-item-section
+        v-if="(userManager.isAdmin || userManager.isManager) && editMode"
+        side>
+        <div>
+          <q-select
+            v-model="selectedRole"
+            :loading="loading"
+            emit-value
+            map-options
+            :options="availableRoleOptions"
+            label="نقش"
+            style="width: 200px">
+            <template #after>
+              <q-btn
+                v-if="userManager.isAdmin || userManager.isManager"
+                color="primary"
+                flat
+                icon="add"
+                :loading="loading"
+                @click="assignRole" />
+            </template>
+          </q-select>
+        </div>
+      </q-item-section>
+    </q-item>
+    <q-linear-progress
+      v-if="loading"
+      indeterminate />
+    <template v-else>
+      <q-item
+        v-for="(role, roleIndex) in visibleRoles"
+        :key="roleIndex"
+        v-ripple
+        clickable
+        class="role-item">
+        <q-item-section>
+          <q-item-label v-if="role.name">{{ getUserRoleLabel(role.name) }}</q-item-label>
+        </q-item-section>
+        <q-item-section
+          v-if="userManager.isAdmin || userManager.isManager"
+          side>
+          <div>
+            <delete-btn
+              v-if="(userManager.isAdmin || userManager.isManager) && editMode"
+              :row="role"
+              :loading="loading"
+              :change-status-promise="removeRole"
+              :use-flag="false" />
+          </div>
+        </q-item-section>
+      </q-item>
+    </template>
+  </q-list>
+</template>
+
 <script setup lang="ts">
-import { defineEmits, ref } from 'vue'
+import { computed, defineEmits, ref } from 'vue'
 import { useUser } from 'src/stores/user'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import UserAPI, { type UserType, type RoleType, userRoleOptions, getUserRoleLabel } from 'src/repositories/user'
@@ -16,6 +82,20 @@ const userAPI = new UserAPI()
 
 const loading = ref(false)
 const selectedRole = ref(null)
+const availableRoleOptions = computed(() => {
+  if (userManager.isAdmin) {
+    return userRoleOptions
+  }
+
+  return userRoleOptions.filter((role) => role.value !== 'admin')
+})
+const visibleRoles = computed(() => {
+  if (userManager.isAdmin) {
+    return props.user.roles
+  }
+
+  return props.user.roles.filter((role) => role.name !== 'admin')
+})
 
 async function assignRole () {
   if (!props.user?.id || !selectedRole.value) {
@@ -45,72 +125,6 @@ async function removeRole (role: RoleType) {
   }
 }
 </script>
-
-<template>
-  <q-list
-    bordered
-    separator
-    class="role-list">
-    <q-item>
-      <q-item-section>
-        <q-item-label>
-          نقش ها
-        </q-item-label>
-      </q-item-section>
-      <q-item-section
-        v-if="userManager.isAdmin && editMode"
-        side>
-        <div>
-          <q-select
-            v-model="selectedRole"
-            :loading="loading"
-            emit-value
-            map-options
-            :options="userRoleOptions"
-            label="نقش"
-            style="width: 200px">
-            <template #after>
-              <q-btn
-                v-if="userManager.isAdmin"
-                color="primary"
-                flat
-                icon="add"
-                :loading="loading"
-                @click="assignRole" />
-            </template>
-          </q-select>
-        </div>
-      </q-item-section>
-    </q-item>
-    <q-linear-progress
-      v-if="loading"
-      indeterminate />
-    <template v-else>
-      <q-item
-        v-for="(role, roleIndex) in user.roles"
-        :key="roleIndex"
-        v-ripple
-        clickable
-        class="role-item">
-        <q-item-section>
-          <q-item-label v-if="role.name">{{ getUserRoleLabel(role.name) }}</q-item-label>
-        </q-item-section>
-        <q-item-section
-          v-if="userManager.isAdmin"
-          side>
-          <div>
-            <delete-btn
-              v-if="userManager.isAdmin && editMode"
-              :row="role"
-              :loading="loading"
-              :change-status-promise="removeRole"
-              :use-flag="false" />
-          </div>
-        </q-item-section>
-      </q-item>
-    </template>
-  </q-list>
-</template>
 
 <style scoped lang="scss">
 .role-list {

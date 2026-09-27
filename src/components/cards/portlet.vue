@@ -1,9 +1,3 @@
-<script setup lang="ts">
-defineProps<{
-  title: string
-}>()
-</script>
-
 <template>
   <q-card class="card-component">
     <q-card-section class="card-component-header">
@@ -21,6 +15,12 @@ defineProps<{
     </q-card-section>
   </q-card>
 </template>
+
+<script setup lang="ts">
+defineProps<{
+  title: string
+}>()
+</script>
 
 <style scoped lang="scss">
 .card-component {

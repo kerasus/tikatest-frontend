@@ -165,7 +165,11 @@ const optionLabel = ref('title')
 
 async function getExamCategories (name: string | null) {
   const schoolId = props.schoolId
-  const examCategoriesList = await examCategoryAPI.index({ name, school_id: schoolId })
+  const examCategoriesList = await examCategoryAPI.index({
+    name, school_id: schoolId,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
   return examCategoriesList.data
 }
 
@@ -180,7 +184,11 @@ useEntitySelector<ExamCategoryType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'exam categories',
-  fetchByIds: (params) => examCategoryAPI.index(params)
+  fetchByIds: (params) => examCategoryAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 </script>
 

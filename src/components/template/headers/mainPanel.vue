@@ -1,66 +1,3 @@
-<script setup lang="ts">
-import { useQuasar } from 'quasar'
-import moment from 'jalali-moment'
-import { useRouter } from 'vue-router'
-import { useUser } from 'src/stores/user'
-import { useAppLayout } from 'stores/appLayout'
-import { ref, onMounted, onUnmounted } from 'vue'
-import { userRoleOptions } from 'src/repositories/user'
-import { useHeaderBreadCrumbs } from 'src/stores/headerBreadCrumbs'
-
-withDefaults(defineProps<{ floated?: boolean }>(), {
-  floated: false
-})
-
-const $q = useQuasar()
-const router = useRouter()
-const userManager = useUser()
-const appLayoutStore = useAppLayout()
-const headerBreadCrumbsStore = useHeaderBreadCrumbs()
-const formattedDate = ref('')
-const formattedTime = ref('')
-
-function updateDateTime () {
-  const now = moment()
-  formattedDate.value = now.format('jYYYY/jMM/jDD')
-  formattedTime.value = now.format('HH:mm')
-}
-
-function translateRole (roleName: string): string {
-  const target = userRoleOptions.find((role) => role.value === roleName)
-  if (!target) {
-    return '-'
-  }
-
-  return target.label
-}
-
-let timer: any
-onMounted(() => {
-  updateDateTime()
-  timer = setInterval(updateDateTime, 60000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
-
-function toggleLeftDrawerMini () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
-  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
-}
-
-function toggleLeftDrawerVisible () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
-  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
-}
-
-function logout () {
-  userManager.logout()
-  router.push({ name: 'Auth.Login' })
-}
-</script>
-
 <template>
   <div
     class="main-dashboard-wrapper"
@@ -215,6 +152,69 @@ function logout () {
     </q-toolbar>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useQuasar } from 'quasar'
+import moment from 'jalali-moment'
+import { useRouter } from 'vue-router'
+import { useUser } from 'src/stores/user'
+import { useAppLayout } from 'stores/appLayout'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { userRoleOptions } from 'src/repositories/user'
+import { useHeaderBreadCrumbs } from 'src/stores/headerBreadCrumbs'
+
+withDefaults(defineProps<{ floated?: boolean }>(), {
+  floated: false
+})
+
+const $q = useQuasar()
+const router = useRouter()
+const userManager = useUser()
+const appLayoutStore = useAppLayout()
+const headerBreadCrumbsStore = useHeaderBreadCrumbs()
+const formattedDate = ref('')
+const formattedTime = ref('')
+
+function updateDateTime () {
+  const now = moment()
+  formattedDate.value = now.format('jYYYY/jMM/jDD')
+  formattedTime.value = now.format('HH:mm')
+}
+
+function translateRole (roleName: string): string {
+  const target = userRoleOptions.find((role) => role.value === roleName)
+  if (!target) {
+    return '-'
+  }
+
+  return target.label
+}
+
+let timer: any
+onMounted(() => {
+  updateDateTime()
+  timer = setInterval(updateDateTime, 60000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
+
+function toggleLeftDrawerMini () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
+  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
+}
+
+function toggleLeftDrawerVisible () {
+  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
+  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
+}
+
+function logout () {
+  userManager.logout()
+  router.push({ name: 'Auth.Login' })
+}
+</script>
 
 <style scoped lang="scss">
 .main-dashboard-wrapper {

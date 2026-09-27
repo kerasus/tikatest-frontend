@@ -92,8 +92,10 @@
           alt="پیش‌نمایش تصویر"
           style="width: 120px; height: 80px; cursor: pointer; border-radius: 4px"
           @click="openPreview" />
-        <span class="q-ml-sm text-grey">
-          {{ currentItem.file ? currentItem.file.name : currentItem.path || '' }}
+        <span
+          v-if="currentItem.file"
+          class="q-ml-sm text-grey">
+          {{ currentItem.file.name }}
         </span>
       </template>
       <template v-else-if="currentItem.type === 'pdf' && currentItem.path">
@@ -108,10 +110,24 @@
           {{ currentItem.file ? currentItem.file.name : currentItem.path }}
         </span>
       </template>
-      <span v-else-if="currentItem.type === 'text' && currentItem.body">
-        {{ currentItem.body.substring(0, 100) }}{{ currentItem.body.length > 100 ? '...' : '' }}
-      </span>
+      <div
+        v-else-if="currentItem.type === 'text' && currentItem.body"
+        class="row items-start q-col-gutter-sm">
+        <div class="col ellipsis-3-lines">
+          {{ currentItem.body }}
+        </div>
+        <div class="col-auto">
+          <q-btn
+            flat
+            dense
+            color="primary"
+            icon="visibility"
+            label="نمایش متن"
+            @click="openTextPreview" />
+        </div>
+      </div>
     </div>
+
     <div
       v-else
       class="text-center q-pa-md text-grey">محتوایی ثبت نشده است.</div>
@@ -137,6 +153,39 @@
             :src="previewSrc"
             alt="پیش‌نمایش تصویر"
             style="width: 100%; height: auto; display: block">
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="textPreviewDialog">
+      <q-card
+        style="
+          max-width: 99vw;
+          min-width: 99vw;
+          height: 99vh;
+          display: flex;
+          flex-direction: column;
+        ">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="col">
+            <div class="text-subtitle2">نمایش متن کامل</div>
+          </div>
+          <div class="col-auto">
+            <q-btn
+              v-close-popup
+              flat
+              round
+              dense
+              icon="close"
+              color="grey" />
+          </div>
+        </q-card-section>
+        <q-card-section class="col scroll">
+          <div
+            class="text-body1"
+            style="white-space: pre-wrap; overflow-wrap: anywhere">
+            {{ currentItem?.body }}
+          </div>
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -178,11 +227,11 @@
 import { ref, watch, computed } from 'vue'
 import type { ContentType } from 'src/repositories/exam'
 
-const modelValue = defineModel<ContentType | null>('value')
-
 defineProps<{
   editable?: boolean;
 }>()
+
+const modelValue = defineModel<ContentType | null>('value')
 
 const typeOptions = [
   { label: 'تصویر', value: 'image' },
@@ -196,6 +245,7 @@ const currentFile = ref<File | null>(null)
 const imageFileInput = ref<HTMLInputElement | null>(null)
 const pdfFileInput = ref<HTMLInputElement | null>(null)
 const previewDialog = ref(false)
+const textPreviewDialog = ref(false)
 const pdfPreviewDialog = ref(false)
 const pdfPreviewSrc = ref('')
 
@@ -268,6 +318,10 @@ function openPreview () {
   if (previewSrc.value) {
     previewDialog.value = true
   }
+}
+
+function openTextPreview () {
+  textPreviewDialog.value = true
 }
 
 function openPdfPreview () {

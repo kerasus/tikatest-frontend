@@ -87,9 +87,6 @@ defineOptions({
   name: 'FormBuilderDate'
 })
 
-const dateManager = useDate()
-const i18n = useI18n()
-
 const props = defineProps({
   name: {
     default: '',
@@ -208,6 +205,12 @@ const props = defineProps({
     type: Boolean || String
   }
 })
+const value: ModelRef<string | null> = defineModel('value', {
+  type: String,
+  default: null
+})
+const dateManager = useDate()
+const i18n = useI18n()
 
 const displayDateTime: Ref<string> = ref('')
 const popupDate = ref(false)
@@ -215,11 +218,6 @@ const popupDate = ref(false)
 const persistentMenu = ref(false)
 const input = ref<HTMLInputElement | null>(null)
 const localErrorMessage: Ref<string | null> = ref(null)
-
-const value: ModelRef<string | null> = defineModel('value', {
-  type: String,
-  default: null
-})
 
 const customClass = computed(() => props.class)
 const showClearAble = computed(() => displayDateTime.value !== '____/__/__')

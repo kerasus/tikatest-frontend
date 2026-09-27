@@ -1,74 +1,3 @@
-<script setup lang="ts">
-import { formatFileSize } from './assist'
-import FileIconComponent from './fileIcon.vue'
-import type { SavedSourcesType } from '../index.vue'
-import { defineEmits, ref } from 'vue'
-import ImagePreview from 'src/components/cards/imagePreview.vue'
-import { useImageSrc } from './useImageSrc'
-
-const props = withDefaults(
-  defineProps<{
-    file?: File;
-    srcUrl?: string;
-    srcObj?: SavedSourcesType;
-    label?: string;
-  }>(),
-  {
-    file: undefined,
-    srcUrl: '',
-    srcObj: undefined,
-    label: ''
-  }
-)
-
-const imagePreviewDialog = ref(false)
-const emit = defineEmits<{ (e: 'delete', file: File | string | SavedSourcesType): void }>()
-
-const { imageSrc } = useImageSrc(props.file, props.srcUrl, props.srcObj)
-
-function deleteFile () {
-  if (props.file) {
-    emit('delete', props.file)
-  } else if (props.srcUrl) {
-    emit('delete', props.srcUrl)
-  } else if (props.srcObj) {
-    emit('delete', props.srcObj)
-  }
-}
-
-function downloadFile (file: File) {
-  const fileUrl = URL.createObjectURL(file)
-  const fileName = file.name
-  fetch(fileUrl)
-    .then((response) => response.blob())
-    .then((blob) => {
-      const blobUrl = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.download = fileName
-      link.click()
-      URL.revokeObjectURL(blobUrl)
-    })
-    .catch((error) => {
-      console.error('Error downloading file:', error)
-    })
-}
-
-function showImagePreviewDialog () {
-  imagePreviewDialog.value = true
-}
-
-function closeImagePreviewDialog () {
-  imagePreviewDialog.value = false
-}
-
-function extractFileNameFromSrcUrl (url: string) {
-  const regex = /\/([^/?]+)\?/
-  const match = url.match(regex)
-  return match ? match[1] : null
-}
-</script>
-
 <template>
   <div class="flex q-pa-sm file-preview justify-between items-center no-wrap">
     <div class="image-preview">
@@ -138,6 +67,76 @@ function extractFileNameFromSrcUrl (url: string) {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { formatFileSize } from './assist'
+import FileIconComponent from './fileIcon.vue'
+import type { SavedSourcesType } from '../index.vue'
+import { defineEmits, ref } from 'vue'
+import ImagePreview from 'src/components/cards/imagePreview.vue'
+import { useImageSrc } from './useImageSrc'
+
+const props = withDefaults(
+  defineProps<{
+    file?: File;
+    srcUrl?: string;
+    srcObj?: SavedSourcesType;
+    label?: string;
+  }>(),
+  {
+    file: undefined,
+    srcUrl: '',
+    srcObj: undefined,
+    label: ''
+  }
+)
+
+const emit = defineEmits<{ (e: 'delete', file: File | string | SavedSourcesType): void }>()
+const imagePreviewDialog = ref(false)
+const { imageSrc } = useImageSrc(props.file, props.srcUrl, props.srcObj)
+
+function deleteFile () {
+  if (props.file) {
+    emit('delete', props.file)
+  } else if (props.srcUrl) {
+    emit('delete', props.srcUrl)
+  } else if (props.srcObj) {
+    emit('delete', props.srcObj)
+  }
+}
+
+function downloadFile (file: File) {
+  const fileUrl = URL.createObjectURL(file)
+  const fileName = file.name
+  fetch(fileUrl)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = fileName
+      link.click()
+      URL.revokeObjectURL(blobUrl)
+    })
+    .catch((error) => {
+      console.error('Error downloading file:', error)
+    })
+}
+
+function showImagePreviewDialog () {
+  imagePreviewDialog.value = true
+}
+
+function closeImagePreviewDialog () {
+  imagePreviewDialog.value = false
+}
+
+function extractFileNameFromSrcUrl (url: string) {
+  const regex = /\/([^/?]+)\?/
+  const match = url.match(regex)
+  return match ? match[1] : null
+}
+</script>
 
 <style scoped lang="scss">
 $icon-preview-width: $space-10;

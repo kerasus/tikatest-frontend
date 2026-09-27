@@ -1,3 +1,48 @@
+<template>
+  <entity-index
+    ref="entityIndexRef"
+    :value="listInputs"
+    :title="listLabel"
+    :api="api"
+    :table="table"
+    :table-keys="tableKeys"
+    :show-route-name="showRouteName"
+    :show-close-button="false"
+    :show-expand-button="false"
+    :show-reload-button="false"
+    :show-search-button="true"
+    :row-key="itemIdentifyKey">
+    <template #entity-index-table-cell="{ inputData }">
+      <template v-if="inputData.col.name === 'actions'">
+        <div class="action-column-entity-index">
+          <q-btn
+            color="primary"
+            flat
+            icon="visibility"
+            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
+        </div>
+      </template>
+      <template v-else-if="inputData.col.name === 'status'">
+        <q-badge :color="getTransferStatusColor(inputData.props.row.status)">
+          {{ inputData.props.row.status_label }}
+        </q-badge>
+        <span v-if="inputData.props.row.status !== 'pending'">
+          در
+        </span>
+        <span v-if="inputData.props.row.status === 'approved'">
+          {{ dateManager.miladiToShamsi(inputData.props.row.approved_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') }}
+        </span>
+        <span v-if="inputData.props.row.status === 'rejected'">
+          {{ dateManager.miladiToShamsi(inputData.props.row.rejected_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') }}
+        </span>
+      </template>
+      <template v-else>
+        {{ inputData.col.value }}
+      </template>
+    </template>
+  </entity-index>
+</template>
+
 <script setup lang="ts">
 // @ts-nocheck
 import { useQuasar } from 'quasar'
@@ -133,48 +178,3 @@ defineExpose({
   reloadList
 })
 </script>
-
-<template>
-  <entity-index
-    ref="entityIndexRef"
-    :value="listInputs"
-    :title="listLabel"
-    :api="api"
-    :table="table"
-    :table-keys="tableKeys"
-    :show-route-name="showRouteName"
-    :show-close-button="false"
-    :show-expand-button="false"
-    :show-reload-button="false"
-    :show-search-button="true"
-    :row-key="itemIdentifyKey">
-    <template #entity-index-table-cell="{ inputData }">
-      <template v-if="inputData.col.name === 'actions'">
-        <div class="action-column-entity-index">
-          <q-btn
-            color="primary"
-            flat
-            icon="visibility"
-            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
-        </div>
-      </template>
-      <template v-else-if="inputData.col.name === 'status'">
-        <q-badge :color="getTransferStatusColor(inputData.props.row.status)">
-          {{ inputData.props.row.status_label }}
-        </q-badge>
-        <span v-if="inputData.props.row.status !== 'pending'">
-          در
-        </span>
-        <span v-if="inputData.props.row.status === 'approved'">
-          {{ dateManager.miladiToShamsi(inputData.props.row.approved_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') }}
-        </span>
-        <span v-if="inputData.props.row.status === 'rejected'">
-          {{ dateManager.miladiToShamsi(inputData.props.row.rejected_at, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') }}
-        </span>
-      </template>
-      <template v-else>
-        {{ inputData.col.value }}
-      </template>
-    </template>
-  </entity-index>
-</template>

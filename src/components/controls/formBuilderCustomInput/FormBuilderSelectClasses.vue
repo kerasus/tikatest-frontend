@@ -117,7 +117,11 @@ const { normalizeIds } = useEntitySelector<SchoolClassType>({
   schoolId: () => props.schoolId,
   filteredOptions: selectedClasses,
   entityName: 'classes',
-  fetchByIds: (params) => schoolClassAPI.index(params)
+  fetchByIds: (params) => schoolClassAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 
 watch(localSchoolId, () => {
@@ -170,7 +174,9 @@ watch(
   () => props.value,
   (value) => {
     const ids = new Set(normalizeIds(value))
-    selectedClasses.value = selectedClasses.value.filter((item) => item.id !== null && ids.has(item.id))
+    selectedClasses.value = selectedClasses.value.filter(
+      (item) => item.id !== null && ids.has(item.id)
+    )
   },
   { deep: true }
 )

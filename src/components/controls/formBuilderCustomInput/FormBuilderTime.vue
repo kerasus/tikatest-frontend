@@ -114,18 +114,6 @@ defineOptions({
   name: 'FormBuilderTime'
 })
 
-const { t: rawT } = useI18n()
-const dateManager = useDate()
-
-
-interface DateTimeObject {
-  date: string
-  time: string
-  hours: string
-  minutes: string
-  seconds: string
-}
-
 const props = withDefaults(defineProps<FormBuilderInputType>(), {
   name: '',
   calendar: 'persian',
@@ -155,6 +143,21 @@ const props = withDefaults(defineProps<FormBuilderInputType>(), {
   lazyRules: false,
   loading: false
 })
+const localValue: ModelRef<string | null> = defineModel('value', {
+  type: String,
+  default: null
+})
+const { t: rawT } = useI18n()
+const dateManager = useDate()
+
+
+interface DateTimeObject {
+  date: string
+  time: string
+  hours: string
+  minutes: string
+  seconds: string
+}
 
 const localMask = ref('##:##:##')
 const localDisplayDateTime: Ref<string> = ref('')
@@ -173,11 +176,6 @@ const dateTime = reactive<DateTimeObject>({
   hours: '__',
   minutes: '__',
   seconds: '__'
-})
-
-const localValue: ModelRef<string | null> = defineModel('value', {
-  type: String,
-  default: null
 })
 
 const customClass = computed(() => props.class)

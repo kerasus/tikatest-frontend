@@ -1,3 +1,112 @@
+<template>
+  ss
+<!--  <q-list bordered separator class="unit-user-list">-->
+<!--    <q-item>-->
+<!--      <q-item-section>-->
+<!--        <q-item-label>-->
+<!--          <span v-if="userRole === 'resident'">-->
+<!--            ساکنین-->
+<!--          </span>-->
+<!--          <span v-else-if="userRole === 'owner'">-->
+<!--            مالکین-->
+<!--          </span>-->
+<!--        </q-item-label>-->
+<!--      </q-item-section>-->
+<!--      <q-item-section v-if="userManager.isManager && editMode"-->
+<!--                      side>-->
+<!--        <div>-->
+<!--          <q-input v-model="inputUserId"-->
+<!--                   :loading="loading"-->
+<!--                    label="user_id">-->
+<!--            <template #after>-->
+<!--              <q-btn v-if="userManager.isManager"-->
+<!--                     color="primary"-->
+<!--                     flat-->
+<!--                     icon="add"-->
+<!--                     :loading="loading"-->
+<!--                     @click="attachUser"-->
+<!--              />-->
+<!--            </template>-->
+<!--          </q-input>-->
+<!--        </div>-->
+<!--      </q-item-section>-->
+<!--    </q-item>-->
+<!--    <q-linear-progress v-if="loading"-->
+<!--                       indeterminate />-->
+<!--    <template v-else>-->
+<!--      <q-item v-for="(user, userIndex) in users"-->
+<!--              :key="userIndex"-->
+<!--              v-ripple-->
+<!--              clickable-->
+<!--              class="unit-user-item"-->
+<!--      >-->
+<!--        <q-item-section avatar-->
+<!--                        class="gt-md">-->
+<!--          <q-icon name="account_circle" />-->
+<!--        </q-item-section>-->
+<!--        <q-item-section class="user-info-section">-->
+<!--          <q-item-label>{{ getUnitUserFullname(user) }}</q-item-label>-->
+<!--          <q-item-label caption>-->
+<!--            {{ user.mobile }}-->
+<!--          </q-item-label>-->
+<!--        </q-item-section>-->
+<!--        <q-item-section v-if="userManager.isManager"-->
+<!--                        side>-->
+<!--          <div class="actions-on-user text-grey-8">-->
+<!--            <template v-if="!editMode">-->
+<!--              <q-btn v-if="user.mobile"-->
+<!--                     flat-->
+<!--                     color="grey"-->
+<!--                     icon="call"-->
+<!--                     class="btn-call-user"-->
+<!--                     @click="callResidentPhoneNumber(user.mobile)"  />-->
+<!--              <q-btn v-if="userManager.isManager && user.id"-->
+<!--                     flat-->
+<!--                     round-->
+<!--                     color="grey"-->
+<!--                     icon="img:/panel/images/icons/sms-auth.png"-->
+<!--                     @click="sendSMSConfirmation(user.id ,'auth')"/>-->
+<!--              <q-btn v-if="userManager.isManager && user.id"-->
+<!--                     flat-->
+<!--                     round-->
+<!--                     color="grey"-->
+<!--                     icon="img:/panel/images/icons/sms-debt.png"-->
+<!--                     @click="sendSMSConfirmation(user.id, userRole === 'resident' ? 'debt-resident' : 'debt-owner')"/>-->
+<!--              <q-btn v-if="userManager.isManager"-->
+<!--                     flat-->
+<!--                     round-->
+<!--                     icon="visibility"-->
+<!--                     color="grey"-->
+<!--                     :to="{ name: 'Panel.User.Show', params: {id: user.id}}"-->
+<!--              />-->
+<!--            </template>-->
+
+<!--            <delete-btn v-if="userManager.isManager && editMode"-->
+<!--                        :row="user"-->
+<!--                        :loading="loading"-->
+<!--                        :change-status-promise="detachUser"-->
+<!--                        :use-flag="false"-->
+<!--            />-->
+<!--          </div>-->
+<!--        </q-item-section>-->
+<!--      </q-item>-->
+<!--    </template>-->
+<!--  </q-list>-->
+<!--  <q-dialog v-model="showSMSDialog" :persistent="sendSMSLoading">-->
+<!--    <confirmation v-if="confirmationMessage"-->
+<!--      title="توجه"-->
+<!--      :message="confirmationMessage"-->
+<!--      submit-label="بله"-->
+<!--      cancel-label="انصراف"-->
+<!--      icon="feedback"-->
+<!--      title-color="warning"-->
+<!--      :loading="sendSMSLoading"-->
+<!--      @submit="onsubmitSendSMS"-->
+<!--      @cancel="hideDialog"-->
+<!--    />-->
+<!--  </q-dialog>-->
+</template>
+
 <script setup lang="ts">
 // import { useQuasar } from 'quasar';
 // import { useUser } from 'src/stores/user';
@@ -146,115 +255,6 @@
 //   }
 // }
 </script>
-
-<template>
-  ss
-<!--  <q-list bordered separator class="unit-user-list">-->
-<!--    <q-item>-->
-<!--      <q-item-section>-->
-<!--        <q-item-label>-->
-<!--          <span v-if="userRole === 'resident'">-->
-<!--            ساکنین-->
-<!--          </span>-->
-<!--          <span v-else-if="userRole === 'owner'">-->
-<!--            مالکین-->
-<!--          </span>-->
-<!--        </q-item-label>-->
-<!--      </q-item-section>-->
-<!--      <q-item-section v-if="userManager.isManager && editMode"-->
-<!--                      side>-->
-<!--        <div>-->
-<!--          <q-input v-model="inputUserId"-->
-<!--                   :loading="loading"-->
-<!--                    label="user_id">-->
-<!--            <template #after>-->
-<!--              <q-btn v-if="userManager.isManager"-->
-<!--                     color="primary"-->
-<!--                     flat-->
-<!--                     icon="add"-->
-<!--                     :loading="loading"-->
-<!--                     @click="attachUser"-->
-<!--              />-->
-<!--            </template>-->
-<!--          </q-input>-->
-<!--        </div>-->
-<!--      </q-item-section>-->
-<!--    </q-item>-->
-<!--    <q-linear-progress v-if="loading"-->
-<!--                       indeterminate />-->
-<!--    <template v-else>-->
-<!--      <q-item v-for="(user, userIndex) in users"-->
-<!--              :key="userIndex"-->
-<!--              v-ripple-->
-<!--              clickable-->
-<!--              class="unit-user-item"-->
-<!--      >-->
-<!--        <q-item-section avatar-->
-<!--                        class="gt-md">-->
-<!--          <q-icon name="account_circle" />-->
-<!--        </q-item-section>-->
-<!--        <q-item-section class="user-info-section">-->
-<!--          <q-item-label>{{ getUnitUserFullname(user) }}</q-item-label>-->
-<!--          <q-item-label caption>-->
-<!--            {{ user.mobile }}-->
-<!--          </q-item-label>-->
-<!--        </q-item-section>-->
-<!--        <q-item-section v-if="userManager.isManager"-->
-<!--                        side>-->
-<!--          <div class="actions-on-user text-grey-8">-->
-<!--            <template v-if="!editMode">-->
-<!--              <q-btn v-if="user.mobile"-->
-<!--                     flat-->
-<!--                     color="grey"-->
-<!--                     icon="call"-->
-<!--                     class="btn-call-user"-->
-<!--                     @click="callResidentPhoneNumber(user.mobile)"  />-->
-<!--              <q-btn v-if="userManager.isManager && user.id"-->
-<!--                     flat-->
-<!--                     round-->
-<!--                     color="grey"-->
-<!--                     icon="img:/panel/images/icons/sms-auth.png"-->
-<!--                     @click="sendSMSConfirmation(user.id ,'auth')"/>-->
-<!--              <q-btn v-if="userManager.isManager && user.id"-->
-<!--                     flat-->
-<!--                     round-->
-<!--                     color="grey"-->
-<!--                     icon="img:/panel/images/icons/sms-debt.png"-->
-<!--                     @click="sendSMSConfirmation(user.id, userRole === 'resident' ? 'debt-resident' : 'debt-owner')"/>-->
-<!--              <q-btn v-if="userManager.isManager"-->
-<!--                     flat-->
-<!--                     round-->
-<!--                     icon="visibility"-->
-<!--                     color="grey"-->
-<!--                     :to="{ name: 'Panel.User.Show', params: {id: user.id}}"-->
-<!--              />-->
-<!--            </template>-->
-
-<!--            <delete-btn v-if="userManager.isManager && editMode"-->
-<!--                        :row="user"-->
-<!--                        :loading="loading"-->
-<!--                        :change-status-promise="detachUser"-->
-<!--                        :use-flag="false"-->
-<!--            />-->
-<!--          </div>-->
-<!--        </q-item-section>-->
-<!--      </q-item>-->
-<!--    </template>-->
-<!--  </q-list>-->
-<!--  <q-dialog v-model="showSMSDialog" :persistent="sendSMSLoading">-->
-<!--    <confirmation v-if="confirmationMessage"-->
-<!--      title="توجه"-->
-<!--      :message="confirmationMessage"-->
-<!--      submit-label="بله"-->
-<!--      cancel-label="انصراف"-->
-<!--      icon="feedback"-->
-<!--      title-color="warning"-->
-<!--      :loading="sendSMSLoading"-->
-<!--      @submit="onsubmitSendSMS"-->
-<!--      @cancel="hideDialog"-->
-<!--    />-->
-<!--  </q-dialog>-->
-</template>
 
 <style scoped lang="scss">
 .unit-user-list {

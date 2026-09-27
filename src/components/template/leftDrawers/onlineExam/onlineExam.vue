@@ -103,7 +103,7 @@
             <div class="row q-col-gutter-sm text-caption">
               <div class="col-6">
                 <div class="text-grey-7">نمره</div>
-                <div class="text-subtitle2">{{ session.score ?? 0 }}</div>
+                <div class="text-subtitle2">{{ session.t_score ?? 0 }}</div>
               </div>
               <div class="col-6">
                 <div class="text-grey-7">درصد</div>

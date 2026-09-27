@@ -389,8 +389,8 @@ function onKeyPress (event: Event) {
 function onBlur () {
   if (
     props.decimalScale !== null &&
-      ['number', 'number+', 'number-'].includes(props.inputType) &&
-      inputData.value !== ''
+    ['number', 'number+', 'number-'].includes(props.inputType) &&
+    inputData.value !== ''
   ) {
     const numericValue = parseFloat(inputData.value)
     if (!isNaN(numericValue)) {
@@ -432,7 +432,7 @@ function isValidInput (strategyType: string, inputValue: InputValueType): boolea
 
     if (
       props.decimalScale !== null &&
-        ['number', 'number+', 'number-'].includes(strategyType)
+      ['number', 'number+', 'number-'].includes(strategyType)
     ) {
       const parts = stringValue.split('.')
       if (parts.length === 2) {
@@ -472,7 +472,7 @@ function isValidInput (strategyType: string, inputValue: InputValueType): boolea
 
   if (
     props.decimalScale !== null &&
-      ['number', 'number+', 'number-'].includes(strategyType)
+    ['number', 'number+', 'number-'].includes(strategyType)
   ) {
     const parts = stringValue.split('.')
     if (parts.length === 2) {
@@ -541,9 +541,9 @@ function getNormalizedInputValueForSetter (
 
     if (
       props.decimalScale !== null &&
-        ['number', 'number+', 'number-'].includes(strategyType) &&
-        typeof inputValue === 'string' &&
-        inputValue !== ''
+      ['number', 'number+', 'number-'].includes(strategyType) &&
+      typeof inputValue === 'string' &&
+      inputValue !== ''
     ) {
       const numericValue = parseFloat(inputValue || '0')
       if (!isNaN(numericValue)) {
@@ -558,15 +558,15 @@ function getNormalizedInputValueForSetter (
 
   if (
     typeof inputValue === 'string' &&
-      [
-        'text',
-        'textarea',
-        'search',
-        'persian',
-        'tradingCode'
-      ].includes(
-        strategyType
-      )
+    [
+      'text',
+      'textarea',
+      'search',
+      'persian',
+      'tradingCode'
+    ].includes(
+      strategyType
+    )
   ) {
     inputValue = normalizePersianLetters(inputValue)
   }

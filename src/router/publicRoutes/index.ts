@@ -9,7 +9,8 @@ export const index: RouteRecordRaw[] = [
         layoutHeader: false,
         layoutLeftDrawer: false,
         layoutRightDrawer: false,
-        layoutFooter: false
+        layoutFooter: false,
+        pageCustomClass: ''
       }
     },
     name: 'HomePage',

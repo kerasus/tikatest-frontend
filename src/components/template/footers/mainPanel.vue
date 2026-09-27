@@ -1,10 +1,3 @@
-<script setup lang="ts">
-
-import { useAppConfig } from 'stores/appConfig'
-
-const appConfig = useAppConfig()
-</script>
-
 <template>
   <div class="main-dashboard">
     <span class="app-version">
@@ -15,6 +8,13 @@ const appConfig = useAppConfig()
     </span>
   </div>
 </template>
+
+<script setup lang="ts">
+
+import { useAppConfig } from 'stores/appConfig'
+
+const appConfig = useAppConfig()
+</script>
 
 <style scoped lang="scss">
 .main-dashboard {

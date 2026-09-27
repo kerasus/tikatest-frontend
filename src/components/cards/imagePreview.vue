@@ -30,8 +30,6 @@
 
 <script setup lang="ts">
 import { defineEmits, ref, watch } from 'vue'
-const imageLoaded = ref(false)
-
 const props = withDefaults(
   defineProps<{
     title?: string | null;
@@ -44,6 +42,8 @@ const props = withDefaults(
 )
 
 const emit = defineEmits(['cancel'])
+
+const imageLoaded = ref(false)
 
 const cancel = (event: Event) => {
   emit('cancel', event)

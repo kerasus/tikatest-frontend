@@ -1,6 +1,7 @@
 import BaseAPI from './BaseAPI'
-import type { AcademicTermType } from './academicTerm'
 import type { SchoolClassType } from './schoolClass'
+import type { AcademicTermType } from './academicTerm'
+import type { SchoolType } from 'src/repositories/school'
 
 export type TermEnrollmentType = {
   id: number | null
@@ -14,9 +15,10 @@ export type TermEnrollmentType = {
   term?: AcademicTermType | null
   school_class?: SchoolClassType | null
   class?: SchoolClassType | null
-  school?: { id: number | null; name: string | null } | null
+  school?: SchoolType | null
   created_at: string | null
   updated_at: string | null
+  deleted_at: string | null
 }
 
 export type TermEnrollmentPayload = Pick<
@@ -40,7 +42,8 @@ export default class TermEnrollmentAPI extends BaseAPI<TermEnrollmentType> {
       enrolled_at: null,
       left_at: null,
       created_at: null,
-      updated_at: null
+      updated_at: null,
+      deleted_at: null
     }
   }
 

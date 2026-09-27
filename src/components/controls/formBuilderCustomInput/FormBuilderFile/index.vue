@@ -1,3 +1,66 @@
+<template>
+  <div class="form-builder-file-picker">
+    <div
+      class="column items-center justify-center uploader"
+      @dragover.prevent
+      @drop.prevent="handleDrop"
+      @dragenter="isDragging = true"
+      @dragleave="isDragging = false">
+      <q-icon
+        name="oms:gallery-import"
+        color="black" />
+      <div class="full-width row no-wrap items-center justify-between">
+        <div class="column">
+          <div class="uploader__title">
+            {{ label }}
+          </div>
+        </div>
+        <q-btn
+          class="no-wrap"
+          color="secondary"
+          type="a"
+          outline
+          dense
+          @click="select">
+          {{ $t('general.selectFile') }}
+        </q-btn>
+      </div>
+      <div
+        v-if="sizeRuleValue"
+        class="maximum-size">
+        {{ $t('general.maxFIleSize') }} {{ sizeRuleValue }}
+      </div>
+    </div>
+    <q-file
+      v-if="!hasUploadedFiles"
+      ref="input"
+      v-model="qFileInputModelValue"
+      :rules="rules"
+      :multiple="multiple"
+      @update:model-value="onUpdateQFile" />
+    <div class="body-preview">
+      <form-builder-file-preview
+        v-for="(file, fileIndex) in selectedFiles"
+        :key="fileIndex"
+        :file="file"
+        :label="label"
+        @delete="atClickRemoveFileBtn" />
+      <form-builder-file-preview
+        v-for="(srcUrl, fileIndex) in savedSources"
+        :key="fileIndex"
+        :src-url="srcUrl"
+        :label="label"
+        @delete="atClickRemoveSrcUrlBtn" />
+      <form-builder-file-preview
+        v-for="(srcObj, fileIndex) in savedSourcesObject"
+        :key="fileIndex"
+        :src-obj="srcObj"
+        :label="label"
+        @delete="atClickRemoveSrcObjBtn" />
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { ValidationRule } from 'quasar'
 import { formatFileSize } from './components/assist'
@@ -7,17 +70,6 @@ import { ref, type ComponentPublicInstance, computed, watch, nextTick } from 'vu
 defineOptions({
   name: 'FormBuilderFile'
 })
-
-interface QFileComponent extends ComponentPublicInstance {
-  pickFiles: () => void;
-  resetValidation: () => void;
-  hasError: boolean;
-}
-export interface SavedSourcesType {
-  name: string;
-  path: string;
-  size: number;
-}
 
 const props = withDefaults(
   defineProps<{
@@ -36,6 +88,16 @@ const value = defineModel('value', {
   type: [File, String, Object, null],
   default: () => []
 })
+interface QFileComponent extends ComponentPublicInstance {
+  pickFiles: () => void;
+  resetValidation: () => void;
+  hasError: boolean;
+}
+export interface SavedSourcesType {
+  name: string;
+  path: string;
+  size: number;
+}
 
 const isDragging = ref(false)
 const selectedFiles = ref<File[]>([])
@@ -240,69 +302,6 @@ watch(
   }
 )
 </script>
-
-<template>
-  <div class="form-builder-file-picker">
-    <div
-      class="column items-center justify-center uploader"
-      @dragover.prevent
-      @drop.prevent="handleDrop"
-      @dragenter="isDragging = true"
-      @dragleave="isDragging = false">
-      <q-icon
-        name="oms:gallery-import"
-        color="black" />
-      <div class="full-width row no-wrap items-center justify-between">
-        <div class="column">
-          <div class="uploader__title">
-            {{ label }}
-          </div>
-        </div>
-        <q-btn
-          class="no-wrap"
-          color="secondary"
-          type="a"
-          outline
-          dense
-          @click="select">
-          {{ $t('general.selectFile') }}
-        </q-btn>
-      </div>
-      <div
-        v-if="sizeRuleValue"
-        class="maximum-size">
-        {{ $t('general.maxFIleSize') }} {{ sizeRuleValue }}
-      </div>
-    </div>
-    <q-file
-      v-if="!hasUploadedFiles"
-      ref="input"
-      v-model="qFileInputModelValue"
-      :rules="rules"
-      :multiple="multiple"
-      @update:model-value="onUpdateQFile" />
-    <div class="body-preview">
-      <form-builder-file-preview
-        v-for="(file, fileIndex) in selectedFiles"
-        :key="fileIndex"
-        :file="file"
-        :label="label"
-        @delete="atClickRemoveFileBtn" />
-      <form-builder-file-preview
-        v-for="(srcUrl, fileIndex) in savedSources"
-        :key="fileIndex"
-        :src-url="srcUrl"
-        :label="label"
-        @delete="atClickRemoveSrcUrlBtn" />
-      <form-builder-file-preview
-        v-for="(srcObj, fileIndex) in savedSourcesObject"
-        :key="fileIndex"
-        :src-obj="srcObj"
-        :label="label"
-        @delete="atClickRemoveSrcObjBtn" />
-    </div>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 .form-builder-file-picker {

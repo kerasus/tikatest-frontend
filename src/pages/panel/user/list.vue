@@ -41,15 +41,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
+import { ref, shallowRef } from 'vue'
 import { EntityIndex } from 'quasar-crud'
 import UserAPI from 'src/repositories/user'
 import { useDate } from 'src/composables/Date'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import { type UserType, getUserRoleLabel, userRoleOptions } from 'src/repositories/user'
 import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
-import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
 const userAPI = new UserAPI()

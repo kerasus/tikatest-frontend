@@ -1,3 +1,37 @@
+<template>
+  <template
+    v-for="item in items"
+    :key="item.title">
+    <q-expansion-item
+      v-if="hasChild(item)"
+      :model-value="item.expanded"
+      :label="(item.title)"
+      :icon="item.icon"
+      class="menu-item">
+      <list-item
+        :items="item.child"
+        :mini="mini" />
+    </q-expansion-item>
+    <q-item
+      v-else
+      v-ripple
+      :active="isActive(item)"
+      :to="item.route"
+      clickable
+      class="menu-item"
+      :class="{ mini: mini }">
+      <q-item-section avatar>
+        <q-icon
+          :name="item.icon"
+          :color="item.iconColor" />
+      </q-item-section>
+      <q-item-section>
+        <q-item-label>{{ (item.title) }}</q-item-label>
+      </q-item-section>
+    </q-item>
+  </template>
+</template>
+
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { watch, type ModelRef } from 'vue'
@@ -12,13 +46,13 @@ interface ListItem {
   expanded?: boolean;
 }
 
+withDefaults(defineProps<{ mini?: boolean }>(), {
+  mini: false
+})
+
 const items: ModelRef<ListItem[]> = defineModel('items', {
   type: Array,
   default: () => []
-})
-
-withDefaults(defineProps<{ mini?: boolean }>(), {
-  mini: false
 })
 
 const route = useRoute()
@@ -73,40 +107,6 @@ watch(
   }
 )
 </script>
-
-<template>
-  <template
-    v-for="item in items"
-    :key="item.title">
-    <q-expansion-item
-      v-if="hasChild(item)"
-      :model-value="item.expanded"
-      :label="(item.title)"
-      :icon="item.icon"
-      class="menu-item">
-      <list-item
-        :items="item.child"
-        :mini="mini" />
-    </q-expansion-item>
-    <q-item
-      v-else
-      v-ripple
-      :active="isActive(item)"
-      :to="item.route"
-      clickable
-      class="menu-item"
-      :class="{ mini: mini }">
-      <q-item-section avatar>
-        <q-icon
-          :name="item.icon"
-          :color="item.iconColor" />
-      </q-item-section>
-      <q-item-section>
-        <q-item-label>{{ (item.title) }}</q-item-label>
-      </q-item-section>
-    </q-item>
-  </template>
-</template>
 
 <style scoped lang="scss">
 @mixin menu-item(){

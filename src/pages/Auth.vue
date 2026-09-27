@@ -22,11 +22,11 @@
 import { useRouter } from 'vue-router'
 import AuthComponent from 'src/components/AuthComponent.vue'
 
-const router = useRouter()
-
 defineOptions({
   name: 'AuthPage'
 })
+
+const router = useRouter()
 
 function goToHomePage () {
   router.push({ name: 'HomePage' })

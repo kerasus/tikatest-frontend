@@ -74,8 +74,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const NO_ANSWER_VALUE = 'none'
-
 const props = withDefaults(defineProps<{
   questionCount: number
   choices?: Record<number, string>
@@ -98,6 +96,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (event: 'select', questionNumber: number, value: string): void
 }>()
+
+const NO_ANSWER_VALUE = 'none'
 
 const optionLabels = [
   { label: '۱', value: 'a' },

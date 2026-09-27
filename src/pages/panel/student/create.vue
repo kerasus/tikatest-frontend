@@ -34,6 +34,20 @@ const entityIdKey = ref('id')
 const entityParamKey = ref('id')
 const inputs = ref([
   {
+    type: 'file',
+    name: 'picture',
+    responseKey: 'picture',
+    label: 'تصویر',
+    placeholder: ' ',
+    col: 'col-md-3 col-12'
+  },
+  {
+    type: 'space',
+    name: 'space',
+    responseKey: 'space',
+    col: 'col-12'
+  },
+  {
     type: FormBuilderInputComponent,
     name: 'first_name',
     responseKey: 'first_name',

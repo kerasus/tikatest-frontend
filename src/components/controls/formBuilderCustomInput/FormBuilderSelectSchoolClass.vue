@@ -184,7 +184,11 @@ const optionValue = ref('id')
 const optionLabel = ref('name')
 
 async function getSchoolClasses (name: string | null) {
-  const params: any = { name }
+  const params: any = {
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
+    name
+  }
   if (props.schoolId) {
     params.school_id = props.schoolId
   }
@@ -211,6 +215,8 @@ useEntitySelector<SchoolClassType>({
   entityName: 'school classes',
   fetchByIds: (params) => schoolClassAPI.index({
     ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
     field_id: props.fieldId ?? undefined,
     academic_level_id: props.levelId ?? undefined
   })

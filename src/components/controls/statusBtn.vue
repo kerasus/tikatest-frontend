@@ -67,11 +67,6 @@ interface StatusBtnProps {
   readOnly?: boolean;
 }
 
-const defaultActiveTitleColor = 'success-dark'
-const defaultDeactiveTitleColor = 'error'
-const defaultActiveIcon = 'oms:unlock'
-const defaultDeactiveIcon = 'oms:lock'
-
 const props = withDefaults(defineProps<StatusBtnProps>(), {
   row: null,
   entityIdKey: 'id',
@@ -98,8 +93,11 @@ const props = withDefaults(defineProps<StatusBtnProps>(), {
     cancelLabel: 'general.cancel'
   })
 })
-
 const emits = defineEmits(['change', 'changing'])
+const defaultActiveTitleColor = 'success-dark'
+const defaultDeactiveTitleColor = 'error'
+const defaultActiveIcon = 'oms:unlock'
+const defaultDeactiveIcon = 'oms:lock'
 
 const showDialog = ref(false)
 const loading = ref(false)

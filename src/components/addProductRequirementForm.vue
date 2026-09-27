@@ -1,3 +1,60 @@
+<template>
+  <portlet title="افزودن نیازمندی جدید">
+    <template #actions>
+      <q-btn
+        flat
+        icon="add"
+        class="add-btn"
+        :loading="loading"
+        @click="addRequirement" />
+    </template>
+    <div class="row q-col-gutter-md full-width">
+      <div class="col-md-3">
+        <div>
+          نوع نیازمندی
+        </div>
+        <q-select
+          v-model="requirementType"
+          :options="requirementTypeOptions"
+          label=""
+          emit-value
+          map-options />
+      </div>
+      <div
+        v-if="requirementType === 'App\\Models\\ProductPart'"
+        class="col-md-3">
+        <select-product-part v-model:value="selectedProductPart" />
+      </div>
+      <div
+        v-if="requirementType === 'App\\Models\\RawMaterial'"
+        class="col-md-3">
+        <select-raw-material v-model:value="selectedRawMaterial" />
+      </div>
+      <div
+        v-if="selectedProductPart || selectedRawMaterial"
+        class="col-md-3">
+        <div>
+          تعداد
+        </div>
+        <q-input
+          v-model="quantity"
+          :loading="loading"
+          type="number" />
+      </div>
+      <div
+        v-if="selectedProductPart || selectedRawMaterial"
+        class="col-md-3">
+        <div>
+          واحد
+        </div>
+        <q-input
+          v-model="unit"
+          :loading="loading" />
+      </div>
+    </div>
+  </portlet>
+</template>
+
 <script setup lang="ts">
 // @ts-nocheck
 import { ref, watch, computed } from 'vue'
@@ -6,11 +63,11 @@ import Portlet from 'src/components/cards/portlet.vue'
 import SelectProductPart from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectProductPart.vue'
 import SelectRawMaterial from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectRawMaterial.vue'
 
-const emit = defineEmits(['add'])
-
 const props = defineProps<{
   productId: number
 }>()
+
+const emit = defineEmits(['add'])
 
 const productAPI = new ProductAPI()
 const requirementType = ref<'App\\Models\\ProductPart' | 'App\\Models\\RawMaterial'>('App\\Models\\RawMaterial')
@@ -91,63 +148,6 @@ watch(requirementType, ()=>{
   clearForm()
 })
 </script>
-
-<template>
-  <portlet title="افزودن نیازمندی جدید">
-    <template #actions>
-      <q-btn
-        flat
-        icon="add"
-        class="add-btn"
-        :loading="loading"
-        @click="addRequirement" />
-    </template>
-    <div class="row q-col-gutter-md full-width">
-      <div class="col-md-3">
-        <div>
-          نوع نیازمندی
-        </div>
-        <q-select
-          v-model="requirementType"
-          :options="requirementTypeOptions"
-          label=""
-          emit-value
-          map-options />
-      </div>
-      <div
-        v-if="requirementType === 'App\\Models\\ProductPart'"
-        class="col-md-3">
-        <select-product-part v-model:value="selectedProductPart" />
-      </div>
-      <div
-        v-if="requirementType === 'App\\Models\\RawMaterial'"
-        class="col-md-3">
-        <select-raw-material v-model:value="selectedRawMaterial" />
-      </div>
-      <div
-        v-if="selectedProductPart || selectedRawMaterial"
-        class="col-md-3">
-        <div>
-          تعداد
-        </div>
-        <q-input
-          v-model="quantity"
-          :loading="loading"
-          type="number" />
-      </div>
-      <div
-        v-if="selectedProductPart || selectedRawMaterial"
-        class="col-md-3">
-        <div>
-          واحد
-        </div>
-        <q-input
-          v-model="unit"
-          :loading="loading" />
-      </div>
-    </div>
-  </portlet>
-</template>
 
 <style scoped lang="scss">
 

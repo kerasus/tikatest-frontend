@@ -55,8 +55,8 @@
               </div>
               <div class="col-12 col-md-6">
                 <q-input
-                  v-model.number="resultForm.z_score"
-                  label="Z نمره"
+                  v-model.number="resultForm.t_score"
+                  label="نمره تراز"
                   outlined
                   type="number"
                   step="0.0001" />
@@ -115,7 +115,7 @@ const { form, validate, buildFormData, loadFromExam } = useExamForm(true)
 const resultForm = reactive({
   raw_score: null as number | null,
   scaled_score: null as number | null,
-  z_score: null as number | null
+  t_score: null as number | null
 })
 
 const resultItem = ref<any>(null)
@@ -129,7 +129,7 @@ onMounted(async () => {
       resultItem.value = result
       resultForm.raw_score = result.raw_score
       resultForm.scaled_score = result.scaled_score
-      resultForm.z_score = result.z_score
+      resultForm.t_score = result.t_score
     } else {
       const examData = await exam.get(examId.value)
       loadFromExam(examData)

@@ -37,7 +37,7 @@ export type StudentGuardianType = {
 export interface StudentType extends UserType {
   student_profile?: StudentProfileType | null
   guardian_records?: StudentGuardianType[] | null
-  term_enrollments?: TermEnrollmentType[] | null
+  term_enrollments: TermEnrollmentType[]
 }
 
 export default class StudentAPI extends BaseAPI<StudentType> {
@@ -65,7 +65,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       updated_at: null,
       student_profile: null,
       guardian_records: null,
-      term_enrollments: null
+      term_enrollments: []
     }
     this.endpoints = {
       ...this.endpoints,

@@ -43,15 +43,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import HomeworkAPI from 'src/repositories/homework'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
-const $q = useQuasar()
 const dateManager = useDate()
-
 const homeworkApi = new HomeworkAPI()
 
 const api = ref(homeworkApi.endpoints.myHomeworks)

@@ -61,8 +61,8 @@
       </template>
 
       <!-- ستون نمره -->
-      <template v-else-if="inputData.col.name === 'score'">
-        <span class="text-weight-bold">{{ inputData.props.row.score ?? '-' }}</span>
+      <template v-else-if="inputData.col.name === 't_score'">
+        <span class="text-weight-bold">{{ inputData.props.row.t_score ?? '-' }}</span>
       </template>
 
       <!-- ستون درصد -->
@@ -185,10 +185,10 @@ const table = ref({
       field: 'duration_limit_seconds'
     },
     {
-      name: 'score',
-      label: 'نمره',
+      name: 't_score',
+      label: 'تراز',
       align: 'center' as const,
-      field: 'score'
+      field: 't_score'
     },
     {
       name: 'percent',

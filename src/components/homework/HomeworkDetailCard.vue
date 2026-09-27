@@ -192,12 +192,11 @@ import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCus
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
 import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
-const homework = defineModel<Partial<HomeworkType>>('homework')
 defineProps<{
   editable?: boolean;
   schoolId?: number;
 }>()
-
+const homework = defineModel<Partial<HomeworkType>>('homework')
 const dateManager = useDate()
 
 const dueDateFormatted = computed(() => {

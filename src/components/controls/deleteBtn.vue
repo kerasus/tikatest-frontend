@@ -38,27 +38,6 @@ interface ConfirmationData {
   titleColor: string;
 }
 
-const defaultActiveTitleColor = 'success-dark'
-const defaultDeactiveTitleColor = 'error'
-
-const selectedRowForChangeStatus: Ref<{
-  title?: string;
-  message?: string;
-  row: any | null;
-  icon?: string | null;
-  titleColor?: string;
-}> = ref({
-  title: '',
-  message: '',
-  row: null,
-  icon: null,
-  titleColor: defaultDeactiveTitleColor
-})
-
-interface ExtendedConfirmationProps extends Omit<ConfirmationProps, 'message'> {
-  message: string | ((data: unknown) => string);
-}
-
 const props = withDefaults(
   defineProps<{
     row?: any;
@@ -93,8 +72,27 @@ const props = withDefaults(
     })
   }
 )
-
 const emits = defineEmits(['change', 'delete', 'changing'])
+const defaultActiveTitleColor = 'success-dark'
+const defaultDeactiveTitleColor = 'error'
+
+const selectedRowForChangeStatus: Ref<{
+  title?: string;
+  message?: string;
+  row: any | null;
+  icon?: string | null;
+  titleColor?: string;
+}> = ref({
+  title: '',
+  message: '',
+  row: null,
+  icon: null,
+  titleColor: defaultDeactiveTitleColor
+})
+
+interface ExtendedConfirmationProps extends Omit<ConfirmationProps, 'message'> {
+  message: string | ((data: unknown) => string);
+}
 
 const showDialog = ref(false)
 const loading = ref(false)

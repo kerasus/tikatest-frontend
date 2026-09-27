@@ -69,7 +69,7 @@ export type InPersonExamResultType = {
   in_person_exam_id: number | null;
   raw_score: number | null;
   scaled_score: number | null;
-  z_score: number | null;
+  t_score: number | null;
   recorded_by: number | null;
   user_id: number | null;
   student?: UserType | null;
@@ -82,7 +82,7 @@ export type StudentExamListType = ListType<ExamType>
 export type ExamScoreType = {
   raw_score?: number | null;
   scaled_score?: number | null;
-  z_score?: number | null;
+  t_score?: number | null;
   score?: number | null;
   percent?: number | null;
   status?: string | null;
@@ -189,7 +189,7 @@ export default class ExamAPI extends BaseAPI<ExamType> {
       user_id: number
       raw_score?: number
       scaled_score?: number
-      z_score?: number
+      t_score?: number
     }[]
   }): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.storeWithInPersonDetailAndResults!, data)

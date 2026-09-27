@@ -141,6 +141,10 @@ const props = defineProps({
   levelId: {
     default: null,
     type: Number
+  },
+  classId: {
+    default: null,
+    type: Number
   }
 })
 
@@ -175,7 +179,11 @@ const optionValue = ref('id')
 const optionLabel = ref('name')
 
 async function getLessons (name: string | null) {
-  const params: any = { name }
+  const params: any = {
+    sortation_field: 'created_at',
+    sortation_order: 'desc',
+    name
+  }
   if (props.schoolId) {
     params.school_id = props.schoolId
   }
@@ -184,6 +192,9 @@ async function getLessons (name: string | null) {
   }
   if (props.levelId) {
     params.academic_level_id = props.levelId
+  }
+  if (props.classId) {
+    params.forClassWithFallback = props.classId
   }
   const lessonsList = await lessonAPI.index(params)
   return lessonsList.data
@@ -203,7 +214,8 @@ useEntitySelector<LessonType>({
   fetchByIds: (params) => lessonAPI.index({
     ...params,
     field_id: props.fieldId ?? undefined,
-    academic_level_id: props.levelId ?? undefined
+    academic_level_id: props.levelId ?? undefined,
+    forClassWithFallback: props.classId ?? undefined
   })
 })
 </script>

@@ -181,7 +181,11 @@ const optionValue = ref('id')
 const optionLabel = ref('label')
 
 async function getUsers (fullName: string | null) {
-  const usersList = await userAPI.index({ full_name: fullName })
+  const usersList = await userAPI.index({
+    full_name: fullName,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
   return usersList.data
 }
 
@@ -202,7 +206,11 @@ useEntitySelector<UserType>({
   value: () => props.value,
   filteredOptions,
   entityName: 'users',
-  fetchByIds: (params) => userAPI.index(params)
+  fetchByIds: (params) => userAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 </script>
 

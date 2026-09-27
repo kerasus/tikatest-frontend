@@ -183,6 +183,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['updated'])
+
 const $q = useQuasar()
 
 const loading = ref(false)
@@ -244,8 +246,6 @@ function onLevelChange () {
 function enrollmentClass (registration: TermEnrollmentType) {
   return registration.school_class || registration.class || null
 }
-
-const emit = defineEmits(['updated'])
 
 async function assignClass () {
   if (!selectedSchoolId.value || !selectedTermId.value || !newClassId.value) return

@@ -7,7 +7,7 @@ export type InPersonExamResultType = {
   raw_score: number | null
   scaled_score: number | null
   recorded_by: number | null
-  z_score: number | null
+  t_score: number | null
   created_at: string | null
   updated_at: string | null
   student?: {
@@ -38,7 +38,7 @@ export default class InPersonExamResultAPI extends BaseAPI<InPersonExamResultTyp
       raw_score: null,
       scaled_score: null,
       recorded_by: null,
-      z_score: null,
+      t_score: null,
       created_at: null,
       updated_at: null
     }

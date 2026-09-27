@@ -9,7 +9,7 @@ export type OnlineExamSessionType = {
   submitted_at: string | null
   duration_limit_seconds: number | null
   time_used_seconds: number | null
-  score: number | null
+  t_score: number | null
   percent: number | null
   ip_address: string | null
   user_agent: string | null
@@ -60,7 +60,7 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
       submitted_at: null,
       duration_limit_seconds: null,
       time_used_seconds: 0,
-      score: 0,
+      t_score: 0,
       percent: 0,
       ip_address: null,
       user_agent: null,
