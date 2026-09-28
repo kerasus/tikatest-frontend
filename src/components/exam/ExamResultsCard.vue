@@ -1,122 +1,315 @@
 <template>
-  <q-card class="q-mb-md">
-    <q-card-section>
-      <div class="text-h6">
-        {{ exam.delivery_mode === 'in_person' ? 'نمرات ثبت شده' : 'جلسات آزمون آنلاین' }}
+  <q-card
+    flat
+    bordered
+    class="rounded-borders q-mb-md">
+    <!-- هدر سکشن با آمار -->
+    <q-card-section class="bg-blue-grey-1 q-py-sm">
+      <div class="row items-center justify-between">
+        <div class="row items-center">
+          <q-avatar
+            size="32px"
+            :color="exam.delivery_mode === 'in_person' ? 'teal' : 'deep-purple'"
+            text-color="white"
+            :icon="exam.delivery_mode === 'in_person' ? 'fact_check' : 'cast_for_education'"
+            class="q-mr-sm shadow-1" />
+          <div>
+            <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+              {{ exam.delivery_mode === 'in_person' ? 'ثبت و مدیریت نمرات حضوری' : 'جلسات و نتایج آزمون آنلاین' }}
+            </div>
+            <div class="text-caption text-grey-7">
+              {{ exam.delivery_mode === 'in_person'
+                ? 'ثبت، بازبینی و ویرایش نمرات آزمون تشریحی یا کتبی دانش‌آموزان'
+                : 'مشاهده لاگ‌های شرکت در آزمون، نشست‌ها و پاسخنامه‌های ثبت‌شده' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- خلاصه آمار دانش‌آموزان برای آزمون حضوری -->
+        <div
+          v-if="exam.delivery_mode === 'in_person' && students.length"
+          class="row items-center q-gutter-x-xs">
+          <q-chip
+            dense
+            color="white"
+            text-color="teal-9"
+            class="shadow-1 text-weight-bold text-caption">
+            <q-icon
+              name="people"
+              size="14px"
+              class="q-mr-xs" />
+            کل دانش‌آموزان: {{ students.length }}
+          </q-chip>
+          <q-chip
+            dense
+            color="teal-6"
+            text-color="white"
+            class="text-weight-bold text-caption">
+            <q-icon
+              name="done_all"
+              size="14px"
+              class="q-mr-xs" />
+            نمرات ثبت‌شده: {{ exam.in_person_exam_results?.length || 0 }}
+          </q-chip>
+        </div>
       </div>
     </q-card-section>
+
     <q-separator />
-    <q-card-section>
+
+    <!-- بدنه کارت -->
+    <q-card-section class="q-pa-none">
+      <!-- الف) در صورتی که آزمون حضوری باشد -->
       <template v-if="exam.delivery_mode === 'in_person'">
+        <!-- حالت در حال بارگذاری -->
         <div
           v-if="loadingStudents"
-          class="text-center q-pa-md">
-          <q-spinner
-            color="primary"
-            size="40px" />
+          class="column items-center justify-center q-pa-xl text-grey-7">
+          <q-spinner-dots
+            color="teal"
+            size="48px" />
+          <div class="text-caption q-mt-md">در حال فراخوانی لیست دانش‌آموزان آزمون...</div>
         </div>
+
+        <!-- لیست دانش‌آموزان و نمرات -->
         <q-list
           v-else-if="rows.length"
-          bordered
-          separator>
+          separator
+          class="rounded-borders">
           <q-item
             v-for="row in rows"
             :key="row.student.id"
-            class="q-py-sm">
+            class="q-py-md items-center transition-all hover-bg-grey-1"
+            :class="{ 'bg-teal-0': editingId === row.result?.id }">
+
+            <!-- ستون مشخصات دانش‌آموز -->
+            <q-item-section avatar>
+              <q-avatar
+                size="40px"
+                :color="row.result ? 'teal-1' : 'grey-2'"
+                :text-color="row.result ? 'teal-9' : 'grey-7'">
+                <q-icon
+                  :name="row.result ? 'how_to_reg' : 'person_outline'"
+                  size="22px" />
+              </q-avatar>
+            </q-item-section>
+
             <q-item-section>
-              <q-item-label>{{ fullName(row.student) }}</q-item-label>
+              <div class="row items-center q-gutter-x-sm">
+                <span class="text-subtitle2 text-weight-bold text-blue-grey-10">
+                  {{ fullName(row.student) }}
+                </span>
+                <span
+                  v-if="row.student.national_code"
+                  class="text-caption text-grey-6 font-monospace">
+                  ({{ row.student.national_code }})
+                </span>
+              </div>
+
+              <!-- حالت نمره ثبت شده (مشاهده / ادیت) -->
               <template v-if="row.result">
-                <q-item-label caption>
-                  نمره خام: {{ row.result.raw_score ?? '-' }} | نمره محاسبه شده:
-                  {{ row.result.scaled_score ?? '-' }} | نمره تراز: {{ row.result.t_score ?? '-' }}
-                </q-item-label>
-                <q-item-label
+                <!-- حالت ویرایش -->
+                <div
                   v-if="editingId === row.result.id"
-                  caption
-                  class="q-mt-xs">
+                  class="row items-center q-col-gutter-sm q-mt-xs">
+                  <div class="col-12 col-sm-4">
+                    <q-input
+                      v-model.number="editRawScore"
+                      type="number"
+                      step="0.01"
+                      outlined
+                      dense
+                      autofocus
+                      label="نمره خام جدید"
+                      bg-color="white"
+                      @update:model-value="onRawScoreInput">
+                      <template #prepend>
+                        <q-icon
+                          name="edit"
+                          size="16px"
+                          color="teal" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-12 col-sm-4 text-caption text-grey-8">
+                    نمره تبدیل‌شده (مبنای ۲۰):
+                    <span class="text-weight-bold text-teal-9 text-body2 q-ml-xs">
+                      {{ editScore ?? computeScaled(editRawScore) ?? '-' }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- حالت برچسب‌های نمره -->
+                <div
+                  v-else
+                  class="row items-center q-gutter-xs q-mt-xs">
+                  <q-chip
+                    dense
+                    color="blue-grey-1"
+                    text-color="blue-grey-9"
+                    class="text-caption">
+                    <span class="text-grey-7 q-mr-xs">نمره خام:</span>
+                    <strong>{{ row.result.raw_score ?? '-' }}</strong>
+                  </q-chip>
+
+                  <q-chip
+                    dense
+                    color="teal-1"
+                    text-color="teal-9"
+                    class="text-caption text-weight-bold">
+                    <span class="text-teal-7 q-mr-xs">نمره مقیاس:</span>
+                    {{ row.result.scaled_score ?? '-' }}
+                  </q-chip>
+
+                  <q-chip
+                    v-if="row.result.t_score"
+                    dense
+                    color="purple-1"
+                    text-color="purple-9"
+                    class="text-caption">
+                    <span class="text-purple-7 q-mr-xs">تراز:</span>
+                    {{ row.result.t_score }}
+                  </q-chip>
+                </div>
+              </template>
+
+              <!-- حالت نمره ثبت‌نشده (ورود جدید) -->
+              <div
+                v-else
+                class="row items-center q-col-gutter-sm q-mt-xs">
+                <div class="col-12 col-sm-4">
                   <q-input
-                    v-model.number="editRawScore"
+                    v-model.number="newScores[row.student.id]"
                     type="number"
                     step="0.01"
                     outlined
                     dense
-                    label="نمره خام"
-                    @update:modelValue="onRawScoreInput" />
-                </q-item-label>
-              </template>
-              <q-item-label
-                v-else
-                caption
-                class="q-mt-xs">
-                <q-input
-                  v-model.number="newScores[row.student.id]"
-                  type="number"
-                  step="0.01"
-                  outlined
-                  dense
-                  label="ثبت نمره خام" />
-              </q-item-label>
+                    placeholder="نمره خام دانش‌آموز"
+                    bg-color="white">
+                    <template #prepend>
+                      <q-icon
+                        name="add_circle_outline"
+                        size="16px"
+                        color="grey-6" />
+                    </template>
+                  </q-input>
+                </div>
+              </div>
             </q-item-section>
+
+            <!-- ستون اکشن‌ها -->
             <q-item-section side>
-              <template v-if="row.result">
-                <q-btn
-                  v-if="editingId !== row.result.id"
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="warning"
-                  size="sm"
-                  @click="startEdit(row.result)" />
-                <q-btn
-                  v-else
-                  flat
-                  round
-                  dense
-                  icon="save"
-                  color="positive"
-                  size="sm"
-                  @click="saveEdit(row.result)" />
-                <q-btn
-                  v-if="editingId === row.result.id"
-                  flat
-                  round
-                  dense
-                  icon="close"
-                  color="negative"
-                  size="sm"
-                  class="q-ml-xs"
-                  @click="cancelEdit" />
-                <q-btn
-                  v-if="editingId !== row.result.id"
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  size="sm"
-                  class="q-ml-xs"
-                  @click="removeResult(row.result)" />
-              </template>
-              <q-btn
-                v-else
-                flat
-                round
-                dense
-                icon="add"
-                color="positive"
-                size="sm"
-                @click="addResult(row.student)" />
+              <div class="row items-center q-gutter-xs">
+                <!-- اگر نمره وجود دارد -->
+                <template v-if="row.result">
+                  <template v-if="editingId !== row.result.id">
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      icon="edit"
+                      color="teal-8"
+                      size="sm"
+                      @click="startEdit(row.result)">
+                      <q-tooltip>ویرایش نمره</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      icon="delete_outline"
+                      color="negative"
+                      size="sm"
+                      @click="removeResult(row.result)">
+                      <q-tooltip>حذف نمره</q-tooltip>
+                    </q-btn>
+                  </template>
+
+                  <template v-else>
+                    <q-btn
+                      unelevated
+                      dense
+                      icon="check"
+                      color="positive"
+                      size="sm"
+                      label="ثبت"
+                      class="q-px-sm"
+                      @click="saveEdit(row.result)" />
+                    <q-btn
+                      flat
+                      dense
+                      icon="close"
+                      color="grey-7"
+                      size="sm"
+                      label="لغو"
+                      class="q-px-sm"
+                      @click="cancelEdit" />
+                  </template>
+                </template>
+
+                <!-- اگر هنوز نمره‌ای ثبت نشده -->
+                <template v-else>
+                  <q-btn
+                    unelevated
+                    dense
+                    icon="add"
+                    color="teal"
+                    size="sm"
+                    label="ثبت نمره"
+                    class="q-px-sm"
+                    @click="addResult(row.student)" />
+                </template>
+              </div>
             </q-item-section>
           </q-item>
         </q-list>
+
+        <!-- حالت لیست خالی -->
         <div
           v-else
-          class="text-center q-pa-md text-grey">دانش‌آموزی برای این آزمون یافت نشد.</div>
+          class="column items-center justify-center q-pa-xl text-grey-6">
+          <q-icon
+            name="group_off"
+            size="56px"
+            color="grey-4" />
+          <div class="text-body2 q-mt-md">هیچ دانش‌آموزی برای این آزمون یافت نشد.</div>
+          <div class="text-caption text-grey-5">لطفاً کلاس‌ها و پایه‌های تحصیلی منتسب به آزمون را بررسی فرمایید.</div>
+        </div>
       </template>
+
+      <!-- ب) در صورتی که آزمون آنلاین باشد -->
+      <div
+        v-else
+        class="q-pa-lg text-center">
+        <q-banner
+          rounded
+          class="bg-deep-purple-1 text-deep-purple-9 q-pa-md text-right">
+          <template #avatar>
+            <q-icon
+              name="hub"
+              color="deep-purple"
+              size="36px" />
+          </template>
+          <div class="text-subtitle1 text-weight-bold">
+            مدیریت جلسات و مانیتورینگ آزمون آنلاین
+          </div>
+          <div class="text-caption text-grey-8 q-mt-xs">
+            برای آزمون‌های آنلاین، نمرات، زمان‌های ورود/خروج و پاسخنامه‌ها از طریق صفحه اختصاصی «جلسات آزمون» کنترل و مشاهده می‌شوند.
+          </div>
+          <template #action>
+            <q-btn
+              unelevated
+              color="deep-purple"
+              icon="open_in_new"
+              label="مشاهده جلسات آزمون آنلاین"
+              :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam.id } }" />
+          </template>
+        </q-banner>
+      </div>
     </q-card-section>
   </q-card>
 </template>
+
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'

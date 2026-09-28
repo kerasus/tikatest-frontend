@@ -1,30 +1,80 @@
 <template>
   <div>
+    <!-- کارت اطلاعات کلی پایه و عمومی -->
     <exam-detail-card
       :exam="exam"
       :school-id="schoolId"
       :editable="editable" />
 
+    <!-- کارت جزییات آزمون حضوری -->
     <q-card
       v-if="exam.in_person_exam_detail"
-      class="q-mb-md">
-      <q-card-section>
-        <div class="text-h6">جزئیات آزمون حضوری</div>
+      flat
+      bordered
+      class="rounded-borders q-mb-md">
+      <!-- هدر سکشن -->
+      <q-card-section class="bg-blue-grey-1 q-py-sm">
+        <div class="row items-center justify-between">
+          <div class="row items-center">
+            <q-avatar
+              size="32px"
+              color="teal"
+              text-color="white"
+              icon="school"
+              class="q-mr-sm shadow-1" />
+            <div>
+              <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+                جزئیات و زمان‌بندی آزمون حضوری
+              </div>
+              <div class="text-caption text-grey-7">
+                زمان برگزاری در محل، انتشار کارنامه و نوع ارزیابی (نمره‌ای / توصیفی)
+              </div>
+            </div>
+          </div>
+
+          <q-badge
+            :color="exam.in_person_exam_detail.is_descriptive ? 'purple' : 'teal'"
+            class="text-weight-bold q-px-sm">
+            <q-icon
+              :name="exam.in_person_exam_detail.is_descriptive ? 'spellcheck' : 'format_list_numbered'"
+              size="14px"
+              class="q-mr-xs" />
+            {{ exam.in_person_exam_detail.is_descriptive ? 'ارزیابی کیفی / توصیفی' : 'ارزیابی کمی / نمره‌ای' }}
+          </q-badge>
+        </div>
       </q-card-section>
+
       <q-separator />
-      <q-card-section>
-        <div class="row q-col-gutter-md">
+
+      <!-- محتوای فیلدها -->
+      <q-card-section class="q-pa-md">
+        <div class="row q-col-gutter-md items-stretch">
+
+          <!-- تاریخ و زمان برگزاری -->
           <div class="col-12 col-md-4">
             <form-builder-date-time
               v-if="editable"
               v-model:value="exam.in_person_exam_detail.held_at"
-              label="تاریخ برگزاری"
+              label="تاریخ و زمان برگزاری حضوری"
               outlined
               dense />
             <div
               v-else
-              class="text-body1">{{ heldAtFormatted }}</div>
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6 flex items-center">
+                <q-icon
+                  name="event"
+                  size="14px"
+                  class="q-mr-xs text-teal" />
+                تاریخ برگزاری در مدرسه:
+              </div>
+              <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+                {{ heldAtFormatted }}
+              </div>
+            </div>
           </div>
+
+          <!-- زمان انتشار نتایج -->
           <div class="col-12 col-md-4">
             <form-builder-date-time
               v-if="editable"
@@ -32,32 +82,60 @@
               label="زمان نمایش نتایج به دانش‌آموزان"
               outlined
               dense />
-            <template v-else>
-              <div class="text-subtitle2">زمان نمایش نتایج به دانش‌آموزان:</div>
-              <div class="text-body1">{{ resultsVisibleAtFormatted }}</div>
-            </template>
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6 flex items-center">
+                <q-icon
+                  name="visibility"
+                  size="14px"
+                  class="q-mr-xs text-primary" />
+                زمان نمایش کارنامه:
+              </div>
+              <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+                {{ resultsVisibleAtFormatted }}
+              </div>
+            </div>
           </div>
-          <div class="col-12 col-md-4">
-            <q-toggle
-              v-if="editable"
-              v-model="exam.in_person_exam_detail.is_descriptive"
-              label="توصیفی"
-              dense
-              color="primary"
-              checked-label="بله"
-              unchecked-label="خیر" />
-            <template v-else>
-              <div class="text-subtitle2">توصیفی:</div>
-              <q-chip
-                :color="exam.in_person_exam_detail.is_descriptive ? 'primary' : 'grey'"
-                text-color="white"
-                dense>
-                {{ exam.in_person_exam_detail.is_descriptive ? 'بله' : 'خیر' }}
-              </q-chip>
-            </template>
-          </div>
-        </div>
 
+          <!-- نوع ارزیابی: توصیفی / نمره‌ای -->
+          <div class="col-12 col-md-4">
+            <div
+              v-if="editable"
+              class="bg-grey-1 q-px-md q-py-xs rounded-borders border row items-center justify-between full-height">
+              <div>
+                <div class="text-caption text-weight-bold text-blue-grey-9">آزمون توصیفی (کیفی)</div>
+                <div class="text-caption text-grey-6">بدون نمره عددی (خیلی خوب، خوب، ...)</div>
+              </div>
+              <q-toggle
+                v-model="exam.in_person_exam_detail.is_descriptive"
+                color="purple"
+                dense />
+            </div>
+
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6 flex items-center">
+                <q-icon
+                  name="grade"
+                  size="14px"
+                  class="q-mr-xs text-purple" />
+                نوع نمره‌دهی:
+              </div>
+              <div class="row items-center q-mt-xs">
+                <q-chip
+                  :color="exam.in_person_exam_detail.is_descriptive ? 'purple-1' : 'teal-1'"
+                  :text-color="exam.in_person_exam_detail.is_descriptive ? 'purple-9' : 'teal-9'"
+                  dense
+                  class="text-weight-bold q-px-sm">
+                  {{ exam.in_person_exam_detail.is_descriptive ? 'نظام کیفی - توصیفی' : 'نظام نمره‌ای (کمی)' }}
+                </q-chip>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </q-card-section>
     </q-card>
   </div>

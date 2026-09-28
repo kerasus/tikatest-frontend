@@ -284,6 +284,7 @@ const topLinks = ref<ListItemType[]>([
     forRoles: ['Student'],
     route: { name: 'Student.Exam.List' }
   },
+  { icon: 'grading', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
   {
     icon: 'assignment',
     title: 'ساعت مطالعه و تکالیف',
@@ -298,24 +299,24 @@ const topLinks = ref<ListItemType[]>([
       }
     ]
   },
-  {
-    icon: 'grading',
-    title: 'نمرات',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
-      { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
-    ]
-  },
-  {
-    icon: 'gavel',
-    title: 'موارد انضباطی',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
-      { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
-    ]
-  },
+  // {
+  //   icon: 'grading',
+  //   title: 'نمرات',
+  //   forRoles: ['Student'],
+  //   child: [
+  //     { icon: '', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } }
+  //     { icon: '', title: 'کارنامه', route: { name: 'Student.ReportCard' } }
+  //   ]
+  // },
+  // {
+  //   icon: 'gavel',
+  //   title: 'موارد انضباطی',
+  //   forRoles: ['Student'],
+  //   child: [
+  //     { icon: '', title: 'مشاهده غیبت‌ها', route: { name: 'Student.Absences' } },
+  //     { icon: '', title: 'مشاهده موارد انضباطی', route: { name: 'Student.Disciplinary.List' } }
+  //   ]
+  // },
   {
     icon: 'sms',
     title: 'مدیریت پیام',

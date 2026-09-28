@@ -97,80 +97,215 @@
         </template>
       </entity-index>
     </template>
+    <!-- دیالوگ بررسی و مشاهده جزئیات ارسال دانش‌آموز -->
+    <q-dialog
+      v-model="submissionDetailDialog"
+      persistent
+      transition-show="scale"
+      transition-hide="scale">
+      <q-card
+        class="column rounded-borders"
+        style="width: 960px; max-width: 95vw; max-height: 90vh">
+        <!-- ۱. هدر دیالوگ -->
+        <q-card-section class="bg-blue-grey-1 q-py-sm col-auto">
+          <div class="row items-center justify-between no-wrap">
+            <div class="row items-center">
+              <q-avatar
+                size="36px"
+                color="primary"
+                text-color="white"
+                icon="assignment_turned_in"
+                class="q-mr-sm shadow-1" />
+              <div>
+                <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+                  بررسی پاسخ و ارزیابی تکلیف
+                </div>
+                <div class="text-caption text-grey-7">
+                  مشاهده محتوای ارسالی، زمان‌بندی و ثبت بازخورد آموزشی
+                </div>
+              </div>
+            </div>
 
-    <q-dialog v-model="submissionDetailDialog">
-      <q-card style="min-width: 90vw; max-width: 90vw">
-        <q-card-section class="row items-center">
-          <div class="col">
-            <div class="text-h6">جزئیات ارسال</div>
+            <div class="row items-center q-gutter-x-sm">
+              <q-chip
+                v-if="selectedSubmission?.id"
+                dense
+                color="blue-grey-2"
+                text-color="blue-grey-9"
+                class="text-weight-bold font-monospace">
+                ارسال: #{{ selectedSubmission.id }}
+              </q-chip>
+              <q-btn
+                v-close-popup
+                flat
+                round
+                dense
+                icon="close"
+                color="grey-7" />
+            </div>
           </div>
-          <div class="col-auto">
-            <q-btn
-              v-close-popup
-              flat
-              round
+        </q-card-section>
+
+        <q-separator />
+
+        <!-- ۲. بدنه اسکرول‌پذیر دیالوگ -->
+        <q-card-section
+          v-if="selectedSubmission"
+          class="col scroll q-pa-md q-gutter-y-md">
+          <!-- کارت مشخصات دانش‌آموز و تایم‌لاین وضعیت -->
+          <div class="bg-grey-1 q-pa-md rounded-borders border">
+            <div class="row q-col-gutter-md">
+              <!-- نام دانش‌آموز -->
+              <div class="col-12 col-md-3">
+                <div class="bg-white q-pa-sm rounded-borders border full-height">
+                  <div class="text-caption text-grey-6 flex items-center">
+                    <q-icon
+                      name="person"
+                      size="14px"
+                      class="q-mr-xs text-primary" />
+                    دانش‌آموز
+                  </div>
+                  <div class="text-subtitle2 text-weight-bold text-blue-grey-10 q-mt-xs ellipsis">
+                    {{ (selectedSubmission.student?.first_name ? `${selectedSubmission.student.first_name} ${selectedSubmission.student.last_name || ''}` : null) || selectedSubmission.student_id || '-' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- زمان ارسال -->
+              <div class="col-12 col-md-3">
+                <div class="bg-white q-pa-sm rounded-borders border full-height">
+                  <div class="text-caption text-grey-6 flex items-center">
+                    <q-icon
+                      name="send"
+                      size="14px"
+                      class="q-mr-xs text-teal" />
+                    زمان ارسال
+                  </div>
+                  <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs font-monospace">
+                    {{ formatDateTime(selectedSubmission.submitted_at) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- مشاهده دانش‌آموز -->
+              <div class="col-12 col-md-3">
+                <div class="bg-white q-pa-sm rounded-borders border full-height">
+                  <div class="text-caption text-grey-6 flex items-center">
+                    <q-icon
+                      name="visibility"
+                      size="14px"
+                      class="q-mr-xs text-info" />
+                    مشاهده دانش‌آموز
+                  </div>
+                  <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs font-monospace">
+                    {{ formatDateTime(selectedSubmission.student_seen_at) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- مشاهده معلم -->
+              <div class="col-12 col-md-3">
+                <div class="bg-white q-pa-sm rounded-borders border full-height">
+                  <div class="text-caption text-grey-6 flex items-center">
+                    <q-icon
+                      name="done_all"
+                      size="14px"
+                      class="q-mr-xs text-positive" />
+                    مشاهده معلم
+                  </div>
+                  <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs font-monospace">
+                    {{ formatDateTime(selectedSubmission.operator_seen_at) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- بخش محتوای ارسالی دانش‌آموز -->
+          <div class="bg-grey-1 q-pa-md rounded-borders border">
+            <div class="row items-center justify-between q-mb-sm">
+              <div class="text-caption text-weight-bold text-grey-8 flex items-center">
+                <q-icon
+                  name="description"
+                  color="primary"
+                  size="16px"
+                  class="q-mr-xs" />
+                پاسخ و محتوای ارسالی دانش‌آموز:
+              </div>
+              <q-badge
+                v-if="submissionContentForEditor"
+                color="blue-1"
+                text-color="primary"
+                class="q-px-sm">
+                آماده بررسی
+              </q-badge>
+            </div>
+
+            <div class="bg-white rounded-borders border q-pa-sm min-height-box">
+              <content-editor
+                v-if="submissionContentForEditor"
+                v-model:value="submissionContentForEditor"
+                :editable="false" />
+              <div
+                v-else
+                class="column items-center justify-center q-pa-lg text-grey-5">
+                <q-icon
+                  name="cloud_off"
+                  size="36px" />
+                <div class="text-caption q-mt-xs">محتوایی برای این پاسخ ثبت نشده است.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- بخش ثبت بازخورد و نظر دبیر -->
+          <div class="bg-grey-1 q-pa-md rounded-borders border">
+            <div class="text-caption text-weight-bold text-grey-8 q-mb-sm flex items-center">
+              <q-icon
+                name="rate_review"
+                color="orange-9"
+                size="16px"
+                class="q-mr-xs" />
+              بازخورد و یادداشت ارزیابی برای دانش‌آموز:
+            </div>
+
+            <q-input
+              v-model="feedbackForm.feedback"
+              label="متن بازخورد یا راهنمایی آموزشی را اینجا بنویسید..."
+              outlined
               dense
-              icon="close"
-              color="grey" />
+              bg-color="white"
+              type="textarea"
+              rows="3"
+              counter
+              maxlength="1000"
+              placeholder="مثال: آفرین علی، راه‌حل مسئله دوم عالی بود اما دقت کن که فرمول را کامل بنویسی." />
           </div>
         </q-card-section>
-        <q-card-section v-if="selectedSubmission">
-          <div class="q-gutter-md">
-            <div class="row">
-              <div class="col-5 text-subtitle2">دانش‌آموز:</div>
-              <div class="col-7">
-                {{ selectedSubmission.student?.first_name }}
-                {{ selectedSubmission.student?.last_name || selectedSubmission.student_id || '-' }}
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-5 text-subtitle2">زمان ارسال:</div>
-              <div class="col-7">{{ formatDateTime(selectedSubmission.submitted_at) }}</div>
-            </div>
-            <div class="row">
-              <div class="col-5 text-subtitle2">مشاهده توسط دانش‌آموز:</div>
-              <div class="col-7">{{ formatDateTime(selectedSubmission.student_seen_at) }}</div>
-            </div>
-            <div class="row">
-              <div class="col-5 text-subtitle2">مشاهده توسط معلم:</div>
-              <div class="col-7">{{ formatDateTime(selectedSubmission.operator_seen_at) }}</div>
-            </div>
-            <div class="row">
-              <div class="col-5 text-subtitle2">بازخورد:</div>
-              <div class="col-7">
-                <q-input
-                  v-model="feedbackForm.feedback"
-                  label="ویرایش بازخورد"
-                  outlined
-                  type="textarea"
-                  rows="3" />
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12 text-subtitle2">محتوای ارسالی:</div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <content-editor
-                  v-model:value="submissionContentForEditor"
-                  :editable="false" />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        <q-separator />
+
+        <!-- ۳. فوتر و دکمه‌های عملیات -->
+        <q-card-actions
+          align="right"
+          class="bg-blue-grey-1 q-px-md q-py-sm col-auto">
           <q-btn
+            v-close-popup
             flat
-            label="انصراف"
-            @click="submissionDetailDialog = false" />
+            label="انصراف و بستن"
+            color="grey-8"
+            class="q-px-md" />
           <q-btn
+            unelevated
             color="primary"
-            label="ذخیره"
+            icon="check_circle"
+            label="ثبت و ارسال بازخورد"
+            class="q-px-md shadow-1"
             :loading="saving"
             @click="saveFeedback" />
         </q-card-actions>
       </q-card>
     </q-dialog>
+
 
     <q-dialog v-model="pdfDialog">
       <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column">

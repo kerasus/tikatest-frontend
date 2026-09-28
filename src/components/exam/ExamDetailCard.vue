@@ -1,103 +1,326 @@
 <template>
-  <q-card class="q-mb-md">
-    <q-card-section>
-      <div class="flex justify-between">
-        <div class="text-h6">اطلاعات کلی آزمون</div>
-        <div class="actions">
-          <q-btn
-            v-if="!editable"
-            flat
-            label="بازگشت"
-            :to="{ name: examListRouteName }" />
-          <q-btn
-            v-if="!editable && exam?.delivery_mode === 'online'"
-            color="secondary"
-            label="جلسات آزمون"
-            icon="menu_book"
-            :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam?.id } }"
-            class="q-ml-sm" />
-          <q-btn
-            v-if="!editable"
+  <q-card
+    flat
+    bordered
+    class="rounded-borders q-mb-md">
+    <!-- ۱. هدر کارت با اکشن‌ها -->
+    <q-card-section class="bg-blue-grey-1 q-py-sm">
+      <div class="row items-center justify-between q-col-gutter-sm">
+        <!-- عنوان و وضعیت آزمون -->
+        <div class="row items-center">
+          <q-avatar
+            size="34px"
             color="primary"
-            label="ویرایش آزمون"
-            :to="{ name: editExamRouteName, params: { id: exam?.id } }"
-            class="q-ml-sm" />
-          <q-btn
-            v-if="editable && exam?.id"
-            flat
-            label="انصراف"
-            :to="{ name: showExamRouteName, params: { id: exam?.id } }" />
-          <q-btn
-            v-if="editable && !exam?.id"
-            flat
-            label="انصراف"
-            :to="{ name: examListRouteName }" />
+            text-color="white"
+            icon="assignment"
+            class="q-mr-sm shadow-1" />
+          <div>
+            <div class="row items-center q-gutter-x-sm">
+              <span class="text-subtitle1 text-weight-bold text-blue-grey-10">
+                {{ editable ? (exam?.id ? 'ویرایش مشخصات آزمون' : 'تعریف آزمون جدید') : 'اطلاعات کلی آزمون' }}
+              </span>
+              <q-badge
+                v-if="exam?.delivery_mode"
+                :color="exam.delivery_mode === 'online' ? 'deep-purple' : 'teal'"
+                class="text-weight-bold q-px-sm">
+                <q-icon
+                  :name="exam.delivery_mode === 'online' ? 'devices' : 'record_voice_over'"
+                  size="14px"
+                  class="q-mr-xs" />
+                {{ exam.delivery_mode === 'online' ? 'آزمون آنلاین' : 'آزمون حضوری' }}
+              </q-badge>
+            </div>
+            <div class="text-caption text-grey-7">
+              تنظیمات ساختاری، سطوح مخاطبین، نصاب قبولی و بارم‌بندی
+            </div>
+          </div>
+        </div>
+
+        <!-- دکمه‌های کنترلی هدر -->
+        <div class="row items-center q-gutter-sm">
+          <!-- دکمه‌های حالت مشاهده -->
+          <template v-if="!editable">
+            <q-btn
+              flat
+              dense
+              color="grey-8"
+              icon="arrow_forward"
+              label="بازگشت"
+              :to="{ name: examListRouteName }" />
+
+            <q-btn
+              v-if="exam?.delivery_mode === 'online'"
+              outline
+              color="secondary"
+              icon="monitor"
+              :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam?.id } }">
+              جلسات آزمون
+            </q-btn>
+
+            <q-btn
+              unelevated
+              color="primary"
+              icon="edit"
+              label="ویرایش آزمون"
+              :to="{ name: editExamRouteName, params: { id: exam?.id } }" />
+          </template>
+
+          <!-- دکمه‌های حالت ویرایش -->
+          <template v-else>
+            <q-btn
+              flat
+              color="grey-8"
+              icon="close"
+              label="انصراف"
+              :to="exam?.id ? { name: showExamRouteName, params: { id: exam?.id } } : { name: examListRouteName }" />
+          </template>
         </div>
       </div>
     </q-card-section>
 
     <q-separator />
 
-    <q-card-section>
+    <!-- ۲. محتوای فرم و اطلاعات -->
+    <q-card-section class="q-pa-md">
       <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-3">
+
+        <!-- نام آزمون -->
+        <div class="col-12">
+          <q-input
+            v-if="editable"
+            v-model="exam.name"
+            label="نام و عنوان آزمون *"
+            placeholder="مثال: آزمون جامع ماهانه، مستمر نوبت اول"
+            outlined
+            dense
+            clearable>
+            <template #prepend>
+              <q-icon
+                name="edit_note"
+                color="primary" />
+            </template>
+          </q-input>
+
+          <div
+            v-else
+            class="bg-grey-1 q-pa-md rounded-borders border row items-center justify-between">
+            <div>
+              <div class="text-caption text-grey-7">نام و عنوان آزمون:</div>
+              <div class="text-h6 text-weight-bold text-primary q-mt-xs">
+                {{ exam.name || 'بدون نام' }}
+              </div>
+            </div>
+            <div
+              v-if="exam.created_by"
+              class="text-left">
+              <div class="text-caption text-grey-6">ایجاد کننده:</div>
+              <div class="row items-center q-gutter-xs q-mt-xs">
+                <span class="text-caption text-weight-bold text-grey-8">
+                  {{ `${exam.created_by?.first_name || ''} ${exam.created_by?.last_name || ''}` }}
+                </span>
+                <q-chip
+                  v-if="exam.created_by?.username"
+                  dense
+                  color="blue-grey-1"
+                  text-color="blue-grey-8"
+                  class="text-caption">
+                  @{{ exam.created_by?.username }}
+                </q-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- باکس گروه‌بندی ۱: مخاطبان و ساختار آموزشی (پایه‌ها، کلاس‌ها، درس، ترم) -->
+        <div class="col-12">
+          <q-card
+            flat
+            bordered
+            class="rounded-borders bg-grey-1">
+            <q-card-section class="q-py-xs bg-grey-2 text-weight-bold text-grey-8 text-caption row items-center">
+              <q-icon
+                name="groups"
+                color="primary"
+                size="18px"
+                class="q-mr-xs" />
+              مخاطبان و مشخصات آموزشی
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-md">
+              <div class="row q-col-gutter-md">
+                <!-- پایه‌ها -->
+                <div class="col-12 col-md-3">
+                  <form-builder-select-academic-level
+                    v-if="editable"
+                    v-model:value="levelIds"
+                    label="پایه‌های تحصیلی"
+                    :school-id="schoolId"
+                    outlined
+                    dense
+                    clearable
+                    multiple
+                    use-chips />
+                  <div
+                    v-else
+                    class="bg-white q-pa-sm rounded-borders border full-height">
+                    <div class="text-caption text-grey-6 flex items-center q-mb-xs">
+                      <q-icon
+                        name="school"
+                        size="14px"
+                        class="q-mr-xs text-primary" />
+                      پایه‌های تحصیلی:
+                    </div>
+                    <div class="row q-gutter-xs">
+                      <q-chip
+                        v-for="level in exam.academic_levels"
+                        :key="level.id"
+                        color="primary"
+                        text-color="white"
+                        dense
+                        size="sm">
+                        {{ level.name || '-' }}
+                      </q-chip>
+                      <span
+                        v-if="!exam.academic_levels?.length"
+                        class="text-caption text-grey-5">
+                        انتخاب نشده
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- کلاس‌ها -->
+                <div class="col-12 col-md-3">
+                  <form-builder-select-school-class
+                    v-if="editable"
+                    v-model:value="classIds"
+                    label="کلاس‌های مشمول"
+                    :school-id="schoolId"
+                    :level-id="levelIds"
+                    outlined
+                    dense
+                    clearable
+                    multiple
+                    use-chips />
+                  <div
+                    v-else
+                    class="bg-white q-pa-sm rounded-borders border full-height">
+                    <div class="text-caption text-grey-6 flex items-center q-mb-xs">
+                      <q-icon
+                        name="meeting_room"
+                        size="14px"
+                        class="q-mr-xs text-secondary" />
+                      کلاس‌های مشمول:
+                    </div>
+                    <div class="row q-gutter-xs">
+                      <q-chip
+                        v-for="cls in exam.classes"
+                        :key="cls.id"
+                        color="secondary"
+                        text-color="white"
+                        dense
+                        size="sm">
+                        {{ cls.name || '-' }}
+                      </q-chip>
+                      <span
+                        v-if="!exam.classes?.length"
+                        class="text-caption text-grey-5">
+                        انتخاب نشده
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- درس -->
+                <div class="col-12 col-md-3">
+                  <form-builder-select-lesson
+                    v-if="editable"
+                    v-model:value="exam.lesson_id"
+                    :school-id="schoolId"
+                    :level-id="levelIds"
+                    :class-id="classIds"
+                    :disable="!!hasAnyBookletLesson"
+                    :placeholder="hasAnyBookletLesson ? 'قفل به دلیل دفترچه‌ها' : 'انتخاب درس...'"
+                    label="درس آزمون"
+                    outlined
+                    dense
+                    clearable
+                    multiple
+                    use-chips />
+                  <div
+                    v-else
+                    class="bg-white q-pa-sm rounded-borders border full-height">
+                    <div class="text-caption text-grey-6 flex items-center">
+                      <q-icon
+                        name="menu_book"
+                        size="14px"
+                        class="q-mr-xs text-teal" />
+                      درس آزمون:
+                    </div>
+                    <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+                      {{ exam.lesson?.name || 'عمومی / جامع (بدون درس تکی)' }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ترم -->
+                <div class="col-12 col-md-3">
+                  <form-builder-select-term
+                    v-if="editable"
+                    v-model:value="exam.term_id"
+                    :school-id="schoolId"
+                    active-only
+                    label="دوره / ترم تحصیلی"
+                    outlined
+                    dense
+                    clearable />
+                  <div
+                    v-else
+                    class="bg-white q-pa-sm rounded-borders border full-height">
+                    <div class="text-caption text-grey-6 flex items-center">
+                      <q-icon
+                        name="date_range"
+                        size="14px"
+                        class="q-mr-xs text-brown" />
+                      دوره / ترم:
+                    </div>
+                    <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+                      {{ exam.term?.name || '-' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <!-- دسته‌بندی و مقادیر نمرات -->
+        <div class="col-12 col-md-4">
           <form-builder-select-exam-category
             v-if="editable"
             v-model:value="exam.exam_category_id"
             :school-id="schoolId"
-            clearable />
-          <div v-else>
-            <div class="text-subtitle2">دسته‌بندی:</div>
-            <div class="text-body1">{{ exam.category?.title || '-' }}</div>
-          </div>
-        </div>
-        <div class="col-12 col-md-9">
-          <q-input
-            v-if="editable"
-            v-model="exam.name"
-            label="نام آزمون"
-            outlined
-            dense />
-          <div v-else>
-            <div class="text-subtitle2">نام آزمون:</div>
-            <div class="text-body1">
-              {{ exam.name || '-' }}
-              <q-chip
-                v-if="!editable"
-                color="info"
-                text-color="white">
-                {{ exam?.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
-              </q-chip>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-3">
-          <form-builder-select-term
-            v-if="editable"
-            v-model:value="exam.term_id"
-            :school-id="schoolId"
-            active-only
-            label="ترم"
+            label="دسته‌بندی آزمون"
             outlined
             dense
             clearable />
-          <div v-else>
-            <div class="text-subtitle2">ترم:</div>
-            <div class="text-body1">{{ exam.term?.name || '-' }}</div>
+          <div
+            v-else
+            class="bg-white q-pa-sm rounded-borders border full-height">
+            <div class="text-caption text-grey-6 flex items-center">
+              <q-icon
+                name="category"
+                size="14px"
+                class="q-mr-xs text-accent" />
+              دسته‌بندی:
+            </div>
+            <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+              {{ exam.category?.title || '-' }}
+            </div>
           </div>
         </div>
-        <div class="col-12 col-md-3">
-          <form-builder-select-lesson
-            v-if="editable"
-            v-model:value="exam.lesson_id"
-            :school-id="schoolId"
-            clearable />
-          <div v-else>
-            <div class="text-subtitle2">درس:</div>
-            <div class="text-body1">{{ exam.lesson?.name || '-' }}</div>
-          </div>
-        </div>
-        <div class="col-12 col-md-3">
+
+        <div class="col-12 col-md-4">
           <q-input
             v-if="editable"
             v-model.number="exam.min_passing_score"
@@ -105,111 +328,91 @@
             outlined
             dense
             type="number"
-            step="0.01" />
-          <div v-else>
-            <div class="text-subtitle2">حداقل نمره قبولی:</div>
-            <div class="text-body1">{{ exam.min_passing_score ?? '-' }}</div>
+            step="0.01">
+            <template #prepend>
+              <q-icon
+                name="check_circle_outline"
+                color="positive" />
+            </template>
+          </q-input>
+          <div
+            v-else
+            class="bg-white q-pa-sm rounded-borders border full-height">
+            <div class="text-caption text-grey-6 flex items-center">
+              <q-icon
+                name="check_circle_outline"
+                size="14px"
+                class="q-mr-xs text-positive" />
+              حداقل نمره قبولی:
+            </div>
+            <div class="text-body2 text-weight-bold text-positive q-mt-xs">
+              {{ exam.min_passing_score ?? '-' }}
+            </div>
           </div>
         </div>
-        <div class="col-12 col-md-3">
+
+        <div class="col-12 col-md-4">
           <q-input
             v-if="editable"
             v-model.number="exam.max_score"
-            label="حداکثر نمره"
+            label="سقف / حداکثر نمره"
             outlined
             dense
             type="number"
-            step="0.01" />
-          <div v-else>
-            <div class="text-subtitle2">حداکثر نمره:</div>
-            <div class="text-body1">{{ exam.max_score ?? '-' }}</div>
+            step="0.01">
+            <template #prepend>
+              <q-icon
+                name="military_tech"
+                color="warning" />
+            </template>
+          </q-input>
+          <div
+            v-else
+            class="bg-white q-pa-sm rounded-borders border full-height">
+            <div class="text-caption text-grey-6 flex items-center">
+              <q-icon
+                name="military_tech"
+                size="14px"
+                class="q-mr-xs text-warning" />
+              سقف نمره:
+            </div>
+            <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+              {{ exam.max_score ?? '-' }}
+            </div>
           </div>
         </div>
+
+        <!-- توضیحات آزمون -->
         <div
-          v-if="!editable"
-          class="col-12 col-md-4">
-          <div class="text-subtitle2">ایجاد کننده:</div>
-          {{ `${exam.created_by?.first_name} ${exam.created_by?.last_name}` }}
-          <q-chip
-            v-if="exam.created_by?.username"
-            color="primary"
-            text-color="white">
-            {{ exam.created_by?.username }}
-          </q-chip>
-        </div>
-        <div
-          v-if="exam.description"
+          v-if="editable || exam.description"
           class="col-12">
-          <div class="text-subtitle2">توضیحات:</div>
           <q-input
             v-if="editable"
             v-model="exam.description"
-            label="توضیحات"
+            label="توضیحات و راهنمای شرکت در آزمون"
+            placeholder="هرگونه نکته، پیش‌نیاز یا توصیه برای شرکت‌کنندگان..."
             outlined
             dense
             type="textarea"
             rows="3" />
-          <div v-else>
-            <div class="text-subtitle2">توضیحات:</div>
-            <div class="text-body1">{{ exam.description }}</div>
+          <div
+            v-else
+            class="bg-grey-1 q-pa-md rounded-borders border">
+            <div class="text-caption text-grey-7 flex items-center q-mb-xs">
+              <q-icon
+                name="info"
+                size="16px"
+                class="q-mr-xs text-primary" />
+              توضیحات و نکات آزمون:
+            </div>
+            <div
+              class="text-body2 text-grey-9"
+              style="white-space: pre-wrap;">
+              {{ exam.description }}
+            </div>
           </div>
         </div>
-      </div>
-      <q-separator class="q-my-md" />
 
-      <div class="col-12">
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <form-builder-select-academic-level
-              v-if="editable"
-              v-model:value="levelIds"
-              label="پایه‌ها"
-              :school-id="schoolId"
-              outlined
-              clearable
-              multiple
-              use-chips />
-            <div v-else>
-              <div class="text-subtitle2">پایه های انتخابی:</div>
-              <q-chip
-                v-for="level in exam.academic_levels"
-                :key="level.id"
-                color="primary"
-                text-color="white"
-                dense>
-                {{ level.name || '-' }}
-              </q-chip>
-              <span
-                v-if="!exam.academic_levels?.length"
-                class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <form-builder-select-school-class
-              v-if="editable"
-              v-model:value="classIds"
-              label="کلاس‌ها"
-              :school-id="schoolId"
-              outlined
-              clearable
-              multiple
-              use-chips />
-            <div v-else>
-              <div class="text-subtitle2">کلاس های انتخابی:</div>
-              <q-chip
-                v-for="cls in exam.classes"
-                :key="cls.id"
-                color="secondary"
-                text-color="white"
-                dense>
-                {{ cls.name || '-' }}
-              </q-chip>
-              <span
-                v-if="!exam.classes?.length"
-                class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
-            </div>
-          </div>
-        </div>
       </div>
     </q-card-section>
   </q-card>
@@ -269,6 +472,10 @@ const classIds = computed({
     exam.value.classes = (val || []).map((id) => ({ id })) as any[]
   }
 })
+
+const hasAnyBookletLesson = computed(() =>
+  (exam.value.online_exam_detail?.booklets || []).some((b) => !!b?.lesson_id)
+)
 </script>
 
 <style scoped></style>

@@ -140,11 +140,11 @@ const props = defineProps({
   },
   levelId: {
     default: null,
-    type: Number
+    type: [Number, Array] as unknown as () => number | number[] | null
   },
   classId: {
     default: null,
-    type: Number
+    type: [Number, Array, String] // Number | number[] | "1,2"
   }
 })
 
@@ -178,6 +178,23 @@ const filteredOptions = ref<LessonType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
 
+function getForClassWithFallbackParam () {
+  const v: any = props.classId
+
+  if (v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0)) {
+    return undefined
+  }
+
+  // اگر آرایه است همان را بفرست => forClassWithFallback[]=1&forClassWithFallback[]=2
+  if (Array.isArray(v)) {
+    return v
+  }
+
+  // اگر رشته کامایی است همان را بفرست => forClassWithFallback=1,2
+  // اگر عدد است هم همان عدد برمی‌گردد
+  return v
+}
+
 async function getLessons (name: string | null) {
   const params: any = {
     sortation_field: 'created_at',
@@ -191,11 +208,18 @@ async function getLessons (name: string | null) {
     params.field_id = props.fieldId
   }
   if (props.levelId) {
-    params.academic_level_id = props.levelId
+    if (Array.isArray(props.levelId) && props.levelId.length > 0) {
+      params.academic_level_id_in = props.levelId
+    } else if (!Array.isArray(props.levelId)) {
+      params.academic_level_id = props.levelId
+    }
   }
-  if (props.classId) {
-    params.forClassWithFallback = props.classId
+  const forClassWithFallback = getForClassWithFallbackParam()
+  if (forClassWithFallback !== undefined) {
+    params.forClassWithFallback = forClassWithFallback
   }
+
+
   const lessonsList = await lessonAPI.index(params)
   return lessonsList.data
 }
@@ -211,11 +235,24 @@ useEntitySelector<LessonType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'lessons',
-  fetchByIds: (params) => lessonAPI.index({
-    ...params,
-    field_id: props.fieldId ?? undefined,
-    academic_level_id: props.levelId ?? undefined,
-    forClassWithFallback: props.classId ?? undefined
-  })
+  fetchByIds: (params) => {
+
+    const levelParams: any = {}
+    if (props.levelId) {
+      if (Array.isArray(props.levelId) && props.levelId.length > 0) {
+        levelParams.academic_level_id_in = props.levelId
+      } else if (!Array.isArray(props.levelId)) {
+        levelParams.academic_level_id = props.levelId
+      }
+    }
+
+    return lessonAPI.index({
+      ...params,
+      ...levelParams,
+      field_id: props.fieldId ?? undefined,
+      academic_level_id: props.levelId ?? undefined,
+      forClassWithFallback: getForClassWithFallbackParam()
+    })
+  }
 })
 </script>

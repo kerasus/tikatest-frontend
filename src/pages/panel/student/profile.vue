@@ -209,11 +209,11 @@
           <div class="schools-section q-mt-lg">
             <span class="text-subtitle2 text-weight-bold text-grey-8 block q-mb-sm">مدرسه / موسسه فعال:</span>
             <div
-              v-if="user?.schools && user.schools.length"
+              v-if="studentSchools.length"
               class="row q-col-gutter-sm">
               <div
-                v-for="sch in user.schools"
-                :key="sch.id || sch.pivot?.school_id"
+                v-for="sch in studentSchools"
+                :key="sch.id"
                 class="col-12">
                 <div class="school-banner row items-center justify-between q-pa-sm">
                   <div class="row items-center q-gutter-sm">
@@ -258,14 +258,19 @@
 import { computed } from 'vue'
 import { useUser } from 'src/stores/user'
 import type { UserType } from 'src/repositories/user'
+import type { SchoolType } from 'src/repositories/school'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const userManager = useUser()
+const currentSchoolManager = useCurrentSchool()
 
 const user = computed<UserType | null>(() => userManager.me)
 
+const studentSchools = computed<SchoolType[]>(() => user.value?.term_enrollments ? user.value.term_enrollments.map((te) => te.school) : [])
+
 const currentSchoolName = computed(() => {
-  if (user.value?.schools && user.value.schools.length > 0) {
-    return user.value.schools[0].name
+  if (currentSchoolManager.currentSchool.value) {
+    return currentSchoolManager.currentSchool.value.name
   }
   return 'پلتفرم آزمون تیکاتست'
 })
@@ -337,7 +342,6 @@ const currentSchoolName = computed(() => {
       margin-top: -58px;
 
       .student-avatar {
-        border: 4px solid #ffffff;
         background: #ffffff;
         img { object-fit: cover; }
       }
@@ -369,6 +373,7 @@ const currentSchoolName = computed(() => {
       .student-tag {
         font-size: 0.85rem;
         color: #7e8299;
+        /* rtl:ignore */
         direction: ltr;
       }
     }

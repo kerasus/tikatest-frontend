@@ -1,50 +1,108 @@
 <template>
-  <q-card class="q-mb-md">
-    <q-card-section>
-      <div class="text-h6">کلاس‌ها</div>
+  <q-card
+    flat
+    bordered
+    class="rounded-borders q-mb-md">
+    <!-- هدر کارت -->
+    <q-card-section class="bg-blue-grey-1 q-py-sm">
+      <div class="row items-center justify-between">
+        <div class="row items-center">
+          <q-avatar
+            size="32px"
+            color="indigo-7"
+            text-color="white"
+            icon="school"
+            class="q-mr-sm shadow-1" />
+          <div>
+            <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+              کلاس‌ها و دوره‌های تحصیلی
+            </div>
+            <div class="text-caption text-grey-7">
+              کلاس‌های ثبت‌نامی و سوابق انتساب دانش‌آموز در ترم‌های مختلف
+            </div>
+          </div>
+        </div>
+
+        <q-badge
+          color="indigo-1"
+          text-color="indigo-9"
+          class="text-weight-bold q-px-sm q-py-xs">
+          تعداد انتساب: {{ localRegistrations.length }} کلاس
+        </q-badge>
+      </div>
     </q-card-section>
+
     <q-separator />
-    <q-card-section>
-      <template v-if="!readonly">
-        <div class="row q-col-gutter-md q-mb-md">
+
+    <q-card-section class="q-pa-md">
+      <!-- بخش فرم افزودن کلاس جدید (در حالت ویرایش) -->
+      <div
+        v-if="!readonly"
+        class="bg-grey-1 q-pa-md rounded-borders border q-mb-md">
+        <div class="text-caption text-weight-bold text-grey-8 q-mb-sm flex items-center">
+          <q-icon
+            name="add_circle"
+            color="indigo-7"
+            size="16px"
+            class="q-mr-xs" />
+          انتساب کلاس و دوره جدید:
+        </div>
+
+        <div class="row q-col-gutter-md">
+          <!-- انتخاب مدرسه -->
           <div
             v-if="!schoolId"
             class="col-12 col-md-4">
             <form-builder-select-school
               v-model:value="selectedSchoolId"
-              label="انتخاب مدرسه"
+              label="انتخاب مدرسه *"
               outlined
+              dense
               clearable
               @update:value="onSchoolChange" />
           </div>
 
+          <!-- انتخاب / نمایش ترم فعال -->
           <div
             v-if="selectedSchoolId"
             class="col-12 col-md-4">
             <div
               v-if="activeTermsLoading"
-              class="flex items-center q-py-md">
-              <q-spinner
-                color="primary"
+              class="flex items-center justify-center full-height q-py-sm">
+              <q-spinner-dots
+                color="indigo-7"
                 size="24px" />
+              <span class="text-caption text-grey-7 q-ml-xs">در حال دریافت ترم‌ها...</span>
             </div>
+
             <div
               v-else-if="singleActiveTerm"
-              class="rounded-borders bg-grey-2 q-pa-md">
-              <div class="text-caption text-grey-7">ترم فعال</div>
-              <div class="text-body1">{{ singleActiveTerm.name || '-' }}</div>
+              class="bg-white q-px-md q-py-xs rounded-borders border row items-center justify-between full-height">
+              <div>
+                <div class="text-caption text-grey-6">ترم فعال جاری</div>
+                <div class="text-body2 text-weight-bold text-blue-grey-9">
+                  {{ singleActiveTerm.name || '-' }}
+                </div>
+              </div>
+              <q-icon
+                name="event_available"
+                color="positive"
+                size="20px" />
             </div>
+
             <form-builder-select-term
               v-else
               :key="selectedSchoolId"
               v-model:value="selectedTermId"
               :school-id="selectedSchoolId"
-              label="انتخاب ترم فعال"
+              label="انتخاب ترم فعال *"
               active-only
               outlined
+              dense
               clearable />
           </div>
 
+          <!-- انتخاب رشته -->
           <div
             v-if="selectedSchoolId"
             class="col-12 col-md-4">
@@ -52,11 +110,14 @@
               :key="selectedSchoolId"
               v-model:value="selectedFieldId"
               :school-id="selectedSchoolId"
-              label="انتخاب رشته"
+              label="انتخاب رشته *"
               outlined
+              dense
               clearable
               @update:value="onFieldChange" />
           </div>
+
+          <!-- انتخاب پایه -->
           <div
             v-if="selectedSchoolId && selectedFieldId"
             class="col-12 col-md-4">
@@ -65,11 +126,14 @@
               v-model:value="selectedLevelId"
               :school-id="selectedSchoolId"
               :field-id="selectedFieldId"
-              label="انتخاب پایه"
+              label="انتخاب پایه تحصیلی *"
               outlined
+              dense
               clearable
               @update:value="onLevelChange" />
           </div>
+
+          <!-- انتخاب کلاس -->
           <div
             v-if="selectedSchoolId && selectedFieldId && selectedLevelId"
             class="col-12 col-md-4">
@@ -79,74 +143,122 @@
               :school-id="selectedSchoolId"
               :field-id="selectedFieldId"
               :level-id="selectedLevelId"
-              label="انتخاب کلاس"
+              label="انتخاب کلاس *"
               outlined
+              dense
               clearable />
           </div>
+
+          <!-- دکمه افزودن -->
           <div
             v-if="selectedSchoolId && selectedFieldId && selectedLevelId"
-            class="col-12 flex items-end">
+            class="col-12 col-md-4 flex items-center">
             <q-btn
-              color="primary"
+              unelevated
+              color="indigo-7"
               icon="add"
-              label="افزودن کلاس"
+              label="افزودن دانش‌آموز به کلاس"
+              class="full-width"
+              style="height: 40px"
               :disable="!newClassId || !selectedTermId"
               @click="assignClass" />
           </div>
         </div>
-      </template>
+      </div>
 
-      <template v-if="loading">
-        <div class="text-center q-pa-lg">
-          <q-spinner
-            color="primary"
-            size="100px" />
-        </div>
-      </template>
+      <!-- وضعیت لودینگ -->
+      <div
+        v-if="loading"
+        class="column items-center justify-center q-pa-lg text-grey-7">
+        <q-spinner-dots
+          color="indigo-7"
+          size="36px" />
+        <div class="text-caption q-mt-sm">در حال بارگذاری لیست کلاس‌ها...</div>
+      </div>
 
-      <template v-else-if="localRegistrations.length > 0">
-        <q-list
-          bordered
-          separator>
-          <q-item
-            v-for="reg in localRegistrations"
-            :key="reg.id">
-            <q-item-section>
-              <q-item-label>{{ enrollmentClass(reg)?.name || '-' }}</q-item-label>
-              <q-item-label caption>
-                <template v-if="enrollmentClass(reg)?.academic_level">
-                  پایه: {{ enrollmentClass(reg)?.academic_level?.name }}
-                </template>
-                <template v-if="enrollmentClass(reg)?.academic_level?.academic_field">
-                  <span v-if="enrollmentClass(reg)?.academic_level"> - </span>
-                  رشته: {{ enrollmentClass(reg)?.academic_level?.academic_field?.name }}
-                </template>
-                <template v-if="reg.term?.name">
-                  <span> - </span>
-                  ترم: {{ reg.term.name }}
-                </template>
-              </q-item-label>
-            </q-item-section>
-            <q-item-section
-              v-if="!readonly"
-              side>
-              <q-btn
-                flat
+      <!-- لیست کلاس‌های ثبت‌شده -->
+      <q-list
+        v-else-if="localRegistrations.length > 0"
+        bordered
+        separator
+        class="rounded-borders">
+        <q-item
+          v-for="reg in localRegistrations"
+          :key="reg.id"
+          class="q-py-sm">
+          <q-item-section avatar>
+            <q-avatar
+              size="36px"
+              color="indigo-1"
+              text-color="indigo-8"
+              icon="class" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label class="text-weight-bold text-blue-grey-10 text-body2">
+              {{ enrollmentClass(reg)?.name || '-' }}
+            </q-item-label>
+
+            <!-- متادیتای کلاس (پایه، رشته، ترم) -->
+            <q-item-label class="q-mt-xs row items-center q-gutter-x-xs">
+              <q-chip
+                v-if="enrollmentClass(reg)?.academic_level"
                 dense
-                icon="delete"
-                color="negative"
                 size="sm"
-                @click="confirmRemoveClass(reg)">
-                <q-tooltip>حذف</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </template>
+                color="blue-1"
+                text-color="blue-9">
+                پایه: {{ enrollmentClass(reg)?.academic_level?.name }}
+              </q-chip>
+
+              <q-chip
+                v-if="enrollmentClass(reg)?.academic_level?.academic_field"
+                dense
+                size="sm"
+                color="cyan-1"
+                text-color="cyan-9">
+                رشته: {{ enrollmentClass(reg)?.academic_level?.academic_field?.name }}
+              </q-chip>
+
+              <q-chip
+                v-if="reg.term?.name"
+                dense
+                size="sm"
+                color="purple-1"
+                text-color="purple-9">
+                ترم: {{ reg.term.name }}
+              </q-chip>
+            </q-item-label>
+          </q-item-section>
+
+          <!-- دکمه حذف کلاس در حالت ویرایش -->
+          <q-item-section
+            v-if="!readonly"
+            side>
+            <q-btn
+              flat
+              round
+              dense
+              icon="delete_outline"
+              color="negative"
+              size="sm"
+              @click="confirmRemoveClass(reg)">
+              <q-tooltip>حذف از این کلاس</q-tooltip>
+            </q-btn>
+          </q-item-section>
+        </q-item>
+      </q-list>
+
+      <!-- حالت بدون کلاس -->
       <div
         v-else
-        class="text-center text-grey">
-        {{ readonly ? 'هیچ کلاسی ثبت نشده است.' : 'هنوز کلاسی ثبت نشده است.' }}
+        class="column items-center justify-center q-pa-lg text-grey-6">
+        <q-icon
+          name="meeting_room"
+          size="42px"
+          color="grey-4" />
+        <div class="text-caption q-mt-sm">
+          {{ readonly ? 'هیچ کلاسی برای این دانش‌آموز ثبت نشده است.' : 'هنوز کلاسی ثبت نشده است. از فرم بالا برای انتساب کلاس استفاده کنید.' }}
+        </div>
       </div>
     </q-card-section>
   </q-card>

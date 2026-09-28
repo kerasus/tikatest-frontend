@@ -77,8 +77,6 @@ export type InPersonExamResultType = {
   updated_at: string | null;
 };
 
-export type StudentExamListType = ListType<ExamType>
-
 export type ExamScoreType = {
   raw_score?: number | null;
   scaled_score?: number | null;
@@ -122,8 +120,6 @@ export type ExamType = {
   occurrence?: number | null;
 };
 
-export type StudentOnlineExamListType = ListType<ExamType>;
-
 export default class ExamAPI extends BaseAPI<ExamType> {
   constructor () {
     super('/exams')
@@ -145,17 +141,17 @@ export default class ExamAPI extends BaseAPI<ExamType> {
       storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results',
       storeWithOnlineDetail: '/exams/store-with-online-detail',
       studentOnlineExams: '/student-portal/online-exams',
-      myExams: '/student-portal/my-exams'
+      myOnlineExams: '/student-portal/my-online-exams'
     }
   }
 
-  async studentOnlineExams (params?: { length?: number; page?: number }): Promise<StudentOnlineExamListType> {
+  async studentOnlineExams (params?: { length?: number; page?: number }): Promise<ListType<ExamType>> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.studentOnlineExams!, { params })
     return response.data
   }
 
-  async myExams (params?: { length?: number; page?: number; sortation_field?: string; sortation_order?: string }): Promise<StudentExamListType> {
-    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myExams, {
+  async myOnlineExams (params?: { length?: number; page?: number; sortation_field?: string; sortation_order?: string }): Promise<ListType<ExamType>> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myOnlineExams, {
       params
     })
     return response.data

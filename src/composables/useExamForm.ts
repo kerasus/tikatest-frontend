@@ -78,6 +78,16 @@ export const useExamForm = (isUpdate = false) => {
       return false
     }
 
+    if (form.min_passing_score !== null && form.min_passing_score < 0) {
+      $q.notify({ icon: 'warning', message: 'حد اقل نمره نمی‌تواند منفی باشد.', color: 'warning' })
+      return false
+    }
+
+    if (form.max_score !== null && form.max_score < 0) {
+      $q.notify({ icon: 'warning', message: 'حداکثر نمره نمی‌تواند منفی باشد.', color: 'warning' })
+      return false
+    }
+
     if (!form.delivery_mode || !['online', 'in_person'].includes(form.delivery_mode)) {
       $q.notify({ icon: 'warning', message: 'نوع تحویل آزمون الزامی است.', color: 'warning' })
       return false
@@ -100,16 +110,20 @@ export const useExamForm = (isUpdate = false) => {
           return false
         }
       }
-    }
 
-    if (form.min_passing_score !== null && form.min_passing_score < 0) {
-      $q.notify({ icon: 'warning', message: 'نمره گذرا نمی‌تواند منفی باشد.', color: 'warning' })
-      return false
-    }
-
-    if (form.max_score !== null && form.max_score < 0) {
-      $q.notify({ icon: 'warning', message: 'حداکثر نمره نمی‌تواند منفی باشد.', color: 'warning' })
-      return false
+      // Rule: either exam.lesson_id OR booklets[*].lesson_id, not both.
+      // (Allowed: neither)
+      const examLessonSelected = !!form.lesson_id
+      const booklets = form.online_exam_detail?.booklets || []
+      const hasAnyBookletLesson = booklets.some((b) => !!b?.lesson_id)
+      if (examLessonSelected && hasAnyBookletLesson) {
+        $q.notify({
+          icon: 'warning',
+          message: 'یا برای کل آزمون درس انتخاب کنید یا برای دفترچه‌ها؛ هر دو با هم مجاز نیست.',
+          color: 'warning'
+        })
+        return false
+      }
     }
 
     return true

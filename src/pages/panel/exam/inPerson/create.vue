@@ -1,70 +1,113 @@
 <template>
-  <div class="grade-create-page">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">ثبت نمره جدید</div>
-      </q-card-section>
+  <div class="grade-create-page q-pa-sm">
+    <q-form @submit.prevent="onSubmit">
+      <!-- ۱. کارت اصلی هدر و انتخاب ساختار آموزشی (Step 1 to 4) -->
+      <q-card
+        flat
+        bordered
+        class="rounded-borders q-mb-md">
+        <q-card-section class="bg-blue-grey-1 q-py-sm">
+          <div class="row items-center justify-between">
+            <div class="row items-center">
+              <q-avatar
+                size="34px"
+                color="teal"
+                text-color="white"
+                icon="playlist_add_check"
+                class="q-mr-sm shadow-1" />
+              <div>
+                <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+                  ثبت آزمون کلاسی و نمرات حضوری
+                </div>
+                <div class="text-caption text-grey-7">
+                  انتخاب کلاس، درس و ثبت نمرات انفرادی دانش‌آموزان به‌صورت مستقیم
+                </div>
+              </div>
+            </div>
 
-      <q-separator />
+            <!-- وضعیت انتخاب مرحله -->
+            <div class="row items-center q-gutter-x-xs">
+              <q-chip
+                dense
+                :color="form.class_id && form.lesson_id ? 'positive' : 'blue-grey-3'"
+                text-color="white"
+                class="text-weight-bold text-caption">
+                <q-icon
+                  :name="form.class_id && form.lesson_id ? 'check_circle' : 'pending'"
+                  size="14px"
+                  class="q-mr-xs" />
+                {{ form.class_id && form.lesson_id ? 'کلاس و درس مشخص شد' : 'در انتظار انتخاب کلاس و درس' }}
+              </q-chip>
+            </div>
+          </div>
+        </q-card-section>
 
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit">
-          <!-- Step 1: School -->
-          <div
-            v-if="!currentSchoolId && userStoreManager.isAdmin"
-            class="row q-col-gutter-md q-mb-md">
+        <q-separator />
+
+        <!-- فیلترهای سلسله مراتبی آموزشی -->
+        <q-card-section class="q-pa-md">
+          <div class="text-caption text-weight-bold text-grey-8 q-mb-sm flex items-center">
+            <q-icon
+              name="apartment"
+              size="16px"
+              class="q-mr-xs text-primary" />
+            انتخاب دامنه آموزشی و کلاس:
+          </div>
+
+          <div class="row q-col-gutter-md">
+            <!-- انتخاب مدرسه برای ادمین -->
             <div
-              v-if="form.school_id"
+              v-if="!currentSchoolId && userStoreManager.isAdmin"
               class="col-12">
               <form-builder-select-school
                 v-model:value="form.school_id"
-                label="انتخاب مدرسه"
+                label="انتخاب مدرسه *"
                 outlined
+                dense
                 :rules="[(v) => !!v || 'مدرسه الزامی است']"
                 @update:value="onSchoolChange" />
             </div>
-          </div>
 
-          <div class="row q-col-gutter-md q-mb-md">
-            <!-- Step 2: Academic Field -->
+            <!-- انتخاب رشته -->
             <div
               v-if="form.school_id"
-              class="col-12 col-md-6">
+              class="col-12 col-md-3">
               <form-builder-select-academic-field
                 v-model:value="form.field_id"
-                label="انتخاب رشته"
+                label="انتخاب رشته *"
                 outlined
+                dense
                 :disable="!form.school_id"
                 :rules="[(v) => !!v || 'رشته الزامی است']"
                 :school-id="form.school_id"
                 @update:value="onFieldChange" />
             </div>
-            <!-- Step 3: Academic Level -->
+
+            <!-- انتخاب پایه -->
             <div
               v-if="form.field_id"
-              class="col-12 col-md-6">
+              class="col-12 col-md-3">
               <form-builder-select-academic-level
                 v-model:value="form.academic_level_id"
-                label="انتخاب پایه"
+                label="انتخاب پایه تحصیلی *"
                 outlined
+                dense
                 :disable="!form.field_id"
                 :rules="[(v) => !!v || 'پایه الزامی است']"
                 :school-id="form.school_id"
                 :field-id="form.field_id"
                 @update:value="onLevelChange" />
             </div>
-          </div>
 
-
-          <!-- Step 4: Class and Lesson -->
-          <div
-            v-if="form.academic_level_id"
-            class="row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-6">
+            <!-- انتخاب کلاس -->
+            <div
+              v-if="form.academic_level_id"
+              class="col-12 col-md-3">
               <form-builder-select-school-class
                 v-model:value="form.class_id"
-                label="انتخاب کلاس"
+                label="انتخاب کلاس *"
                 outlined
+                dense
                 :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'کلاس الزامی است']"
                 :school-id="form.school_id"
@@ -72,13 +115,16 @@
                 :level-id="form.academic_level_id"
                 @update:value="onClassChange" />
             </div>
+
+            <!-- انتخاب درس -->
             <div
               v-if="form.class_id"
-              class="col-12 col-md-6">
+              class="col-12 col-md-3">
               <form-builder-select-lesson
                 v-model:value="form.lesson_id"
-                label="انتخاب درس"
+                label="انتخاب درس *"
                 outlined
+                dense
                 :disable="!form.academic_level_id"
                 :rules="[(v) => !!v || 'درس الزامی است']"
                 :school-id="form.school_id"
@@ -87,150 +133,277 @@
                 :class-id="form.class_id" />
             </div>
           </div>
+        </q-card-section>
+      </q-card>
 
-          <!-- Step 5: Exam Form -->
-          <div v-if="form.class_id && form.lesson_id">
-            <q-separator class="q-my-md" />
+      <!-- ۲. کارت تنظیمات و پارامترهای آزمون -->
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut">
+        <q-card
+          v-if="form.class_id && form.lesson_id"
+          flat
+          bordered
+          class="rounded-borders q-mb-md">
+          <q-card-section class="bg-grey-1 q-py-xs text-caption text-weight-bold text-grey-8 row items-center">
+            <q-icon
+              name="tune"
+              color="teal"
+              size="18px"
+              class="q-mr-xs" />
+            مشخصات، بارم‌بندی و زمان‌بندی آزمون
+          </q-card-section>
 
+          <q-separator />
+
+          <q-card-section class="q-pa-md">
             <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <form-builder-date
-                  v-model:value="form.exam_date"
-                  label="تاریخ آزمون"
+              <!-- عنوان آزمون -->
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="examName"
+                  label="عنوان / نام آزمون *"
                   outlined
-                  :rules="[() => !!form.exam_date || 'تاریخ الزامی است']" />
+                  dense
+                  :rules="[(v) => !!v || 'نام آزمون الزامی است']">
+                  <template #prepend>
+                    <q-icon
+                      name="edit_note"
+                      color="teal" />
+                  </template>
+                </q-input>
               </div>
-              <div class="col-12 col-md-6">
+
+              <!-- دسته‌بندی آزمون -->
+              <div class="col-12 col-md-4">
                 <form-builder-select-exam-category
                   v-model:value="form.exam_category_id"
                   :school-id="currentSchoolId"
-                  label="دسته‌بندی آزمون"
+                  label="دسته‌بندی آزمون *"
                   outlined
+                  dense
+                  :rules="[(v) => !!v || 'دسته‌بندی الزامی است']"
                   :disable="!form.school_id" />
               </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="examName"
-                  label="نام آزمون"
-                  outlined
-                  :rules="[(v) => !!v || 'نام آزمون الزامی است']" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-checkbox
-                  v-model="form.is_descriptive"
-                  label="نمره توصیفی" />
-              </div>
-              <div
-                v-if="!form.is_descriptive"
-                class="col-12 col-md-6">
-                <q-input
-                  v-model="form.min_passing_score"
-                  label="حداقل نمره قبولی"
-                  outlined
-                  type="number"
-                  step="0.01" />
-              </div>
-              <div
-                v-if="!form.is_descriptive"
-                class="col-12 col-md-6">
-                <q-input
-                  v-model="form.max_score"
-                  label="حداکثر نمره"
-                  outlined
-                  type="number"
-                  step="0.01" />
-              </div>
-              <div class="col-12 col-md-6">
-                <form-builder-date-time
-                  v-model:value="form.results_visible_at"
-                  label="زمان نمایش نتایج به دانش‌آموزان" />
-              </div>
-              <div class="col-12 col-md-6">
+
+              <!-- دوره / ترم تحصیلی -->
+              <div class="col-12 col-md-4">
                 <form-builder-select-term
                   v-model:value="form.term_id"
                   :school-id="form.school_id"
                   active-only
-                  label="ترم"
+                  label="دوره / ترم تحصیلی *"
                   outlined
                   dense
                   clearable />
               </div>
+
+              <!-- تاریخ برگزاری آزمون -->
+              <div class="col-12 col-md-3">
+                <form-builder-date
+                  v-model:value="form.exam_date"
+                  label="تاریخ برگزاری آزمون *"
+                  outlined
+                  dense
+                  :rules="[() => !!form.exam_date || 'تاریخ الزامی است']" />
+              </div>
+
+              <!-- زمان انتشار نتایج -->
+              <div class="col-12 col-md-3">
+                <form-builder-date-time
+                  v-model:value="form.results_visible_at"
+                  label="زمان نمایش نتایج به دانش‌آموزان"
+                  outlined
+                  dense />
+              </div>
+
+              <!-- وضعیت ارزیابی توصیفی -->
+              <div class="col-12 col-md-6">
+                <div class="bg-grey-1 q-px-md q-py-xs rounded-borders border row items-center justify-between full-height">
+                  <div>
+                    <div class="text-caption text-weight-bold text-blue-grey-9">نظام ارزیابی توصیفی (کیفی)</div>
+                    <div class="text-caption text-grey-6">سطوح خیلی خوب، خوب، قابل قبول و...</div>
+                  </div>
+                  <q-toggle
+                    v-model="form.is_descriptive"
+                    color="purple"
+                    dense />
+                </div>
+              </div>
+
+              <!-- حداقل نمره قبولی و حداکثر نمره (اگر توصیفی نباشد) -->
+              <template v-if="!form.is_descriptive">
+                <div class="col-12 col-md-3">
+                  <q-input
+                    v-model.number="form.min_passing_score"
+                    label="حداقل نمره قبولی"
+                    outlined
+                    dense
+                    type="number"
+                    step="0.01">
+                    <template #prepend>
+                      <q-icon
+                        name="check_circle_outline"
+                        color="positive" />
+                    </template>
+                  </q-input>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <q-input
+                    v-model.number="form.max_score"
+                    label="سقف / حداکثر نمره *"
+                    outlined
+                    dense
+                    type="number"
+                    step="0.01">
+                    <template #prepend>
+                      <q-icon
+                        name="military_tech"
+                        color="warning" />
+                    </template>
+                  </q-input>
+                </div>
+              </template>
             </div>
+          </q-card-section>
+        </q-card>
+      </transition>
 
-            <q-separator class="q-my-md" />
+      <!-- ۳. کارت ورود نمرات دانش‌آموزان -->
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut">
+        <q-card
+          v-if="form.class_id && form.lesson_id"
+          flat
+          bordered
+          class="rounded-borders q-mb-md">
+          <q-card-section class="bg-blue-grey-1 q-py-sm">
+            <div class="row items-center justify-between">
+              <div class="row items-center">
+                <q-icon
+                  name="groups"
+                  color="teal"
+                  size="22px"
+                  class="q-mr-xs" />
+                <span class="text-subtitle2 text-weight-bold text-blue-grey-10">
+                  لیست دانش‌آموزان و ورود نمرات
+                </span>
+              </div>
+              <q-badge
+                color="teal-7"
+                class="text-weight-bold q-px-sm">
+                تعداد کل: {{ studentOptions.length }} نفر
+              </q-badge>
+            </div>
+          </q-card-section>
 
-            <!-- Student List -->
-            <div class="text-subtitle1 q-mb-md">لیست دانش آموزان کلاس</div>
+          <q-separator />
 
+          <q-card-section class="q-pa-none">
+            <!-- لودینگ / لیست خالی -->
             <div
               v-if="studentOptions.length === 0"
-              class="text-center q-pa-lg text-grey">
-              ابتدا کلاس را انتخاب کنید تا لیست دانش آموزان نمایش داده شود
+              class="column items-center justify-center q-pa-xl text-grey-6">
+              <q-icon
+                name="person_search"
+                size="48px"
+                color="grey-4" />
+              <div class="text-body2 q-mt-sm">دانش‌آموزی در این کلاس یافت نشد.</div>
             </div>
 
+            <!-- جدول / لیست ورود نمرات -->
             <q-list
               v-else
-              bordered
-              separator>
+              separator
+              class="rounded-borders">
               <q-item
-                v-for="student in studentOptions"
+                v-for="(student, index) in studentOptions"
                 :key="student.id"
-                class="q-py-sm">
-                <q-item-section>
-                  <q-item-label>{{ student.full_name }}</q-item-label>
+                class="q-py-sm items-center hover-bg-grey-1">
+                <!-- ردیف و آیکون -->
+                <q-item-section
+                  avatar
+                  style="min-width: 40px">
+                  <span class="text-caption text-weight-bold text-grey-6">#{{ index + 1 }}</span>
                 </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="text-weight-bold text-blue-grey-10">
+                    {{ student.full_name }}
+                  </q-item-label>
+                </q-item-section>
+
+                <!-- ورودی نمره عددی یا انتخاب توصیفی -->
                 <q-item-section side>
                   <div class="row items-center q-col-gutter-sm">
+                    <!-- حالت نمره‌ای -->
                     <div
+                      v-if="!form.is_descriptive"
                       class="col-auto"
-                      style="width: 130px">
+                      style="width: 140px">
                       <q-input
                         v-model="student.raw_grade"
-                        label="نمره"
+                        label="نمره آزمون"
                         outlined
                         dense
                         type="number"
                         step="0.01"
-                        :disable="form.is_descriptive" />
+                        placeholder="مثلاً 18.5"
+                        bg-color="white" />
                     </div>
+
+                    <!-- حالت توصیفی -->
                     <div
-                      v-if="form.is_descriptive"
+                      v-else
                       class="col-auto"
-                      style="width: 160px">
+                      style="width: 200px">
                       <q-select
                         v-model="student.descriptive_value"
                         :options="descriptiveOptions"
                         option-value="value"
                         option-label="label"
+                        label="سطح توصیفی"
                         outlined
                         dense
                         emit-value
-                        map-options />
+                        map-options
+                        bg-color="white" />
                     </div>
                   </div>
                 </q-item-section>
               </q-item>
             </q-list>
-          </div>
+          </q-card-section>
+        </q-card>
+      </transition>
 
-          <div class="q-mt-md">
-            <q-btn
-              type="submit"
-              color="primary"
-              label="ثبت نمره‌ها"
-              :loading="saving"
-              :disable="!form.class_id || !form.lesson_id || !form.exam_category_id" />
-            <q-btn
-              flat
-              label="انصراف"
-              :to="{ name: 'Panel.Exam.InPerson.List' }"
-              class="q-ml-sm" />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
+      <!-- دکمه‌های اقدام و سابمیت پایین صفحه -->
+      <div class="row items-center justify-between q-mt-md">
+        <q-btn
+          flat
+          color="grey-8"
+          icon="arrow_forward"
+          label="بازگشت به لیست آزمون‌های حضوری"
+          :to="{ name: 'Panel.Exam.InPerson.List' }" />
+
+        <q-btn
+          type="submit"
+          unelevated
+          color="teal"
+          icon="check_circle"
+          label="ثبت نهایی آزمون و نمرات"
+          class="q-px-lg"
+          :loading="saving"
+          :disable="!form.class_id || !form.lesson_id || !form.exam_category_id" />
+      </div>
+    </q-form>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'

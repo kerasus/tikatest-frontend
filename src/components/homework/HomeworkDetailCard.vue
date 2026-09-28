@@ -1,180 +1,332 @@
 <template>
-  <q-card class="q-mb-md">
-    <q-card-section>
-      <div class="text-h6">جزئیات تکلیف</div>
+  <q-card
+    flat
+    bordered
+    class="rounded-borders q-mb-md">
+    <!-- هدر کارت -->
+    <q-card-section class="bg-blue-grey-1 q-py-sm">
+      <div class="row items-center justify-between">
+        <div class="row items-center">
+          <q-avatar
+            size="32px"
+            color="primary"
+            text-color="white"
+            icon="assignment"
+            class="q-mr-sm shadow-1" />
+          <div>
+            <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
+              جزئیات و مشخصات تکلیف
+            </div>
+            <div class="text-caption text-grey-7">
+              تنظیمات زمان‌بندی تحویل، مخاطبان، درس و پیوست‌های آموزشی
+            </div>
+          </div>
+        </div>
+
+        <q-chip
+          v-if="homework.id"
+          dense
+          color="blue-grey-2"
+          text-color="blue-grey-9"
+          class="text-weight-bold q-px-sm font-monospace">
+          شناسه: #{{ homework.id }}
+        </q-chip>
+      </div>
     </q-card-section>
+
     <q-separator />
 
-    <q-card-section>
-      <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-12">
-          <q-input
-            v-if="editable"
-            v-model="homework.title"
-            label="عنوان تکلیف"
-            maxlength="255"
-            required />
-          <div
-            v-else
-            class="text-body1">
-            {{ homework.title || '-' }}
-          </div>
+    <q-card-section class="q-pa-md q-gutter-y-md">
+      <!-- ۱. مشخصات عمومی و زمان‌بندی -->
+      <div class="bg-grey-1 q-pa-md rounded-borders border">
+        <div class="text-caption text-weight-bold text-grey-8 q-mb-md flex items-center">
+          <q-icon
+            name="info"
+            color="primary"
+            size="16px"
+            class="q-mr-xs" />
+          مشخصات اصلی و زمان‌بندی:
         </div>
-        <div class="col-12 col-md-6">
-          <form-builder-date
-            v-if="editable"
-            v-model:value="homework.due_date"
-            label="موعد تحویل" />
-          <div
-            v-else
-            class="text-body1">{{ dueDateFormatted }}</div>
-        </div>
-        <div class="col-12 col-md-6">
-          <form-builder-select-lesson
-            v-if="editable"
-            v-model:value="homework.lesson_id"
-            label="درس" />
-          <div
-            v-else
-            class="text-body1">
-            {{ homework.lesson?.name || '-' }}
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <form-builder-select-term
-            v-if="editable"
-            v-model:value="homework.term_id"
-            :school-id="schoolId"
-            label="ترم" />
-          <div
-            v-else
-            class="text-body1">
-            {{ homework.term?.name || '-' }}
-          </div>
-        </div>
-        <div
-          v-if="editable || homework.description"
-          class="col-12">
-          <q-input
-            v-if="editable"
-            v-model="homework.description"
-            label="توضیحات"
-            type="textarea"
-            rows="3" />
-          <div
-            v-else
-            class="text-body1">{{ homework.description }}</div>
-        </div>
-      </div>
 
-      <q-separator class="q-my-md" />
-
-      <div class="row q-col-gutter-md q-mt-md">
-        <div class="col-12 col-md-6">
-          <form-builder-select-academic-level
-            v-if="editable"
-            v-model:value="levelIds"
-            label="پایه‌ها"
-            :school-id="schoolId"
-            outlined
-            clearable
-            multiple
-            use-chips />
-          <div v-else>
-            <div class="text-subtitle2">پایه‌ها:</div>
-            <div class="q-gutter-xs">
-              <q-chip
-                v-for="level in homework.academic_levels"
-                :key="level.id"
-                color="primary"
-                text-color="white"
-                dense>
-                {{ level.name || '-' }}
-              </q-chip>
-              <span
-                v-if="!homework.academic_levels?.length"
-                class="text-grey">هیچ سطح آموزشی انتخاب نشده است.</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <form-builder-select-school-class
-            v-if="editable"
-            v-model:value="classIds"
-            label="کلاس‌ها"
-            :school-id="schoolId"
-            outlined
-            clearable
-            multiple
-            use-chips />
-          <div v-else>
-            <div class="text-subtitle2">کلاس‌ها:</div>
-            <div class="q-gutter-xs">
-              <q-chip
-                v-for="cls in homework.classes"
-                :key="cls.id"
-                color="secondary"
-                text-color="white"
-                dense>
-                {{ cls.name || '-' }}
-              </q-chip>
-              <span
-                v-if="!homework.classes?.length"
-                class="text-grey">هیچ کلاسی انتخاب نشده است.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <q-separator class="q-my-md" />
-
-      <div class="row q-col-gutter-md q-mt-md">
-        <div class="col-12">
-          <div class="row items-center q-mb-sm">
-            <div class="col">
-              <div class="text-subtitle2">
-                پیوست‌ها
-                <q-btn
-                  v-if="editable"
-                  color="primary"
-                  icon="add"
-                  class="q-ml-md"
-                  @click="addAttachment" />
+        <div class="row q-col-gutter-md">
+          <!-- عنوان تکلیف -->
+          <div class="col-12 col-md-6">
+            <q-input
+              v-if="editable"
+              v-model="homework.title"
+              label="عنوان تکلیف *"
+              outlined
+              dense
+              bg-color="white"
+              maxlength="255"
+              :rules="[(val) => !!val || 'عنوان تکلیف الزامی است']" />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border">
+              <div class="text-caption text-grey-6">عنوان تکلیف</div>
+              <div class="text-subtitle2 text-weight-bold text-blue-grey-10">
+                {{ homework.title || '-' }}
               </div>
             </div>
           </div>
-          <q-list
-            v-if="attachmentsList.length"
-            bordered
-            separator
-            class="rounded-borders">
-            <q-item
-              v-for="(att, index) in attachmentsList"
-              :key="att.id || `new-${index}`"
-              class="q-py-sm">
-              <q-item-section>
-                <content-editor
-                  v-model:value="att.content"
-                  :editable="editable" />
-              </q-item-section>
-              <q-item-section
-                v-if="editable"
-                side
-                top>
-                <q-btn
-                  flat
-                  round
+
+          <!-- انتخاب ترم -->
+          <div class="col-12 col-md-3">
+            <form-builder-select-term
+              v-if="editable"
+              v-model:value="homework.term_id"
+              :school-id="schoolId"
+              label="ترم تحصیلی *"
+              outlined
+              dense
+              bg-color="white" />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border">
+              <div class="text-caption text-grey-6">ترم تحصیلی</div>
+              <div class="text-body2 text-weight-bold text-blue-grey-9">
+                {{ homework.term?.name || '-' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- موعد تحویل -->
+          <div class="col-12 col-md-3">
+            <form-builder-date
+              v-if="editable"
+              v-model:value="homework.due_date"
+              label="موعد تحویل *"
+              outlined
+              dense
+              bg-color="white" />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border">
+              <div class="text-caption text-grey-6">موعد تحویل</div>
+              <div class="text-body2 text-weight-bold text-primary flex items-center q-mt-xs">
+                <q-icon
+                  name="event"
+                  size="16px"
+                  class="q-mr-xs" />
+                {{ dueDateFormatted }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ۲. انتساب و اطلاعات آموزشی (پایه‌ها، کلاس‌ها، درس مربوطه) -->
+      <div class="bg-grey-1 q-pa-md rounded-borders border">
+        <div class="text-caption text-weight-bold text-grey-8 q-mb-md flex items-center">
+          <q-icon
+            name="school"
+            color="primary"
+            size="16px"
+            class="q-mr-xs" />
+          انتساب و ساختار آموزشی (پایه‌ها، کلاس‌ها و درس):
+        </div>
+
+        <div class="row q-col-gutter-md">
+          <!-- انتخاب پایه‌ها -->
+          <div class="col-12 col-md-4">
+            <form-builder-select-academic-level
+              v-if="editable"
+              v-model:value="levelIds"
+              label="پایه‌های تحصیلی"
+              :school-id="schoolId"
+              bg-color="white"
+              clearable
+              multiple
+              use-chips />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6 q-mb-xs">پایه‌های تحصیلی:</div>
+              <div class="row items-center q-gutter-xs">
+                <q-chip
+                  v-for="level in homework.academic_levels"
+                  :key="level.id"
                   dense
-                  icon="delete"
-                  color="negative"
-                  size="sm"
-                  @click="removeAttachment(index)" />
-              </q-item-section>
-            </q-item>
-          </q-list>
-          <div
-            v-else
-            class="text-center q-pa-md text-grey">پیوستی ثبت نشده است.</div>
+                  color="blue-1"
+                  text-color="blue-9"
+                  size="sm">
+                  {{ level.name || '-' }}
+                </q-chip>
+                <span
+                  v-if="!homework.academic_levels?.length"
+                  class="text-caption text-grey-6">هیچ پایه‌ای انتخاب نشده است.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- انتخاب کلاس‌ها (فیلتر شده براساس پایه‌ها) -->
+          <div class="col-12 col-md-4">
+            <form-builder-select-school-class
+              v-if="editable"
+              v-model:value="classIds"
+              label="کلاس‌های مشمول"
+              :school-id="schoolId"
+              :level-id="levelIds"
+              outlined
+              dense
+              bg-color="white"
+              clearable
+              multiple
+              use-chips />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6 q-mb-xs">کلاس‌های مشمول:</div>
+              <div class="row items-center q-gutter-xs">
+                <q-chip
+                  v-for="cls in homework.classes"
+                  :key="cls.id"
+                  dense
+                  color="teal-1"
+                  text-color="teal-9"
+                  size="sm">
+                  {{ cls.name || '-' }}
+                </q-chip>
+                <span
+                  v-if="!homework.classes?.length"
+                  class="text-caption text-grey-6">هیچ کلاسی انتخاب نشده است.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- انتخاب درس (فیلتر شده براساس پایه‌ها و کلاس‌ها) -->
+          <div class="col-12 col-md-4">
+            <form-builder-select-lesson
+              v-if="editable"
+              v-model:value="homework.lesson_id"
+              :school-id="schoolId"
+              :level-id="levelIds"
+              :class-id="classIds"
+              label="درس مربوطه *"
+              outlined
+              dense
+              bg-color="white" />
+            <div
+              v-else
+              class="bg-white q-pa-sm rounded-borders border full-height">
+              <div class="text-caption text-grey-6">درس مربوطه:</div>
+              <div class="text-body2 text-weight-bold text-blue-grey-9 q-mt-xs">
+                {{ homework.lesson?.name || '-' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ۳. شرح و دستورالعمل تکلیف -->
+      <div
+        v-if="editable || homework.description"
+        class="bg-grey-1 q-pa-md rounded-borders border">
+        <div class="text-caption text-weight-bold text-grey-8 q-mb-md flex items-center">
+          <q-icon
+            name="description"
+            color="primary"
+            size="16px"
+            class="q-mr-xs" />
+          توضیحات و دستورالعمل تکلیف:
+        </div>
+
+        <q-input
+          v-if="editable"
+          v-model="homework.description"
+          label="توضیحات و دستورالعمل برای دانش‌آموزان"
+          type="textarea"
+          outlined
+          dense
+          bg-color="white"
+          rows="3" />
+        <div
+          v-else
+          class="bg-white q-pa-md rounded-borders border text-body2 text-grey-9 text-justify"
+          style="white-space: pre-wrap">
+          {{ homework.description }}
+        </div>
+      </div>
+
+      <!-- ۴. پیوست‌ها و ضمیمه‌ها -->
+      <div class="bg-grey-1 q-pa-md rounded-borders border">
+        <div class="row items-center justify-between q-mb-md">
+          <div class="text-caption text-weight-bold text-grey-8 flex items-center">
+            <q-icon
+              name="attach_file"
+              color="primary"
+              size="16px"
+              class="q-mr-xs" />
+            پیوست‌ها و فایل‌های ضمیمه ({{ attachmentsList.length }} مورد):
+          </div>
+
+          <q-btn
+            v-if="editable"
+            dense
+            unelevated
+            color="primary"
+            icon="add"
+            label="افزودن پیوست جدید"
+            size="sm"
+            class="q-px-sm"
+            @click="addAttachment" />
+        </div>
+
+        <!-- لیست پیوست‌ها -->
+        <q-list
+          v-if="attachmentsList.length"
+          bordered
+          separator
+          class="bg-white rounded-borders">
+          <q-item
+            v-for="(att, index) in attachmentsList"
+            :key="att.id || `new-${index}`"
+            class="q-py-md">
+            <q-item-section
+              avatar
+              top>
+              <q-avatar
+                size="28px"
+                color="blue-1"
+                text-color="primary"
+                class="text-weight-bold text-caption">
+                {{ index + 1 }}
+              </q-avatar>
+            </q-item-section>
+
+            <q-item-section>
+              <content-editor
+                v-model:value="att.content"
+                :editable="editable" />
+            </q-item-section>
+
+            <q-item-section
+              v-if="editable"
+              side
+              top>
+              <q-btn
+                flat
+                round
+                dense
+                icon="delete_outline"
+                color="negative"
+                size="sm"
+                @click="removeAttachment(index)">
+                <q-tooltip>حذف این پیوست</q-tooltip>
+              </q-btn>
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <!-- وضعیت عدم وجود پیوست -->
+        <div
+          v-else
+          class="column items-center justify-center q-pa-lg text-grey-6 bg-white rounded-borders border">
+          <q-icon
+            name="attachment"
+            size="36px"
+            color="grey-4" />
+          <div class="text-caption q-mt-xs">پیوستی برای این تکلیف ثبت نشده است.</div>
         </div>
       </div>
     </q-card-section>

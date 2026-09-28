@@ -56,7 +56,6 @@
 import { computed, ref, onMounted } from 'vue'
 import { useEntitySelector } from 'src/composables/useEntitySelector'
 import SchoolClassAPI, { type SchoolClassType } from 'src/repositories/schoolClass'
-import { getUserRoleLabel } from 'src/repositories/user'
 
 defineOptions({
   name: 'FormBuilderSelectSchoolClass'
@@ -149,7 +148,7 @@ const props = defineProps({
   },
   levelId: {
     default: null,
-    type: Number
+    type: [Number, Array] as unknown as () => number | number[] | null
   }
 })
 
@@ -196,7 +195,11 @@ async function getSchoolClasses (name: string | null) {
     params.field_id = props.fieldId
   }
   if (props.levelId) {
-    params.academic_level_id = props.levelId
+    if (Array.isArray(props.levelId) && props.levelId.length > 0) {
+      params.academic_level_id_in = props.levelId
+    } else if (!Array.isArray(props.levelId)) {
+      params.academic_level_id = props.levelId
+    }
   }
   const schoolClassesList = await schoolClassAPI.index(params)
   return schoolClassesList.data
@@ -213,13 +216,24 @@ useEntitySelector<SchoolClassType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'school classes',
-  fetchByIds: (params) => schoolClassAPI.index({
-    ...params,
-    sortation_field: 'created_at',
-    sortation_order: 'desc',
-    field_id: props.fieldId ?? undefined,
-    academic_level_id: props.levelId ?? undefined
-  })
+  fetchByIds: (params) => {
+    const levelParams: any = {}
+    if (props.levelId) {
+      if (Array.isArray(props.levelId) && props.levelId.length > 0) {
+        levelParams.academic_level_id_in = props.levelId
+      } else if (!Array.isArray(props.levelId)) {
+        levelParams.academic_level_id = props.levelId
+      }
+    }
+
+    return schoolClassAPI.index({
+      ...params,
+      ...levelParams,
+      sortation_field: 'created_at',
+      sortation_order: 'desc',
+      field_id: props.fieldId ?? undefined
+    })
+  }
 })
 
 onMounted(async () => {

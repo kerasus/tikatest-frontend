@@ -244,6 +244,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { EntityIndex } from 'quasar-crud'
+import { useDate } from 'src/composables/Date'
 import { exam, type ExamType } from 'src/repositories/exam'
 import type { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
@@ -253,11 +254,11 @@ interface ExamTimingStatus {
   icon: string
 }
 
-
 const router = useRouter()
 const entityIndexRef = ref()
+const dateManager = useDate()
 
-const api = ref(exam.endpoints.studentOnlineExams)
+const api = ref(exam.endpoints.myOnlineExams)
 const label = ref('آزمون‌های آنلاین')
 const itemIdentifyKey = ref('id')
 const tableKeys = ref({
@@ -379,7 +380,7 @@ const getActionLabel = (examItem: ExamType) => {
 
 const formatDateTime = (value: string | null) => {
   if (!value) return '-'
-  return new Date(value).toLocaleString('fa-IR')
+  return dateManager.isoToLocalShamsiDateTime(value)
 }
 
 const formatTimeUsed = (seconds: number | null | undefined) => {
