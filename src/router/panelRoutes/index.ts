@@ -20,7 +20,9 @@ import { index as studentGuardianRoutes } from './studentGuardian'
 export const index: RouteRecordRaw[] = [
   {
     path: ':school/:role',
+    name: 'PanelParent',
     meta: {
+      isPanel: true,
       middleware: [Authenticated],
       layoutConfig: {
         pageCustomClass: 'q-pa-md'

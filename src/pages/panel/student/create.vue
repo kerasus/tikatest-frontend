@@ -17,14 +17,14 @@ import StudentAPI from 'src/repositories/student'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
-import FormBuilderSelectClasses from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectClasses.vue'
+import FormBuilderSelectEnrollments from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectEnrollments.vue'
 
 const studentAPI = new StudentAPI()
 const currentSchoolManager = useCurrentSchool()
 
 const FormBuilderDateComponent = shallowRef(FormBuilderDate)
 const FormBuilderInputComponent = shallowRef(FormBuilderInput)
-const FormBuilderSelectClassesComponent = shallowRef(FormBuilderSelectClasses)
+const FormBuilderSelectEnrollmentsComponent = shallowRef(FormBuilderSelectEnrollments)
 
 const api = ref(studentAPI.endpoints.base)
 const label = ref('ثبت دانش آموز جدید')
@@ -124,9 +124,9 @@ const inputs = ref([
     col: 'col-md-12'
   },
   {
-    type: FormBuilderSelectClassesComponent,
-    name: 'class_ids',
-    responseKey: 'class_ids',
+    type: FormBuilderSelectEnrollmentsComponent,
+    name: 'enrollments',
+    responseKey: 'enrollments',
     schoolId: currentSchoolManager.currentSchool.value?.id,
     label: 'کلاس ها',
     col: 'col-md-12'
