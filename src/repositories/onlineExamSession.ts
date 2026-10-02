@@ -1,10 +1,56 @@
 import BaseAPI from './BaseAPI'
+import type { LessonType } from 'src/repositories/lesson'
+import type { BookletType, ExamType, OnlineExamDetailType } from 'src/repositories/exam'
+import type { UserType } from 'src/repositories/user'
+
+export type ParticipationStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'submitted'
+  | 'graded'
+  | 'expired';
+
+export type OnlineExamSessionResponseItemType = {
+  id: number | null
+  session_id: number | null
+  question_number: number | null
+  booklet_id?: number | null
+  lesson_id?: number | null
+  submitted_option: string | null
+  answer_text: string | null
+  is_correct: boolean | null
+  marks_obtained: number | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export type OnlineExamSessionResultType = {
+  id: number | null
+  online_exam_session_id: number | null
+  online_exam_booklet_id: number | null
+  lesson_id: number | null
+  question_count: number | null
+  answered_questions: number | null
+  correct_count: number | null
+  wrong_count: number | null
+  unanswered_count: number | null
+  raw_score: number | null
+  t_score: number | null
+  percent: number | null
+  rank_in_lesson?: number | null
+  rank_in_booklet?: number | null
+  rank_in_exam?: number | null
+  created_at?: string | null
+  updated_at?: string | null
+  lesson?: LessonType | null
+  booklet?: BookletType | null
+}
 
 export type OnlineExamSessionType = {
   id: number | null
   exam_id: number | null
   student_id: number | null
-  status: 'not_started' | 'in_progress' | 'submitted' | 'graded' | 'expired' | null
+  status: ParticipationStatus | null
   started_at: string | null
   submitted_at: string | null
   duration_limit_seconds: number | null
@@ -17,14 +63,10 @@ export type OnlineExamSessionType = {
   is_locked: boolean | null
   created_at: string | null
   updated_at: string | null
-  exam?: any | null
-  student?: {
-    id: number | null
-    full_name: string | null
-    first_name: string | null
-    last_name: string | null
-  } | null
-  responses?: any[] | null
+  exam?: ExamType | null
+  student?: UserType | null
+  responses?: OnlineExamSessionResponseItemType[] | null
+  results?: OnlineExamSessionResultType[] | null
 }
 
 export type StudentAnswerKeyType = {
@@ -42,10 +84,9 @@ export type StudentAnswerKeyType = {
 export type StartExamResponseType = {
   session: OnlineExamSessionType
   remaining_time: number | null
-  online_detail: any | null
   answer_keys: StudentAnswerKeyType[] | null
   error?: string | null
-  status?: number | null
+  status?: number | string | null
 }
 
 export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType> {
@@ -67,7 +108,11 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
       attempt_number: 1,
       is_locked: false,
       created_at: null,
-      updated_at: null
+      updated_at: null,
+      exam: null,
+      student: null,
+      responses: [],
+      results: []
     }
   }
 
@@ -107,11 +152,17 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
     return response.data
   }
 
-  async getResultByExamId (examId: number, params?: { attempt_number?: number }): Promise<StartExamResponseType> {
+  async getMyResultByExamId (examId: number, params?: { attempt_number?: number }): Promise<StartExamResponseType> {
     const response = await this.getAxiosInstanceWithToken().get(
-      `${this.baseEndpoint}/${examId}/result`,
+      `${this.baseEndpoint}/${examId}/my-result`,
       { params }
     )
+    return response.data
+  }
+
+  async getResultBySessionId (sessionId: number): Promise<StartExamResponseType> {
+    const response = await this.getAxiosInstanceWithToken()
+      .get(`${this.baseEndpoint}/${sessionId}`)
     return response.data
   }
 

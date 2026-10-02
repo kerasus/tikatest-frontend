@@ -1,310 +1,146 @@
 <template>
-  <div
-    class="left-drawer"
-    :class="{ 'left-drawer--mini': appLayoutStore.layoutLeftDrawerMini }">
-    <div class="left-drawer__inner">
-      <div class="left-drawer__toggle-visible lt-md">
+  <q-card>
+    <exam-answer-sheet
+      :booklets="booklets"
+      :readonly="isReadonly"
+      :answer-keys="answerKeys"
+      :session-responses="sessionResponses"
+      @answer-changed="submitAnswer" />
+
+    <q-separator />
+
+    <template v-if="isReadonly">
+      <exam-overall-result
+        v-if="session"
+        :session="session"
+        :answer-keys="answerKeys"
+        :session-responses="sessionResponses"
+        :status-label="onlineExamStore.statusLabel"
+        :used-time-seconds="onlineExamStore.usedTimeSeconds" />
+
+      <exam-booklet-results
+        :results="bookletResults"
+        :booklets="booklets" />
+    </template>
+
+    <q-card-actions
+      v-else
+      align="right">
+      <q-btn
+        flat
+        icon="send"
+        label="اتمام و ثبت"
+        color="positive"
+        @click="confirmSubmit" />
+    </q-card-actions>
+  </q-card>
+  <!-- انتهای template -->
+  <q-dialog
+    v-model="isConfirmDialogOpen"
+    persistent
+    full-width>
+    <q-card style="max-width: 900px; width: 100%">
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6 text-primary">تایید نهایی پاسخ‌ها</div>
+        <q-space />
         <q-btn
-          class="icon-button drawer-btn"
-          color="primary"
+          v-close-popup
+          icon="close"
           flat
-          :icon="
-            !appLayoutStore.layoutLeftDrawerVisible
-              ? 'keyboard_double_arrow_left'
-              : 'keyboard_double_arrow_right'
-          "
-          @click="toggleLeftDrawerVisible" />
-      </div>
-      <q-scroll-area class="scroll-area">
-        <q-card>
-          <q-table
-            v-if="answerKeys"
-            :columns="answerColumns"
-            :rows="answerKeys"
-            row-key="question_number"
-            :rows-per-page-options="[0]"
-            dense
-            separator="cell"
-            hide-pagination>
-            <template #body-cell="cellProps">
-              <!-- ۱. شماره سوال -->
-              <q-td
-                v-if="cellProps.col.name === 'question_number'"
-                :props="cellProps">
-                <div class="text-center">
-                  {{ cellProps.row.question_number }}
-                </div>
-              </q-td>
+          round
+          dense />
+      </q-card-section>
 
-              <!-- ۳. ستون بی‌پاسخ (جدید) -->
-              <q-td
-                v-else-if="cellProps.col.name === 'unanswered'"
-                :props="cellProps"
-                :class="{
-                  'cursor-pointer': !isReadonly && !!cellProps.row.submitted_option
-                }"
-                @click="resetOption(cellProps.row)">
-                <div class="text-center">
-                  <q-icon
-                    :name="!cellProps.row.submitted_option ? 'radio_button_checked' : 'radio_button_unchecked'"
-                    :color="
-                      isReadonly
-                        ? (!cellProps.row.submitted_option ? 'amber-8' : 'grey-4')
-                        : (!cellProps.row.submitted_option ? 'primary' : 'grey-4')
-                    "
-                    size="24px" />
-                </div>
-              </q-td>
-
-              <!-- ۳. گزینه‌های الف، ب، ج، د ... -->
-              <q-td
-                v-else
-                :props="cellProps"
-                :class="{
-                  'cursor-pointer':
-                    !isReadonly && isChoiceEnabled(cellProps.row, Number(cellProps.col.name)),
-                }"
-                @click="
-                  !isReadonly &&
-                    isChoiceEnabled(cellProps.row, Number(cellProps.col.name)) &&
-                    selectOption(cellProps.row, cellProps.col.name)
-                ">
-                <div class="text-center">
-                  <q-icon
-                    v-if="isChoiceEnabled(cellProps.row, Number(cellProps.col.name))"
-                    :name="
-                      isReadonly
-                        ? choiceIcon(cellProps.row, cellProps.col.name)
-                        : cellProps.row.submitted_option === cellProps.col.name
-                          ? 'check_circle'
-                          : 'radio_button_unchecked'
-                    "
-                    :color="
-                      isReadonly
-                        ? choiceColor(cellProps.row, cellProps.col.name)
-                        : cellProps.row.submitted_option === cellProps.col.name
-                          ? 'primary'
-                          : 'grey-4'
-                    "
-                    size="24px" />
-                  <span
-                    v-else
-                    class="text-grey-5">-</span>
-                </div>
-              </q-td>
-            </template>
-          </q-table>
-
-          <q-separator />
-
-          <q-card-section
-            v-if="isReadonly && session"
-            class="q-pb-none">
-            <div class="row q-col-gutter-sm text-caption">
-              <div class="col-6">
-                <div class="text-grey-7">نمره</div>
-                <div class="text-subtitle2">{{ session.t_score ?? 0 }}</div>
-              </div>
-              <div class="col-6">
-                <div class="text-grey-7">درصد</div>
-                <div class="text-subtitle2">{{ session.percent ?? 0 }}٪</div>
-              </div>
-              <div class="col-6">
-                <div class="text-grey-7">زمان مصرف‌شده</div>
-                <div class="text-subtitle2">{{ onlineExamStore.usedTimeSeconds ?? 0 }} ثانیه</div>
-              </div>
-              <div class="col-6">
-                <div class="text-grey-7">وضعیت</div>
-                <div class="text-subtitle2">{{ onlineExamStore.statusLabel }}</div>
-              </div>
-              <div class="col-6">
-                <div class="text-grey-7">شروع</div>
-                <div class="text-subtitle2 ltr">
-                  {{ formatSessionDateTime(session.started_at) }}
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="text-grey-7">پایان</div>
-                <div class="text-subtitle2 ltr">
-                  {{ formatSessionDateTime(session.submitted_at) }}
-                </div>
-              </div>
-            </div>
-          </q-card-section>
-
-          <q-separator v-if="isReadonly && session" />
-
-          <q-card-section
-            v-if="isReadonly"
-            class="text-caption">
-            <div class="row items-center q-gutter-sm">
-              <q-icon
-                name="check_circle_outline"
-                color="positive" />
-              <span>پاسخ صحیح</span>
-              <q-icon
-                name="cancel"
-                color="negative" />
-              <span>پاسخ انتخاب‌شده نادرست</span>
-            </div>
-          </q-card-section>
-
-          <q-card-actions
-            v-else
-            align="right">
-            <q-btn
-              flat
-              icon="send"
-              label="اتمام و ثبت"
-              color="positive"
-              @click="confirmSubmit" />
-          </q-card-actions>
-        </q-card>
-      </q-scroll-area>
-      <div class="left-drawer__copyright-section">
-        <div class="app-version">v: {{ appConfigManager.version }}</div>
-        <div class="copy-right">
-          <span> Copyright TikaTest co. </span>
-          <span> &copy; {{ new Date().getFullYear() }} </span>
+      <q-card-section class="q-pt-sm">
+        <div class="text-subtitle2 text-red-8 q-mb-md">
+          ⚠️ <strong>توجه:</strong> لطفاً پاسخ‌های خود را در جدول زیر بررسی کنید. این آخرین شانس شما
+          برای مرور است. پس از ثبت نهایی، امکان ویرایش یا ادعای جابجایی گزینه‌ها وجود نخواهد داشت.
         </div>
-      </div>
-    </div>
-  </div>
+
+        <!-- نمایش پاسخ‌نامه در حالت فقط خواندنی -->
+
+        <exam-answer-sheet
+          :booklets="booklets"
+          :readonly="true"
+          :answer-keys="answerKeys"
+          :session-responses="sessionResponses" />
+      </q-card-section>
+
+      <q-card-actions
+        align="right"
+        class="q-pa-md">
+        <q-btn
+          v-close-popup
+          flat
+          label="بازگشت و اصلاح"
+          color="grey-8" />
+        <q-btn
+          label="ثبت نهایی آزمون"
+          color="positive"
+          icon="check"
+          @click="executeFinalSubmit" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { useRoute, useRouter } from 'vue-router'
-import { computed, watch, onMounted, nextTick } from 'vue'
 import { useAppLayout } from 'stores/appLayout'
-import { useAppConfig } from 'stores/appConfig'
-import { useOnlineExamSession } from 'src/stores/onlineExamSession'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import ExamAnswerSheet from './components/ExamAnswerSheet.vue'
+import { useOnlineExamSession } from 'stores/onlineExamSession'
+import ExamOverallResult from './components/ExamOverallResult.vue'
+import ExamBookletResults from './components/ExamBookletResults.vue'
 import OnlineExamSessionAPI from 'src/repositories/onlineExamSession'
-import moment from 'jalali-moment'
+import type { OnlineExamSessionResultType } from 'src/repositories/onlineExamSession'
 
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
 const appLayoutStore = useAppLayout()
-const appConfigManager = useAppConfig()
-const startAPI = new OnlineExamSessionAPI()
 const onlineExamStore = useOnlineExamSession()
+const onlineExamSessionAPI = new OnlineExamSessionAPI()
 
-const optionLabels = ['الف', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', 'ی']
+const isConfirmDialogOpen = ref(false)
 
+const booklets = computed(() => onlineExamStore.booklets)
 const session = computed(() => onlineExamStore.sessionData)
 const answerKeys = computed(() => onlineExamStore.answerKeys ?? null)
-const isReadonly = computed(
-  () => route.name === 'Student.Exam.Result' || !onlineExamStore.isActive
-)
-
-const answerColumns = computed(() => {
-  const cols = [
-    {
-      name: 'question_number',
-      label: 'شماره سوال',
-      field: 'question_number',
-      align: 'center' as const
-    }
-  ]
-  for (let i = 0; i < effectiveChoiceCount.value; i++) {
-    cols.push({
-      name: String(i + 1),
-      label: optionLabels[i],
-      field: String(i + 1),
-      align: 'center' as const
-    })
-  }
-  cols.push({
-    name: 'unanswered',
-    label: 'بی‌پاسخ',
-    field: 'unanswered',
-    align: 'center' as const
-  })
-  return cols
+const sessionResponses = computed(() => onlineExamStore.sessionResponses ?? null)
+const isReadonly = computed(() => route.name === 'Student.Exam.Result' || !onlineExamStore.isActive)
+const bookletResults = computed<OnlineExamSessionResultType[]>(() => {
+  return (session.value?.results ?? []).filter((result) => result.online_exam_booklet_id != null)
 })
 
-const currentRouteName = computed(() => route.name)
+async function submitAnswer (questionNumber: number, submittedOption: string | null) {
+  if (session.value?.id == null) return
 
-const effectiveChoiceCount = computed(() => {
-  if (!answerKeys.value) return 4
-  const maxFromKeys = answerKeys.value.reduce((max, key) => {
-    const n = Number(key.number_of_choices) || 0
-    return n > max ? n : max
-  }, 0)
-  return Math.max(maxFromKeys, 2)
-})
-
-function toggleLeftDrawer () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
-  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
-}
-
-function toggleLeftDrawerVisible () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = false
-  appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
-}
-
-const isChoiceEnabled = (row: any, choiceIndex: number) => {
-  const maxChoices = Number(row.number_of_choices) || effectiveChoiceCount.value
-  return choiceIndex >= 1 && choiceIndex <= maxChoices
-}
-
-const selectOption = (row: any, option: string) => {
-  if (isReadonly.value) return
-
-  const previous = row.submitted_option
-  row.submitted_option = previous === option ? null : option
-
-  submitAnswer(row.question_number, row.submitted_option)
-}
-
-const choiceIcon = (row: any, option: string) => {
-  const isSelected = row.submitted_option === option
-  const isCorrect = row.correct_option === option
-
-  if (isSelected && isCorrect) return 'check_circle'
-  if (isSelected) return 'cancel'
-  if (isCorrect) return 'check_circle_outline'
-  return 'radio_button_unchecked'
-}
-
-const choiceColor = (row: any, option: string) => {
-  if (row.correct_option === option) return 'positive'
-  if (row.submitted_option === option) return 'negative'
-  return 'grey-4'
-}
-
-const submitAnswer = async (questionNumber: number, submittedOption: string | null) => {
   try {
-    await startAPI.submitAnswer(session.value.id, questionNumber, submittedOption || undefined)
-  } catch (err: any) {
+    await onlineExamSessionAPI.submitAnswer(
+      session.value.id,
+      questionNumber,
+      submittedOption || undefined
+    )
+  } catch {
     $q.notify({ type: 'negative', message: 'خطا در ذخیره پاسخ' })
   }
 }
 
-const confirmSubmit = () => {
-  $q.dialog({
-    title: 'تایید ثبت آزمون',
-    message: 'آیا مطمئن هستید که می‌خواهید آزمون را ثبت کنید؟',
-    cancel: true,
-    persistent: true
-  }).onOk(() => {
-    submitSession()
-  })
-}
+async function submitSession () {
+  const currentSession = session.value
+  if (currentSession?.id == null) return
 
-const submitSession = async () => {
   try {
-    const currentSession = session.value
-    await startAPI.submitSession(currentSession.id)
+    await onlineExamSessionAPI.submitSession(currentSession.id)
     $q.notify({ type: 'positive', message: 'آزمون با موفقیت ثبت شد' })
     onlineExamStore.clearSession()
-    router.push({
+    await router.push({
       name: 'Student.Exam.Result',
       params: { id: currentSession.exam?.id ?? route.params.id }
     })
-  } catch (err: any) {
+  } catch {
     $q.notify({ type: 'negative', message: 'خطا در ثبت آزمون' })
   }
 }
@@ -313,145 +149,85 @@ function checkLayoutLeftDrawerOverlay () {
   appLayoutStore.layoutLeftDrawerOverlay = !$q.screen.gt.md
 }
 
+async function confirmSubmit () {
+  const currentSession = session.value
+  const examId = Number(route.params.id)
+
+  // اگر سشن نداریم، منطقی نیست دیالوگ ثبت نهایی باز کنیم
+  if (!currentSession?.id) return
+
+  onlineExamStore.setLoading(true)
+  try {
+    // 1) گرفتن آخرین وضعیت از دیتابیس
+    const fresh = await onlineExamSessionAPI.start(examId)
+
+    // اگر بک‌اند پیام خطا برگردوند
+    if (fresh?.error) {
+      $q.notify({ type: 'negative', message: fresh.error || 'خطا در دریافت آخرین پاسخ‌ها' })
+      return
+    }
+
+    // 2) Sync کردن استور با داده تازه
+    // اگر setSession کل ساختار (session/answerKeys/...) رو می‌چیند، این بهترین گزینه است:
+    onlineExamStore.setSession(fresh)
+
+    // 3) برای اطمینان: submitted_option های answerKeys را با responses هم‌راستا کن
+    syncAnswerKeysFromSession(session.value)
+
+    // 4) حالا دیالوگ را باز کن: این چیزی است که واقعاً در DB ثبت شده
+    isConfirmDialogOpen.value = true
+  } catch (e) {
+    $q.notify({ type: 'negative', message: 'خطا در دریافت آخرین پاسخ‌های ذخیره‌شده' })
+  } finally {
+    onlineExamStore.setLoading(false)
+  }
+
+}
+
+// ۳. متد اجرای ثبت (بعد از تایید کاربر)
+async function executeFinalSubmit () {
+  isConfirmDialogOpen.value = false // بستن دیالوگ
+  await submitSession() // فراخوانی همان متد قدیمی که لاجیک اصلی را داشت
+}
+
+const syncAnswerKeysFromSession = (freshSession: any) => {
+  const responses = freshSession?.responses || []
+  if (!answerKeys.value) return
+
+  // اول پاکسازی submitted_option ها تا اگر کاربر جواب رو پاک کرده بود هم درست رندر بشه
+  answerKeys.value.forEach((k: any) => {
+    k.submitted_option = null
+  })
+
+  responses.forEach((r: any) => {
+    const key = answerKeys.value.find((k: any) => k.question_number === r.question_number)
+    if (key) {
+      // @ts-ignore
+      key.submitted_option = r.submitted_option || null
+    }
+  })
+}
+
 watch(
-  currentRouteName,
+  () => route.name,
   () => {
     if ($q.screen.lt.md) {
       appLayoutStore.layoutLeftDrawerVisible = false
     }
   },
-  {
-    immediate: true
-  }
+  { immediate: true }
 )
-
-const formatSessionDateTime = (value: string | null | undefined) => {
-  if (!value) return '-'
-  return moment(value).locale('fa').format('jYYYY/jMM/jDD HH:mm:ss')
-}
-
-const resetOption = (row: any) => {
-  if (isReadonly.value) return
-  if (!row.submitted_option) return
-
-  row.submitted_option = null
-  submitAnswer(row.question_number, null)
-}
-
 
 watch(
   () => $q.screen.gt.md,
   () => {
-    requestAnimationFrame(() => {
-      checkLayoutLeftDrawerOverlay()
-    })
+    requestAnimationFrame(checkLayoutLeftDrawerOverlay)
   },
   { immediate: true }
 )
 
 onMounted(async () => {
   await nextTick()
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  checkLayoutLeftDrawerOverlay()
-                })
-              })
-            })
-          })
-        })
-      })
-    })
-  })
+  requestAnimationFrame(checkLayoutLeftDrawerOverlay)
 })
 </script>
-
-<style scoped lang="scss">
-.left-drawer {
-  background: $gray-100;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  .left-drawer__inner {
-    background: $gray-100;
-    padding: $space-4 $space-2;
-    border-radius: 0 $radius-6 $radius-6 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column;
-    .left-drawer__toggle-visible {
-    }
-    :deep(.scroll-area) {
-      flex: 1;
-      .q-scrollarea__container {
-        .q-scrollarea__content {
-          display: flex;
-          width: 100%;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-      }
-    }
-    .left-drawer__copyright-section {
-      padding-left: $space-4;
-      color: #67748e;
-      font-size: 11px;
-      direction: rtl;
-      text-align: left;
-      .app-version {
-      }
-      .copy-right {
-      }
-    }
-  }
-  &.left-drawer--mini {
-    .left-drawer__inner {
-      :deep(.scroll-area) {
-        flex: 1;
-        .q-scrollarea__container {
-          .q-scrollarea__content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-          }
-        }
-      }
-      .left-drawer__copyright-section {
-        display: flex;
-        flex-direction: column;
-        span {
-          text-align: justify;
-        }
-      }
-    }
-  }
-}
-:deep(.q-expansion-item--expanded) {
-  color: $primary;
-  .q-expansion-item__container {
-    .q-icon {
-      color: $primary;
-    }
-  }
-}
-:deep(.q-table__container) {
-  .q-table__middle .q-table {
-    thead tr th {
-      height: 0;
-      padding: 0;
-    }
-    tbody tr td {
-      height: 0;
-      padding: 0;
-      border-bottom-width: 1px;
-    }
-  }
-}
-</style>

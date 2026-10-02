@@ -5,7 +5,8 @@ import {
   createWebHashHistory,
   createWebHistory,
   type RouteLocationRaw,
-  type RouteLocationNamedRaw
+  type RouteLocationNamedRaw,
+  type RouteLocationNormalizedLoaded
 } from 'vue-router'
 import routes from './routes'
 
@@ -20,40 +21,66 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
+  // تابع کمکی برای استخراج سریع پارامترهای school و role از URL مرورگر در صورت خالی بودن Router.currentRoute
+  function extractParamsFromBrowserUrl (): { school?: string; role?: string } {
+    if (typeof window === 'undefined') return {}
+    // پشتیبانی هم از حالت هش (#/mobtakeran/student/...) و هم history
+    const path = window.location.hash
+      ? window.location.hash.replace(/^#\/?/, '/')
+      : window.location.pathname
+
+    const segments = path.split('/').filter(Boolean)
+    if (segments.length >= 2) {
+      return {
+        school: segments[0],
+        role: segments[1]
+      }
+    }
+    return {}
+  }
+
   // -------------------------------------------------------------
   // منطق تزریق خودکار پارامترهای school و role برای روت‌های پنل
   // -------------------------------------------------------------
-  function autoFillPanelParams (to: RouteLocationRaw): RouteLocationRaw {
-    // اگر آدرس یک رشته ساده مثل "/login" بود کاری باهاش نداریم
+  function autoFillPanelParams (
+    to: RouteLocationRaw,
+    currentLocation?: RouteLocationNormalizedLoaded
+  ): RouteLocationRaw {
+    // اگر آدرس یک رشته ساده یا نامعتبر بود کاری باهاش نداریم
     if (typeof to !== 'object' || to === null || !('name' in to) || !to.name) {
       return to
     }
 
-    const currentParams = Router.currentRoute.value?.params || {}
-    const currentSchool = currentParams.school
-    const currentRole = currentParams.role
+    // ۱. اولویت اول: خواندن از currentLocation که خود vue-router پاس داده
+    // ۲. اولویت دوم: Router.currentRoute
+    // ۳. اولویت سوم: خواندن مستقیم از آدرس بار مرورگر
+    const fallbackFromBrowser = extractParamsFromBrowserUrl()
+    const activeRoute = currentLocation || Router.currentRoute.value
 
-    // اگر در حال حاضر پارامترهای school و role موجود نیستند، نیازی به پر کردن نیست
-    if (!currentSchool || !currentRole) {
-      return to
-    }
+    const currentSchool =
+      activeRoute?.params?.school ||
+      fallbackFromBrowser.school ||
+      (typeof localStorage !== 'undefined' ? localStorage.getItem('last_school') : null)
 
-    // بررسی اینکه آیا این نام روت متعلق به پنل است؟
-    // ۱. چک ساده بر اساس نام (مثلا Panel.Dashboard یا Panel.*)
-    // ۲. چک پیشرفته بر اساس meta.isPanel در رکورد روت
+    const currentRole =
+      activeRoute?.params?.role ||
+      fallbackFromBrowser.role ||
+      'student' // نقش پیش‌فرض برای نجات از خطای کرش
+
+    // بررسی اینکه آیا روت مقصد متعلق به پنل است؟
     const targetRecord = Router.getRoutes().find((r) => r.name === to.name)
-    const isPanelRoute = String(to.name).startsWith('Panel.') ||
+    const isPanelRoute =
+      String(to.name).startsWith('Panel.') ||
       Boolean(targetRecord?.meta?.isPanel)
 
-
-    if (isPanelRoute) {
+    if (isPanelRoute && currentSchool && currentRole) {
       const namedTo = to as RouteLocationNamedRaw
       return {
         ...namedTo,
         params: {
           school: currentSchool,
           role: currentRole,
-          ...(namedTo.params || {}) // اگر خودش پارامتر دستی فرستاده بود، اولویت با دستی‌هاست
+          ...(namedTo.params || {}) // اگر خودش دستی پارامتر داده بود، اولویت با داده‌های دستی است
         }
       }
     }
@@ -61,19 +88,19 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     return to
   }
 
-  // ۱. اورراید resolve (حل کننده مشکل :to روی q-item، q-btn و RouterLink)
+  // ۱. اورراید resolve (پاس دادن currentLocation به autoFillPanelParams)
   const originalResolve = Router.resolve.bind(Router)
   Router.resolve = function (to: RouteLocationRaw, currentLocation?: any) {
-    return originalResolve(autoFillPanelParams(to), currentLocation)
+    return originalResolve(autoFillPanelParams(to, currentLocation), currentLocation)
   }
 
-  // ۲. اورراید push (برای router.push در اسکریپت‌ها)
+  // ۲. اورراید push
   const originalPush = Router.push.bind(Router)
   Router.push = function (to: RouteLocationRaw) {
     return originalPush(autoFillPanelParams(to))
   }
 
-  // ۳. اورراید replace (برای router.replace در اسکریپت‌ها)
+  // ۳. اورراید replace
   const originalReplace = Router.replace.bind(Router)
   Router.replace = function (to: RouteLocationRaw) {
     return originalReplace(autoFillPanelParams(to))

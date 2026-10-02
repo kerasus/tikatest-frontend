@@ -54,8 +54,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useEntitySelector } from 'src/composables/useEntitySelector'
+import { useUser } from 'src/stores/user'
 import LessonAPI, { type LessonType } from 'src/repositories/lesson'
+import { useEntitySelector } from 'src/composables/useEntitySelector'
 
 defineOptions({
   name: 'FormBuilderSelectLesson'
@@ -151,6 +152,7 @@ const props = defineProps({
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
 const lessonAPI = new LessonAPI()
+const userStoreManager = useUser()
 
 const localValue = computed({
   get () {
@@ -177,6 +179,14 @@ const errorMessage = ref<string | undefined>(undefined)
 const filteredOptions = ref<LessonType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('name')
+
+function getIndexAPI (params: any) {
+  if (userStoreManager.isStudent) {
+    return lessonAPI.mine(params)
+  }
+
+  return lessonAPI.index(params)
+}
 
 function getForClassWithFallbackParam () {
   const v: any = props.classId
@@ -220,7 +230,7 @@ async function getLessons (name: string | null) {
   }
 
 
-  const lessonsList = await lessonAPI.index(params)
+  const lessonsList = await getIndexAPI(params)
   return lessonsList.data
 }
 
@@ -235,24 +245,10 @@ useEntitySelector<LessonType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'lessons',
-  fetchByIds: (params) => {
-
-    const levelParams: any = {}
-    if (props.levelId) {
-      if (Array.isArray(props.levelId) && props.levelId.length > 0) {
-        levelParams.academic_level_id_in = props.levelId
-      } else if (!Array.isArray(props.levelId)) {
-        levelParams.academic_level_id = props.levelId
-      }
-    }
-
-    return lessonAPI.index({
-      ...params,
-      ...levelParams,
-      field_id: props.fieldId ?? undefined,
-      academic_level_id: props.levelId ?? undefined,
-      forClassWithFallback: getForClassWithFallbackParam()
-    })
-  }
+  fetchByIds: (params) => getIndexAPI({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 </script>

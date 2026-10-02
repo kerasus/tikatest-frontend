@@ -59,72 +59,7 @@
             class="icon-button"
             label="لیست آزمون‌ها"
             @click="goToExamList" />
-
-          <q-btn
-            v-if="userManager.me"
-            icon="account_circle"
-            color="primary"
-            flat
-            class="icon-button">
-            <q-menu
-              transition-show="jump-down"
-              transition-hide="jump-up"
-              style="min-width: 260px">
-              <q-card>
-                <q-card-section class="row items-center">
-                  <q-avatar size="56px">
-                    <img
-                      src="/images/blankProfile.png"
-                      alt="avatar">
-                  </q-avatar>
-                  <div class="q-mr-md">
-                    <div class="text-subtitle1 text-blue-grey-9">
-                      {{ userManager.me?.first_name }} {{ userManager.me?.last_name }}
-                    </div>
-                    <div class="text-caption text-blue-grey-7">
-                      {{ userManager.me.roles.map((r) => translateRole(r.name)).join(', ') }}
-                    </div>
-                  </div>
-                </q-card-section>
-
-                <q-separator />
-
-                <q-list padding>
-                  <q-item
-                    v-if="onlineExamStore.isActive"
-                    v-close-popup
-                    clickable
-                    @click="goToExamList">
-                    <q-item-section avatar>
-                      <q-icon name="assignment" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>لیست آزمون‌ها</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item
-                    v-close-popup
-                    clickable
-                    @click="logout">
-                    <q-item-section avatar>
-                      <q-icon
-                        name="logout"
-                        color="red" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label class="text-red">خروج</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-card>
-            </q-menu>
-          </q-btn>
-          <q-btn
-            v-else
-            icon="login"
-            color="primary"
-            outline
-            :to="{ name: 'Auth.Login' }" />
+          <profile-btn />
         </div>
       </q-toolbar-title>
     </q-toolbar>
@@ -132,76 +67,45 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
-import moment from 'jalali-moment'
 import { useRouter } from 'vue-router'
-import { useUser } from 'src/stores/user'
+import { onUnmounted, computed } from 'vue'
 import { useAppLayout } from 'stores/appLayout'
-import { userRoleOptions } from 'src/repositories/user'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useOnlineExamSession } from 'src/stores/onlineExamSession'
+import ProfileBtn from 'src/components/template/headers/components/profileBtn.vue'
 
 withDefaults(defineProps<{ floated?: boolean }>(), {
   floated: false
 })
 
-const $q = useQuasar()
 const router = useRouter()
-const userManager = useUser()
 const appLayoutStore = useAppLayout()
 const onlineExamStore = useOnlineExamSession()
 
-const formattedDate = ref('')
-
-function updateDateTime () {
-  const now = moment()
-  formattedDate.value = now.format('jYYYY/jMM/jDD')
-}
-
-function translateRole (roleName: string): string {
-  const target = userRoleOptions.find((role) => role.value === roleName)
-  if (!target) {
-    return '-'
-  }
-
-  return target.label
-}
-
 let timer: any
-onMounted(() => {
-  updateDateTime()
-  timer = setInterval(updateDateTime, 60000)
-})
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
-
-function toggleLeftDrawerMini () {
-  appLayoutStore.layoutLeftDrawerMiniToOverlay = $q.screen.lt.md
-  appLayoutStore.layoutLeftDrawerMini = !appLayoutStore.layoutLeftDrawerMini
-}
 
 function toggleLeftDrawerVisible () {
   appLayoutStore.layoutLeftDrawerMiniToOverlay = false
   appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
 }
 
-function logout () {
-  userManager.logout()
-  router.push({ name: 'Auth.Login' })
-}
-
-const layoutFooterHeight = computed(() => appLayoutStore.layoutFooterHeight + 'px')
 const remainingTimeText = computed(() => {
   const remaining = onlineExamStore.remainingTime
   if (remaining == null) return '--:--'
   const safe = Math.max(0, Math.floor(remaining))
-  const mins = Math.floor(safe / 60)
+
+  const hours = Math.floor(safe / 3600)
+  const mins = Math.floor((safe % 3600) / 60)
   const secs = safe % 60
+
+  if (hours > 0) {
+    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
   return `${mins}:${secs.toString().padStart(2, '0')}`
 })
-
 const progressPercent = computed(() => {
   const total = onlineExamStore.durationLimit
   const remaining = onlineExamStore.remainingTime
@@ -211,16 +115,6 @@ const progressPercent = computed(() => {
 })
 
 const session = computed(() => onlineExamStore.sessionData)
-
-const formatDuration = (seconds: number | null | undefined) => {
-  if (seconds == null) return '-'
-  const safe = Math.max(0, Math.floor(seconds))
-  const hours = Math.floor(safe / 3600)
-  const mins = Math.floor((safe % 3600) / 60)
-  const secs = safe % 60
-
-  return [hours, mins, secs].map((part) => part.toString().padStart(2, '0')).join(':')
-}
 
 function goToExamList () {
   router.push({ name: 'Student.Exam.List' })
@@ -233,7 +127,7 @@ function goToExamList () {
   //background: $gray-100;
   background: transparent;
   min-height: $header-height;
-  padding: $space-4 $space-4 $space-4 $space-10;
+  padding: $space-2;
   .main-dashboard {
     border-radius: 1rem;
     padding: $space-3 $space-4 $space-3 $space-16;

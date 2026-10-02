@@ -132,7 +132,7 @@ const selectedClasses = ref<SchoolClassType[]>([])
 
 const schoolClassAPI = new SchoolClassAPI()
 
-const { normalizeIds } = useEntitySelector<SchoolClassType>({
+useEntitySelector<SchoolClassType>({
   value: () => props.value,
   schoolId: () => props.schoolId,
   filteredOptions: selectedClasses,

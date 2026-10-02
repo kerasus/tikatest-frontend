@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { OnlineExamSessionType, type StartExamResponseType } from 'src/repositories/onlineExamSession'
+import type {
+  OnlineExamSessionResponseItemType,
+  OnlineExamSessionType,
+  StartExamResponseType
+} from 'src/repositories/onlineExamSession'
+import type { BookletType, OnlineExamDetailType } from 'src/repositories/exam'
+import type { UserType } from 'src/repositories/user'
 
 const SESSION_STATUS_LABELS: Record<string, string> = {
   not_started: 'شرکت نکرده',
@@ -15,13 +21,16 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const sessionData = computed(() => session.value?.session ?? null)
+  const sessionData = computed<OnlineExamSessionType | null>(() => session.value?.session ?? null)
+  const student = computed<UserType | null>(() => sessionData.value?.student ?? null)
+  const booklets = computed<BookletType[]>(() => sessionData.value?.exam?.online_exam_detail?.booklets ?? [])
+  const sessionResponses = computed<OnlineExamSessionResponseItemType[]>(() => sessionData.value?.responses ?? [])
   const examTitle = computed(() => sessionData.value?.exam?.name ?? 'آزمون آنلاین')
   const remainingTime = computed(() => session.value?.remaining_time ?? null)
-  const answerKeys = computed(() => session.value?.answer_keys ?? null)
-  const onlineDetail = computed(() => session.value?.online_detail ?? null)
+  const onlineDetail = computed<OnlineExamDetailType | null>(() => sessionData.value?.exam?.online_exam_detail ?? null)
+  const answerKeys = computed(() => onlineDetail.value?.answer_keys ?? null)
   const isActive = computed(() => sessionData.value?.status === 'in_progress')
-  const isResultMode = computed(() => ['submitted', 'graded'].includes(sessionData.value?.status ?? ''))
+  const isResultMode = computed(() => ['submitted', 'graded', 'expired'].includes(sessionData.value?.status ?? ''))
   const status = computed(() => sessionData.value?.status ?? null)
   const statusLabel = computed(() => SESSION_STATUS_LABELS[status.value ?? ''] ?? 'نامشخص')
   const durationLimit = computed(() => sessionData.value?.duration_limit_seconds ?? null)
@@ -78,12 +87,15 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
 
   return {
     session,
+    student,
     sessionData,
     loading,
     error,
     examTitle,
     remainingTime,
     answerKeys,
+    sessionResponses,
+    booklets,
     onlineDetail,
     isActive,
     isResultMode,

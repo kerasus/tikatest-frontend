@@ -198,8 +198,7 @@ useEntitySelector<AcademicLevelType>({
   fetchByIds: (params) => academicLevelAPI.index({
     ...params,
     sortation_field: 'created_at',
-    sortation_order: 'desc',
-    field_id: props.fieldId ?? undefined
+    sortation_order: 'desc'
   })
 })
 

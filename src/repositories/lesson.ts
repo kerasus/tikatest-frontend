@@ -1,7 +1,7 @@
-import BaseAPI from './BaseAPI'
+import BaseAPI, { type ListType } from './BaseAPI'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
 
-export type { ListType } from './BaseAPI'
+
 export type LessonType = {
   id: number | null;
   name: string | null;
@@ -29,6 +29,28 @@ export default class LessonAPI extends BaseAPI<LessonType> {
       updated_at: null,
       deleted_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      mine: `${this.baseEndpoint}/mine`
+    }
+  }
+
+  async mine (filters: any = { length: 10 }): Promise<ListType<LessonType>> {
+    return new Promise((resolve, reject) => {
+      this.getAxiosInstanceWithToken()
+        .get(this.endpoints.mine, {
+          params: this.getNormalizedIndexFilter(filters)
+        })
+        .then((response) => {
+          const normalizedListType = this.getNormalizedListType(response)
+          normalizedListType.data = this.getNormalizedList(normalizedListType.data)
+          resolve(normalizedListType)
+        })
+        .catch((e) => {
+          console.error(e)
+          reject(e)
+        })
+    })
   }
 }
 

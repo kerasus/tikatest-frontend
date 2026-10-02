@@ -216,24 +216,11 @@ useEntitySelector<SchoolClassType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'school classes',
-  fetchByIds: (params) => {
-    const levelParams: any = {}
-    if (props.levelId) {
-      if (Array.isArray(props.levelId) && props.levelId.length > 0) {
-        levelParams.academic_level_id_in = props.levelId
-      } else if (!Array.isArray(props.levelId)) {
-        levelParams.academic_level_id = props.levelId
-      }
-    }
-
-    return schoolClassAPI.index({
-      ...params,
-      ...levelParams,
-      sortation_field: 'created_at',
-      sortation_order: 'desc',
-      field_id: props.fieldId ?? undefined
-    })
-  }
+  fetchByIds: (params) => schoolClassAPI.index({
+    ...params,
+    sortation_field: 'created_at',
+    sortation_order: 'desc'
+  })
 })
 
 onMounted(async () => {

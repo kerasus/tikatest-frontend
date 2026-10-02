@@ -4,8 +4,13 @@ import type { ExamCategoryType } from 'src/repositories/examCategory'
 import type { SchoolClassType } from 'src/repositories/schoolClass'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
 import type { LessonType } from 'src/repositories/lesson'
-import type { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
+import type {
+  OnlineExamSessionType,
+  ParticipationStatus
+} from 'src/repositories/onlineExamSession'
 import type { AcademicTermType } from 'src/repositories/academicTerm'
+
+export type DeliveryMode = 'online' | 'in_person';
 
 export interface ContentType {
   type: 'text' | 'image' | 'pdf';
@@ -31,6 +36,26 @@ export type BookletType = {
   lesson?: LessonType | null;
 };
 
+export interface OnlineExamAnswerKeyType {
+  id: number;
+  exam_id: number;
+  question_number: number;
+  number_of_choices: number;
+  /**
+   * گزینه صحیح که به صورت رشته برمی‌گرده (مثلاً '1' تا '4' یا برای سوالات چندگزینه‌ای)
+   * می‌تونه در صورت خالی بودن یا چندگزینه‌ای بودن string باشه
+   */
+  correct_option: string;
+  /**
+   * ضریب/بارم سوال که در دیتابیس DECIMAL بوده و به صورت رشته برمی‌گرده (مثل '1.00')
+   */
+  weight: string;
+  has_negative_mark: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export type OnlineExamDetailType = {
   id: number | null;
   exam_id: number | null;
@@ -46,6 +71,7 @@ export type OnlineExamDetailType = {
   updated_at: string | null;
   deleted_at: string | null;
   sessions?: any[];
+  answer_keys?: OnlineExamAnswerKeyType[];
   booklets?: BookletType[];
   createdBy?: UserType | null;
 };
@@ -93,29 +119,32 @@ export type ExamType = {
   lesson_id: number | null;
   min_passing_score: number | null;
   max_score: number | null;
-  delivery_mode: 'online' | 'in_person' | null;
+  delivery_mode: DeliveryMode | null;
   exam_category_id: number | null;
   created_by: UserType | null;
   created_at: string | null;
   updated_at: string | null;
   category?: ExamCategoryType | null;
   lesson?: LessonType | null;
+  participation_status?: ParticipationStatus;
   in_person_exam_detail?: InPersonExamDetailType | null;
   online_exam_detail?: OnlineExamDetailType | null;
-  answer_keys?: any[];
+  answer_keys?: OnlineExamAnswerKeyType[];
   classes?: SchoolClassType[];
   class_ids?: number[];
   academic_levels?: AcademicLevelType[];
   academic_level_ids?: number[];
   in_person_exam_results?: InPersonExamResultType[];
+  in_person_exam_result?: InPersonExamResultType;
   grades?: any[];
   online_exam_sessions?: OnlineExamSessionType[];
   latest_session?: OnlineExamSessionType | null;
   session_status?: OnlineExamSessionType['status'];
-  my_result?: InPersonExamResultType | null;
-  my_session?: OnlineExamSessionType | null;
+  // my_result?: InPersonExamResultType | null;
+  student_online_exam_session?: OnlineExamSessionType | null;
   score?: ExamScoreType | null;
   term?: AcademicTermType | null;
+  sensitive_data_available?: boolean;
   term_id?: number | null;
   occurrence?: number | null;
 };
@@ -141,8 +170,15 @@ export default class ExamAPI extends BaseAPI<ExamType> {
       storeWithInPersonDetailAndResults: '/exams/store-with-inperson-results',
       storeWithOnlineDetail: '/exams/store-with-online-detail',
       studentOnlineExams: '/student-portal/online-exams',
-      myOnlineExams: '/student-portal/my-online-exams'
+      showStudentOnlineExam: (onlineExamId: number) => `/student-portal/online-exams/${onlineExamId}`,
+      myGrades: '/student-portal/my-grades'
     }
+  }
+
+  async showStudentOnlineExam (onlineExamId: number): Promise<ExamType> {
+    const response = await this.getAxiosInstanceWithToken()
+      .get(this.endpoints.showStudentOnlineExam(onlineExamId))
+    return response.data
   }
 
   async studentOnlineExams (params?: { length?: number; page?: number }): Promise<ListType<ExamType>> {
@@ -150,8 +186,8 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     return response.data
   }
 
-  async myOnlineExams (params?: { length?: number; page?: number; sortation_field?: string; sortation_order?: string }): Promise<ListType<ExamType>> {
-    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myOnlineExams, {
+  async myGrades (params?: { length?: number; page?: number; sortation_field?: string; sortation_order?: string }): Promise<ListType<ExamType>> {
+    const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myGrades, {
       params
     })
     return response.data
@@ -195,6 +231,19 @@ export default class ExamAPI extends BaseAPI<ExamType> {
   async examStudents (examId: number, params?: { length?: number }): Promise<ListType<UserType>> {
     const response = await this.getAxiosInstanceWithToken().get(`exams/${examId}/students`, { params })
     return response.data
+  }
+
+  override getNormalizedItem (item: ExamType): ExamType {
+    if (item?.category) {
+      item.exam_category_id = item.category.id
+    }
+    if (item?.term) {
+      item.term_id = item.term.id
+    }
+    if (item?.online_exam_detail?.answer_keys) {
+      item.answer_keys = item.online_exam_detail.answer_keys
+    }
+    return item
   }
 }
 

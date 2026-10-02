@@ -352,7 +352,7 @@
             color="primary"
             outline
             class="text-bold">
-            {{ exam.answer_keys?.length || 0 }} کلید ثبت‌شده
+            {{ exam.online_exam_detail?.answer_keys?.length || 0 }} کلید ثبت‌شده
           </q-badge>
         </div>
       </q-card-section>

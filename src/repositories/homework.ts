@@ -1,4 +1,4 @@
-import BaseAPI from './BaseAPI'
+import BaseAPI, { type ListType } from './BaseAPI'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
 import type { AcademicTermType } from 'src/repositories/academicTerm'
 import type { ContentType } from 'src/repositories/exam'
@@ -38,6 +38,7 @@ export type HomeworkType = {
   academic_level_ids?: number[];
   class_ids?: number[];
   submissions?: HomeworkSubmissionType[];
+  submission?: HomeworkSubmissionType;
 };
 
 export type HomeworkSubmissionType = {
@@ -106,7 +107,7 @@ export default class HomeworkAPI extends BaseAPI<HomeworkType> {
     return response.data
   }
 
-  async myHomework (filters: any = { length: 10 }) {
+  async myHomework (filters: any = { length: 10 }): Promise<ListType<HomeworkType>> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.myHomeworks, {
       params: filters
     })

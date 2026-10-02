@@ -87,6 +87,21 @@ export const index = [
               ]
             },
             component: () => import('pages/panel/exam/online/sessions.vue')
+          },
+          {
+            path: ':id/sessions/:sessionId',
+            name: 'Panel.Exam.Online.Sessions.Show',
+            meta: {
+              pageCategory: 'نتیجه آزمون',
+              layoutConfig: {
+                layoutHeaderType: 'sessionResultAdminView',
+                layoutLeftDrawerType: 'onlineExam',
+                layoutLeftDrawerWidth: 360,
+                layoutLeftDrawerBehavior: 'default',
+                layoutLeftDrawerOverlay: false
+              }
+            },
+            component: () => import('src/pages/panel/exam/online/session.vue')
           }
         ]
       },

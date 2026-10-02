@@ -11,9 +11,8 @@
     <template v-else>
       <exam-online-detail-card
         :exam="form"
-        :editable="true"
-        :lesson-options="lessonOptions"
-        :category-options="categoryOptions" />
+        :school-id="currentSchoolId"
+        :editable="true" />
 
       <div class="row q-mt-md">
         <div class="col-12">
@@ -29,23 +28,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { exam } from 'src/repositories/exam'
-import { examCategory } from 'src/repositories/examCategory'
+import { ref, onMounted, computed } from 'vue'
 import LessonAPI from 'src/repositories/lesson'
-import AcademicLevelAPI from 'src/repositories/academicLevel'
-import SchoolClassAPI from 'src/repositories/schoolClass'
-import ExamOnlineDetailCard from 'src/components/exam/ExamOnlineDetailCard.vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useExamForm } from 'src/composables/useExamForm'
+import SchoolClassAPI from 'src/repositories/schoolClass'
+import { examCategory } from 'src/repositories/examCategory'
+import AcademicLevelAPI from 'src/repositories/academicLevel'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import ExamOnlineDetailCard from 'src/components/exam/ExamOnlineDetailCard.vue'
 
 const router = useRouter()
 const route = useRoute()
 const $q = useQuasar()
 const lessonApi = new LessonAPI()
-const academicLevelApi = new AcademicLevelAPI()
 const schoolClassApi = new SchoolClassAPI()
+const academicLevelApi = new AcademicLevelAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -56,6 +57,8 @@ const academicLevelOptions = ref<any[]>([])
 const schoolClassOptions = ref<any[]>([])
 
 const { form, validate, buildFormData, loadFromExam } = useExamForm(true)
+
+const currentSchoolId = computed(() => currentSchoolManager?.currentSchool.value?.id)
 
 onMounted(async () => {
   loading.value = true

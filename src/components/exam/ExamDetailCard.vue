@@ -123,7 +123,7 @@
                   dense
                   color="blue-grey-1"
                   text-color="blue-grey-8"
-                  class="text-caption">
+                  class="text-caption ltr">
                   @{{ exam.created_by?.username }}
                 </q-chip>
               </div>

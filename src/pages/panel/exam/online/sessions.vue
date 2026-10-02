@@ -78,6 +78,25 @@
       <!-- ستون عملیات -->
       <template v-else-if="inputData.col.name === 'actions'">
         <div class="action-column-entity-index">
+          <!-- دکمه مشاهده کارنامه / جزئیات جلسه -->
+          <q-btn
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            icon="visibility"
+            :disable="!canViewReport(inputData.props.row.status)"
+            :to="{
+              name: 'Panel.Exam.Online.Sessions.Show',
+              params: { id: examId, sessionId: inputData.props.row.id }
+            }">
+            <q-tooltip>
+              {{ canViewReport(inputData.props.row.status) ? 'مشاهده کارنامه و پاسخ‌برگ' : 'جلسه هنوز تکمیل نشده است' }}
+            </q-tooltip>
+          </q-btn>
+
+          <!-- دکمه حذف جلسه -->
           <delete-btn
             :row="inputData.props.row"
             :api="onlineExamSessionApi"
@@ -85,6 +104,7 @@
             @change="afterRemove" />
         </div>
       </template>
+
 
       <!-- پیش‌فرض بقیه ستون‌ها -->
       <template v-else>
@@ -293,6 +313,10 @@ async function loadExamTitle () {
 
 function search () {
   entityIndexRef.value?.changePage()
+}
+
+function canViewReport (status: string | null): boolean {
+  return status === 'graded' || status === 'submitted'
 }
 
 onMounted(() => {

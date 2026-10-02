@@ -11,11 +11,11 @@
               color="primary"
               flat
               :icon="
-                appLayoutStore.layoutLeftDrawerMini
+                !appLayoutStore.layoutLeftDrawerVisible
                   ? 'keyboard_double_arrow_left'
                   : 'keyboard_double_arrow_right'
               "
-              @click="toggleLeftDrawerMini" />
+              @click="toggleLeftDrawerVisible" />
             <q-btn
               class="icon-button drawer-btn lt-md"
               color="primary"
@@ -23,31 +23,35 @@
               icon="menu"
               @click="toggleLeftDrawerVisible" />
           </div>
-          <div class="pageCategory">
-            {{ headerBreadCrumbsStore.pageCategory }}
-          </div>
-          <div class="breadCrumbs">
-            <q-breadcrumbs active-color="color-text2">
-              <q-breadcrumbs-el
-                v-for="(breadCrumb, breadCrumbIndex) in headerBreadCrumbsStore.breadCrumbs"
-                :key="breadCrumbIndex"
-                :to="breadCrumb.to ? breadCrumb.to : undefined">
-                {{ breadCrumb.label }}
-              </q-breadcrumbs-el>
-            </q-breadcrumbs>
+
+          <div class="exam-info-and-progressbar">
+            <div class="exam-info">
+              <div class="exam-title">
+                {{ onlineExamStore.examTitle }}
+                <span>
+                  (
+                  {{ student?.first_name }}
+                  {{ student?.last_name }}
+                  )
+                </span>
+              </div>
+              <div class="result-time-info">
+                <span class="exam-session-status">
+                  {{ onlineExamStore.statusLabel }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="main-dashboard__center-section" />
         <div class="main-dashboard__left-section">
-          <div class="time">
-            {{ formattedDate }}
-            <q-icon name="remove" />
-            {{ formattedTime }}
-          </div>
-          <!-- <q-btn icon="notifications" class="icon-button" @click="toggleRightDrawer">
-            <q-badge floating rounded color="red"> 2 </q-badge>
-          </q-btn> -->
-          <profile-btn v-if="userManager.me" />
+          <q-btn
+            v-if="onlineExamStore.isActive || onlineExamStore.isResultMode"
+            icon="assignment"
+            color="primary"
+            flat
+            class="icon-button"
+            label="لیست نتایج آزمون"
+            :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: examId} }" />
           <q-btn
             v-else
             icon="login"
@@ -63,30 +67,32 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import moment from 'jalali-moment'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
-import { ref, onMounted, onUnmounted } from 'vue'
 import { userRoleOptions } from 'src/repositories/user'
-import { useHeaderBreadCrumbs } from 'src/stores/headerBreadCrumbs'
-import ProfileBtn from 'src/components/template/headers/components/profileBtn.vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useOnlineExamSession } from 'src/stores/onlineExamSession'
 
 withDefaults(defineProps<{ floated?: boolean }>(), {
   floated: false
 })
 
 const $q = useQuasar()
+const route = useRoute()
 const router = useRouter()
 const userManager = useUser()
 const appLayoutStore = useAppLayout()
-const headerBreadCrumbsStore = useHeaderBreadCrumbs()
+const onlineExamStore = useOnlineExamSession()
+
 const formattedDate = ref('')
-const formattedTime = ref('')
+
+const examId = computed(() => parseInt(route.params.id as string))
+const student = computed(() => onlineExamStore.student)
 
 function updateDateTime () {
   const now = moment()
   formattedDate.value = now.format('jYYYY/jMM/jDD')
-  formattedTime.value = now.format('HH:mm')
 }
 
 function translateRole (roleName: string): string {
@@ -122,6 +128,36 @@ function logout () {
   userManager.logout()
   router.push({ name: 'Auth.Login' })
 }
+
+const layoutFooterHeight = computed(() => appLayoutStore.layoutFooterHeight + 'px')
+const remainingTimeText = computed(() => {
+  const remaining = onlineExamStore.remainingTime
+  if (remaining == null) return '--:--'
+  const safe = Math.max(0, Math.floor(remaining))
+  const mins = Math.floor(safe / 60)
+  const secs = safe % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+})
+
+const progressPercent = computed(() => {
+  const total = onlineExamStore.durationLimit
+  const remaining = onlineExamStore.remainingTime
+  if (!total || remaining == null) return 0
+  const elapsed = Math.max(0, total - remaining)
+  return Math.min(100, Math.max(0, (elapsed / total) * 100))
+})
+
+const session = computed(() => onlineExamStore.sessionData)
+
+const formatDuration = (seconds: number | null | undefined) => {
+  if (seconds == null) return '-'
+  const safe = Math.max(0, Math.floor(seconds))
+  const hours = Math.floor(safe / 3600)
+  const mins = Math.floor((safe % 3600) / 60)
+  const secs = safe % 60
+
+  return [hours, mins, secs].map((part) => part.toString().padStart(2, '0')).join(':')
+}
 </script>
 
 <style scoped lang="scss">
@@ -144,21 +180,45 @@ function logout () {
       top: 50%;
       transform: translateY(-50%);
     }
+    .exam-info-and-progressbar {
+      .exam-info {
+        display: flex;
+        gap: $space-2;
+        .exam-title {
+          color: $color-text1;
+          @include typo-title-3;
+        }
+        .remaining-info {
+          color: $color-text2;
+          @include typo-body-3;
+        }
+        .result-time-info {
+          display: flex;
+          flex-wrap: wrap;
+          gap: $space-2;
+          color: $color-text2;
+          @include typo-body-3;
+        }
+        .exam-session-status {
+          color: $color-text3;
+          @include typo-title-3;
+        }
+      }
+    }
     .main-dashboard__main-section {
       height: $header-height;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      $left-section-width: 200px;
       .main-dashboard__right-section {
+        width: calc(100% - #{$left-section-width});
         display: flex;
         flex-direction: column;
         gap: $space-2;
-        .pageCategory {
-          color: $color-text1;
-          @include typo-title-3;
-        }
       }
       .main-dashboard__left-section {
+        width: $left-section-width;
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -198,13 +258,9 @@ function logout () {
 }
 
 .profile-menu {
-  min-width: 200px;
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  min-width: 260px;
   .q-avatar {
+    margin: 0 auto;
   }
   .profile-menu-user-info {
     .profile-menu-user-fullname {
@@ -215,14 +271,5 @@ function logout () {
   .logout-btn {
     width: 100%;
   }
-}
-
-/* تنظیمات کارت منو */
-:deep(.profile-menu-card) {
-  border-radius: 20px !important;
-  overflow: hidden;
-  border: 1px solid rgba($secondary, 0.12);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
 }
 </style>

@@ -63,6 +63,18 @@ export const useUser = defineStore('user', () => {
     return null
   })
 
+  const mySchools = computed(() => {
+    if (isStudent.value) {
+      const rawSchools = me.value?.term_enrollments
+        ?.map((te) => te.school)
+        ?.filter(Boolean) || []
+
+      return Array.from(new Map(rawSchools.map((school) => [school.id, school])).values())
+    }
+
+    return me.value?.schools || []
+  })
+
   function hasRole (user: UserType | null, role: string): boolean {
     if (!user) {
       return false
@@ -108,8 +120,9 @@ export const useUser = defineStore('user', () => {
     me,
     token,
     hasRole,
-    mainRole,
     isAdmin,
+    mainRole,
+    mySchools,
     isManager,
     isTeacher,
     isStudent,

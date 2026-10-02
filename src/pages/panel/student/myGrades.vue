@@ -1,7 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
-    <h4 class="q-ma-none q-mb-lg">نمرات آزمون‌ها</h4>
-
+  <div>
     <entity-index
       ref="entityIndexRef"
       :value="inputs"
@@ -33,18 +31,18 @@
           </q-chip>
         </template>
         <template v-else-if="inputData.col.name === 'score'">
-          <template v-if="inputData.props.row.score?.scaled_score || inputData.props.row.score?.score">
+          <template v-if="getScoreObject(inputData.props.row).scaled_score || getScoreObject(inputData.props.row).raw_score">
             <q-chip
               :color="
                 getScoreColor(
-                  inputData.props.row.score,
-                  inputData.props.row.max_score,
-                  inputData.props.row.min_passing_score,
+                  getScoreObject(inputData.props.row).raw_score,
+                  getScoreObject(inputData.props.row).max_score,
+                  getScoreObject(inputData.props.row).min_passing_score,
                 )
               "
               text-color="white"
               dense>
-              {{ formatScore(inputData.props.row.score, inputData.props.row.max_score) }}
+              {{ formatScore(getScoreObject(inputData.props.row).raw_score, inputData.props.row.max_score) }}
             </q-chip>
           </template>
           <span
@@ -74,27 +72,29 @@
         </template>
       </template>
     </entity-index>
+
+
     <!-- پنجره پاپ‌آپ گزارش و جزئیات نمره آزمون -->
     <q-dialog
       v-model="examDetailDialog"
       transition-show="scale"
       transition-hide="scale">
       <q-card
-        style="width: 640px; max-width: 95vw;"
-        class="rounded-borders">
+        style="width: 600px; max-width: 95vw;"
+        class="rounded-borders shadow-10">
 
-        <!-- هدر دیالوگ -->
-        <q-card-section class="bg-grey-1 q-py-sm row items-center justify-between">
+        <!-- هدر دیالوگ با تم رنگی بر اساس نمره -->
+        <q-card-section
+          :class="`bg-${getScoreColor(getScoreObject(selectedExam).raw_score, selectedExam.max_score, selectedExam.min_passing_score)}`"
+          class="text-white q-py-md row items-center justify-between">
           <div class="row items-center no-wrap">
-            <q-avatar
-              icon="fact_check"
-              color="primary"
-              text-color="white"
-              size="36px"
+            <q-icon
+              name="auto_stories"
+              size="32px"
               class="q-mr-sm" />
             <div>
-              <div class="text-subtitle1 text-weight-bold text-grey-9">جزئیات و کارنامه آزمون</div>
-              <div class="text-caption text-grey-6">{{ selectedExam?.name || '-' }}</div>
+              <div class="text-subtitle1 text-weight-bolder">کارنامه و جزئیات آزمون</div>
+              <div class="text-caption opacity-80">{{ selectedExam?.name || '-' }}</div>
             </div>
           </div>
           <q-btn
@@ -103,247 +103,151 @@
             round
             dense
             icon="close"
-            color="grey-7">
-            <q-tooltip>بستن</q-tooltip>
-          </q-btn>
+            color="white" />
         </q-card-section>
-
-        <q-separator />
 
         <!-- بدنه اصلی -->
         <q-card-section
           v-if="selectedExam"
-          class="q-pa-md scroll"
-          style="max-height: 72vh;">
-          <div class="column q-gutter-y-md">
+          class="q-pa-lg scroll"
+          style="max-height: 75vh;">
 
-            <!-- کارت نمره و نتیجه دانش‌آموز (Highlight) -->
-            <q-card
-              flat
-              bordered
-              class="bg-grey-1">
-              <q-card-section class="q-py-md">
-                <div class="row items-center justify-between q-col-gutter-sm">
-                  <!-- امتیاز کسب‌شده -->
-                  <div class="col-12 col-sm-auto row items-center">
-                    <q-avatar
-                      :color="getScoreColor(selectedExam.score, selectedExam.max_score, selectedExam.min_passing_score)"
-                      text-color="white"
-                      size="52px"
-                      icon="military_tech"
-                      class="q-mr-md" />
-                    <div>
-                      <div class="text-caption text-grey-7 text-weight-medium">نمره کسب‌شده شما:</div>
-                      <div
-                        v-if="selectedExam.score"
-                        class="text-h5 text-weight-bolder"
-                        :class="`text-${getScoreColor(selectedExam.score, selectedExam.max_score, selectedExam.min_passing_score)}`">
-                        {{ formatScore(selectedExam.score, selectedExam.max_score) }}
-                      </div>
-                      <span
-                        v-else
-                        class="text-grey-6 text-weight-bold">نمره‌ای ثبت نشده</span>
-                    </div>
-                  </div>
+          <div class="column q-gutter-y-lg">
 
-                  <!-- حداقل قبولی و سقف نمره -->
-                  <div class="col-12 col-sm-auto row q-gutter-x-sm">
-                    <q-badge
-                      outline
-                      color="grey-8"
-                      class="q-pa-sm text-caption">
-                      حداقل قبولی:
-                      <strong class="q-ml-xs text-orange-9">{{ selectedExam.min_passing_score || '-' }}</strong>
-                    </q-badge>
-                    <q-badge
-                      outline
-                      color="grey-8"
-                      class="q-pa-sm text-caption">
-                      سقف نمره:
-                      <strong class="q-ml-xs text-primary">{{ selectedExam.max_score || '-' }}</strong>
-                    </q-badge>
-                  </div>
-                </div>
-              </q-card-section>
-            </q-card>
-
-            <!-- مشخصات و اطلاعات پایه آزمون (دو ستونه ریسپانسیو) -->
-            <div class="row q-col-gutter-sm">
-              <!-- درس -->
-              <div class="col-12 col-sm-6">
-                <q-item
-                  dense
-                  class="bg-grey-1 rounded-borders q-pa-sm">
-                  <q-item-section avatar>
-                    <q-icon
-                      name="menu_book"
-                      color="primary"
-                      size="24px" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label
-                      caption
-                      class="text-weight-bold text-grey-7">عنوان درس</q-item-label>
-                    <q-item-label class="text-weight-medium text-grey-9">
-                      {{ selectedExam.lesson?.name || '-' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
+            <!-- بخش نمایش نمره (بزرگ و متمرکز) -->
+            <div class="column items-center justify-center q-py-md bg-grey-1 rounded-borders border-dashed">
+              <div class="text-grey-7 text-weight-medium q-mb-xs">
+                {{ Number(selectedExam.max_score) === 20 ? 'نمره نهایی شما' : 'وضعیت عملکرد' }}
               </div>
 
-              <!-- دسته‌بندی -->
-              <div class="col-12 col-sm-6">
-                <q-item
-                  dense
-                  class="bg-grey-1 rounded-borders q-pa-sm">
-                  <q-item-section avatar>
-                    <q-icon
-                      name="category"
-                      color="primary"
-                      size="24px" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label
-                      caption
-                      class="text-weight-bold text-grey-7">دسته‌بندی</q-item-label>
-                    <q-item-label class="text-weight-medium text-grey-9">
-                      {{ selectedExam.category?.title || '-' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
+              <div class="row items-baseline q-gutter-x-xs">
+                <span
+                  class="text-h2 text-weight-bolder"
+                  :class="`text-${getScoreColor(getScoreObject(selectedExam).raw_score, selectedExam.max_score, selectedExam.min_passing_score)}`">
+                  {{ getScoreObject(selectedExam).raw_score ?? '-' }}
+                </span>
+                <span class="text-h6 text-grey-5">/</span>
+                <span class="text-h6 text-grey-6">{{ selectedExam.max_score }}</span>
               </div>
 
-              <!-- شیوه برگزاری -->
-              <div class="col-12 col-sm-6">
-                <q-item
-                  dense
-                  class="bg-grey-1 rounded-borders q-pa-sm">
-                  <q-item-section avatar>
-                    <q-icon
-                      :name="selectedExam.delivery_mode === 'online' ? 'devices' : 'location_city'"
-                      :color="selectedExam.delivery_mode === 'online' ? 'primary' : 'secondary'"
-                      size="24px" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label
-                      caption
-                      class="text-weight-bold text-grey-7">نوع برگزاری</q-item-label>
-                    <q-item-label>
-                      <q-chip
-                        :color="selectedExam.delivery_mode === 'online' ? 'primary' : 'secondary'"
-                        text-color="white"
-                        dense
-                        size="sm"
-                        class="q-ma-none text-weight-medium">
-                        {{ selectedExam.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
-                      </q-chip>
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </div>
-
-              <!-- زمان برگزاری یا شروع -->
-              <div class="col-12 col-sm-6">
-                <q-item
-                  dense
-                  class="bg-grey-1 rounded-borders q-pa-sm">
-                  <q-item-section avatar>
-                    <q-icon
-                      name="event"
-                      color="primary"
-                      size="24px" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label
-                      caption
-                      class="text-weight-bold text-grey-7">
-                      {{ selectedExam.delivery_mode === 'online' ? 'زمان شروع' : 'تاریخ برگزاری' }}
-                    </q-item-label>
-                    <q-item-label class="text-weight-medium text-grey-9">
-                      <template v-if="selectedExam.in_person_exam_detail?.held_at">
-                        {{ formatDate(selectedExam.in_person_exam_detail.held_at) }}
-                      </template>
-                      <template v-else-if="selectedExam.online_exam_detail?.starts_at">
-                        {{ formatDate(selectedExam.online_exam_detail.starts_at) }}
-                      </template>
-                      <span
-                        v-else
-                        class="text-grey-6">-</span>
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
+              <!-- نمایش معادل نمره از ۲۰ (فقط اگر سقف نمره ۲۰ نباشد) -->
+              <div
+                v-if="selectedExam.in_person_exam_result && Number(selectedExam.max_score) !== 20"
+                class="q-mt-sm">
+                <q-badge
+                  color="blue-grey-7"
+                  class="q-pa-sm text-subtitle2 shadow-2">
+                  <q-icon
+                    name="calculate"
+                    class="q-mr-xs" />
+                  معادل نمره از ۲۰:
+                  <span class="text-weight-bolder q-ml-xs">
+                    {{ ((getScoreObject(selectedExam).raw_score * 20) / selectedExam.max_score).toFixed(2) }}
+                  </span>
+                </q-badge>
               </div>
             </div>
 
-            <!-- اطلاعات تکمیلی آزمون‌دهنده (در صورت وجود نتیجه خام یا جلسه) -->
-            <template v-if="selectedExam.my_result || selectedExam.my_session">
-              <q-separator inset />
-
-              <div class="row q-col-gutter-sm">
-                <!-- نمره خام -->
-                <div
-                  v-if="selectedExam.my_result"
-                  class="col-12 col-sm-6">
-                  <div class="row items-center justify-between bg-grey-2 rounded-borders q-pa-sm">
-                    <span class="text-caption text-grey-8 text-weight-bold">نمره خام آزمون:</span>
-                    <q-badge
-                      color="grey-7"
-                      text-color="white"
-                      class="text-weight-bold">
-                      {{ selectedExam.my_result.raw_score ?? '-' }}
-                    </q-badge>
-                  </div>
+            <!-- مشخصات آزمون در قالب گرید -->
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <div class="label">درس</div>
+                  <div class="value text-primary">{{ selectedExam.lesson?.name || '-' }}</div>
                 </div>
-
-                <!-- وضعیت جلسه -->
-                <div
-                  v-if="selectedExam.my_session"
-                  class="col-12 col-sm-6">
-                  <div class="row items-center justify-between bg-grey-2 rounded-borders q-pa-sm">
-                    <span class="text-caption text-grey-8 text-weight-bold">وضعیت جلسه:</span>
-                    <q-badge
-                      color="info"
-                      text-color="white">
-                      {{ selectedExam.my_session.status || '-' }}
-                    </q-badge>
+              </div>
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <div class="label">دسته‌بندی</div>
+                  <div class="value">{{ selectedExam.category?.title || '-' }}</div>
+                </div>
+              </div>
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <div class="label">شیوه برگزاری</div>
+                  <div class="value">
+                    <q-icon
+                      :name="selectedExam.delivery_mode === 'online' ? 'devices' : 'location_on'"
+                      :color="selectedExam.delivery_mode === 'online' ? 'primary' : 'secondary'"
+                      size="18px"
+                      class="q-mr-xs" />
+                    {{ selectedExam.delivery_mode === 'online' ? 'آنلاین' : 'حضوری' }}
                   </div>
                 </div>
               </div>
-            </template>
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <div class="label">تاریخ</div>
+                  <div class="value">
+                    <template v-if="selectedExam.in_person_exam_detail?.held_at">
+                      {{ formatDate(selectedExam.in_person_exam_detail.held_at) }}
+                    </template>
+                    <template v-else-if="selectedExam.online_exam_detail?.starts_at">
+                      {{ formatDate(selectedExam.online_exam_detail.starts_at) }}
+                    </template>
+                    <span v-else>-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- فوتر جزئیات (حداقل قبولی) -->
+            <div class="row justify-center q-pt-md">
+              <div class="text-caption text-grey-6 row items-center">
+                <q-icon
+                  name="info_outline"
+                  class="q-mr-xs" />
+                حداقل نمره برای قبولی در این آزمون
+                <span class="text-weight-bold text-grey-9 q-mx-xs">{{ selectedExam.min_passing_score }}</span>
+                تعیین شده بود.
+              </div>
+            </div>
 
           </div>
         </q-card-section>
 
-        <q-separator />
-
-        <!-- دکمه بستن -->
         <q-card-actions
-          align="right"
-          class="bg-grey-1 q-py-xs q-px-sm">
+          align="center"
+          class="q-pb-md">
           <q-btn
             v-close-popup
-            flat
-            rounded
-            label="بستن"
-            color="primary"
-            class="text-weight-bold q-px-md" />
+            outline
+            label="فهمیدم، ممنون"
+            color="grey-8"
+            class="rounded-borders q-px-xl" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-  </q-page>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, shallowRef } from 'vue'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
-import { exam, type ExamScoreType, type ExamType } from 'src/repositories/exam'
+import ExamAPI, { type ExamType } from 'src/repositories/exam'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import FormBuilderInput from 'components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
+import FormBuilderSelectExamCategory from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectExamCategory.vue'
 
-const examApi = exam
 const dateManager = useDate()
+const examAPI = new ExamAPI()
+const currentSchoolManager = useCurrentSchool()
 
-const api = ref(examApi.endpoints.myOnlineExams)
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
+const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
+const FormBuilderSelectExamCategoryComponent = shallowRef(FormBuilderSelectExamCategory)
+
+type ScoreObjectType = {
+  max_score: number
+  min_passing_score: number
+  raw_score: number
+  scaled_score: number
+}
+
+const api = ref(examAPI.endpoints.myGrades)
 const itemIdentifyKey = ref('id')
 const tableKeys = ref({
   data: 'data',
@@ -374,7 +278,26 @@ const table = ref({
 const inputs = ref([
   { type: 'hidden', name: 'sortation_field', value: 'created_at' },
   { type: 'hidden', name: 'sortation_order', value: 'desc' },
-  { type: 'hidden', name: 'length', value: 10 }
+  { type: 'hidden', name: 'length', value: 10 },
+  { type: 'hidden', name: 'inSchool', value: currentSchoolManager.currentSchool.value?.id },
+  {
+    type: FormBuilderInputComponent,
+    name: 'name',
+    label: 'نام آزمون',
+    placeholder: ' ',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectLessonComponent,
+    name: 'lesson_id',
+    label: 'درس',
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectExamCategoryComponent,
+    name: 'exam_category_id',
+    col: 'col-md-4 col-12'
+  }
 ])
 
 const entityIndexRef = ref()
@@ -386,23 +309,37 @@ const formatDate = (dateString: string): string => {
   return dateManager.miladiToShamsi(dateString, 'YYYY-MM-DD', 'jYYYY/jMM/jDD') || dateString
 }
 
-function formatScore (score: ExamScoreType, maxScore: number): string {
-  return `${score.raw_score}/${maxScore}`
+function getScoreObject (row: ExamType): ScoreObjectType {
+  const inPersonResult = row?.in_person_exam_result
+  return {
+    max_score: row?.max_score,
+    min_passing_score: row?.min_passing_score,
+    raw_score: inPersonResult ? inPersonResult.raw_score : null,
+    scaled_score: inPersonResult ? inPersonResult.scaled_score : null
+  }
+}
+
+function formatScore (rawScore: number, maxScore: number): string {
+  return `${rawScore}/${maxScore}`
 }
 
 function getScoreColor (
-  score: ExamScoreType | null | undefined,
+  rawScore: number | null | undefined,
   maxScore: number,
   minPassingScore: number
 ): 'grey' | 'positive' | 'info' | 'warning' | 'negative' {
-  if (!score || maxScore <= 0) return 'grey'
+  // تبدیل امن به عدد
+  const rScore = Number(rawScore)
+  const mScore = Number(maxScore)
+  const minScore = Number(minPassingScore)
 
-  const rawScore = score.raw_score ?? 0
+  if (!rawScore || mScore <= 0) return 'grey'
 
-  if (rawScore <= 0) return 'grey'
-  if (rawScore >= maxScore) return 'positive'
-  if (rawScore >= maxScore * 0.8) return 'info'
-  if (rawScore >= minPassingScore) return 'warning'
+  // حالا با مقادیر عددی مقایسه کن
+  if (rScore >= mScore * 0.9) return 'positive'
+  if (rScore >= mScore * 0.75) return 'info'
+  if (rScore >= minScore) return 'warning'
+
   return 'negative'
 }
 
@@ -410,6 +347,18 @@ function openExamDetail (exam: ExamType) {
   selectedExam.value = exam
   examDetailDialog.value = true
 }
+
+onMounted(() => {
+  inputs.value.forEach((item) => {
+    if (item.name === 'exam_category_id') {
+      // @ts-ignore
+      item.schoolId = currentSchoolManager.currentSchool.value?.id
+    }
+    if (item.name === 'inSchool') {
+      item.value = currentSchoolManager.currentSchool.value?.id
+    }
+  })
+})
 </script>
 
 <style scoped></style>

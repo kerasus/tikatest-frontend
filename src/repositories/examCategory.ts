@@ -1,4 +1,4 @@
-import BaseAPI from './BaseAPI'
+import BaseAPI, { type ListType } from './BaseAPI'
 
 export type ExamCategoryType = {
   id: number | null
@@ -29,6 +29,28 @@ export default class ExamCategoryAPI extends BaseAPI<ExamCategoryType> {
       created_at: null,
       updated_at: null
     }
+    this.endpoints = {
+      ...this.endpoints,
+      mine: `${this.baseEndpoint}/mine`
+    }
+  }
+
+  async mine (filters: any = { length: 10 }): Promise<ListType<ExamCategoryType>> {
+    return new Promise((resolve, reject) => {
+      this.getAxiosInstanceWithToken()
+        .get(this.endpoints.mine, {
+          params: this.getNormalizedIndexFilter(filters)
+        })
+        .then((response) => {
+          const normalizedListType = this.getNormalizedListType(response)
+          normalizedListType.data = this.getNormalizedList(normalizedListType.data)
+          resolve(normalizedListType)
+        })
+        .catch((e) => {
+          console.error(e)
+          reject(e)
+        })
+    })
   }
 }
 

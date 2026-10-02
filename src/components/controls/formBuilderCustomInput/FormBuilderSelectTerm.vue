@@ -112,7 +112,7 @@ async function getTerms (name: string | null) {
   const schoolId = getSchoolId()
   if (name) payload.name = name
   if (schoolId) payload.school_id = schoolId
-  if (props.activeOnly) payload.is_active = true
+  if (props.activeOnly) payload.is_active = 1
   const academicTermAPI = new AcademicTermAPI(schoolId as number)
   const list = await academicTermAPI.index(payload)
   return list.data

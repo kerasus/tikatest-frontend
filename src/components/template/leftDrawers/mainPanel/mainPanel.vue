@@ -285,20 +285,21 @@ const topLinks = ref<ListItemType[]>([
     route: { name: 'Student.Exam.List' }
   },
   { icon: 'grading', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
-  {
-    icon: 'assignment',
-    title: 'ساعت مطالعه و تکالیف',
-    forRoles: ['Student'],
-    child: [
-      { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
-      { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
-      {
-        icon: '',
-        title: 'مشاهده ساعات مطالعه ثبت شده',
-        route: { name: 'Student.StudySessions.List' }
-      }
-    ]
-  },
+  { icon: 'assignment', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
+  // {
+  //   icon: 'assignment',
+  //   title: 'ساعت مطالعه و تکالیف',
+  //   forRoles: ['Student'],
+  //   child: [
+  //     { icon: '', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
+  //     { icon: '', title: 'ثبت ساعت مطالعه', route: { name: 'Student.StudySessions.Create' } },
+  //     {
+  //       icon: '',
+  //       title: 'مشاهده ساعات مطالعه ثبت شده',
+  //       route: { name: 'Student.StudySessions.List' }
+  //     }
+  //   ]
+  // },
   // {
   //   icon: 'grading',
   //   title: 'نمرات',

@@ -255,7 +255,7 @@ export const useExamForm = (isUpdate = false) => {
       form.in_person_exam_detail = { ...exam.in_person_exam_detail }
     }
 
-    form.answer_keys = exam.answer_keys || []
+    form.answer_keys = exam.online_exam_detail?.answer_keys || []
   }
 
   return {

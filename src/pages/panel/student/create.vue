@@ -7,6 +7,7 @@
     :entity-param-key="entityParamKey"
     :index-route-name="indexRouteName"
     :show-route-name="showRouteName"
+    :before-send-data="beforeSendData"
     :show-expand-button="false" />
 </template>
 
@@ -14,6 +15,7 @@
 import { ref, shallowRef } from 'vue'
 import { EntityCreate } from 'quasar-crud'
 import StudentAPI from 'src/repositories/student'
+import { FormBuilderAssist } from 'quasar-form-builder'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
@@ -21,6 +23,20 @@ import FormBuilderSelectEnrollments from 'src/components/controls/formBuilderCus
 
 const studentAPI = new StudentAPI()
 const currentSchoolManager = useCurrentSchool()
+
+type localInputType = {
+  type: any
+  name: string
+  responseKey: string
+  col?: string
+  label?: string
+  placeholder?: string
+  inputType?: string
+  schoolId?: number
+  required?: boolean
+  sendNull?: boolean
+  value?: any
+}
 
 const FormBuilderDateComponent = shallowRef(FormBuilderDate)
 const FormBuilderInputComponent = shallowRef(FormBuilderInput)
@@ -32,7 +48,7 @@ const indexRouteName = ref('Panel.Student.List')
 const showRouteName = ref('Panel.Student.Show')
 const entityIdKey = ref('id')
 const entityParamKey = ref('id')
-const inputs = ref([
+const inputs = ref<localInputType[]>([
   {
     type: 'file',
     name: 'picture',
@@ -132,5 +148,51 @@ const inputs = ref([
     col: 'col-md-12'
   }
 ])
-</script>
+
+function beforeSendData (formData) {
+  if (!(formData instanceof FormData)) {
+    return
+  }
+  const enrollmentsInput = FormBuilderAssist.getInputsByName(inputs.value, 'enrollments')
+  const enrollments = enrollmentsInput.value
+  formData.delete('enrollments[]')
+  enrollments.forEach((item, index) => {
+    formData.append(`enrollments[${index}][class_id]`, item.class_id.toString())
+    formData.append(`enrollments[${index}][term_id]`, item.term_id.toString())
+  })
 }
+
+function getFormData (): FormData {
+  const isFile = (file) => {
+    return file instanceof File
+  }
+  const formData = new FormData()
+  inputs.value.forEach((item) => {
+    if (
+      item.type.toString().toLowerCase() === 'file' &&
+      (
+        (!isFile(item.value) && !item.sendNull) ||
+        (!isFile(item.value) && item.sendNull && item.value !== null)
+      )
+    ) {
+      return
+    }
+
+    if (Array.isArray(item.value)) {
+      item.value.forEach((arrayValue) => {
+        if (arrayValue !== null && typeof arrayValue !== 'undefined') {
+          formData.append(item.name + '[]', arrayValue)
+        }
+      })
+    } else if (typeof item.value === 'object') {
+      formData.append(item.name + '[]', JSON.stringify(item.value))
+    } else {
+      if (item.value !== null && typeof item.value !== 'undefined') {
+        formData.append(item.name, item.value)
+      }
+    }
+  })
+
+  return formData
+}
+</script>

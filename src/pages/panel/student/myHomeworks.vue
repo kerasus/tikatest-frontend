@@ -42,14 +42,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import HomeworkAPI from 'src/repositories/homework'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
+import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 
 const dateManager = useDate()
 const homeworkApi = new HomeworkAPI()
+const currentSchoolManager = useCurrentSchool()
+
+const FormBuilderInputComponent = shallowRef(FormBuilderInput)
+const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
 
 const api = ref(homeworkApi.endpoints.myHomeworks)
 const label = ref('تکالیف من')
@@ -113,11 +120,22 @@ const inputs = ref([
     value: 10
   },
   {
-    type: 'input',
+    type: 'hidden',
+    name: 'school_id',
+    value: currentSchoolManager.currentSchool.value.id
+  },
+  {
+    type: FormBuilderInputComponent,
     name: 'title',
     label: 'عنوان تکلیف',
     placeholder: ' ',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
+  },
+  {
+    type: FormBuilderSelectLessonComponent,
+    name: 'lesson_id',
+    label: 'درس',
+    col: 'col-md-4 col-12'
   }
 ])
 
@@ -134,16 +152,43 @@ const getOwner = (
   return homework.submissions?.[0]
 }
 
-const getStatusColor = (homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }): string => {
-  const owner = getOwner(homework)
-  if (!owner) return 'info'
-  return owner.submitted_at ? 'positive' : 'info'
+
+const getStatusColor = (homework: HomeworkType): string => {
+  const sub = homework.submission
+
+  // حالت اول: دانش‌آموز ارسال کرده
+  if (sub?.submitted_at) {
+    // اگر فیدبک یا تصحیحی از سمت معلم ثبت شده باشد، رنگ اختصاصی (مثلا primary یا positive)
+    return sub.feedback ? 'positive' : 'teal'
+  }
+
+  // حالت دوم: هنوز ارسال نکرده، چک کنیم ددلاین گذشته یا نه؟
+  if (homework.due_date) {
+    const isPastDue = new Date(homework.due_date).getTime() < Date.now()
+    if (isPastDue) {
+      return 'negative' // مهلت تمام شده و ارسال نکرده
+    }
+  }
+
+  // در انتظار ارسال (هنوز مهلت دارد)
+  return 'warning'
 }
 
-const getStatusLabel = (homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }): string => {
-  const owner = getOwner(homework)
-  if (!owner) return 'در انتظار ارسال'
-  return owner.submitted_at ? 'ارسال شده' : 'در انتظار ارسال'
+const getStatusLabel = (homework: HomeworkType): string => {
+  const sub = homework.submission
+
+  if (sub?.submitted_at) {
+    return sub.feedback ? 'بررسی شده' : 'ارسال شده'
+  }
+
+  if (homework.due_date) {
+    const isPastDue = new Date(homework.due_date).getTime() < Date.now()
+    if (isPastDue) {
+      return 'مهلت پایان یافته'
+    }
+  }
+
+  return 'در انتظار ارسال'
 }
 </script>
 

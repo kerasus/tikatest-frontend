@@ -124,8 +124,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
-const onlineExamStore = useOnlineExamSession()
 const sessionAPI = new OnlineExamSessionAPI()
+const onlineExamStore = useOnlineExamSession()
 
 const activeTab = ref<'content' | 'solution'>('content')
 const stickyTabsTop = ref('0px')
@@ -159,6 +159,7 @@ const error = computed({
     onlineExamStore.error = value
   }
 })
+const sessionId = computed(() => parseInt(route.params.sessionId as string))
 const examContent = computed(() => onlineExamStore.onlineDetail?.content || null)
 const solutionContent = computed(() => onlineExamStore.onlineDetail?.solution || null)
 
@@ -167,12 +168,7 @@ const loadResult = async () => {
   error.value = null
 
   try {
-    const examId = Number(route.params.id)
-    const params = route.query.attemptNumber
-      ? { attempt_number: Number(route.query.attemptNumber) }
-      : undefined
-
-    const result = await sessionAPI.getMyResultByExamId(examId, params)
+    const result = await sessionAPI.getResultBySessionId(sessionId.value)
     onlineExamStore.setSession(result)
   } catch (err: any) {
     error.value = err.response?.data?.message || err.message || 'خطا در بارگذاری نتایج'

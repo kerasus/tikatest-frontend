@@ -53,8 +53,8 @@ export const useCurrentSchool = () => {
 
     return firstUserSchoolSlug ?? 'guest'
   })
-  const mySchools = computed(()=>userStoreManager?.me?.schools || [])
-  const currentSchool = computed<UserSchoolPivoteType | undefined>(()=> {
+  const mySchools = computed(()=>userStoreManager?.mySchools || [])
+  const currentSchool = computed<UserSchoolPivoteType | SchoolType | undefined>(()=> {
     if (localSchoolFromApiBySlug.value) {
       return localSchoolFromApiBySlug.value
     }

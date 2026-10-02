@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useUser } from 'src/stores/user'
 import { useEntitySelector } from 'src/composables/useEntitySelector'
 import ExamCategoryAPI, { type ExamCategoryType } from 'src/repositories/examCategory'
 
@@ -135,6 +136,7 @@ const props = defineProps({
 
 const emits = defineEmits(['update:value', 'input', 'click', 'keydown', 'keypress', 'submit'])
 
+const userStoreManager = useUser()
 const examCategoryAPI = new ExamCategoryAPI()
 
 const localValue = computed({
@@ -163,13 +165,20 @@ const filteredOptions = ref<ExamCategoryType[]>([])
 const optionValue = ref('id')
 const optionLabel = ref('title')
 
+
+async function getIndexAPI (params: any) {
+  params.school_id = props.schoolId
+  params.sortation_field = 'created_at'
+  params.sortation_order = 'desc'
+  if (userStoreManager.isStudent) {
+    return examCategoryAPI.mine(params)
+  }
+
+  return examCategoryAPI.index(params)
+}
+
 async function getExamCategories (name: string | null) {
-  const schoolId = props.schoolId
-  const examCategoriesList = await examCategoryAPI.index({
-    name, school_id: schoolId,
-    sortation_field: 'created_at',
-    sortation_order: 'desc'
-  })
+  const examCategoriesList = await getIndexAPI({ name })
   return examCategoriesList.data
 }
 
@@ -184,11 +193,7 @@ useEntitySelector<ExamCategoryType>({
   schoolId: () => props.schoolId,
   filteredOptions,
   entityName: 'exam categories',
-  fetchByIds: (params) => examCategoryAPI.index({
-    ...params,
-    sortation_field: 'created_at',
-    sortation_order: 'desc'
-  })
+  fetchByIds: (params) => getIndexAPI(params)
 })
 </script>
 

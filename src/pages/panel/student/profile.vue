@@ -266,7 +266,7 @@ const currentSchoolManager = useCurrentSchool()
 
 const user = computed<UserType | null>(() => userManager.me)
 
-const studentSchools = computed<SchoolType[]>(() => user.value?.term_enrollments ? user.value.term_enrollments.map((te) => te.school) : [])
+const studentSchools = computed<SchoolType[]>(() => userManager.mySchools)
 
 const currentSchoolName = computed(() => {
   if (currentSchoolManager.currentSchool.value) {

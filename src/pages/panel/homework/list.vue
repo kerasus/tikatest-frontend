@@ -47,20 +47,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef } from 'vue'
 import { useQuasar } from 'quasar'
 import { EntityIndex } from 'quasar-crud'
-import { homework, HomeworkType } from 'src/repositories/homework'
-import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { useDate } from 'src/composables/Date'
+import { computed, ref, shallowRef } from 'vue'
+import { homework } from 'src/repositories/homework'
+import DeleteBtn from 'src/components/controls/deleteBtn.vue'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicField from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicField.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 const $q = useQuasar()
 const dateManager = useDate()

@@ -19,11 +19,10 @@
         <div
           v-if="inputData.props.row.online_exam_detail"
           class="column items-start q-gutter-y-xs">
-
           <!-- نمایش فقط جزئیات زمان‌بندی -->
           <div
             class="text-caption text-grey-8 column q-gutter-y-xs"
-            style="font-size: 11px; line-height: 1.3;">
+            style="font-size: 11px; line-height: 1.3">
             <div class="row items-center no-wrap">
               <q-icon
                 name="schedule"
@@ -58,7 +57,6 @@
           class="text-grey-5">-</span>
       </template>
       <template v-else-if="inputData.col.name === 'session_status'">
-
         <!-- چیپ وضعیت با آیکون -->
         <q-chip
           :color="getExamTimingStatus(inputData.props.row).color"
@@ -99,7 +97,11 @@
         </q-chip>
       </template>
       <template v-else-if="inputData.col.name === 'percent'">
-        {{ inputData.props.row.latest_session?.percent ? inputData.props.row.latest_session.percent + '%' : '-' }}
+        {{
+          inputData.props.row.latest_session?.percent
+            ? inputData.props.row.latest_session.percent + '%'
+            : '-'
+        }}
       </template>
       <template v-else-if="inputData.col.name === 'timing'">
         <div
@@ -117,9 +119,23 @@
             <span>شروع: {{ formatDateTime(getLatestSession(inputData.props.row)?.started_at) }}</span>
           </div>
 
-          <!-- ۲. زمان استفاده شده (با تفکیک کل زمان در صورت وجود) -->
+          <!-- ۲. تایمر معکوس زنده در صورت در جریان بودن آزمون -->
           <div
-            v-if="getLatestSession(inputData.props.row)?.time_used_seconds !== null && getLatestSession(inputData.props.row)?.time_used_seconds !== undefined"
+            v-if="getLatestSession(inputData.props.row)?.status === 'in_progress' && getLatestSession(inputData.props.row)?.duration_limit_seconds"
+            class="row items-center no-wrap text-weight-bolder text-negative bg-red-1 q-px-xs rounded-borders">
+            <q-icon
+              name="alarm"
+              size="14px"
+              class="q-mr-xs text-negative" />
+            <span>
+              فرصت باقی‌مانده:
+              <span class="timer-display">{{ getRemainingTime(getLatestSession(inputData.props.row)) }}</span>
+            </span>
+          </div>
+
+          <!-- ۳. اگر آزمون پایان یافته یا مدت زمان محدود ندارد: زمان استفاده شده قبلی -->
+          <div
+            v-else-if="getLatestSession(inputData.props.row)?.time_used_seconds !== null && getLatestSession(inputData.props.row)?.time_used_seconds !== undefined"
             class="row items-center no-wrap text-weight-medium text-blue-grey-9">
             <q-icon
               name="timer"
@@ -135,7 +151,7 @@
             </span>
           </div>
 
-          <!-- ۳. زمان ارسال پاسخ / پایان جلسه -->
+          <!-- ۴. زمان ارسال پاسخ / پایان جلسه -->
           <div
             v-if="getLatestSession(inputData.props.row)?.submitted_at"
             class="row items-center no-wrap text-positive">
@@ -146,9 +162,9 @@
             <span>ارسال: {{ formatDateTime(getLatestSession(inputData.props.row)?.submitted_at) }}</span>
           </div>
 
-          <!-- اگر هنوز ارسال نکرده و در حال آزمونه -->
+          <!-- اگر هنوز ارسال نکرده و در حال آزمونه (حالت بدون محدودیت زمانی) -->
           <div
-            v-else-if="getLatestSession(inputData.props.row)?.status === 'in_progress'"
+            v-else-if="getLatestSession(inputData.props.row)?.status === 'in_progress' && !getLatestSession(inputData.props.row)?.duration_limit_seconds"
             class="row items-center no-wrap text-warning text-weight-medium">
             <q-icon
               name="pending"
@@ -168,7 +184,7 @@
       <template v-else-if="inputData.col.name === 'actions'">
         <div class="row items-center no-wrap q-gutter-x-sm action-column-entity-index">
 
-          <!-- ۱. دکمه شروع / ادامه آزمون -->
+          <!-- ۱. دکمه شروع / ادامه آزمون (فقط اگر آزمون زنده و فعال باشد) -->
           <q-btn
             v-if="canStart(inputData.props.row)"
             unelevated
@@ -184,38 +200,40 @@
             </q-tooltip>
           </q-btn>
 
-          <!-- ۲. دکمه مشاهده کارنامه / نتیجه آزمون -->
+          <!-- ۲. دکمه مشاهده کارنامه / مرور سوالات و پاسخ‌ها (آزمون ارسال‌شده، منقضی‌شده یا پایان‌یافته) -->
           <q-btn
             v-else-if="canViewResult(inputData.props.row)"
             outline
             dense
             no-caps
-            color="info"
-            icon="analytics"
-            label="مشاهده کارنامه"
+            color="primary"
+            :icon="(inputData.props.row.latest_session?.status === 'expired' || !inputData.props.row.latest_session) ? 'menu_book' : 'analytics'"
+            :label="(inputData.props.row.latest_session?.status === 'expired' || !inputData.props.row.latest_session) ? 'مرور سوالات' : 'مشاهده کارنامه'"
             class="q-px-sm action-btn-main"
             @click.stop="viewResult(inputData.props.row)">
             <q-tooltip>
-              مشاهده جزئیات کارنامه و درصدها
+              {{
+                (inputData.props.row.latest_session?.status === 'expired' || !inputData.props.row.latest_session)
+                  ? 'مشاهده دفترچه، سوالات و پاسخ‌های تشریحی'
+                  : 'مشاهده جزئیات کارنامه، درصدها و کلید آزمون'
+              }}
             </q-tooltip>
           </q-btn>
 
-          <!-- ۳. حالت غیرقابل دسترس (مثلاً قبل از شروع آزمون یا بدون دسترسی) -->
+          <!-- ۳. حالت غیرقابل دسترس (مثلاً هنوز زمان شروع آزمون نرسیده است) -->
           <q-btn
             v-else
             flat
             dense
             disable
             color="grey-6"
-            icon="lock"
-            label="غیرفعال"
+            icon="schedule"
+            label="هنوز شروع نشده"
             class="q-px-sm text-grey-6 action-btn-disabled">
-            <q-tooltip>
-              امکان شرکت در این آزمون وجود ندارد
-            </q-tooltip>
+            <q-tooltip> زمان شروع این آزمون هنوز فرا نرسیده است </q-tooltip>
           </q-btn>
 
-          <!-- ۴. دکمه مشاهده اطلاعات / جزئیات آزمون (Secondary Action) -->
+          <!-- ۴. دکمه مشاهده مشخصات و اطلاعات آزمون (Secondary Action) -->
           <q-btn
             round
             flat
@@ -225,13 +243,13 @@
             icon="visibility"
             class="action-btn-icon"
             @click.stop="viewExam(inputData.props.row)">
-            <q-tooltip>
-              مشاهده جزئیات آزمون
-            </q-tooltip>
+            <q-tooltip> مشاهده مشخصات آزمون </q-tooltip>
           </q-btn>
 
         </div>
       </template>
+
+
 
       <template v-else>
         {{ inputData.col.value }}
@@ -241,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
@@ -249,16 +267,19 @@ import { exam, type ExamType } from 'src/repositories/exam'
 import type { OnlineExamSessionType } from 'src/repositories/onlineExamSession'
 
 interface ExamTimingStatus {
-  label: string
-  color: string
-  icon: string
+  label: string;
+  color: string;
+  icon: string;
 }
 
 const router = useRouter()
 const entityIndexRef = ref()
 const dateManager = useDate()
 
-const api = ref(exam.endpoints.myOnlineExams)
+// ساعت لحظه‌ای برای آپدیت ۱ ثانیه‌ای کامپیوتدها و تایمرها
+const currentTimestamp = ref(Date.now())
+let timerInterval: ReturnType<typeof setInterval> | null = null
+const api = ref(exam.endpoints.studentOnlineExams)
 const label = ref('آزمون‌های آنلاین')
 const itemIdentifyKey = ref('id')
 const tableKeys = ref({
@@ -280,9 +301,24 @@ const table = ref({
       sortable: true
     },
     { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
-    { name: 'exam_timing', label: 'برنامه زمانی', align: 'center' as const, field: 'online_exam_detail' },
-    { name: 'session_status', label: 'وضعیت جلسه', align: 'center' as const, field: 'session_status' },
-    { name: 'participation_status', label: 'وضعیت شرکت', align: 'center' as const, field: 'latest_session' },
+    {
+      name: 'exam_timing',
+      label: 'برنامه زمانی',
+      align: 'center' as const,
+      field: 'online_exam_detail'
+    },
+    {
+      name: 'session_status',
+      label: 'وضعیت جلسه',
+      align: 'center' as const,
+      field: 'session_status'
+    },
+    {
+      name: 'participation_status',
+      label: 'وضعیت شرکت',
+      align: 'center' as const,
+      field: 'latest_session'
+    },
     { name: 'percent', label: 'درصد', align: 'center' as const, field: 'percent' },
     { name: 'timing', label: 'زمان', align: 'center' as const, field: 'latest_session' },
     {
@@ -326,16 +362,56 @@ const isExamWindowOpen = (examItem: ExamType) => {
   return true
 }
 
+// آیا زمان کلی پنجره آزمون تمام شده است؟
+const isExamWindowExpired = (examItem: ExamType) => {
+  const endsAt = examItem.online_exam_detail?.ends_at
+  if (!endsAt) return false
+  return new Date(endsAt).getTime() < Date.now()
+}
+
+// آیا دانش‌آموز می‌تواند آزمون را شروع یا ادامه دهد؟
 const canStart = (examItem: ExamType) => {
   const session = getLatestSession(examItem)
-  if (session?.status === 'in_progress') return true
-  if (session && ['submitted', 'graded', 'expired'].includes(session.status || '')) return false
+
+  // اگر در حال پاسخگویی است اما زمان کلی آزمون تمام نشده
+  if (session?.status === 'in_progress') {
+    return isExamWindowOpen(examItem)
+  }
+
+  // اگر سشن تمام/منقضی/ثبت شده، دیگه نمی‌تونه شروع کنه
+  if (session && ['submitted', 'graded', 'expired'].includes(session.status || '')) {
+    return false
+  }
+
+  // اگر هنوز شرکت نکرده و مهلت آزمون باز است
   return isExamWindowOpen(examItem)
 }
 
+// آیا دکمه «مشاهده کارنامه / تحلیل آزمون» باید فعال باشد؟
 const canViewResult = (examItem: ExamType) => {
   const session = getLatestSession(examItem)
-  return ['submitted', 'graded'].includes(session?.status || '')
+
+  // ۱. اگر آزمون ارسال، تصحیح یا منقضی شده باشد
+  if (session && ['submitted', 'graded', 'expired'].includes(session.status || '')) {
+    return true
+  }
+
+  // ۲. حتی اگر دانش‌آموز شرکت نکرده ولی زمان کل آزمون گذشته باشد (Exam Window Expired)
+  if (isExamWindowExpired(examItem)) {
+    return true
+  }
+
+  return false
+}
+
+// متد هدایت به صفحه کارنامه / مرور سوالات
+const viewResult = (examItem: ExamType) => {
+  // روت صفحه کارنامه یا مشاهده سوالات آزمون آنلاین
+  // می‌تونی به روت کارنامه یا صفحه مرور پاسخنامه هدایتش کنی:
+  router.push({
+    name: 'Student.Exam.Result', // یا هر اسمی که برای این روت گذاشتی، مثلا: 'Student.OnlineExam.Review'
+    params: { id: examItem.id }
+  })
 }
 
 const getSessionStatusLabel = (status: OnlineExamSessionType['status']) => {
@@ -398,10 +474,6 @@ const viewExam = (examItem: ExamType) => {
   router.push({ name: 'Student.Exam.Show', params: { id: examItem.id } })
 }
 
-const viewResult = (examItem: ExamType) => {
-  router.push({ name: 'Student.Exam.Result', params: { id: examItem.id } })
-}
-
 const getExamTimingStatus = (row: any): ExamTimingStatus => {
   const detail = row?.online_exam_detail
   if (!detail) {
@@ -448,11 +520,11 @@ const getExamTimingStatus = (row: any): ExamTimingStatus => {
 }
 
 interface StatusBadgeInfo {
-  label: string
-  color: string
-  icon: string
-  outline?: boolean
-  textColor?: string
+  label: string;
+  color: string;
+  icon: string;
+  outline?: boolean;
+  textColor?: string;
 }
 
 // 🎯 محاسبه وضعیت کلی آزمون (پنجره زمانی آزمون)
@@ -568,6 +640,44 @@ const getActionTooltip = (examItem: ExamType) => {
   return 'ورود به محیط آزمون و شروع'
 }
 
+// محاسبه زمان باقی‌مانده به صورت mm:ss
+const getRemainingTime = (session: OnlineExamSessionType | null) => {
+  if (!session?.started_at || !session.duration_limit_seconds) return '--:--'
+
+  // زمان شروع به میلی‌ثانیه
+  const startedAtMs = new Date(session.started_at).getTime()
+  // مهلت کل بر حسب ثانیه ضربدر ۱۰۰۰
+  const durationMs = Number(session.duration_limit_seconds) * 1000
+  // زمان پایانی که نشست باید بسته بشه
+  const endAtMs = startedAtMs + durationMs
+
+  // اختلاف با ساعت سیستم (بر حسب ثانیه)
+  const remainingSeconds = Math.max(0, Math.floor((endAtMs - currentTimestamp.value) / 1000))
+
+  if (remainingSeconds <= 0) {
+    return '۰۰:۰۰'
+  }
+
+  const minutes = Math.floor(remainingSeconds / 60)
+  const seconds = remainingSeconds % 60
+
+  const mm = minutes.toString().padStart(2, '0')
+  const ss = seconds.toString().padStart(2, '0')
+
+  return `${mm}:${ss}`
+}
+
+onMounted(() => {
+  timerInterval = setInterval(() => {
+    currentTimestamp.value = Date.now()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

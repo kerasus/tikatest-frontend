@@ -16,7 +16,9 @@
         </a>
 
         <!-- منوی کشویی پایه‌ها و مباحث -->
-        <div class="dropdown-wrap">
+        <div
+          v-if="false"
+          class="dropdown-wrap">
           <button
             id="category-btn"
             onclick="document.getElementById('list-dropdown').classList.toggle('hidden')"
@@ -74,7 +76,9 @@
       </div>
 
       <!-- نوار جستجو (راست‌چین شده با حفظ شعاع و سایه‌ها) -->
-      <div class="search-wrap">
+      <div
+        v-if="false"
+        class="search-wrap">
         <div class="search-inner">
           <q-icon
             name="fa-solid fa-magnifying-glass"
@@ -89,11 +93,13 @@
       <!-- لینک‌ها و دکمه‌های ورود / ثبت‌نام -->
       <div class="nav-right">
         <a
+          v-if="false"
           href="#teachers"
           class="nav-link">
           پنل دبیران
         </a>
         <a
+          v-if="false"
           href="#schools"
           class="nav-link">
           مدارس و موسسات
@@ -326,7 +332,9 @@
   </section>
 
   <!-- کارت‌های پکیج‌ها و تعرفه‌ها (با حفظ دقیق رنگ‌ها، دکمه‌ها و بوردرهای اورجینال) -->
-  <section class="pricing">
+  <section
+    v-if="false"
+    class="pricing">
     <div class="section-header section-header-pricing">
       <h2 class="section-title">طرح‌های همکاری با مدارس و مراکز آموزشی</h2>
       <p class="section-desc">زیرساخت‌های هوشمند برای مدیریت آزمون و تحلیل داده‌های آموزشی</p>
@@ -399,7 +407,9 @@
   </section>
 
   <!-- فوتر اصلی روشن با لینک‌های کاربردی -->
-  <footer class="footer">
+  <footer
+    v-if="false"
+    class="footer">
     <div class="footer-grid">
       <div>
         <h4 class="footer-heading">پنل‌های کاربری</h4>
@@ -475,6 +485,9 @@
   </footer>
 
 </template>
+
+<script setup lang="ts">
+</script>
 
 <style scoped>
 /* ===== Base / Reset helpers ===== */

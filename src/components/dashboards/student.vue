@@ -249,46 +249,103 @@
                 یعنی فرصت طلایی برای مرور… یا چرت علمی.
               </div>
             </div>
-
             <q-list
               v-else
               bordered
-              class="rounded-borders">
+              separator
+              class="rounded-borders overflow-hidden">
               <q-item
                 v-for="e in upcomingExams.slice(0, 5)"
-                :key="String((e as any).id)"
-                clickable>
+                :key="String(e.id)"
+                v-ripple
+                clickable
+                :to="{ name: 'Student.Exam.Show', params: { id: e.id } }"
+                class="q-py-md hover-scale">
+
+                <!-- آیکون نوع برگزاری -->
                 <q-item-section avatar>
                   <q-avatar
-                    color="purple-1"
-                    text-color="purple-9"
-                    icon="quiz" />
+                    :color="e.delivery_mode === 'online' ? 'purple-1' : 'blue-grey-1'"
+                    :text-color="e.delivery_mode === 'online' ? 'purple-9' : 'blue-grey-9'"
+                    :icon="e.delivery_mode === 'online' ? 'devices' : 'edit_calendar'"
+                    size="44px" />
                 </q-item-section>
 
+                <!-- اطلاعات جامع آزمون -->
                 <q-item-section>
-                  <q-item-label class="text-weight-bolder">
-                    {{ e.name || 'آزمون' }}
-                  </q-item-label>
-                  <q-item-label caption>
-                    {{ e.delivery_mode === 'online' ? 'شروع' : 'تاریخ برگزاری' }}:
-                    {{ formatDateTime(examDate(e)) }}
-                    <span v-if="e.online_exam_detail?.time_limit_minutes">
-                      • زمان: {{ e.online_exam_detail.time_limit_minutes }} دقیقه
+                  <div class="row items-center q-gutter-x-sm no-wrap">
+                    <span class="text-subtitle2 text-weight-bolder ellipsis text-grey-9">
+                      {{ e.name || 'بدون عنوان' }}
                     </span>
-                  </q-item-label>
+                    <q-badge
+                      v-if="e.category?.title"
+                      color="purple-1"
+                      text-color="purple-9"
+                      class="q-px-xs text-weight-medium">
+                      {{ e.category.title }}
+                    </q-badge>
+                  </div>
+
+                  <!-- جزئیات زمان‌بندی -->
+                  <div class="row items-center text-caption text-grey-7 q-gutter-x-md q-mt-xs">
+                    <!-- تاریخ / زمان شروع -->
+                    <div class="row items-center no-wrap">
+                      <q-icon
+                        :name="e.delivery_mode === 'online' ? 'play_circle_outline' : 'event'"
+                        size="15px"
+                        class="q-mr-xs text-primary" />
+                      <span>
+                        {{ e.delivery_mode === 'online' ? 'شروع:' : 'برگزاری:' }}
+                        {{ formatDateTime(examDate(e)) }}
+                      </span>
+                    </div>
+
+                    <!-- مهلت پایان در صورت وجود -->
+                    <div
+                      v-if="e.delivery_mode === 'online' && e.online_exam_detail?.ends_at"
+                      class="row items-center no-wrap">
+                      <q-icon
+                        name="event_busy"
+                        size="15px"
+                        class="q-mr-xs text-negative" />
+                      <span>پایان: {{ formatDateTime(e.online_exam_detail.ends_at) }}</span>
+                    </div>
+
+                    <!-- مدت آزمون -->
+                    <div
+                      v-if="e.online_exam_detail?.time_limit_minutes"
+                      class="row items-center no-wrap text-weight-medium text-blue-grey-9">
+                      <q-icon
+                        name="timer"
+                        size="15px"
+                        class="q-mr-xs text-amber-9" />
+                      <span>{{ e.online_exam_detail.time_limit_minutes }} دقیقه</span>
+                    </div>
+                  </div>
                 </q-item-section>
 
-                <q-item-section side>
+                <!-- نشانگر وضعیت و فلش هدایت -->
+                <q-item-section
+                  side
+                  class="column items-end q-gutter-y-xs">
                   <q-chip
                     dense
-                    color="purple-2"
-                    text-color="purple-10"
-                    icon="schedule">
-                    پیش‌رو
+                    size="12px"
+                    text-color="white"
+                    :color="getExamStatus(e).color"
+                    :icon="getExamStatus(e).icon"
+                    class="q-ma-none text-weight-bold">
+                    {{ getExamStatus(e).label }}
                   </q-chip>
+
+                  <q-icon
+                    name="chevron_left"
+                    size="20px"
+                    color="grey-5" />
                 </q-item-section>
               </q-item>
             </q-list>
+
           </q-card-section>
         </q-card>
       </div>
@@ -653,8 +710,13 @@ type UpcomingExam = {
   id: number
   name: string
   delivery_mode: 'online' | 'in_person'
+  category?: {
+    id: number
+    title: string
+  } | null
   online_exam_detail?: {
     starts_at?: string | null
+    ends_at?: string | null
     time_limit_minutes?: number | null
   } | null
   in_person_exam_detail?: {
@@ -720,6 +782,55 @@ const studyProgress = computed(() => {
   const goal = 600
   return Math.max(0, Math.min(1, minutes / goal))
 })
+
+function getExamStatus (e: UpcomingExam) {
+  if (e.delivery_mode === 'in_person') {
+    return {
+      label: 'حضوری',
+      color: 'blue-grey-6',
+      icon: 'apartment'
+    }
+  }
+
+  const detail = e.online_exam_detail
+  if (!detail) {
+    return { label: 'آنلاین', color: 'purple-7', icon: 'devices' }
+  }
+
+  const now = Date.now()
+  const startsAt = detail.starts_at ? new Date(detail.starts_at).getTime() : null
+  const endsAt = detail.ends_at ? new Date(detail.ends_at).getTime() : null
+
+  if (startsAt && now < startsAt) {
+    return {
+      label: 'شروع نشده',
+      color: 'blue-7',
+      icon: 'schedule'
+    }
+  }
+
+  if (endsAt && now > endsAt) {
+    return {
+      label: 'پایان یافته',
+      color: 'grey-7',
+      icon: 'event_busy'
+    }
+  }
+
+  if (startsAt && now >= startsAt && (!endsAt || now <= endsAt)) {
+    return {
+      label: 'در حال برگزاری',
+      color: 'positive',
+      icon: 'sensors'
+    }
+  }
+
+  return {
+    label: 'آزاد',
+    color: 'teal-7',
+    icon: 'all_inclusive'
+  }
+}
 
 function formatDateTime (value?: string | null) {
   if (!value) return '-'
