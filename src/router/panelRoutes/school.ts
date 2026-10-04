@@ -125,6 +125,28 @@ export const index: RouteRecordRaw[] = [
           ]
         },
         component: () => import('pages/panel/school/schoolTerms.vue')
+      },
+      {
+        path: ':id/skyroom-accounts',
+        name: 'Panel.School.SkyroomAccounts',
+        meta: {
+          breadCrumbs: [
+            { label: 'لیست مدارس', to: { name: 'Panel.School.List' } },
+            { label: 'مدیریت اکانت‌های اسکای‌روم', to: { name: 'Panel.School.SkyroomAccounts' } }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolSkyroomAccounts.vue')
+      },
+      {
+        path: ':id/features',
+        name: 'Panel.School.Features',
+        meta: {
+          breadCrumbs: [
+            { label: 'لیست مدارس', to: { name: 'Panel.School.List' } },
+            { label: 'مدیریت ویژگی‌های مدرسه', to: { name: 'Panel.School.Features' } }
+          ]
+        },
+        component: () => import('pages/panel/school/schoolFeatures.vue')
       }
     ]
   },

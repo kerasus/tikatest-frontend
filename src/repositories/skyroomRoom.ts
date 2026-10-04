@@ -1,29 +1,32 @@
 import BaseAPI from './BaseAPI'
 import type { SchoolClassType } from './schoolClass'
+import type { SchoolSkyroomAccountType } from './schoolSkyroomAccount'
 import type { SkyroomRoomScheduleType } from './skyroomRoomSchedule'
 
 export type SkyroomRoomType = {
-  id: number | null;
-  class_id: number | null;
-  skyroom_id: number | null;
-  name: string | null;
-  title: string | null;
-  description: string | null;
-  max_users: number;
-  guest_login: boolean;
-  op_login_first: boolean;
-  status: boolean;
-  schedules?: SkyroomRoomScheduleType[];
-  class?: SchoolClassType;
-  created_at?: string | null;
-  updated_at?: string | null;
-  deleted_at?: string | null;
-};
+  id: number | null
+  class_id: number | null
+  skyroom_account_id: number | null
+  skyroom_id: number | null
+  name: string | null
+  title: string | null
+  description: string | null
+  max_users: number
+  guest_login: boolean
+  op_login_first: boolean
+  status: boolean
+  schedules?: SkyroomRoomScheduleType[]
+  class?: SchoolClassType
+  skyroom_account?: SchoolSkyroomAccountType
+  created_at?: string | null
+  updated_at?: string | null
+  deleted_at?: string | null
+}
 
 export type SkyroomRoomShowResponseType = {
-  local_room: SkyroomRoomType;
-  live_data: Record<string, any> | null;
-};
+  local_room: SkyroomRoomType
+  live_data: Record<string, any> | null
+}
 
 export default class SkyroomRoomAPI extends BaseAPI<SkyroomRoomType> {
   constructor () {
@@ -31,6 +34,7 @@ export default class SkyroomRoomAPI extends BaseAPI<SkyroomRoomType> {
     this.defaultObject = {
       id: null,
       class_id: null,
+      skyroom_account_id: null,
       skyroom_id: null,
       name: null,
       title: null,
@@ -50,17 +54,11 @@ export default class SkyroomRoomAPI extends BaseAPI<SkyroomRoomType> {
     }
   }
 
-  /**
-   * دریافت جزئیات لوکال و زنده یک اتاق اسکای‌روم
-   */
   async getRoomDetails (roomId: number | string, params?: any): Promise<SkyroomRoomShowResponseType> {
     const response = await this.getAxiosInstanceWithToken().get(`${this.baseEndpoint}/${roomId}`, { params })
     return response.data
   }
 
-  /**
-   * دریافت لینک ورود مستقیم به کلاس بدون نیاز به لاگین در اسکای‌روم
-   */
   async getLoginUrl (roomId: number | string, payload?: any): Promise<string> {
     const endpoint = (this.endpoints as any).loginUrl(roomId)
     const response = await this.getAxiosInstanceWithToken().post(endpoint, payload)

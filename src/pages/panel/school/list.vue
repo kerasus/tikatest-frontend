@@ -76,6 +76,34 @@
                   </q-item-section>
                   <q-item-section>مدیریت ترم‌ها</q-item-section>
                 </q-item>
+                <q-item
+                  v-close-popup
+                  clickable
+                  :to="{
+                    name: 'Panel.School.SkyroomAccounts',
+                    params: { id: inputData.props.row.id },
+                  }">
+                  <q-item-section avatar>
+                    <q-icon
+                      name="video_camera_front"
+                      color="primary" />
+                  </q-item-section>
+                  <q-item-section>مدیریت اکانت‌های اسکای‌روم</q-item-section>
+                </q-item>
+                <q-item
+                  v-close-popup
+                  clickable
+                  :to="{
+                    name: 'Panel.School.Features',
+                    params: { id: inputData.props.row.id },
+                  }">
+                  <q-item-section avatar>
+                    <q-icon
+                      name="extension"
+                      color="accent" />
+                  </q-item-section>
+                  <q-item-section>مدیریت ویژگی‌های مدرسه</q-item-section>
+                </q-item>
               </q-list>
             </q-menu>
           </q-btn>

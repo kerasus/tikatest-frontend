@@ -8,7 +8,7 @@
     <q-card-section v-if="!readonly">
       <div class="text-subtitle2 q-mb-sm">افزودن مدرسه جدید</div>
       <q-form @submit.prevent="onSubmitNew">
-        <div class="row q-col-gutter-md items-end">
+        <div class="row q-col-gutter-md">
           <div class="col-12 col-md-3">
             <form-builder-select-school
               v-model:value="newForm.school_id"
@@ -35,7 +35,7 @@
               label="تاریخ پایان"
               outlined />
           </div>
-          <div class="col-12 col-md-2 flex items-end">
+          <div class="col-12 col-md-2 flex align-center">
             <q-checkbox
               v-model="newForm.is_active"
               label="فعال" />
