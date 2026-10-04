@@ -51,6 +51,7 @@
         </div>
         <q-tree
           v-else
+          ref="treeRef"
           v-model:selected="selectedNode"
           v-model:expanded="expandedNodes"
           :nodes="treeData"
@@ -61,14 +62,16 @@
           <template #default-header="{ node }">
             <div
               class="row items-center q-col-gutter-sm full-width"
-              @click.stop="toggleNode(node)">
+              @click.stop="handleNodeClick(node)">
               <div class="col">
                 <div class="text-subtitle2">{{ node.label }}</div>
                 <div
                   v-if="node.subtitle"
                   class="text-caption text-grey">{{ node.subtitle }}</div>
               </div>
-              <div class="col-auto">
+              <div
+                class="col-auto"
+                @click.stop>
                 <q-btn
                   v-if="node.type === 'level'"
                   flat
@@ -109,9 +112,7 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog
-      v-model="addDialog.show"
-      persistent>
+    <q-dialog v-model="addDialog.show">
       <q-card style="min-width: 400px; max-width: 90vw">
         <q-card-section>
           <div class="text-h6">افزودن کلاس</div>
@@ -155,12 +156,12 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { useUser } from 'src/stores/user'
-import { ref, reactive, onMounted, computed } from 'vue'
+import { QTree, useQuasar } from 'quasar'
 import SchoolAPI from 'src/repositories/school'
 import ClassAPI from 'src/repositories/schoolClass'
+import { ref, reactive, onMounted, computed } from 'vue'
 import type { SchoolType } from 'src/repositories/school'
 import AcademicFieldAPI from 'src/repositories/academicField'
 import AcademicLevelAPI from 'src/repositories/academicLevel'
@@ -180,6 +181,7 @@ const fieldApi = new AcademicFieldAPI()
 const levelApi = new AcademicLevelAPI()
 const currentSchoolManager = useCurrentSchool()
 
+const treeRef = ref<QTree | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const selectedNode = ref(null)
@@ -212,14 +214,20 @@ const editDialog = reactive({
   levelId: null as number | null
 })
 
-function toggleNode (node: any) {
-  if (!node) return
-  const key = node.id
-  const index = expandedNodes.value.findIndex((item) => item === key)
-  if (index >= 0) {
-    expandedNodes.value.splice(index, 1)
+function handleNodeClick (node: any) {
+  // کلاس‌ها برگ درخت هستند و فرزندی ندارند، پس نیازی به expand/collapse ندارند
+  if (!node || node.type === 'class') return
+
+  if (treeRef.value) {
+    const isExpanded = treeRef.value.isExpanded(node.id)
+    treeRef.value.setExpanded(node.id, !isExpanded)
   } else {
-    expandedNodes.value.push(key)
+    const index = expandedNodes.value.indexOf(node.id)
+    if (index > -1) {
+      expandedNodes.value.splice(index, 1)
+    } else {
+      expandedNodes.value.push(node.id)
+    }
   }
 }
 

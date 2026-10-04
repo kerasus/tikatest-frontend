@@ -39,7 +39,7 @@
                   clickable
                   :to="{
                     name: 'Panel.School.AcademicTree',
-                    params: { school_id: inputData.props.row.id },
+                    params: { id: inputData.props.row.id },
                   }">
                   <q-item-section avatar>
                     <q-icon
@@ -53,7 +53,7 @@
                   clickable
                   :to="{
                     name: 'Panel.School.Classes',
-                    params: { school_id: inputData.props.row.id },
+                    params: { id: inputData.props.row.id },
                   }">
                   <q-item-section avatar>
                     <q-icon
@@ -67,7 +67,7 @@
                   clickable
                   :to="{
                     name: 'Panel.School.Terms',
-                    params: { school_id: inputData.props.row.id },
+                    params: { id: inputData.props.row.id },
                   }">
                   <q-item-section avatar>
                     <q-icon

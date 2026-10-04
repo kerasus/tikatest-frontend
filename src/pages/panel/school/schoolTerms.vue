@@ -125,9 +125,7 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog
-      v-model="dialog.show"
-      persistent>
+    <q-dialog v-model="dialog.show">
       <q-card style="min-width: 500px; max-width: 90vw">
         <q-card-section>
           <div class="text-h6">{{ dialog.title }}</div>
@@ -265,7 +263,7 @@ const currentSchoolManager = useCurrentSchool()
 
 const schoolIdFromRouteParam = computed<number>(() => {
   if (route.params.id) {
-    return parseInt(route.params.school_id as string)
+    return parseInt(route.params.id as string)
   }
 
   return null

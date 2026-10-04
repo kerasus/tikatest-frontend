@@ -1,7 +1,5 @@
 <template>
-  <q-dialog
-    v-model="dialogVisible"
-    persistent>
+  <q-dialog v-model="dialogVisible">
     <q-card style="width: 700px; max-width: 95vw">
       <q-card-section class="row items-center">
         <div class="text-h6">ویرایش کلاس</div>

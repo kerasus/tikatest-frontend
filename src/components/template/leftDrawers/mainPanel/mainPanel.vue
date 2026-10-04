@@ -188,9 +188,17 @@ const topLinks = ref<ListItemType[]>([
     forRoles: ['Manager', 'Teacher', 'Admin'],
     child: [
       { icon: 'description', title: 'ریز نمرات', route: { name: 'Panel.ReportCard.Generate' } },
-      { icon: 'analytics', title: 'کارنامه جامع', route: { name: 'Panel.ReportCard.Comprehensive' } },
+      {
+        icon: 'analytics',
+        title: 'کارنامه جامع',
+        route: { name: 'Panel.ReportCard.Comprehensive' }
+      },
       { icon: 'grid_on', title: 'ماتریس نمرات', route: { name: 'Panel.ReportCard.GradeMatrix' } },
-      { icon: 'assignment', title: 'شیت نمرات کلاسی', route: { name: 'Panel.ReportCard.ClassGradeSheet' } }
+      {
+        icon: 'assignment',
+        title: 'شیت نمرات کلاسی',
+        route: { name: 'Panel.ReportCard.ClassGradeSheet' }
+      }
     ]
   },
   {
@@ -284,8 +292,18 @@ const topLinks = ref<ListItemType[]>([
     forRoles: ['Student'],
     route: { name: 'Student.Exam.List' }
   },
-  { icon: 'grading', title: 'مشاهده نمرات', route: { name: 'Student.Grade.List' } },
-  { icon: 'assignment', title: 'مشاهده تکالیف', route: { name: 'Student.Homework.List' } },
+  {
+    icon: 'grading',
+    title: 'مشاهده نمرات',
+    forRoles: ['Student'],
+    route: { name: 'Student.Grade.List' }
+  },
+  {
+    icon: 'assignment',
+    title: 'مشاهده تکالیف',
+    forRoles: ['Student'],
+    route: { name: 'Student.Homework.List' }
+  },
   // {
   //   icon: 'assignment',
   //   title: 'ساعت مطالعه و تکالیف',

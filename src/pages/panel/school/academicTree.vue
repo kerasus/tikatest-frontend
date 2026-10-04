@@ -55,6 +55,7 @@
         </div>
         <q-tree
           v-else
+          ref="treeRef"
           v-model:selected="selectedNode"
           v-model:expanded="expandedNodes"
           :nodes="treeData"
@@ -65,14 +66,16 @@
           <template #default-header="{ node }">
             <div
               class="row items-center q-col-gutter-sm full-width"
-              @click.stop="toggleNode(node)">
+              @click="handleNodeClick(node)">
               <div class="col">
                 <div class="text-subtitle2">{{ node.label }}</div>
                 <div
                   v-if="node.subtitle"
                   class="text-caption text-grey">{{ node.subtitle }}</div>
               </div>
-              <div class="col-auto">
+              <div
+                class="col-auto"
+                @click.stop>
                 <q-btn
                   v-if="node.type !== 'lesson'"
                   flat
@@ -84,12 +87,8 @@
                   @click.stop="addChild(node)">
                   <q-tooltip>
                     افزودن
-                    <template v-if="node.type === 'field'">
-                      پایه
-                    </template>
-                    <template v-if="node.type === 'level'">
-                      درس
-                    </template>
+                    <template v-if="node.type === 'field'"> پایه </template>
+                    <template v-if="node.type === 'level'"> درس </template>
                   </q-tooltip>
                 </q-btn>
                 <q-btn
@@ -119,9 +118,7 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog
-      v-model="dialog.show"
-      persistent>
+    <q-dialog v-model="dialog.show">
       <q-card style="min-width: 400px; max-width: 90vw">
         <q-card-section>
           <div class="text-h6">{{ dialog.title }}</div>
@@ -210,8 +207,8 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
+import { QTree, useQuasar } from 'quasar'
 import { useUser } from 'src/stores/user'
 import LessonAPI from 'src/repositories/lesson'
 import { ref, reactive, onMounted, computed } from 'vue'
@@ -231,19 +228,27 @@ const fieldApi = new AcademicFieldAPI()
 const levelApi = new AcademicLevelAPI()
 const currentSchoolManager = useCurrentSchool()
 
+const treeRef = ref<QTree | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const selectedNode = ref(null)
 const expandedNodes = ref<any[]>([])
 
-function toggleNode (node: any) {
+function handleNodeClick (node: any) {
+  // اگر نود درس (lesson) باشه یا فرزند نداشته باشه، نیازی به toggle باز شدن نداره
   if (!node || node.type === 'lesson') return
-  const key = node.id
-  const index = expandedNodes.value.findIndex((item) => item === key)
-  if (index >= 0) {
-    expandedNodes.value.splice(index, 1)
+
+  if (treeRef.value) {
+    const isExpanded = treeRef.value.isExpanded(node.id)
+    treeRef.value.setExpanded(node.id, !isExpanded)
   } else {
-    expandedNodes.value.push(key)
+    // روش فال‌بک با دستکاری آرایه v-model
+    const index = expandedNodes.value.indexOf(node.id)
+    if (index > -1) {
+      expandedNodes.value.splice(index, 1)
+    } else {
+      expandedNodes.value.push(node.id)
+    }
   }
 }
 const treeData = ref<any[]>([])

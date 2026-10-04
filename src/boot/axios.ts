@@ -247,7 +247,7 @@ function getAxiosInstanceManager (apiServer: string) {
           })
           notifyError(validationErrors.join('<br/>')) // Join all error messages with a semicolon
         }
-        if (status === 403 && (data as ErrorResponse).message) {
+        if ((data as ErrorResponse).message) {
           notifyError((data as ErrorResponse).message) // Join all error messages with a semicolon
         }
         else if (typeof data === 'string') {
