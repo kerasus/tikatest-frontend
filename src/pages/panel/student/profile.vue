@@ -11,7 +11,7 @@
 
         <div class="status-chip row items-center q-gutter-xs">
           <span class="live-dot" />
-          <span class="text-caption text-weight-bold">دانش‌آموز فعال تیکاتست</span>
+          <span class="text-caption text-weight-bold">دانش‌آموز فعال سنجاد</span>
         </div>
       </div>
 
@@ -272,7 +272,7 @@ const currentSchoolName = computed(() => {
   if (currentSchoolManager.currentSchool.value) {
     return currentSchoolManager.currentSchool.value.name
   }
-  return 'پلتفرم آزمون تیکاتست'
+  return 'پلتفرم آزمون سنجاد'
 })
 </script>
 

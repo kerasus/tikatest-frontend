@@ -9,7 +9,7 @@
                 src="/images/logo.png"
                 @click="goToHomePage" />
             </div>
-            <div class="auth-page__login__title">تیکا تست</div>
+            <div class="auth-page__login__title">سنجاد</div>
             <auth-component class="auth-component" />
           </div>
         </div>

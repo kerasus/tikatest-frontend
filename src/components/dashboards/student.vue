@@ -15,7 +15,7 @@
               icon="auto_awesome" />
             <div>
               <div class="text-h6 text-weight-bolder">
-                داشبورد دانش‌آموزی <span class="text-weight-bolder">تیکا تست</span>
+                داشبورد دانش‌آموزی <span class="text-weight-bolder">سنجاد</span>
               </div>
               <div class="text-body2 hero__sub q-mt-xs">
                 امروز قراره بترکونی؛ کلاس‌های آنلاین، آزمون‌ها و تکالیفت زیر ذره‌بینِ توئه!

@@ -39,7 +39,7 @@
       <q-card-section>
         <div class="text-h6">
           خوش آمدید به سیستم مدیریت دانش آموزی
-          <span class="text-bold"> تیکا تست </span>
+          <span class="text-bold"> سنجاد </span>
         </div>
         <p class="text-grey-7">گزینه مورد نظر را از منو انتخاب کنید.</p>
       </q-card-section>

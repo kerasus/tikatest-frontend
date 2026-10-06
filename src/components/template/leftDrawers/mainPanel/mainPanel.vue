@@ -65,7 +65,7 @@
       <div class="left-drawer__copyright-section">
         <div class="app-version">v: {{ appConfigManager.version }}</div>
         <div class="copy-right">
-          <span> Copyright TikaTest co. </span>
+          <span> Copyright Sanjad co. </span>
           <span> &copy; {{ new Date().getFullYear() }} </span>
         </div>
       </div>

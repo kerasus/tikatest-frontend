@@ -39,7 +39,7 @@
       <q-card-section>
         <div class="text-h6">
           خوش آمدید به پنل مدیریت کل سامانه
-          <span class="text-bold">تیکا تست</span>
+          <span class="text-bold">سنجاد</span>
         </div>
         <p class="text-grey-7">از این بخش می‌توانید مدارس، کاربران و اطلاعات کل سامانه را مدیریت کنید.</p>
       </q-card-section>

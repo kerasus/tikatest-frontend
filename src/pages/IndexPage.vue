@@ -10,9 +10,9 @@
           href="/"
           class="logo-link">
           <div class="logo-icon">
-            ت
+            Sanjad
           </div>
-          <span class="logo-text">تیکا<span class="logo-text-accent">تست</span></span>
+          <span class="logo-text">سنج<span class="logo-text-accent">اد</span></span>
         </a>
 
         <!-- منوی کشویی پایه‌ها و مباحث -->
@@ -133,7 +133,7 @@
           </div>
 
           <h1 class="hero-title">
-            <span class="hero-title-accent">تیکا تست</span>
+            <span class="hero-title-accent">سنجاد</span>
             سامانه
             هوشمند مدیریت آموزش و ارزیابی
           </h1>
@@ -179,7 +179,7 @@
           <div class="hero-visual-frame">
             <img
               :src="'/images/landing/home/hero-section.png'"
-              alt="دانش‌آموزان تیکاتست در حال تحلیل آزمون"
+              alt="دانش‌آموزان سنجاد در حال تحلیل آزمون"
               class="hero-img">
 
             <div class="hero-float hero-float-top">
@@ -200,7 +200,7 @@
               </div>
               <div>
                 <div class="hero-float-title">تراز ۷۲۰۰ کشوری</div>
-                <div class="hero-float-sub">آزمون جامع تیکاتست</div>
+                <div class="hero-float-sub">آزمون جامع سنجاد</div>
               </div>
             </div>
           </div>
@@ -219,7 +219,7 @@
           مدیریت متمرکز؛ از طرح سوال تا تحلیل داده
         </h2>
         <p class="features-dark-desc">
-          تیکاتست دغدغه‌های آموزشی مراکز را حذف می‌کند. از تصحیح خودکار گرفته تا گزارش‌دهی هوشمند به اولیا؛ همه‌چیز زیر یک سقف
+          سنجاد دغدغه‌های آموزشی مراکز را حذف می‌کند. از تصحیح خودکار گرفته تا گزارش‌دهی هوشمند به اولیا؛ همه‌چیز زیر یک سقف
         </p>
 
         <div class="features-dark-list">
@@ -299,9 +299,9 @@
   <!-- نقشه راه ۴ مرحله‌ای یادگیری (Curriculum Roadmap) با همان جدول و استایل اصلی -->
   <section class="roadmap">
     <div class="section-header">
-      <span class="section-label">فرآیند رشد در تیکاتست</span>
+      <span class="section-label">فرآیند رشد در سنجاد</span>
       <h2 class="section-title">مسیر تحول دیجیتال در موسسه شما</h2>
-      <p class="section-desc">چگونه با تیکاتست، فرآیند آموزشی مجموعه خود را هوشمند کنید؟</p>
+      <p class="section-desc">چگونه با سنجاد، فرآیند آموزشی مجموعه خود را هوشمند کنید؟</p>
     </div>
 
     <div class="roadmap-grid">
@@ -430,7 +430,7 @@
       </div>
 
       <div>
-        <h4 class="footer-heading">امکانات تیکاتست</h4>
+        <h4 class="footer-heading">امکانات سنجاد</h4>
         <ul class="footer-list">
           <li><a
             href="#exams"
@@ -465,7 +465,7 @@
       <div>
         <h4 class="footer-heading">درباره سامانه</h4>
         <p class="footer-about">
-          تیکاتست بستر یکپارچه برگزاری آزمون، تحلیل عملکرد و مدیریت یادگیری مدارس سراسر کشور است.
+          سنجاد بستر یکپارچه برگزاری آزمون، تحلیل عملکرد و مدیریت یادگیری مدارس سراسر کشور است.
         </p>
         <div class="footer-phone">
           پشتیبانی:
@@ -479,7 +479,7 @@
     </div>
 
     <div class="footer-bottom">
-      <div>© ۱۴۰۳ سامانه هوشمند سنجش آموزشی تیکاتست (TikaTest). تمامی حقوق محفوظ است.</div>
+      <div>© ۱۴۰۳ سامانه هوشمند سنجش آموزشی سنجاد (Sanjad.ir). تمامی حقوق محفوظ است.</div>
       <div>نسخه ۳.۵.۰</div>
     </div>
   </footer>

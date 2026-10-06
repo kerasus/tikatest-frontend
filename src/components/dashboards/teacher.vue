@@ -39,7 +39,7 @@
       <q-card-section>
         <div class="text-h6">
           به پنل معلم
-          <span class="text-bold">تیکا تست</span>
+          <span class="text-bold">سنجاد</span>
           خوش آمدید
         </div>
         <p class="text-grey-7">برای مدیریت کلاس‌ها، آزمون‌ها و تکالیف از منوی اصلی استفاده کنید.</p>

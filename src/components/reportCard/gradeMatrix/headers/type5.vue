@@ -1,4 +1,3 @@
-<!-- /home/ali/projects/TikaTest/tikatest-frontend/src/components/reportCard/gradeMatrix/headers/type5.vue -->
 <template>
   <header class="matrix-header-compact">
     <!-- نوار باریک گرادیان بالای هدر -->
