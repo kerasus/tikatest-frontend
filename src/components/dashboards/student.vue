@@ -18,7 +18,7 @@
                 داشبورد دانش‌آموزی <span class="text-weight-bolder">تیکا تست</span>
               </div>
               <div class="text-body2 hero__sub q-mt-xs">
-                امروز قراره بدرخشی؛ من فقط وضعیت رو قشنگ و مرتب نشون می‌دم، اجرا با تو.
+                امروز قراره بترکونی؛ کلاس‌های آنلاین، آزمون‌ها و تکالیفت زیر ذره‌بینِ توئه!
               </div>
             </div>
           </div>
@@ -35,17 +35,17 @@
             <q-btn
               flat
               color="white"
-              icon="grading"
-              label="مشاهده نمرات"
-              class="q-px-md"
-              :to="{ name: 'Student.Grade.List' }" />
-            <q-btn
-              flat
-              color="white"
               icon="assignment"
               label="مشاهده تکالیف"
               class="q-px-md"
               :to="{ name: 'Student.Homework.List' }" />
+            <q-btn
+              flat
+              color="white"
+              icon="grading"
+              label="مشاهده نمرات"
+              class="q-px-md"
+              :to="{ name: 'Student.Grade.List' }" />
           </div>
         </div>
 
@@ -77,16 +77,99 @@
               track-color="white"
               style="opacity: 0.28" />
             <div class="text-caption hero__muted q-mt-xs">
-              پیشرفت نمادین: {{ Math.round(studyProgress * 100) }}٪
+              پیشرفت هدف ماهانه: {{ Math.round(studyProgress * 100) }}٪
             </div>
           </div>
         </div>
       </q-card-section>
     </q-card>
 
+    <!-- LIVE SKYROOM ALERT BANNER (فانتزی و سبز نئونی - سشن فعال اسکای‌روم) -->
+    <transition-group
+      appear
+      enter-active-class="animated bounceInDown"
+      leave-active-class="animated bounceOutUp">
+      <div
+        v-for="liveClass in liveOnlineClasses"
+        :key="liveClass.schedule_id"
+        class="live-banner-fantasy q-pa-md q-mb-md shadow-5">
+        <div class="row items-center justify-between no-wrap q-gutter-x-md">
+          <div class="row items-center no-wrap q-gutter-x-md">
+            <!-- آواتار نئونی متحرک -->
+            <div class="live-avatar-box">
+              <q-avatar
+                size="48px"
+                class="live-avatar"
+                icon="sensors"
+                text-color="white" />
+              <span class="live-orbit" />
+              <span class="live-orbit live-orbit--delay" />
+            </div>
+
+            <div>
+              <div class="row items-center q-gutter-x-sm">
+                <span class="text-subtitle1 text-weight-bolder text-white">
+                  کلاس «{{ liveClass.title || liveClass.class_name || 'اسکای‌روم' }}» آماده پرواز است!
+                </span>
+                <q-chip
+                  dense
+                  class="badge-live-tag text-weight-bolder">
+                  <span class="blinking-dot" /> LIVE
+                </q-chip>
+              </div>
+              <div class="text-caption text-emerald-light q-mt-xs">
+                هم‌اکنون سشن باز است • ساعت {{ liveClass.start_time }} تا {{ liveClass.end_time }}
+                <span v-if="liveClass.class_name"> • {{ liveClass.class_name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- دکمه ورود فانتزی -->
+          <div>
+            <q-btn
+              unelevated
+              class="btn-enter-live text-weight-bolder q-px-md"
+              icon-right="rocket_launch"
+              label="ورود به اتاق"
+              target="_blank"
+              :href="liveClass.join_url" />
+          </div>
+        </div>
+      </div>
+    </transition-group>
+
     <!-- KPI STRIP -->
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-6 col-lg-3">
+      <!-- 1. KPI Skyroom (اولویت اول زمانی) -->
+      <div
+        v-if="stats.has_skyroom_feature"
+        class="col-12 col-sm-6 col-md-3">
+        <q-card
+          flat
+          bordered
+          class="kpi kpi--skyroom">
+          <q-card-section class="row items-start justify-between">
+            <div>
+              <div class="text-caption kpi__label">کلاس‌های آنلاین امروز</div>
+              <div class="text-h5 text-weight-bolder kpi__value">
+                {{ activeOnlineClasses.length }}
+              </div>
+              <div class="text-caption text-teal-8 q-mt-xs text-weight-medium">
+                {{ liveOnlineClasses.length ? `${liveOnlineClasses.length} جلسه لایو` : 'اسکای‌روم فعال' }}
+              </div>
+            </div>
+            <q-avatar
+              size="44px"
+              class="kpi__icon"
+              icon="cast_for_education" />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <!-- 2. KPI Exams (اولویت دوم زمانی) -->
+      <div
+        class="col-12 col-sm-6"
+        :class="stats.has_skyroom_feature ? 'col-md-3' : 'col-md-4'">
         <q-card
           flat
           bordered
@@ -97,7 +180,7 @@
               <div class="text-h5 text-weight-bolder kpi__value">
                 {{ upcomingExams.length }}
               </div>
-              <div class="text-caption text-grey-7 q-mt-xs">نزدیک‌ترین‌ها</div>
+              <div class="text-caption text-grey-7 q-mt-xs">نزدیک‌ترین آزمون‌ها</div>
             </div>
             <q-avatar
               size="44px"
@@ -107,14 +190,17 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-3">
+      <!-- 3. KPI Homeworks (اولویت سوم زمانی) -->
+      <div
+        class="col-12 col-sm-6"
+        :class="stats.has_skyroom_feature ? 'col-md-3' : 'col-md-4'">
         <q-card
           flat
           bordered
           class="kpi kpi--homework">
           <q-card-section class="row items-start justify-between">
             <div>
-              <div class="text-caption kpi__label">تکالیف ارسال‌نشده</div>
+              <div class="text-caption kpi__label">تکالیف در انتظار ارسال</div>
               <div class="text-h5 text-weight-bolder kpi__value">
                 {{ pendingHomeworks.length }}
               </div>
@@ -128,18 +214,21 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-3">
+      <!-- 4. KPI Grades / Calendar -->
+      <div
+        class="col-12 col-sm-6"
+        :class="stats.has_skyroom_feature ? 'col-md-3' : 'col-md-4'">
         <q-card
           flat
           bordered
           class="kpi kpi--grades">
           <q-card-section class="row items-start justify-between">
             <div>
-              <div class="text-caption kpi__label">نمرات اخیر</div>
+              <div class="text-caption kpi__label">نمرات کارنامه اخیر</div>
               <div class="text-h5 text-weight-bolder kpi__value">
                 {{ stats.recent_grades.length }}
               </div>
-              <div class="text-caption text-grey-7 q-mt-xs">آخرین ثبت‌ها</div>
+              <div class="text-caption text-grey-7 q-mt-xs">آخرین ارزیابی‌ها</div>
             </div>
             <q-avatar
               size="44px"
@@ -148,37 +237,152 @@
           </q-card-section>
         </q-card>
       </div>
+    </div>
 
-      <div class="col-12 col-md-6 col-lg-3">
+    <!-- MAIN CRITICAL ACTION ROW: سه بخش با بیشترین اهمیت زمانی -->
+    <div class="row q-col-gutter-md q-mt-md">
+
+      <!-- اولویت ۱: کلاس‌های آنلاین اسکای‌روم -->
+      <div
+        v-if="stats.has_skyroom_feature"
+        class="col-12 col-lg-4">
         <q-card
           flat
           bordered
-          class="kpi kpi--calendar">
-          <q-card-section class="row items-start justify-between">
-            <div>
-              <div class="text-caption kpi__label">رویدادهای نزدیک</div>
-              <div class="text-h5 text-weight-bolder kpi__value">
-                {{ upcomingEvents.length }}
+          class="panel full-height">
+          <q-card-section class="row items-center justify-between">
+            <div class="row items-center q-gutter-sm">
+              <q-avatar
+                size="34px"
+                color="teal-1"
+                text-color="teal-9"
+                icon="cast_for_education" />
+              <div>
+                <div class="text-subtitle1 text-weight-bolder">کلاس‌های آنلاین اسکای‌روم</div>
+                <div class="text-caption text-grey-7">جلسات زنده و پیش‌رو</div>
               </div>
-              <div class="text-caption text-grey-7 q-mt-xs">تقویم آموزشی</div>
             </div>
-            <q-avatar
-              size="44px"
-              class="kpi__icon"
-              icon="event" />
+            <q-badge
+              v-if="activeOnlineClasses.length"
+              color="teal-1"
+              text-color="teal-9"
+              class="text-weight-bold">
+              {{ activeOnlineClasses.length }} جلسه
+            </q-badge>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <!-- اسکلتون لودینگ -->
+            <q-list
+              v-if="loading"
+              bordered
+              class="rounded-borders">
+              <q-item
+                v-for="n in 3"
+                :key="n">
+                <q-item-section avatar>
+                  <q-skeleton
+                    type="QAvatar"
+                    size="40px" />
+                </q-item-section>
+                <q-item-section>
+                  <q-skeleton
+                    type="text"
+                    width="60%" />
+                  <q-skeleton
+                    type="text"
+                    width="40%" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+
+            <!-- امپتی استیت -->
+            <div
+              v-else-if="!activeOnlineClasses.length"
+              class="empty q-pa-lg rounded-borders">
+              <q-icon
+                name="videocam_off"
+                size="42px"
+                class="text-grey-5" />
+              <div class="text-subtitle2 text-weight-bolder q-mt-sm">فعلاً کلاس آنلاینی در برنامه نیست</div>
+              <div class="text-caption text-grey-7 q-mt-xs">
+                به محض نزدیک شدن به شروع جلسه، لینک ورود در این قسمت قرار می‌گیرد.
+              </div>
+            </div>
+
+            <!-- لیست جلسات اسکای‌روم فانتزی -->
+            <q-list
+              v-else
+              class="q-gutter-y-sm">
+              <q-item
+                v-for="c in activeOnlineClasses"
+                :key="c.schedule_id"
+                class="sky-item-card"
+                :class="{ 'sky-item-card--live': c.is_live_now }">
+                <q-item-section avatar>
+                  <div class="relative-position">
+                    <q-avatar
+                      :class="c.is_live_now ? 'avatar-sky--live' : 'avatar-sky--idle'"
+                      :icon="c.is_live_now ? 'videocam' : 'alarm'"
+                      size="42px" />
+                    <span
+                      v-if="c.is_live_now"
+                      class="pulse-indicator" />
+                  </div>
+                </q-item-section>
+
+                <q-item-section>
+                  <div class="row items-center q-gutter-x-xs no-wrap">
+                    <span class="text-subtitle2 text-weight-bolder ellipsis text-grey-9">
+                      {{ c.title || 'کلاس آنلاین' }}
+                    </span>
+                    <q-chip
+                      v-if="c.is_live_now"
+                      dense
+                      class="chip-status-active">
+                      درحال برگزاری
+                    </q-chip>
+                    <q-chip
+                      v-else
+                      dense
+                      class="chip-status-waiting">
+                      به‌زودی
+                    </q-chip>
+                  </div>
+                  <div class="text-caption text-grey-7 q-mt-xs">
+                    <q-icon
+                      name="schedule"
+                      size="14px"
+                      class="q-mr-xs text-teal" />
+                    <span>{{ c.start_time }} تا {{ c.end_time }}</span>
+                    <span v-if="c.class_name"> • {{ c.class_name }}</span>
+                  </div>
+                </q-item-section>
+
+                <q-item-section side>
+                  <q-btn
+                    unelevated
+                    :class="c.is_live_now ? 'btn-sky--active' : 'btn-sky--idle'"
+                    :icon-right="c.is_live_now ? 'login' : 'link'"
+                    :label="c.is_live_now ? 'ورود سریع' : 'دریافت لینک'"
+                    dense
+                    target="_blank"
+                    :href="c.join_url" />
+                </q-item-section>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </div>
-    </div>
 
-    <!-- MAIN GRID -->
-    <div class="row q-col-gutter-md q-mt-md">
-      <!-- Upcoming exams -->
-      <div class="col-12 col-lg-6">
+      <!-- اولویت ۲: آزمون‌های پیش‌رو (با اولویت و تفکیک آزمون‌های آنلاین) -->
+      <div :class="stats.has_skyroom_feature ? 'col-12 col-lg-4' : 'col-12 col-lg-6'">
         <q-card
           flat
           bordered
-          class="panel">
+          class="panel full-height">
           <q-card-section class="row items-center justify-between">
             <div class="row items-center q-gutter-sm">
               <q-avatar
@@ -188,15 +392,16 @@
                 icon="quiz" />
               <div>
                 <div class="text-subtitle1 text-weight-bolder">آزمون‌های پیش‌رو</div>
-                <div class="text-caption text-grey-7">نزدیک‌ترین آزمون‌هایی که باید آماده‌شون باشی</div>
+                <div class="text-caption text-grey-7">ارزیابی‌های آنلاین و حضوری</div>
               </div>
             </div>
 
             <q-btn
               flat
+              dense
               color="primary"
               icon-right="chevron_left"
-              label="همه آزمون‌ها"
+              label="همه"
               :to="{ name: 'Student.Exam.List' }" />
           </q-card-section>
 
@@ -216,39 +421,29 @@
                     size="40px" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>
-                    <q-skeleton
-                      type="text"
-                      width="60%" />
-                  </q-item-label>
-                  <q-item-label caption>
-                    <q-skeleton
-                      type="text"
-                      width="40%" />
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
                   <q-skeleton
-                    type="QBadge"
-                    width="50px"
-                    height="24px" />
+                    type="text"
+                    width="60%" />
+                  <q-skeleton
+                    type="text"
+                    width="40%" />
                 </q-item-section>
               </q-item>
             </q-list>
-
 
             <div
               v-else-if="!upcomingExams.length"
               class="empty q-pa-lg rounded-borders">
               <q-icon
                 name="celebration"
-                size="40px"
+                size="42px"
                 class="text-grey-5" />
-              <div class="text-subtitle2 text-weight-bolder q-mt-sm">فعلاً آزمون نزدیک نداریم</div>
+              <div class="text-subtitle2 text-weight-bolder q-mt-sm">فعلاً آزمون نزدیکی نداری</div>
               <div class="text-caption text-grey-7 q-mt-xs">
-                یعنی فرصت طلایی برای مرور… یا چرت علمی.
+                فرصت عالی برای مرور و استراحت!
               </div>
             </div>
+
             <q-list
               v-else
               bordered
@@ -261,17 +456,14 @@
                 clickable
                 :to="{ name: 'Student.Exam.Show', params: { id: e.id } }"
                 class="q-py-md hover-scale">
-
-                <!-- آیکون نوع برگزاری -->
                 <q-item-section avatar>
                   <q-avatar
                     :color="e.delivery_mode === 'online' ? 'purple-1' : 'blue-grey-1'"
                     :text-color="e.delivery_mode === 'online' ? 'purple-9' : 'blue-grey-9'"
                     :icon="e.delivery_mode === 'online' ? 'devices' : 'edit_calendar'"
-                    size="44px" />
+                    size="42px" />
                 </q-item-section>
 
-                <!-- اطلاعات جامع آزمون -->
                 <q-item-section>
                   <div class="row items-center q-gutter-x-sm no-wrap">
                     <span class="text-subtitle2 text-weight-bolder ellipsis text-grey-9">
@@ -286,76 +478,39 @@
                     </q-badge>
                   </div>
 
-                  <!-- جزئیات زمان‌بندی -->
-                  <div class="row items-center text-caption text-grey-7 q-gutter-x-md q-mt-xs">
-                    <!-- تاریخ / زمان شروع -->
-                    <div class="row items-center no-wrap">
-                      <q-icon
-                        :name="e.delivery_mode === 'online' ? 'play_circle_outline' : 'event'"
-                        size="15px"
-                        class="q-mr-xs text-primary" />
-                      <span>
-                        {{ e.delivery_mode === 'online' ? 'شروع:' : 'برگزاری:' }}
-                        {{ formatDateTime(examDate(e)) }}
-                      </span>
-                    </div>
-
-                    <!-- مهلت پایان در صورت وجود -->
-                    <div
-                      v-if="e.delivery_mode === 'online' && e.online_exam_detail?.ends_at"
-                      class="row items-center no-wrap">
-                      <q-icon
-                        name="event_busy"
-                        size="15px"
-                        class="q-mr-xs text-negative" />
-                      <span>پایان: {{ formatDateTime(e.online_exam_detail.ends_at) }}</span>
-                    </div>
-
-                    <!-- مدت آزمون -->
-                    <div
-                      v-if="e.online_exam_detail?.time_limit_minutes"
-                      class="row items-center no-wrap text-weight-medium text-blue-grey-9">
-                      <q-icon
-                        name="timer"
-                        size="15px"
-                        class="q-mr-xs text-amber-9" />
-                      <span>{{ e.online_exam_detail.time_limit_minutes }} دقیقه</span>
-                    </div>
+                  <div class="row items-center text-caption text-grey-7 q-gutter-x-sm q-mt-xs">
+                    <span>{{ formatDateTime(examDate(e)) }}</span>
+                    <span v-if="e.online_exam_detail?.time_limit_minutes">
+                      • {{ e.online_exam_detail.time_limit_minutes }} دقیقه
+                    </span>
                   </div>
                 </q-item-section>
 
-                <!-- نشانگر وضعیت و فلش هدایت -->
                 <q-item-section
                   side
-                  class="column items-end q-gutter-y-xs">
+                  class="column items-end">
                   <q-chip
                     dense
-                    size="12px"
+                    size="11px"
                     text-color="white"
                     :color="getExamStatus(e).color"
                     :icon="getExamStatus(e).icon"
                     class="q-ma-none text-weight-bold">
                     {{ getExamStatus(e).label }}
                   </q-chip>
-
-                  <q-icon
-                    name="chevron_left"
-                    size="20px"
-                    color="grey-5" />
                 </q-item-section>
               </q-item>
             </q-list>
-
           </q-card-section>
         </q-card>
       </div>
 
-      <!-- Pending homework -->
-      <div class="col-12 col-lg-6">
+      <!-- اولویت ۳: تکالیف پیش‌رو و ارسال‌نشده -->
+      <div :class="stats.has_skyroom_feature ? 'col-12 col-lg-4' : 'col-12 col-lg-6'">
         <q-card
           flat
           bordered
-          class="panel">
+          class="panel full-height">
           <q-card-section class="row items-center justify-between">
             <div class="row items-center q-gutter-sm">
               <q-avatar
@@ -364,25 +519,23 @@
                 text-color="orange-9"
                 icon="assignment" />
               <div>
-                <div class="text-subtitle1 text-weight-bolder">تکالیف ارسال‌نشده</div>
-                <div class="text-caption text-grey-7">
-                  همون‌ها که “فقط یه فایل مونده” ولی ۳ روزه مونده
-                </div>
+                <div class="text-subtitle1 text-weight-bolder">تکالیف در انتظار ارسال</div>
+                <div class="text-caption text-grey-7">نیازمند اقدام دانش‌آموز</div>
               </div>
             </div>
 
             <q-btn
               flat
+              dense
               color="primary"
               icon-right="chevron_left"
-              label="همه تکالیف"
+              label="همه"
               :to="{ name: 'Student.Homework.List' }" />
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
-
             <q-list
               v-if="loading"
               bordered
@@ -396,22 +549,12 @@
                     size="40px" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>
-                    <q-skeleton
-                      type="text"
-                      width="60%" />
-                  </q-item-label>
-                  <q-item-label caption>
-                    <q-skeleton
-                      type="text"
-                      width="40%" />
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
                   <q-skeleton
-                    type="QBadge"
-                    width="50px"
-                    height="24px" />
+                    type="text"
+                    width="60%" />
+                  <q-skeleton
+                    type="text"
+                    width="40%" />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -421,43 +564,52 @@
               class="empty q-pa-lg rounded-borders">
               <q-icon
                 name="done_all"
-                size="40px"
+                size="42px"
                 class="text-grey-5" />
-              <div class="text-subtitle2 text-weight-bolder q-mt-sm">همه تکالیف ارسال شدن</div>
-              <div class="text-caption text-grey-7 q-mt-xs">این سطح از نظم… مشکوکه! ولی عالیه.</div>
+              <div class="text-subtitle2 text-weight-bolder q-mt-sm">تمام تکالیف ارسال شده‌اند</div>
+              <div class="text-caption text-grey-7 q-mt-xs">خیالت راحت، کار عقب‌افتاده‌ای نداری!</div>
             </div>
 
             <q-list
               v-else
               bordered
-              class="rounded-borders">
+              separator
+              class="rounded-borders overflow-hidden">
               <q-item
                 v-for="h in pendingHomeworks.slice(0, 5)"
                 :key="String((h as any).id)"
-                clickable>
+                v-ripple
+                clickable
+                :to="{ name: 'Student.Homework.Show', params: { id: (h as any).id } }"
+                class="q-py-md hover-scale">
                 <q-item-section avatar>
                   <q-avatar
                     color="orange-1"
                     text-color="orange-9"
-                    icon="assignment_late" />
+                    icon="assignment_late"
+                    size="42px" />
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label class="text-weight-bolder">
+                  <q-item-label class="text-weight-bolder ellipsis">
                     {{ (h as any).title || 'تکلیف' }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label
+                    caption
+                    class="text-grey-7 q-mt-xs">
                     مهلت: {{ formatDateTime((h as any).due_date) }}
-                    <span v-if="(h as any).lesson?.name"> • درس: {{ (h as any).lesson.name }}</span>
+                    <span v-if="(h as any).lesson?.name"> • {{ (h as any).lesson.name }}</span>
                   </q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
                   <q-chip
                     dense
+                    size="11px"
                     color="orange-2"
                     text-color="orange-10"
-                    icon="upload">
+                    icon="pending"
+                    class="text-weight-bold">
                     ارسال نشده
                   </q-chip>
                 </q-item-section>
@@ -466,10 +618,12 @@
           </q-card-section>
         </q-card>
       </div>
+
     </div>
 
-    <!-- Bottom row: Recent grades + Calendar -->
+    <!-- SECONDARY SECTION: Recent Grades & Calendar Events -->
     <div class="row q-col-gutter-md q-mt-md">
+      <!-- نمرات اخیر -->
       <div class="col-12 col-lg-6">
         <q-card
           flat
@@ -484,12 +638,13 @@
                 icon="grading" />
               <div>
                 <div class="text-subtitle1 text-weight-bolder">نمرات اخیر</div>
-                <div class="text-caption text-grey-7">آخرین رکوردها</div>
+                <div class="text-caption text-grey-7">آخرین نمرات ثبت‌شده</div>
               </div>
             </div>
 
             <q-btn
               flat
+              dense
               color="primary"
               icon-right="chevron_left"
               label="همه نمرات"
@@ -499,64 +654,31 @@
           <q-separator />
 
           <q-card-section>
-            <q-list
-              v-if="loading"
-              bordered
-              class="rounded-borders">
-              <q-item
-                v-for="n in 3"
-                :key="n">
-                <q-item-section avatar>
-                  <q-skeleton
-                    type="QAvatar"
-                    size="40px" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>
-                    <q-skeleton
-                      type="text"
-                      width="60%" />
-                  </q-item-label>
-                  <q-item-label caption>
-                    <q-skeleton
-                      type="text"
-                      width="40%" />
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-skeleton
-                    type="QBadge"
-                    width="50px"
-                    height="24px" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-
             <div
-              v-else-if="!stats.recent_grades.length"
+              v-if="!stats.recent_grades.length"
               class="empty q-pa-lg rounded-borders">
               <q-icon
                 name="inbox"
                 size="40px"
                 class="text-grey-5" />
               <div class="text-subtitle2 text-weight-bolder q-mt-sm">هنوز نمره‌ای ثبت نشده</div>
-              <div class="text-caption text-grey-7 q-mt-xs">
-                به محض ثبت، اینجا میاد تو ویترین.
-              </div>
+              <div class="text-caption text-grey-7 q-mt-xs">به محض ثبت، اینجا میاد تو ویترین.</div>
             </div>
 
             <q-list
               v-else
               bordered
+              separator
               class="rounded-borders">
               <q-item
                 v-for="(g, i) in stats.recent_grades.slice(0, 5)"
                 :key="g.id"
-                clickable>
+                class="q-py-sm">
                 <q-item-section avatar>
                   <q-avatar
                     color="blue-1"
-                    text-color="primary">
+                    text-color="primary"
+                    size="36px">
                     {{ i + 1 }}
                   </q-avatar>
                 </q-item-section>
@@ -565,22 +687,19 @@
                   <q-item-label class="text-weight-bolder">
                     {{ g.exam_name || 'آزمون' }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label
+                    caption
+                    class="text-grey-7">
                     {{ g.type === 'online' ? 'آنلاین' : 'حضوری' }}
                     <span v-if="g.lesson_name"> • درس: {{ g.lesson_name }}</span>
-                    <span> • نمره: {{ g.score ?? '-' }}</span>
-                    <span v-if="g.percent !== null"> • {{ g.percent }}٪</span>
+                    <span v-if="g.percent !== null"> • درصد: <b>{{ g.percent }}٪</b></span>
                   </q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
-                  <q-chip
-                    dense
-                    color="blue-2"
-                    text-color="blue-10"
-                    icon="star">
-                    جدید
-                  </q-chip>
+                  <div class="text-weight-bolder text-primary text-subtitle2">
+                    {{ g.score ?? '-' }}
+                  </div>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -588,6 +707,7 @@
         </q-card>
       </div>
 
+      <!-- تقویم آموزشی -->
       <div class="col-12 col-lg-6">
         <q-card
           flat
@@ -602,7 +722,7 @@
                 icon="event" />
               <div>
                 <div class="text-subtitle1 text-weight-bolder">تقویم آموزشی</div>
-                <div class="text-caption text-grey-7">رویدادهای نزدیک</div>
+                <div class="text-caption text-grey-7">رویدادها و برنامه‌های نزدیک</div>
               </div>
             </div>
           </q-card-section>
@@ -610,82 +730,53 @@
           <q-separator />
 
           <q-card-section>
-
-            <q-list
-              v-if="loading"
-              bordered
-              class="rounded-borders">
-              <q-item
-                v-for="n in 3"
-                :key="n">
-                <q-item-section avatar>
-                  <q-skeleton
-                    type="QAvatar"
-                    size="40px" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>
-                    <q-skeleton
-                      type="text"
-                      width="60%" />
-                  </q-item-label>
-                  <q-item-label caption>
-                    <q-skeleton
-                      type="text"
-                      width="40%" />
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-skeleton
-                    type="QBadge"
-                    width="50px"
-                    height="24px" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-
             <div
-              v-else-if="!upcomingEvents.length"
+              v-if="!upcomingEvents.length"
               class="empty q-pa-lg rounded-borders">
               <q-icon
                 name="event_available"
                 size="40px"
                 class="text-grey-5" />
-              <div class="text-subtitle2 text-weight-bolder q-mt-sm">رویداد نزدیک نداریم</div>
-              <div class="text-caption text-grey-7 q-mt-xs">تقویم فعلاً خلوت و دوست‌داشتنیه.</div>
+              <div class="text-subtitle2 text-weight-bolder q-mt-sm">رویدادی ثبت نشده است</div>
+              <div class="text-caption text-grey-7 q-mt-xs">تقویم فعلاً خلوت است.</div>
             </div>
 
             <q-list
               v-else
               bordered
+              separator
               class="rounded-borders">
               <q-item
-                v-for="ev in upcomingEvents.slice(0, 6)"
-                :key="String((ev as any).id)">
+                v-for="ev in upcomingEvents.slice(0, 5)"
+                :key="String((ev as any).id)"
+                class="q-py-sm">
                 <q-item-section avatar>
                   <q-avatar
                     :style="{
-                      background: ((ev as any).color || '#E0F2F1'),
+                      background: (ev as any).color || '#E0F2F1',
                       color: '#0F766E'
                     }"
-                    icon="event" />
+                    icon="event"
+                    size="36px" />
                 </q-item-section>
 
                 <q-item-section>
                   <q-item-label class="text-weight-bolder">
                     {{ (ev as any).title || 'رویداد' }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label
+                    caption
+                    class="text-grey-7">
                     {{ formatDateTime((ev as any).starts_at) }}
                     <span v-if="(ev as any).all_day"> • تمام‌روز</span>
-                    <span v-if="(ev as any).type"> • {{ mapEventType((ev as any).type) }}</span>
                   </q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
                   <q-chip
                     dense
-                    color="teal-2"
+                    size="11px"
+                    color="teal-1"
                     text-color="teal-10"
                     icon="near_me">
                     نزدیک
@@ -704,84 +795,43 @@
 import { computed, onMounted, ref } from 'vue'
 
 import { useDate } from 'src/composables/Date'
-import { student } from 'src/repositories/student'
-
-type UpcomingExam = {
-  id: number
-  name: string
-  delivery_mode: 'online' | 'in_person'
-  category?: {
-    id: number
-    title: string
-  } | null
-  online_exam_detail?: {
-    starts_at?: string | null
-    ends_at?: string | null
-    time_limit_minutes?: number | null
-  } | null
-  in_person_exam_detail?: {
-    held_at?: string | null
-  } | null
-}
-
-type PendingHomework = {
-  id: number
-  title: string
-  due_date?: string | null
-  lesson?: {
-    name?: string | null
-  } | null
-}
-
-type RecentGrade = {
-  id: string
-  type: 'online' | 'in_person'
-  exam_name?: string | null
-  lesson_name?: string | null
-  score?: string | number | null
-  percent?: string | number | null
-  graded_at?: string | null
-}
-
-type UpcomingEvent = {
-  id: number
-  title: string
-  starts_at?: string | null
-  all_day?: boolean
-  type?: string
-  color?: string | null
-}
-
-type StudentDashboardStats = {
-  upcoming_exams: UpcomingExam[]
-  pending_homeworks: PendingHomework[]
-  recent_grades: RecentGrade[]
-  upcoming_events: UpcomingEvent[]
-  total_study_minutes_this_month: number
-  total_study_hours_this_month: number
-}
+import {
+  student,
+  type ActiveOnlineClass,
+  type StudentDashboardData,
+  type UpcomingExam
+} from 'src/repositories/student'
 
 const dateManager = useDate()
 
-const stats = ref<StudentDashboardStats>({
-  upcoming_exams: [],
-  pending_homeworks: [],
-  recent_grades: [],
-  upcoming_events: [],
-  total_study_minutes_this_month: 0,
-  total_study_hours_this_month: 0
-})
-
+const stats = ref<StudentDashboardData>(getDefaultStats())
 const loading = ref(false)
-const upcomingExams = computed(() => stats.value.upcoming_exams)
-const pendingHomeworks = computed(() => stats.value.pending_homeworks)
-const upcomingEvents = computed(() => stats.value.upcoming_events)
+
+// لیست‌های استخراج‌شده
+const activeOnlineClasses = computed(() => stats.value.active_online_classes || [])
+const liveOnlineClasses = computed(() => activeOnlineClasses.value.filter((c) => c.is_live_now))
+const upcomingExams = computed(() => stats.value.upcoming_exams || [])
+const pendingHomeworks = computed(() => stats.value.pending_homeworks || [])
+const upcomingEvents = computed(() => stats.value.upcoming_events || [])
 
 const studyProgress = computed(() => {
   const minutes = stats.value.total_study_minutes_this_month || 0
   const goal = 600
   return Math.max(0, Math.min(1, minutes / goal))
 })
+
+function getDefaultStats (): StudentDashboardData {
+  return {
+    has_skyroom_feature: false,
+    active_online_classes: [],
+    upcoming_exams: [],
+    pending_homeworks: [],
+    recent_grades: [],
+    upcoming_events: [],
+    total_study_minutes_this_month: 0,
+    total_study_hours_this_month: 0
+  }
+}
 
 function getExamStatus (e: UpcomingExam) {
   if (e.delivery_mode === 'in_person') {
@@ -843,31 +893,12 @@ function examDate (exam: UpcomingExam) {
     : exam.in_person_exam_detail?.held_at
 }
 
-function mapEventType (t: any) {
-  switch (t) {
-    case 'exam': return 'آزمون'
-    case 'homework': return 'تکلیف'
-    case 'meeting': return 'جلسه'
-    case 'holiday': return 'تعطیل'
-    case 'reminder': return 'یادآور'
-    case 'class': return 'کلاس'
-    default: return 'عمومی'
-  }
-}
-
 async function loadDashboard () {
   loading.value = true
   try {
     stats.value = await student.dashboard()
   } catch (e) {
-    stats.value = {
-      upcoming_exams: [],
-      pending_homeworks: [],
-      recent_grades: [],
-      upcoming_events: [],
-      total_study_minutes_this_month: 0,
-      total_study_hours_this_month: 0
-    }
+    stats.value = getDefaultStats()
   } finally {
     loading.value = false
   }
@@ -881,9 +912,9 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .dash {
   background:
-    radial-gradient(1200px 600px at 12% 0%, rgba(124, 77, 255, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 92% 18%, rgba(45, 127, 249, 0.10), transparent 55%),
-    radial-gradient(900px 500px at 70% 80%, rgba(255, 152, 0, 0.08), transparent 60%);
+    radial-gradient(1200px 600px at 12% 0%, rgba(124, 77, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 92% 18%, rgba(45, 127, 249, 0.08), transparent 55%),
+    radial-gradient(900px 500px at 70% 80%, rgba(255, 152, 0, 0.06), transparent 60%);
   min-height: calc(100vh - 120px);
 }
 
@@ -921,7 +952,35 @@ onMounted(async () => {
   backdrop-filter: blur(14px);
 }
 
-/* KPI */
+/* LIVE SKYROOM ALERT BANNER */
+.live-banner {
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.live-pulse {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 13px;
+  height: 13px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.live-btn {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* KPI CARDS */
 .kpi {
   border-radius: 18px;
   position: relative;
@@ -948,18 +1007,19 @@ onMounted(async () => {
   }
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 40px rgba(30, 41, 59, 0.10);
-    border-color: rgba(45, 127, 249, 0.30);
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(30, 41, 59, 0.09);
+    border-color: rgba(45, 127, 249, 0.3);
 
     &::before {
-      opacity: 0.40;
+      opacity: 0.38;
     }
   }
 }
 
 .kpi__label {
   color: #64748b;
+  font-size: 0.8rem;
 }
 
 .kpi__value {
@@ -985,20 +1045,220 @@ onMounted(async () => {
   background: #2d7ff9;
 }
 
-.kpi--calendar::before {
-  background: #14b8a6;
-}
-
-/* Panels */
+/* PANELS */
 .panel {
   border-radius: 18px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.bg-teal-0 {
+  background-color: #f0fdfa;
+}
+
+.hover-scale {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
 }
 
 .empty {
   text-align: center;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.03), rgba(255, 255, 255, 1));
-  border: 1.5px dashed rgba(15, 23, 42, 0.18);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(255, 255, 255, 1));
+  border: 1.5px dashed rgba(15, 23, 42, 0.16);
 }
+
+
+/* =========================================
+   FANTASY SKYROOM & EMERALD LIVE STYLES
+   ========================================= */
+
+/* بنر بزرگ اعلان زنده (سبز زمردی فانتزی با عمق سه بعدی) */
+.live-banner-fantasy {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #14b8a6 100%);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 30px -6px rgba(16, 185, 129, 0.45);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 60%);
+    pointer-events: none;
+    animation: rotateGlow 10s linear infinite;
+  }
+}
+
+.text-emerald-light {
+  color: #d1fae5;
+}
+
+/* آواتار متحرک بنر */
+.live-avatar-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-avatar {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid #a7f3d0;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.live-orbit {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  animation: orbitPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+
+  &--delay {
+    animation-delay: 0.9s;
+  }
+}
+
+/* بج متنی چشمک‌زن */
+.badge-live-tag {
+  background: #ffffff !important;
+  color: #059669 !important;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.blinking-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #10b981;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 5px;
+  animation: blink 1s ease infinite alternate;
+}
+
+/* دکمه ورود موشکی */
+.btn-enter-live {
+  background: #ffffff;
+  color: #047857;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    color: #065f46;
+  }
+}
+
+/* کارت‌های اختصاصی آیتم‌های اسکای روم داخل پنل */
+.sky-item-card {
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.25s ease;
+
+  &--live {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    border: 1.5px solid #a7f3d0;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+    }
+  }
+}
+
+.avatar-sky--live {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.avatar-sky--idle {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.pulse-indicator {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: pulsePoint 1.4s infinite;
+}
+
+.chip-status-active {
+  background: #d1fae5;
+  color: #065f46;
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.chip-status-waiting {
+  background: #f1f5f9;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.btn-sky--active {
+  background: #10b981;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 4px 12px;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+
+  &:hover {
+    background: #059669;
+  }
+}
+
+.btn-sky--idle {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+}
+
+/* انیمیشن‌ها */
+@keyframes orbitPulse {
+  0% { transform: scale(0.85); opacity: 0.9; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes pulsePoint {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes blink {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+@keyframes rotateGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>

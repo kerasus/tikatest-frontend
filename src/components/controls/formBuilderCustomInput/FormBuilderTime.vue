@@ -34,11 +34,11 @@
         <q-icon
           v-if="clearable"
           v-show="showClearAble"
-          name="oms:close-circle"
+          name="close"
           class="cursor-pointer"
           @click="onClear" />
         <q-icon
-          name="oms:clock"
+          name="watch"
           class="cursor-pointer"
           @click="toggleMenuFn" />
       </template>
@@ -52,51 +52,20 @@
       class="form-builder-time"
       transition-show="jump-down"
       transition-hide="jump-up">
-      <q-form class="time-picker">
-        <q-input
-          ref="inputSecond"
-          v-model="dateTime.seconds"
-          mask="##"
-          :label="$t('fieldName.second')"
-          :fill-mask="fillMask"
-          :reverse-fill-mask="reverseFillMask"
-          dir="ltr"
-          :autofocus="false"
-          @keydown="onKeydownSecond"
-          @update:model-value="onMenuSecondInputUpdate" />
-        <div class="time-separator">:</div>
-        <q-input
-          ref="inputMinute"
-          v-model="dateTime.minutes"
-          mask="##"
-          :label="$t('fieldName.minute')"
-          :fill-mask="fillMask"
-          :reverse-fill-mask="reverseFillMask"
-          dir="ltr"
-          :autofocus="false"
-          @keydown="onKeydownMinute"
-          @update:model-value="onMenuMinuteInputUpdate" />
-        <div class="time-separator">:</div>
-        <q-input
-          ref="inputHour"
-          v-model="dateTime.hours"
-          mask="##"
-          :label="$t('fieldName.hour')"
-          :fill-mask="fillMask"
-          :reverse-fill-mask="reverseFillMask"
-          dir="ltr"
-          :autofocus="false"
-          @keydown="onKeydownHour"
-          @update:model-value="onMenuHourInputUpdate" />
-      </q-form>
-      <div class="row items-center justify-end">
-        <q-btn
-          ref="closeBtnRef"
-          v-close-popup
-          :label="$t('general.close')"
-          :color="closeColorBtn"
-          flat />
-      </div>
+      <q-time
+        v-model="pickerTime"
+        format24h
+        :disable="disable || readonly"
+        :now-btn="todayBtn"
+        @update:model-value="onPickerTimeChange">
+        <div class="row items-center justify-end">
+          <q-btn
+            v-close-popup
+            label="بستن"
+            :color="closeColorBtn"
+            flat />
+        </div>
+      </q-time>
     </q-menu>
   </div>
 </template>
@@ -108,7 +77,7 @@ import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
 import type { FormBuilderInputType } from 'src/types'
 import type { LocalErrorDataType } from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
-import { type ComponentPublicInstance, computed, type ModelRef, nextTick, reactive, ref, type Ref, watch } from 'vue'
+import { computed, type ModelRef, ref, type Ref, watch } from 'vue'
 
 defineOptions({
   name: 'FormBuilderTime'
@@ -151,35 +120,15 @@ const { t: rawT } = useI18n()
 const dateManager = useDate()
 
 
-interface DateTimeObject {
-  date: string
-  time: string
-  hours: string
-  minutes: string
-  seconds: string
-}
-
-const localMask = ref('##:##:##')
+const localMask = ref('##:##')
 const localDisplayDateTime: Ref<string> = ref('')
+const pickerTime = ref<string | null>(null)
 const popupTime = ref(false)
 const localPersistentMenu = ref(false)
-const input = ref<HTMLInputElement | null>(null)
-const inputHour = ref<any>(null)
-const inputMinute = ref<HTMLInputElement | null>(null)
-const inputSecond = ref<HTMLInputElement | null>(null)
-const closeBtnRef = ref<ComponentPublicInstance | null>(null)
 const localErrorMessage: Ref<string | null> = ref(null)
 
-const dateTime = reactive<DateTimeObject>({
-  date: '',
-  time: '',
-  hours: '__',
-  minutes: '__',
-  seconds: '__'
-})
-
 const customClass = computed(() => props.class)
-const showClearAble = computed(() => localDisplayDateTime.value !== '__:__:__')
+const showClearAble = computed(() => localDisplayDateTime.value !== '__:__')
 
 const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() => {
   if (!localErrorMessage.value) {
@@ -199,7 +148,7 @@ const localRules = computed(() =>
       const ruleName = rule.ruleName
       const ruleParams = rule.ruleParams
       rule = (): boolean | string => {
-        if (localDisplayDateTime.value === '__:__:__') {
+        if (localDisplayDateTime.value === '__:__') {
           return rawT('error.validation.required', { field: props.label })
         } else return !localErrorMessage.value
       }
@@ -216,11 +165,11 @@ watch(
   () => localValue.value,
   (newValue) => {
     if (!newValue) {
-      localDisplayDateTime.value = '__:__:__'
+      localDisplayDateTime.value = '__:__'
+      pickerTime.value = null
       return
     }
     onChangeTime(newValue)
-    updateDateTime(newValue)
   },
   { immediate: true }
 )
@@ -229,8 +178,13 @@ function onChangeInputTime (newValue: string | number | null) {
   if (typeof newValue !== 'string') {
     return
   }
-  dateTime.time = newValue
-  const analysedShamsiTime = dateManager.validationTime(localDisplayDateTime.value)
+  if (newValue === '__:__') {
+    localErrorMessage.value = null
+    localValue.value = null
+    return
+  }
+
+  const analysedShamsiTime = dateManager.validationTime(`${newValue}:00`)
 
   if (analysedShamsiTime.isValid && analysedShamsiTime.validTime) {
     localErrorMessage.value = null
@@ -241,12 +195,10 @@ function onChangeInputTime (newValue: string | number | null) {
 }
 
 function onChangeTime (newValue: string) {
-  dateTime.time = newValue
-  const parseTime = dateManager.parseTime(newValue)
-  dateTime.hours = parseTime.formattedHour
-  dateTime.minutes = parseTime.formattedMinute
-  dateTime.seconds = parseTime.formattedSecond
-  updateDateTime(newValue)
+  const [hour = '', minute = ''] = newValue.split(':')
+  const normalizedTime = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
+  pickerTime.value = normalizedTime
+  updateDateTime(normalizedTime)
 }
 
 function updateDateTime (newValue: string) {
@@ -254,14 +206,16 @@ function updateDateTime (newValue: string) {
   localValue.value = newValue ? newValue.toString() : newValue
 }
 function onClear () {
-  localDisplayDateTime.value = '__:__:__'
+  localDisplayDateTime.value = '__:__'
+  pickerTime.value = null
+  localErrorMessage.value = null
   localValue.value = null
 }
 
 function openMenu () {
+  if (props.disable || props.readonly) return
   localPersistentMenu.value = true
   popupTime.value = true
-  input.value?.focus()
 }
 
 function onKeydown (e: KeyboardEvent) {
@@ -282,7 +236,6 @@ function onKeydown (e: KeyboardEvent) {
   ]
   if (e.key === 'ArrowDown') {
     openMenu()
-    input.value?.focus()
     return
   }
   if (e.key === ' ') {
@@ -303,70 +256,19 @@ function onKeydown (e: KeyboardEvent) {
   }
 }
 
-function onKeydownHour (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    inputMinute.value?.focus()
-  }
-  nextTick(() => {
-    if (!dateTime.hours.includes('_') && e.key !== 'Backspace' && e.key !== 'Delete') {
-      inputMinute.value?.focus()
-    }
-  })
-}
-
-function onKeydownMinute (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    inputSecond.value?.focus()
-  }
-  nextTick(() => {
-    if (!dateTime.minutes.includes('_') && e.key !== 'Backspace' && e.key !== 'Delete') {
-      inputSecond.value?.focus()
-    }
-    if (dateTime.minutes === '__' && e.key === 'Backspace') {
-      inputHour.value?.focus()
-    }
-  })
-}
-
-function onKeydownSecond (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    closeBtnRef.value?.$el.focus()
-  }
-  nextTick(() => {
-    if (dateTime.seconds === '__' && e.key === 'Backspace') {
-      inputMinute.value?.focus()
-    }
-  })
-}
-
-function onMenuTimeInputUpdate () {
-  localDisplayDateTime.value = dateTime.hours + ':' + dateTime.minutes + ':' + dateTime.seconds
-}
-
-function onMenuHourInputUpdate () {
-  onMenuTimeInputUpdate()
-}
-
-function onMenuMinuteInputUpdate () {
-  dateTime.hours = dateTime.hours.replaceAll('_', '0')
-  onMenuTimeInputUpdate()
-}
-
-function onMenuSecondInputUpdate () {
-  dateTime.hours = dateTime.hours.replaceAll('_', '0')
-  dateTime.minutes = dateTime.minutes.replaceAll('_', '0')
-
-  onMenuTimeInputUpdate()
+function onPickerTimeChange (newValue: string | null) {
+  if (!newValue) return
+  localErrorMessage.value = null
+  onChangeTime(newValue)
 }
 
 function toggleMenuFn () {
-  popupTime.value = !popupTime.value
+  if (popupTime.value) {
+    popupTime.value = false
+    return
+  }
+  openMenu()
 }
-
-watch(localDisplayDateTime, onChangeInputTime)
 
 watch(
   () => props.errorMessage,

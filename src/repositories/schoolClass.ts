@@ -34,8 +34,10 @@ export default class SchoolClassAPI extends BaseAPI<SchoolClassType> {
 
   async getSkyroomRooms (classId: number | string, params?: any): Promise<SkyroomRoomType[]> {
     const endpoint = (this.endpoints as any).skyroomRooms(classId)
-    const response = await this.getAxiosInstanceWithToken().get(endpoint, { params })
-    return response.data
+    const response = await this.getAxiosInstanceWithToken().get(endpoint, {
+      params: { length: 1000, ...params }
+    })
+    return Array.isArray(response.data) ? response.data : response.data.data
   }
 }
 

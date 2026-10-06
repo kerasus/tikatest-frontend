@@ -89,6 +89,17 @@
                   dense
                   round
                   size="sm"
+                  icon="video_camera_front"
+                  color="accent"
+                  @click.stop="manageSkyroom(node)">
+                  <q-tooltip>مدیریت اتاق‌ها و زمان‌بندی اسکای‌روم</q-tooltip>
+                </q-btn>
+                <q-btn
+                  v-if="node.type === 'class'"
+                  flat
+                  dense
+                  round
+                  size="sm"
                   icon="edit"
                   color="primary"
                   @click.stop="editClass(node)">
@@ -152,6 +163,11 @@
       :field-id="editDialog.fieldId"
       :level-id="editDialog.levelId"
       @updated="loadTreeData" />
+
+    <school-class-skyroom-dialog
+      v-model="skyroomDialog.show"
+      :school-class="skyroomDialog.schoolClass"
+      :school-id="schoolId" />
   </div>
 </template>
 
@@ -170,6 +186,7 @@ import type { SchoolClassType } from 'src/repositories/schoolClass'
 import type { AcademicFieldType } from 'src/repositories/academicField'
 import type { AcademicLevelType } from 'src/repositories/academicLevel'
 import EditSchoolClassDialog from 'src/components/school/EditSchoolClassDialog.vue'
+import SchoolClassSkyroomDialog from 'src/components/school/SchoolClassSkyroomDialog.vue'
 
 const $q = useQuasar()
 const route = useRoute()
@@ -212,6 +229,11 @@ const editDialog = reactive({
   schoolClass: null as SchoolClassType | null,
   fieldId: null as number | null,
   levelId: null as number | null
+})
+
+const skyroomDialog = reactive({
+  show: false,
+  schoolClass: null as SchoolClassType | null
 })
 
 function handleNodeClick (node: any) {
@@ -303,6 +325,11 @@ function editClass (node: any) {
   editDialog.fieldId = node.fieldId
   editDialog.levelId = node.levelId
   editDialog.show = true
+}
+
+function manageSkyroom (node: any) {
+  skyroomDialog.schoolClass = node.data
+  skyroomDialog.show = true
 }
 
 function deleteClass (node: any) {

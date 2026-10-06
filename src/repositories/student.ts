@@ -40,6 +40,87 @@ export interface StudentType extends UserType {
   term_enrollments: TermEnrollmentType[]
 }
 
+
+export interface ActiveOnlineClass {
+  schedule_id: number
+  room_id: number
+  class_id: number
+  class_name: string
+  title: string
+  start_time: string // e.g. "15:15"
+  end_time: string   // e.g. "23:59"
+  is_live_now: boolean
+  status: 'live' | 'upcoming'
+  join_url: string
+}
+
+export interface UpcomingExam {
+  id: number
+  name: string
+  delivery_mode: 'online' | 'in_person';
+  category?: {
+    id: number;
+    title: string;
+  } | null;
+  online_exam_detail?: {
+    starts_at?: string | null;
+    ends_at?: string | null;
+    time_limit_minutes?: number | null;
+  } | null;
+  in_person_exam_detail?: {
+    held_at?: string | null;
+  } | null;
+}
+
+export interface PendingHomework {
+  id: number;
+  title: string;
+  due_date?: string | null;
+  lesson?: {
+    name?: string | null;
+  } | null;
+}
+
+export interface RecentGrade {
+  id: string;
+  type: 'online' | 'in_person';
+  exam_name?: string | null;
+  lesson_name?: string | null;
+  score?: string | number | null;
+  percent?: string | number | null;
+  graded_at?: string | null;
+  exam_id: number | null
+  scaled_score: number | null
+  t_score: number | null
+}
+
+export interface UpcomingEvent {
+  id: number;
+  title: string;
+  starts_at?: string | null;
+  all_day?: boolean;
+  type?: string;
+  color?: string | null;
+  ends_at: string
+  status: string
+  calendar?: {
+    id: number
+    title: string
+    is_active: boolean
+  }
+}
+
+export interface StudentDashboardData {
+  has_skyroom_feature: boolean
+  active_online_classes: ActiveOnlineClass[]
+  upcoming_exams: UpcomingExam[]
+  pending_homeworks: PendingHomework[]
+  recent_grades: RecentGrade[]
+  upcoming_events: UpcomingEvent[]
+  total_study_minutes_this_month: number
+  total_study_hours_this_month: number
+}
+
 export default class StudentAPI extends BaseAPI<StudentType> {
   constructor () {
     super('/students')
@@ -78,7 +159,7 @@ export default class StudentAPI extends BaseAPI<StudentType> {
     }
   }
 
-  async dashboard (params?: any) {
+  async dashboard (params?: any): Promise<StudentDashboardData> {
     const response = await this.getAxiosInstanceWithToken().get(this.endpoints.dashboard!, { params })
     return response.data
   }
