@@ -1,5 +1,5 @@
 import BaseAPI from './BaseAPI'
-import { axiosInstanceManager } from 'src/boot/axios'
+import type { SchoolFeatureType } from 'src/repositories/schoolFeature'
 
 export type SchoolType = {
   id: number | null
@@ -10,6 +10,7 @@ export type SchoolType = {
   logo: string | null
   type: SchoolTypeEnum | null
   account_url: string | null
+  features: SchoolFeatureType[]
   created_at: string | null
   updated_at: string | null
   deleted_at: string | null
@@ -36,6 +37,7 @@ export default class SchoolAPI extends BaseAPI<SchoolType> {
       website: null,
       logo: null,
       type: null,
+      features: [],
       account_url: null,
       created_at: null,
       updated_at: null,

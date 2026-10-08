@@ -143,6 +143,7 @@
               autogrow
               label="تنظیمات JSON"
               hint='مثال: {"sender":"service-name"}'
+              dir="ltr"
               :error="!!settingsError"
               :error-message="settingsError" />
             <q-toggle
