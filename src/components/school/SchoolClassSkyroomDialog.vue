@@ -145,7 +145,7 @@
                   class="rounded-borders">
                   <q-item
                     v-for="schedule in getRoomSchedules(room)"
-                    :key="schedule.id ?? `${schedule.start_time}-${schedule.end_time}`">
+                    :key="schedule.id">
                     <q-item-section avatar>
                       <q-icon
                         name="schedule"
@@ -154,7 +154,11 @@
                     <q-item-section>
                       <q-item-label>{{ schedule.title }}</q-item-label>
                       <q-item-label caption>
-                        {{ scheduleLabel(schedule) }} — از {{ schedule.start_time }} تا {{ schedule.end_time }}
+                        {{ scheduleLabel(schedule) }}
+                        — از
+                        {{ schedule.start_time }}
+                        تا
+                        {{ schedule.end_time }}
                       </q-item-label>
                     </q-item-section>
                     <q-item-section side>
@@ -346,6 +350,7 @@
               <form-builder-time
                 v-model:value="scheduleDialog.form.start_time"
                 label="ساعت شروع"
+                :iso8601="false"
                 outlined
                 clearable
                 :rules="[(value) => !!value || 'ساعت شروع الزامی است']" />
@@ -354,6 +359,7 @@
               <form-builder-time
                 v-model:value="scheduleDialog.form.end_time"
                 label="ساعت پایان"
+                :iso8601="false"
                 outlined
                 clearable
                 :rules="[(value) => !!value || 'ساعت پایان الزامی است']" />
@@ -382,8 +388,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { computed, reactive, ref, watch } from 'vue'
 import SchoolClassAPI, { type SchoolClassType } from 'src/repositories/schoolClass'
 import SkyroomRoomAPI, { type SkyroomRoomType } from 'src/repositories/skyroomRoom'
 import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
@@ -403,8 +409,8 @@ const emit = defineEmits<{
 }>()
 
 const $q = useQuasar()
-const classApi = new SchoolClassAPI()
 const roomApi = new SkyroomRoomAPI()
+const classApi = new SchoolClassAPI()
 const scheduleApi = new SkyroomRoomScheduleAPI()
 
 const loading = ref(false)

@@ -264,7 +264,7 @@ export default defineConfig((ctx) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'gitisam-front',
+        appId: 'sanjad-front',
       },
     },
 

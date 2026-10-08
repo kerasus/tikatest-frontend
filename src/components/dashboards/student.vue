@@ -1,88 +1,122 @@
 <template>
   <div class="dash q-pa-md">
-    <!-- HERO -->
+    <!-- HERO FANTASY & CANDY EDITION -->
     <q-card
       flat
-      bordered
-      class="hero overflow-hidden q-mb-md">
-      <q-card-section class="row items-center q-col-gutter-md">
-        <div class="col-12 col-md-8">
-          <div class="row items-center q-gutter-sm">
-            <q-avatar
-              size="44px"
-              class="hero__avatar"
-              text-color="white"
-              icon="auto_awesome" />
+      class="hero-fantasy overflow-hidden q-mb-lg relative-position">
+
+      <!-- پس‌زمینه‌های انیمیشنی معلق (Blobs) -->
+      <div class="blob blob-1" />
+      <div class="blob blob-2" />
+      <div class="blob blob-3" />
+      <div class="sparkle sparkle-1">✨</div>
+      <div class="sparkle sparkle-2">🚀</div>
+      <div class="sparkle sparkle-3">🎯</div>
+
+      <q-card-section
+        class="row items-center q-col-gutter-lg relative-position"
+        style="z-index: 2;">
+        <!-- بخش اصلی سلام و دکمه‌ها -->
+        <div class="col-12 col-md-7">
+          <div class="row items-center q-gutter-md no-wrap">
+            <div class="avatar-wrapper">
+              <q-avatar
+                size="56px"
+                class="hero__avatar shadow-3"
+                text-color="deep-purple-9"
+                icon="auto_awesome" />
+              <span class="avatar-badge">⚡</span>
+            </div>
+
             <div>
-              <div class="text-h6 text-weight-bolder">
-                داشبورد دانش‌آموزی <span class="text-weight-bolder">سنجاد</span>
+              <div class="hero__badge q-mb-xs">
+                <q-badge
+                  rounded
+                  color="yellow-7"
+                  text-color="dark"
+                  class="text-weight-bold q-px-sm q-py-xs">
+                  آماده برای یادگیری؟ 🔥
+                </q-badge>
               </div>
-              <div class="text-body2 hero__sub q-mt-xs">
-                امروز قراره بترکونی؛ کلاس‌های آنلاین، آزمون‌ها و تکالیفت زیر ذره‌بینِ توئه!
+              <div class="text-h5 text-weight-bolder text-white hero__title">
+                داشبورد دانش‌آموزی <span class="brand-glow">سنجاد</span>
+              </div>
+              <div class="text-subtitle2 hero__sub q-mt-xs">
+                امروز قراره بترکونی؛ کلاس‌ها، آزمون‌ها و تمرین‌هات منتظر درخشش تواند! ✨
               </div>
             </div>
           </div>
 
-          <div class="row q-gutter-sm q-mt-md">
+          <!-- دکمه‌های شاد و کپسولی -->
+          <div class="row q-gutter-sm q-mt-md items-center">
             <q-btn
               unelevated
-              color="white"
-              text-color="primary"
+              rounded
               icon="quiz"
               label="لیست آزمون‌ها"
-              class="q-px-md"
+              class="btn-candy btn-candy--primary q-px-md text-weight-bold"
               :to="{ name: 'Student.Exam.List' }" />
             <q-btn
               flat
-              color="white"
+              rounded
               icon="assignment"
               label="مشاهده تکالیف"
-              class="q-px-md"
+              class="btn-candy btn-candy--glass q-px-md text-weight-medium"
               :to="{ name: 'Student.Homework.List' }" />
             <q-btn
               flat
-              color="white"
+              rounded
               icon="grading"
               label="مشاهده نمرات"
-              class="q-px-md"
+              class="btn-candy btn-candy--glass q-px-md text-weight-medium"
               :to="{ name: 'Student.Grade.List' }" />
           </div>
         </div>
 
-        <!-- Study highlight -->
-        <div class="col-12 col-md-4">
-          <div class="hero__glass q-pa-md rounded-borders">
+        <!-- باکس شیشه‌ای مطالعه (Study Card) -->
+        <div class="col-12 col-md-5">
+          <div class="hero__glass-card q-pa-md">
             <div class="row items-center justify-between">
-              <div class="text-caption hero__muted">مطالعه این ماه</div>
+              <div class="row items-center q-gutter-xs">
+                <span class="text-h6">⏳</span>
+                <span class="text-subtitle2 text-weight-bolder text-white">ماراتن مطالعه این ماه</span>
+              </div>
               <q-chip
                 dense
+                class="chip-status text-weight-bolder"
                 color="white"
-                text-color="primary"
-                icon="timer">
-                Focus
+                text-color="purple-9"
+                icon="bolt">
+                Super Focus
               </q-chip>
             </div>
 
-            <div class="text-h5 text-weight-bolder q-mt-sm">
-              {{ stats.total_study_hours_this_month }}
-              <span class="text-caption hero__muted">ساعت</span>
+            <div class="row items-baseline q-mt-md q-gutter-xs">
+              <span class="text-h3 text-weight-bolder text-white score-counter">
+                {{ stats.total_study_hours_this_month }}
+              </span>
+              <span class="text-body2 text-white-8 text-weight-medium">ساعت تمرکز طلایی</span>
             </div>
 
-            <q-linear-progress
-              class="q-mt-md"
-              rounded
-              size="10px"
-              :value="studyProgress"
-              color="white"
-              track-color="white"
-              style="opacity: 0.28" />
-            <div class="text-caption hero__muted q-mt-xs">
-              پیشرفت هدف ماهانه: {{ Math.round(studyProgress * 100) }}٪
+            <!-- پروگرس‌بار دو رنگ و براق -->
+            <div class="progress-container q-mt-md">
+              <q-linear-progress
+                rounded
+                size="14px"
+                :value="studyProgress"
+                class="custom-progress" />
+              <div class="row items-center justify-between q-mt-xs">
+                <span class="text-caption text-white-8">پیشرفت هدف ماه</span>
+                <span class="text-caption text-weight-bold text-yellow-3">
+                  {{ Math.round(studyProgress * 100) }}٪
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </q-card-section>
     </q-card>
+
 
     <!-- LIVE SKYROOM ALERT BANNER (فانتزی و سبز نئونی - سشن فعال اسکای‌روم) -->
     <transition-group
@@ -118,7 +152,10 @@
                 </q-chip>
               </div>
               <div class="text-caption text-emerald-light q-mt-xs">
-                هم‌اکنون سشن باز است • ساعت {{ liveClass.start_time }} تا {{ liveClass.end_time }}
+                هم‌اکنون سشن باز است • ساعت
+                {{ liveClass.start_time }}
+                تا
+                {{ liveClass.end_time }}
                 <span v-if="liveClass.class_name"> • {{ liveClass.class_name }}</span>
               </div>
             </div>
@@ -797,7 +834,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useDate } from 'src/composables/Date'
 import {
   student,
-  type ActiveOnlineClass,
   type StudentDashboardData,
   type UpcomingExam
 } from 'src/repositories/student'
@@ -918,39 +954,201 @@ onMounted(async () => {
   min-height: calc(100vh - 120px);
 }
 
-/* HERO */
-.hero {
-  border-radius: 18px;
+/* ========================================================
+   FANTASY HERO STYLES & ANIMATIONS
+   ======================================================== */
+.hero-fantasy {
+  border-radius: 28px !important;
   color: #fff;
-  background: linear-gradient(135deg, #2d7ff9 0%, #6a5cff 45%, #ff7aa2 100%);
-  position: relative;
+  border: none !important;
+  background: linear-gradient(125deg, #4f46e5 0%, #7c3aed 35%, #ec4899 75%, #f59e0b 100%);
+  background-size: 300% 300%;
+  animation: gradientShift 10s ease infinite;
+  box-shadow: 0 20px 45px -10px rgba(124, 58, 237, 0.45);
+  overflow: hidden;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(800px 400px at 20% 30%, rgba(255, 255, 255, 0.18), transparent 55%),
-      radial-gradient(700px 300px at 80% 10%, rgba(255, 255, 255, 0.12), transparent 60%);
-    pointer-events: none;
+/* ۱. انیمیشن پس‌زمینه رنگی متحرک */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-.hero__avatar {
-  background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(10px);
+/* ۲. گوی‌های رنگی ژله‌ای معلق (Organic Blobs) */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  pointer-events: none;
+  opacity: 0.65;
+  mix-blend-mode: overlay;
+  z-index: 1;
 }
 
-.hero__sub,
-.hero__muted {
-  color: rgba(255, 255, 255, 0.78);
+.blob-1 {
+  width: 260px;
+  height: 260px;
+  background: #38bdf8;
+  top: -60px;
+  right: 15%;
+  animation: floatOrb 8s ease-in-out infinite alternate;
 }
 
-.hero__glass {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(14px);
+.blob-2 {
+  width: 220px;
+  height: 220px;
+  background: #f43f5e;
+  bottom: -40px;
+  left: 20%;
+  animation: floatOrb 6s ease-in-out infinite alternate-reverse;
 }
+
+.blob-3 {
+  width: 180px;
+  height: 180px;
+  background: #facc15;
+  top: 40%;
+  left: 5%;
+  animation: floatOrb 9s ease-in-out infinite alternate;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(25px, -30px) scale(1.15);
+  }
+}
+
+/* ۳. استیکرها و جرقه‌های معلق در هوا */
+.sparkle {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  font-size: 22px;
+  z-index: 1;
+  opacity: 0.7;
+  animation: sparkleBounce 4s ease-in-out infinite alternate;
+}
+.sparkle-1 { top: 12px; left: 10%; animation-delay: 0.2s; }
+.sparkle-2 { bottom: 15px; right: 28%; font-size: 26px; animation-delay: 1.1s; }
+.sparkle-3 { top: 40%; right: 4%; animation-delay: 0.7s; }
+
+@keyframes sparkleBounce {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+  100% { transform: translateY(-12px) rotate(15deg); opacity: 0.9; }
+}
+
+/* ۴. آواتار با افکت پالس */
+.avatar-wrapper {
+  position: relative;
+
+  .hero__avatar {
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    &:hover {
+      transform: scale(1.1) rotate(-8deg);
+    }
+  }
+
+  .avatar-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 16px;
+    background: #ffdd00;
+    border-radius: 50%;
+    padding: 2px 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+}
+
+.brand-glow {
+  color: #fff;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.8), 0 0 30px rgba(250, 204, 21, 0.6);
+}
+
+.hero__sub {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* ۵. دکمه‌های جذاب کپسولی و آبنباتی */
+.btn-candy {
+  transition: all 0.25s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &--primary {
+    background: #ffffff !important;
+    color: #6366f1 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+    &:hover {
+      box-shadow: 0 10px 22px rgba(255, 255, 255, 0.3);
+      color: #4f46e5 !important;
+    }
+  }
+
+  &--glass {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.28) !important;
+    }
+  }
+}
+
+/* ۶. باکس شیشه‌ای نئومورفیک مطالعه */
+.hero__glass-card {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.chip-status {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.score-counter {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.text-white-8 {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* پروگرس بار کاستوم */
+.custom-progress {
+  background: rgba(255, 255, 255, 0.2) !important;
+  :deep(.q-linear-progress__model) {
+    background: linear-gradient(90deg, #facc15 0%, #38bdf8 100%) !important;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+  }
+}
+
 
 /* LIVE SKYROOM ALERT BANNER */
 .live-banner {

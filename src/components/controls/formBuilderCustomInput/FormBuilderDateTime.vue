@@ -363,79 +363,62 @@ function onChangeTime (newTime: string) {
 }
 
 // newValue should be miladi
+// newValue should be gregorian date (YYYY-MM-DD) or time (HH:mm:ss)
 function updateDateTime (newValue: string, type: 'date' | 'time') {
   const systemDate = dateManager.now('YYYY-MM-DD')
   const systemTime = dateManager.now('HH:mm:ss')
 
-  const displayTime = `${dateTime.hours}:${dateTime.minutes}:${dateTime.seconds}`
+  // ۱. تاریخ و زمان محلی جاری از روی وضعیت فعلی کامپوننت
+  let localGregorianDate = systemDate
+  if (displayDate.value) {
+    localGregorianDate = props.calendar === 'persian'
+      ? dateManager.shamsiToMiladi(displayDate.value)
+      : displayDate.value
+  }
 
-  const analysedShamsiDate = dateManager.validationShamsiDate(displayDate.value)
-  const analysedTime = dateManager.validationTime(displayTime)
-
-  const defaultDate = analysedShamsiDate.isValid
-    ? dateManager.shamsiToMiladi(displayDate.value)
-    : systemDate
-
-  const defaultTime = analysedTime.isValid ? displayTime : systemTime
-
-  /*
-   * مقدار قبلی را بدون Z و بدون T می‌خوانیم.
-   * مهم: از Date / new Date استفاده نمی‌کنیم تا timezone ساعت را تغییر ندهد.
-   */
-  const rawValue = (value.value ?? '').trim().replace(/[zZ]$/, '').replace('T', ' ')
-
-  const [oldDate, oldTime] = rawValue.split(/\s+/)
-
-  let dateValue = oldDate || defaultDate
-  let timeValue = oldTime || defaultTime
+  const h = dateTime.hours.replace(/_/g, '0').padStart(2, '0')
+  const m = dateTime.minutes.replace(/_/g, '0').padStart(2, '0')
+  const s = dateTime.seconds.replace(/_/g, '0').padStart(2, '0')
+  let localTime = `${h}:${m}:${s}`
 
   if (type === 'date') {
-    dateValue = newValue || defaultDate
+    localGregorianDate = newValue || systemDate
+  } else if (type === 'time') {
+    localTime = newValue || systemTime
   }
 
-  if (type === 'time') {
-    timeValue = newValue || defaultTime
-  }
-
-  /*
-   * زمان را یک‌دست می‌کنیم؛ مثلاً:
-   * 19:45 => 19:45:00
-   */
-  const parsedTime = dateManager.parseTime(timeValue)
-
+  // ۲. یکدست‌سازی زمان محلی
+  const parsedTime = dateManager.parseTime(localTime)
   if (parsedTime) {
-    timeValue =
-      `${parsedTime.formattedHour}:` +
-      `${parsedTime.formattedMinute}:` +
-      `${parsedTime.formattedSecond}`
-
+    localTime = `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
     dateTime.hours = parsedTime.formattedHour
     dateTime.minutes = parsedTime.formattedMinute
     dateTime.seconds = parsedTime.formattedSecond
   }
 
-  /*
-   * تاریخ نمایشی بر اساس calendar است،
-   * ولی dateValue همچنان میلادی و مناسب API باقی می‌ماند.
-   */
-  const displayDateValue =
-    props.calendar === 'persian' ? dateManager.miladiToShamsi(dateValue) : dateValue
+  // ۳. نمایش به کاربر (شمسی یا میلادی طبق تقویم)
+  const displayDateValue = props.calendar === 'persian'
+    ? dateManager.miladiToShamsi(localGregorianDate)
+    : localGregorianDate
 
   displayDate.value = displayDateValue
-  displayDateTime.value = `${displayDateValue} ${timeValue}`
+  displayDateTime.value = `${displayDateValue} ${localTime}`
 
+  // ۴. انتشار به بیرون: اگر iso8601 فعال باشد قطعا تبدیل به UTC واقعی می‌شود
   if (props.iso8601) {
-    /*
-     * displayDateTime:
-     * تاریخ شمسی + ساعت محلی کاربر
-     *
-     * value:
-     * معادل همان لحظه به UTC/Zulu
-     */
-    value.value = localGregorianDateTimeToUtcIso(dateValue, timeValue)
+    value.value = localGregorianDateTimeToUtcIso(localGregorianDate, localTime)
   } else {
-    value.value = `${dateValue} ${timeValue}`
+    value.value = `${localGregorianDate} ${localTime}`
   }
+}
+
+// اصلاح به‌روزرسانی تایم از پاپ‌آپ تقویم
+function onMenuTimeInputUpdate () {
+  const h = (dateTime.hours || '00').replaceAll('_', '0').padStart(2, '0')
+  const m = (dateTime.minutes || '00').replaceAll('_', '0').padStart(2, '0')
+  const s = (dateTime.seconds || '00').replaceAll('_', '0').padStart(2, '0')
+
+  updateDateTime(`${h}:${m}:${s}`, 'time')
 }
 
 function onClear () {
@@ -531,23 +514,6 @@ function onKeydownSecond (e: KeyboardEvent) {
   })
 }
 
-function onMenuTimeInputUpdate () {
-  // ____/__/__ __:__:__
-  const defaultDate = dateManager.now('jYYYY/jMM/jDD')
-
-  if (!value.value) {
-    displayDateTime.value = defaultDate + displayDateTime.value.slice(10, 19)
-  }
-  displayDateTime.value =
-    displayDateTime.value.slice(0, 11) +
-    dateTime.hours +
-    displayDateTime.value.slice(13, 14) +
-    dateTime.minutes +
-    displayDateTime.value.slice(16, 17) +
-    dateTime.seconds +
-    displayDateTime.value.slice(19)
-}
-
 function onMenuHourInputUpdate () {
   onMenuTimeInputUpdate()
 }
@@ -595,7 +561,23 @@ function utcIsoToLocalGregorianDateTime (isoDateTime: string): {
   date: string;
   time: string;
 } {
-  const date = new Date(isoDateTime)
+  // پشتیبانی از فرمت‌های با فاصله یا بدون Z
+  let normalized = isoDateTime.trim()
+  if (!normalized.includes('T') && normalized.includes(' ')) {
+    normalized = normalized.replace(' ', 'T')
+  }
+  if (!normalized.endsWith('Z') && !normalized.includes('+')) {
+    normalized += 'Z' // فرض بر این است که رشته دریافتی از سرور UTC است
+  }
+
+  const date = new Date(normalized)
+
+  if (isNaN(date.getTime())) {
+    return {
+      date: dateManager.now('YYYY-MM-DD'),
+      time: dateManager.now('HH:mm:ss')
+    }
+  }
 
   return {
     date: `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`,

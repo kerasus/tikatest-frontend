@@ -70,7 +70,7 @@
                 size="20px" />
               <span class="text-subtitle2 text-weight-bolder text-white">کارت هویت دیجیتال</span>
             </div>
-            <span class="id-type-badge">Tika Pass</span>
+            <span class="id-type-badge">Sanjad Pass</span>
           </div>
 
           <div class="card-details q-pa-md">

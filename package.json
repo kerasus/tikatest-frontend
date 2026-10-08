@@ -1,8 +1,8 @@
 {
-  "name": "tikatest-frontend",
+  "name": "sanjad-frontend",
   "version": "1.0.0",
-  "description": "سیستم مدیریت دانش آموزی TikaTest",
-  "productName": "TikaTest",
+  "description": "سیستم مدیریت دانش آموزی سنجاد",
+  "productName": "سنجاد",
   "author": "ali <aliesmaeeli20@gmail.com>",
   "type": "module",
   "private": true,

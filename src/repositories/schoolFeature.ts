@@ -3,12 +3,12 @@ import type { SchoolType } from './school'
 
 export enum SchoolFeatureKey {
   Skyroom = 'skyroom',
-  FipPanel = 'fip_panel'
+  FtpPanel = 'ftp_panel'
 }
 
 export const SCHOOL_FEATURE_LABELS: Record<SchoolFeatureKey, string> = {
   [SchoolFeatureKey.Skyroom]: 'اسکای‌روم',
-  [SchoolFeatureKey.FipPanel]: 'پنل FIP'
+  [SchoolFeatureKey.FtpPanel]: 'پنل FTP'
 }
 
 export const schoolFeatureOptions = Object.entries(SCHOOL_FEATURE_LABELS).map(([value, label]) => ({
