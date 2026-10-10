@@ -79,6 +79,56 @@ export default defineConfig((ctx) => {
 
       publicPath: process.env.BASE_ROUTE || '/',
 
+
+
+      extendViteConf(viteConf) {
+        viteConf.build = viteConf.build || {}
+        viteConf.build.target = 'esnext'
+
+
+        // ----------------------------------------------------
+        // ۱. ثابت کردن نام فایل‌های WASM (جلوگیری از تغییر Hash با هر بیلد)
+        // ----------------------------------------------------
+        viteConf.build.rollupOptions = viteConf.build.rollupOptions || {}
+        viteConf.build.rollupOptions.output = viteConf.build.rollupOptions.output || {}
+
+        // اگر output آرایه نبود یا آبجکت بود
+        const existingOutput = viteConf.build.rollupOptions.output
+        if (Array.isArray(existingOutput)) {
+          existingOutput.forEach((out) => {
+            out.assetFileNames = (assetInfo) => {
+              if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
+                return 'assets/[name][extname]' // خروجی: assets/mupdf-wasm.wasm (بدون هش)
+              }
+              return 'assets/[name]-[hash][extname]'
+            }
+          })
+        } else {
+          existingOutput.assetFileNames = (assetInfo) => {
+            if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
+              return 'assets/[name][extname]' // خروجی: assets/mupdf-wasm.wasm (بدون هش)
+            }
+            return 'assets/[name]-[hash][extname]'
+          }
+        }
+
+        // ----------------------------------------------------
+        // ۲. تنظیمات قبلی esbuild و exclude
+        // ----------------------------------------------------
+        viteConf.optimizeDeps = viteConf.optimizeDeps || {}
+        viteConf.optimizeDeps.esbuildOptions = viteConf.optimizeDeps.esbuildOptions || {}
+        viteConf.optimizeDeps.esbuildOptions.target = 'esnext'
+        viteConf.optimizeDeps.esbuildOptions.supported = {
+          'top-level-await': true,
+        }
+
+        // معاف کردن mupdf از اسکن اولیه‌ی esbuild (چون WASM لود می‌کنه)
+        viteConf.optimizeDeps.exclude = [
+          ...(viteConf.optimizeDeps.exclude || []),
+          'mupdf',
+        ]
+      },
+
       vitePlugins: [
         [
           '@intlify/unplugin-vue-i18n/vite',
@@ -108,6 +158,25 @@ export default defineConfig((ctx) => {
           },
           { server: false },
         ],
+
+
+        // ----------------------------------------------------
+        // ۳. فشرده‌سازی خودکار پیش از انتشار (Pre-compression)
+        // ----------------------------------------------------
+        [
+          'vite-plugin-compression',
+          {
+            verbose: true,
+            disable: false,
+            threshold: 10240, // فقط فایل‌های بالای ۱۰ کیلوبایت
+            algorithm: 'gzip',
+            ext: '.gz',
+            // فیلتر کامل برای شامل شدن فایل‌های WASM، JS، CSS و غیره
+            filter: /\.(js|css|html|txt|json|wasm|svg)$/i,
+          },
+        ],
+
+
       ],
     },
 

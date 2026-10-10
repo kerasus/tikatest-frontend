@@ -69,10 +69,9 @@
               style="max-width: 100%; display: block" />
           </template>
           <template v-else-if="examContent.type === 'pdf'">
-            <iframe
-              v-if="examContent.path"
-              :src="`storage/${examContent.path}`"
-              style="width: 100%; height: 600px; border: none;" />
+            <vue-pdf-embed
+              :source="examContent.path"
+              class="shadow-2 rounded-borders" />
           </template>
         </div>
         <div
@@ -98,10 +97,9 @@
               style="max-width: 100%; display: block" />
           </template>
           <template v-else-if="solutionContent.type === 'pdf'">
-            <iframe
-              v-if="solutionContent.path"
-              :src="`storage/${solutionContent.path}`"
-              style="width: 100%; height: 600px; border: none;" />
+            <vue-pdf-embed
+              :source="solutionContent.path"
+              class="shadow-2 rounded-borders" />
           </template>
         </div>
         <div
@@ -117,6 +115,7 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { useRouter, useRoute } from 'vue-router'
+import VuePdfEmbed from 'src/components/VuePdfEmbed.vue'
 import { useOnlineExamSession } from 'src/stores/onlineExamSession'
 import OnlineExamSessionAPI from 'src/repositories/onlineExamSession'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'

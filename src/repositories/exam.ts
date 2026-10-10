@@ -240,6 +240,9 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     if (item?.term) {
       item.term_id = item.term.id
     }
+    if (item?.lesson) {
+      item.lesson_id = item.lesson.id
+    }
     if (item?.online_exam_detail?.answer_keys) {
       item.answer_keys = item.online_exam_detail.answer_keys
     }

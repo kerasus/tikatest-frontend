@@ -1,5 +1,5 @@
 <template>
-  <div class="school-dashboard q-pa-md">
+  <div class="school-dashboard">
     <!-- بنر خوش‌آمدگویی فانتزی، شاد و متحرک سنجاد -->
     <div class="welcome-hero q-mb-xl">
       <!-- لایه‌های پس‌زمینه زنده و پترن متحرک -->
@@ -51,7 +51,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- کارت‌های آمار فانتزی و تعاملی -->
     <div class="row q-col-gutter-lg q-mb-xl">
@@ -197,19 +196,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { type RouteLocationRaw, useRouter } from 'vue-router'
-import ExamAPI from 'src/repositories/exam'
-import StudentAPI from 'src/repositories/student'
-import HomeworkAPI from 'src/repositories/homework'
-import SchoolClassAPI from 'src/repositories/schoolClass'
+import DashboardAPI from 'src/repositories/dashboard'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const router = useRouter()
-const examAPI = new ExamAPI()
-const studentAPI = new StudentAPI()
-const homeworkAPI = new HomeworkAPI()
-const schoolClassAPI = new SchoolClassAPI()
+const dashboardAPI = new DashboardAPI()
 
 const currentSchoolManager = useCurrentSchool()
 
@@ -220,7 +213,7 @@ const stats = ref({
   exams: 0,
   homework: 0
 })
-const statCards = ref([
+const statCards = computed(() => [
   {
     title: 'دانش‌آموزان ثبت‌نامی',
     value: stats.value.students,
@@ -240,7 +233,7 @@ const statCards = ref([
     to: { name: 'Panel.CurrentSchool.Classes' }
   },
   {
-    title: 'آزمون‌های برگزارشده',
+    title: 'آزمون‌های ساخته شده',
     value: stats.value.exams,
     icon: 'quiz',
     theme: 'rose',
@@ -294,17 +287,16 @@ onMounted(async () => {
   const schoolId = currentSchoolManager.currentSchool.value?.id
 
   try {
-    const [studentsRes, classesRes, examsRes, homeworkRes] = await Promise.all([
-      studentAPI.index({ length: 1, school_id: schoolId }),
-      schoolClassAPI.index({ length: 1, school_id: schoolId }),
-      examAPI.index({ length: 1, school_id: schoolId }),
-      homeworkAPI.index({ length: 1, school_id: schoolId })
-    ])
+    if (!schoolId) {
+      return
+    }
 
-    stats.value.students = studentsRes.total || 0
-    stats.value.classes = classesRes.total || 0
-    stats.value.exams = examsRes.total || 0
-    stats.value.homework = homeworkRes.total || 0
+    const dashboardStats = await dashboardAPI.schoolDashboard(schoolId)
+
+    stats.value.students = dashboardStats.students_count || 0
+    stats.value.classes = dashboardStats.classes_count || 0
+    stats.value.exams = dashboardStats.online_exams_count || 0
+    stats.value.homework = dashboardStats.homeworks_count || 0
   } catch (error) {
     console.error('Error loading dashboard stats:', error)
   } finally {
@@ -315,257 +307,332 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .school-dashboard {
-
   /* ==========================================================================
    🌈 Bright, Candy-Vibrant Hero Banner with Dynamic Moving Pattern
    ========================================================================== */
-.welcome-hero {
-  position: relative;
-  border-radius: 28px;
-  /* بک‌گراند گرادیان شاد و پرطراوت (آبی-بنفش روشن به ارغوانی و فیروزه‌ای) */
-  background: linear-gradient(125deg, #4f46e5 0%, #7c3aed 35%, #06b6d4 100%);
-  overflow: hidden;
-  box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.4),
-              0 0 0 1px rgba(255, 255, 255, 0.4) inset;
-  isolation: isolate;
-
-  /* 🎨 پس‌زمینه متحرک و جلوه‌های بصری */
-  .hero-animated-canvas {
-    position: absolute;
-    inset: 0;
+  .welcome-hero {
+    position: relative;
+    border-radius: 28px;
+    /* بک‌گراند گرادیان شاد و پرطراوت (آبی-بنفش روشن به ارغوانی و فیروزه‌ای) */
+    background: linear-gradient(125deg, #4f46e5 0%, #7c3aed 35%, #06b6d4 100%);
     overflow: hidden;
-    z-index: 1;
-    pointer-events: none;
+    box-shadow:
+      0 16px 36px -10px rgba(99, 102, 241, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+    isolation: isolate;
 
-    /* اورب‌های رنگی نوری شاداب */
-    .ambient-glow {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(65px);
-      opacity: 0.85;
-      mix-blend-mode: screen;
-      will-change: transform;
-    }
-
-    /* حباب طلایی/هلویی شاد */
-    .glow-1 {
-      top: -20%;
-      right: 15%;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, #f43f5e 0%, #fb923c 70%);
-      animation: floatOrbit1 12s ease-in-out infinite alternate;
-    }
-
-    /* حباب سبز آبی / فیروزه‌ای خنک */
-    .glow-2 {
-      bottom: -35%;
-      left: 10%;
-      width: 360px;
-      height: 360px;
-      background: radial-gradient(circle, #2dd4bf 0%, #38bdf8 70%);
-      animation: floatOrbit2 15s ease-in-out infinite alternate;
-    }
-
-    /* حباب بنفش پاستلی درخشان */
-    .glow-3 {
-      top: 15%;
-      left: 45%;
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, #ec4899 0%, #c084fc 70%);
-      animation: floatOrbit3 10s ease-in-out infinite alternate;
-    }
-
-    /* 🌊 پترن هندسی متحرک بی‌نهایت (Moving Polka & Mesh Pattern) */
-    .moving-pattern-grid {
-      position: absolute;
-      inset: -100px;
-      background-image:
-        radial-gradient(circle, rgba(255, 255, 255, 0.28) 2px, transparent 2.5px),
-        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-      background-size: 32px 32px, 64px 64px, 64px 64px;
-      animation: infinitePatternMove 5s linear infinite;
-      opacity: 0.65;
-    }
-
-    /* لایه شیشه‌ای ملایم روی پترن برای عمق‌دهی */
-    .glass-layer {
+    /* 🎨 پس‌زمینه متحرک و جلوه‌های بصری */
+    .hero-animated-canvas {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-      backdrop-filter: blur(2px);
-    }
-  }
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
 
-  /* محتوای بنر */
-  .hero-content {
-    position: relative;
-    z-index: 2;
-  }
+      /* اورب‌های رنگی نوری شاداب */
+      .ambient-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(65px);
+        opacity: 0.85;
+        mix-blend-mode: screen;
+        will-change: transform;
+      }
 
-  /* نشان (Badge) کریستالی با رنگ شاد */
-  .badge-tag {
-    display: inline-flex;
-    align-items: center;
-    position: relative;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(10px);
-    padding: 6px 16px;
-    border-radius: 999px;
-    color: #4338ca;
-    font-size: 0.88rem;
-    font-weight: 700;
-    box-shadow: 0 6px 18px rgba(31, 38, 135, 0.15),
-                0 0 0 1px rgba(255, 255, 255, 0.8);
+      /* حباب طلایی/هلویی شاد */
+      .glow-1 {
+        top: -20%;
+        right: 15%;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, #f43f5e 0%, #fb923c 70%);
+        animation: floatOrbit1 12s ease-in-out infinite alternate;
+      }
 
-    .badge-pulse {
-      position: absolute;
-      left: 10px;
-      width: 7px;
-      height: 7px;
-      background: #10b981;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
-      animation: pulseVibrant 2s infinite;
-    }
-  }
+      /* حباب سبز آبی / فیروزه‌ای خنک */
+      .glow-2 {
+        bottom: -35%;
+        left: 10%;
+        width: 360px;
+        height: 360px;
+        background: radial-gradient(circle, #2dd4bf 0%, #38bdf8 70%);
+        animation: floatOrbit2 15s ease-in-out infinite alternate;
+      }
 
-  /* عنوان شاد و چشم‌نواز */
-  .hero-title {
-    color: #ffffff;
-    line-height: 1.45;
-    letter-spacing: -0.5px;
-    text-shadow: 0 2px 10px rgba(30, 27, 75, 0.25);
+      /* حباب بنفش پاستلی درخشان */
+      .glow-3 {
+        top: 15%;
+        left: 45%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, #ec4899 0%, #c084fc 70%);
+        animation: floatOrbit3 10s ease-in-out infinite alternate;
+      }
 
-    .highlight-text {
-      /* گرادیان رنگی پرانرژی زرد لیمویی به نارنجی تابستانی */
-      background: linear-gradient(135deg, #fffbeb 0%, #fef08a 35%, #fed7aa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-      position: relative;
-    }
-  }
+      /* 🌊 پترن هندسی متحرک بی‌نهایت (Moving Polka & Mesh Pattern) */
+      .moving-pattern-grid {
+        position: absolute;
+        inset: -100px;
+        background-image:
+          radial-gradient(circle, rgba(255, 255, 255, 0.28) 2px, transparent 2.5px),
+          linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        background-size:
+          32px 32px,
+          64px 64px,
+          64px 64px;
+        animation: infinitePatternMove 5s linear infinite;
+        opacity: 0.65;
+      }
 
-  .hero-subtitle {
-    color: #e0f2fe;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-    font-weight: 400;
-  }
-
-  /* 🎓 آیکون شناور با استایل شاداب */
-  .hero-icon-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 140px;
-    height: 140px;
-
-    .icon-halo-effect {
-      position: absolute;
-      inset: 8px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
-      filter: blur(14px);
-      animation: pulseHalo 3.5s ease-in-out infinite alternate;
-    }
-
-    .floating-wrapper {
-      animation: floatToy 4.5s ease-in-out infinite;
-    }
-
-    .hero-floating-icon {
-      color: #ffffff;
-      filter: drop-shadow(0 10px 20px rgba(30, 27, 75, 0.3))
-              drop-shadow(0 0 16px rgba(255, 255, 255, 0.7));
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-      &:hover {
-        transform: scale(1.15) rotate(12deg);
-        filter: drop-shadow(0 14px 26px rgba(30, 27, 75, 0.4))
-                drop-shadow(0 0 25px #fed7aa);
+      /* لایه شیشه‌ای ملایم روی پترن برای عمق‌دهی */
+      .glass-layer {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        backdrop-filter: blur(2px);
       }
     }
 
-    /* ستاره‌ها و جرقه‌های شاد */
-    .sparkle {
-      position: absolute;
-      font-size: 14px;
-      pointer-events: none;
-      animation: sparkleTwinkle 2.8s ease-in-out infinite alternate;
+    /* محتوای بنر */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
 
-      &.s1 { top: 8%; right: 5%; color: #fef08a; animation-delay: 0.2s; font-size: 18px; }
-      &.s2 { bottom: 12%; right: 18%; color: #fed7aa; animation-delay: 0.9s; font-size: 14px; }
-      &.s3 { top: 22%; left: 2%; color: #ffffff; animation-delay: 1.8s; font-size: 20px; }
+    /* نشان (Badge) کریستالی با رنگ شاد */
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      padding: 6px 16px;
+      border-radius: 999px;
+      color: #4338ca;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow:
+        0 6px 18px rgba(31, 38, 135, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.8);
+
+      .badge-pulse {
+        position: absolute;
+        left: 10px;
+        width: 7px;
+        height: 7px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #10b981;
+        animation: pulseVibrant 2s infinite;
+      }
+    }
+
+    /* عنوان شاد و چشم‌نواز */
+    .hero-title {
+      color: #ffffff;
+      line-height: 1.45;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(30, 27, 75, 0.25);
+
+      .highlight-text {
+        /* گرادیان رنگی پرانرژی زرد لیمویی به نارنجی تابستانی */
+        background: linear-gradient(135deg, #fffbeb 0%, #fef08a 35%, #fed7aa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+        position: relative;
+      }
+    }
+
+    .hero-subtitle {
+      color: #e0f2fe;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      font-weight: 400;
+    }
+
+    /* 🎓 آیکون شناور با استایل شاداب */
+    .hero-icon-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 140px;
+
+      .icon-halo-effect {
+        position: absolute;
+        inset: 8px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.5) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        filter: blur(14px);
+        animation: pulseHalo 3.5s ease-in-out infinite alternate;
+      }
+
+      .floating-wrapper {
+        animation: floatToy 4.5s ease-in-out infinite;
+      }
+
+      .hero-floating-icon {
+        color: #ffffff;
+        filter: drop-shadow(0 10px 20px rgba(30, 27, 75, 0.3))
+          drop-shadow(0 0 16px rgba(255, 255, 255, 0.7));
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        &:hover {
+          transform: scale(1.15) rotate(12deg);
+          filter: drop-shadow(0 14px 26px rgba(30, 27, 75, 0.4)) drop-shadow(0 0 25px #fed7aa);
+        }
+      }
+
+      /* ستاره‌ها و جرقه‌های شاد */
+      .sparkle {
+        position: absolute;
+        font-size: 14px;
+        pointer-events: none;
+        animation: sparkleTwinkle 2.8s ease-in-out infinite alternate;
+
+        &.s1 {
+          top: 8%;
+          right: 5%;
+          color: #fef08a;
+          animation-delay: 0.2s;
+          font-size: 18px;
+        }
+        &.s2 {
+          bottom: 12%;
+          right: 18%;
+          color: #fed7aa;
+          animation-delay: 0.9s;
+          font-size: 14px;
+        }
+        &.s3 {
+          top: 22%;
+          left: 2%;
+          color: #ffffff;
+          animation-delay: 1.8s;
+          font-size: 20px;
+        }
+      }
     }
   }
-}
 
-/* ==========================================================================
+  /* ==========================================================================
    🎬 انیمیشن‌های پترن و المان‌ها
    ========================================================================== */
-/* حرکت روان و مورب پترن به صورت پیوسته (بی‌نهایت) */
-@keyframes infinitePatternMove {
-  0% {
-    transform: translate(0, 0);
+  /* حرکت روان و مورب پترن به صورت پیوسته (بی‌نهایت) */
+  @keyframes infinitePatternMove {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(64px, 64px);
+    }
   }
-  100% {
-    transform: translate(64px, 64px);
+
+  @keyframes floatOrbit1 {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-45px, 35px) scale(1.2);
+    }
+    100% {
+      transform: translate(25px, -20px) scale(0.9);
+    }
   }
-}
 
-@keyframes floatOrbit1 {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(-45px, 35px) scale(1.2); }
-  100% { transform: translate(25px, -20px) scale(0.9); }
-}
+  @keyframes floatOrbit2 {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(40px, -40px) scale(1.15);
+    }
+    100% {
+      transform: translate(-30px, 25px) scale(0.95);
+    }
+  }
 
-@keyframes floatOrbit2 {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(40px, -40px) scale(1.15); }
-  100% { transform: translate(-30px, 25px) scale(0.95); }
-}
+  @keyframes floatOrbit3 {
+    0% {
+      transform: translate(0, 0) scale(0.95);
+    }
+    50% {
+      transform: translate(-35px, -25px) scale(1.2);
+    }
+    100% {
+      transform: translate(40px, 30px) scale(1);
+    }
+  }
 
-@keyframes floatOrbit3 {
-  0%   { transform: translate(0, 0) scale(0.95); }
-  50%  { transform: translate(-35px, -25px) scale(1.2); }
-  100% { transform: translate(40px, 30px) scale(1); }
-}
+  @keyframes floatToy {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(-6deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(5deg);
+    }
+  }
 
-@keyframes floatToy {
-  0%, 100% { transform: translateY(0px) rotate(-6deg); }
-  50%      { transform: translateY(-14px) rotate(5deg); }
-}
+  @keyframes pulseHalo {
+    0% {
+      transform: scale(0.85);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1.3);
+      opacity: 0.9;
+    }
+  }
 
-@keyframes pulseHalo {
-  0%   { transform: scale(0.85); opacity: 0.4; }
-  100% { transform: scale(1.3); opacity: 0.9; }
-}
+  @keyframes sparkleTwinkle {
+    0% {
+      opacity: 0.3;
+      transform: scale(0.7) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.25) rotate(60deg);
+      filter: drop-shadow(0 0 6px currentColor);
+    }
+    100% {
+      opacity: 0.4;
+      transform: scale(0.85) rotate(120deg);
+    }
+  }
 
-@keyframes sparkleTwinkle {
-  0%   { opacity: 0.3; transform: scale(0.7) rotate(0deg); }
-  50%  { opacity: 1; transform: scale(1.25) rotate(60deg); filter: drop-shadow(0 0 6px currentColor); }
-  100% { opacity: 0.4; transform: scale(0.85) rotate(120deg); }
-}
+  @keyframes pulseVibrant {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
 
-@keyframes pulseVibrant {
-  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70%  { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
+  .spin-slow {
+    animation: spinSlow 9s linear infinite;
+  }
 
-.spin-slow {
-  animation: spinSlow 9s linear infinite;
-}
-
-@keyframes spinSlow {
-  100% { transform: rotate(360deg); }
-}
-
+  @keyframes spinSlow {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
   /* Stat Cards */
   .stat-card {

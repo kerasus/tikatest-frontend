@@ -1,63 +1,89 @@
 <template>
-  <div
+  <header
     class="main-dashboard-wrapper"
-    :class="{ floated: floated }">
-    <q-toolbar class="main-dashboard">
-      <q-toolbar-title class="main-dashboard__main-section">
-        <div class="main-dashboard__right-section">
-          <div class="toggle-mini-btn">
-            <q-btn
-              class="icon-button drawer-btn gt-sm"
-              color="primary"
-              flat
-              :icon="
-                appLayoutStore.layoutLeftDrawerMini
-                  ? 'keyboard_double_arrow_left'
-                  : 'keyboard_double_arrow_right'
-              "
-              @click="toggleLeftDrawerMini" />
-            <q-btn
-              class="icon-button drawer-btn lt-md"
-              color="primary"
-              flat
-              icon="menu"
-              @click="toggleLeftDrawerVisible" />
-          </div>
-          <div class="pageCategory">
+    :class="{ floated: floated, 'is-floated': floated }">
+    <div class="main-dashboard">
+      <!-- بخش راست: دکمه سایدبار + (دسته‌بندی در بالا و بردکرامبز در زیر آن) -->
+      <div class="nav-cluster">
+        <q-btn
+          class="compact-action-btn gt-sm"
+          flat
+          round
+          dense
+          color="primary"
+          :icon="
+            appLayoutStore.layoutLeftDrawerMini
+              ? 'keyboard_double_arrow_left'
+              : 'keyboard_double_arrow_right'
+          "
+          @click="toggleLeftDrawerMini">
+          <q-tooltip class="bg-dark text-caption">تغییر حالت منو</q-tooltip>
+        </q-btn>
+
+        <q-btn
+          class="compact-action-btn lt-md"
+          flat
+          round
+          dense
+          color="primary"
+          icon="menu"
+          @click="toggleLeftDrawerVisible" />
+
+        <!-- دسته صفحه در بالا و Breadcrumbs دقیقاً زیر آن -->
+        <div class="nav-titles-stack">
+          <div
+            v-if="headerBreadCrumbsStore.pageCategory"
+            class="nav-category">
             {{ headerBreadCrumbsStore.pageCategory }}
           </div>
-          <div class="breadCrumbs">
-            <q-breadcrumbs active-color="color-text2">
+
+          <div
+            v-if="headerBreadCrumbsStore.breadCrumbs?.length"
+            class="nav-breadcrumbs-row">
+            <q-breadcrumbs
+              class="compact-breadcrumbs"
+              active-color="primary"
+              separator="/"
+              separator-color="grey-4">
               <q-breadcrumbs-el
-                v-for="(breadCrumb, breadCrumbIndex) in headerBreadCrumbsStore.breadCrumbs"
-                :key="breadCrumbIndex"
-                :to="breadCrumb.to ? breadCrumb.to : undefined">
-                {{ breadCrumb.label }}
-              </q-breadcrumbs-el>
+                v-for="(breadCrumb, idx) in headerBreadCrumbsStore.breadCrumbs"
+                :key="idx"
+                :label="breadCrumb.label"
+                :to="breadCrumb.to || undefined" />
             </q-breadcrumbs>
           </div>
         </div>
-        <div class="main-dashboard__center-section" />
-        <div class="main-dashboard__left-section">
-          <div class="time">
-            {{ formattedDate }}
-            <q-icon name="remove" />
-            {{ formattedTime }}
-          </div>
-          <!-- <q-btn icon="notifications" class="icon-button" @click="toggleRightDrawer">
-            <q-badge floating rounded color="red"> 2 </q-badge>
-          </q-btn> -->
-          <profile-btn v-if="userManager.me" />
-          <q-btn
-            v-else
-            icon="login"
-            color="primary"
-            outline
-            :to="{ name: 'Auth.Login' }" />
+      </div>
+
+      <!-- بخش چپ: تاریخ، ساعت و پروفایل کاربری -->
+      <div class="actions-cluster">
+        <!-- ویجت زمان فشرده و متناسب با ارتفاع ۶۴ -->
+        <div class="compact-time-pill">
+          <q-icon
+            name="schedule"
+            size="14px"
+            class="time-icon" />
+          <span class="date-txt gt-xs">{{ formattedDate }}</span>
+          <span class="sep-dot gt-xs">•</span>
+          <span class="time-txt ltr-num">{{ formattedTime }}</span>
         </div>
-      </q-toolbar-title>
-    </q-toolbar>
-  </div>
+
+        <profile-btn
+          v-if="userManager.me"
+          class="compact-profile" />
+
+        <q-btn
+          v-else
+          icon="login"
+          label="ورود"
+          color="primary"
+          unelevated
+          dense
+          class="compact-login-btn"
+          :to="{ name: 'Auth.Login' }" />
+      </div>
+    </div>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +93,6 @@ import { useRouter } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
 import { ref, onMounted, onUnmounted } from 'vue'
-import { userRoleOptions } from 'src/repositories/user'
 import { useHeaderBreadCrumbs } from 'src/stores/headerBreadCrumbs'
 import ProfileBtn from 'src/components/template/headers/components/profileBtn.vue'
 
@@ -80,8 +105,10 @@ const router = useRouter()
 const userManager = useUser()
 const appLayoutStore = useAppLayout()
 const headerBreadCrumbsStore = useHeaderBreadCrumbs()
+
 const formattedDate = ref('')
 const formattedTime = ref('')
+let timer: ReturnType<typeof setInterval> | null = null
 
 function updateDateTime () {
   const now = moment()
@@ -89,19 +116,9 @@ function updateDateTime () {
   formattedTime.value = now.format('HH:mm')
 }
 
-function translateRole (roleName: string): string {
-  const target = userRoleOptions.find((role) => role.value === roleName)
-  if (!target) {
-    return '-'
-  }
-
-  return target.label
-}
-
-let timer: any
 onMounted(() => {
   updateDateTime()
-  timer = setInterval(updateDateTime, 60000)
+  timer = setInterval(updateDateTime, 30000)
 })
 
 onUnmounted(() => {
@@ -117,112 +134,208 @@ function toggleLeftDrawerVisible () {
   appLayoutStore.layoutLeftDrawerMiniToOverlay = false
   appLayoutStore.layoutLeftDrawerVisible = !appLayoutStore.layoutLeftDrawerVisible
 }
-
-function logout () {
-  userManager.logout()
-  router.push({ name: 'Auth.Login' })
-}
 </script>
 
 <style scoped lang="scss">
 .main-dashboard-wrapper {
-  $header-height: 50px;
-  //background: $gray-100;
-  background: transparent;
-  min-height: $header-height;
-  padding: $space-2;
-  .main-dashboard {
-    border-radius: 1rem;
-    padding: $space-3 $space-4 $space-3 $space-16;
-    transition:
-      box-shadow 0.25s ease-in,
-      background-color 0.25s ease-in;
-    position: relative;
-    .toggle-mini-btn {
-      position: absolute;
-      left: $space-3;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    .main-dashboard__main-section {
-      height: $header-height;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      .main-dashboard__right-section {
-        display: flex;
-        flex-direction: column;
-        gap: $space-2;
-        .pageCategory {
-          color: $color-text1;
-          @include typo-title-3;
-        }
-      }
-      .main-dashboard__left-section {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: $space-2;
-        .q-btn {
-          color: $neutral-30;
-          background: $neutral-95;
-        }
-        .time {
-          color: $color-text2;
-          margin-right: $space-2;
-          direction: rtl;
-          @include typo-body-3;
-        }
-      }
-    }
-  }
-  &.floated {
-    .main-dashboard {
-      box-shadow:
-        inset 0 0 1px 1px rgba(254, 254, 254, 0.9),
-        0 20px 27px 0 rgba(0, 0, 0, 0.05) !important;
-      backdrop-filter: saturate(200%) blur(30px);
-      background-color: rgba(255, 255, 255, 0.4) !important;
-    }
-  }
-}
-:global(.search-in-menu__input) {
   position: sticky;
-  top: $spacing-none;
-  padding-top: $space-3;
-  background: $neutral-100;
-  z-index: 1;
-}
-.search-input {
-  margin: 10px;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  padding: 6px 16px;
+  background: transparent;
+  transition: all 0.25s ease;
+
+  .main-dashboard {
+    height: 64px;
+    padding: 0 14px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.25s ease;
+  }
+
+  /* افکت شیشه‌ای نرم در اسکرول */
+  &.floated,
+  &.is-floated {
+    padding-top: 6px;
+    padding-bottom: 6px;
+
+    .main-dashboard {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow:
+        0 8px 20px -6px rgba(0, 0, 0, 0.05),
+        0 2px 6px -1px rgba(0, 0, 0, 0.02),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+  }
 }
 
-.profile-menu {
-  min-width: 200px;
+/* --------------------------------------------------
+   بخش سمت راست (سایدبار و تیتر دوطبقه)
+--------------------------------------------------- */
+.nav-cluster {
   display: flex;
-  flex-flow: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  .q-avatar {
-  }
-  .profile-menu-user-info {
-    .profile-menu-user-fullname {
-    }
-    .profile-menu-user-roles {
-    }
-  }
-  .logout-btn {
-    width: 100%;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.compact-action-btn {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.05);
   }
 }
 
-/* تنظیمات کارت منو */
-:deep(.profile-menu-card) {
-  border-radius: 20px !important;
+.nav-titles-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nav-category {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+  white-space: nowrap;
   overflow: hidden;
-  border: 1px solid rgba($secondary, 0.12);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  text-overflow: ellipsis;
+  letter-spacing: -0.2px;
+}
+
+.nav-breadcrumbs-row {
+  line-height: 1;
+  min-width: 0;
+}
+
+.compact-breadcrumbs {
+  font-size: 11px;
+  line-height: 1.1;
+
+  :deep(.q-breadcrumbs__el) {
+    font-weight: 600;
+    color: #64748b;
+    padding: 1px 3px;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--q-primary);
+    }
+  }
+
+  :deep(.q-breadcrumbs__separator) {
+    font-size: 10px;
+    color: #cbd5e1;
+    margin: 0 2px;
+  }
+}
+
+/* --------------------------------------------------
+   بخش سمت چپ (زمان و پروفایل)
+--------------------------------------------------- */
+.actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.compact-time-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  font-size: 11.5px;
+  color: #475569;
+  font-weight: 700;
+
+  .time-icon {
+    color: var(--q-primary);
+    opacity: 0.8;
+  }
+
+  .date-txt {
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .sep-dot {
+    color: #cbd5e1;
+    font-size: 8px;
+  }
+
+  .time-txt {
+    color: #1e293b;
+  }
+}
+
+.ltr-num {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.compact-login-btn {
+  font-size: 12px;
+  padding: 3px 12px;
+  height: 30px;
+  min-height: 30px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+:deep(.compact-profile) {
+  display: flex;
+  align-items: center;
+}
+
+/* --------------------------------------------------
+   ریسپانسیو موبایل
+--------------------------------------------------- */
+@media (max-width: 599px) {
+  .main-dashboard-wrapper {
+    padding: 4px 8px;
+
+    .main-dashboard {
+      height: 58px;
+      padding: 0 8px;
+    }
+  }
+
+  .nav-titles-stack {
+    max-width: 160px;
+  }
+
+  .nav-category {
+    font-size: 12.5px;
+  }
+
+  .compact-time-pill {
+    padding: 3px 7px;
+    height: 28px;
+    font-size: 11px;
+    gap: 4px;
+  }
 }
 </style>

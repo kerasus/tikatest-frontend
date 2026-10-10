@@ -324,9 +324,9 @@
           </div>
         </q-card-section>
         <q-card-section class="col q-pa-none overflow-hidden">
-          <iframe
-            :src="pdfPreviewSrc"
-            style="width: 100%; height: 100%; border: none" />
+          <vue-pdf-embed
+            :source="pdfPreviewSrc"
+            class="shadow-2 rounded-borders" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -334,15 +334,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
 import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
+import { ref, computed, onMounted } from 'vue'
 import HomeworkAPI from 'src/repositories/homework'
-import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
-import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
+import VuePdfEmbed from 'src/components/VuePdfEmbed.vue'
 import ContentEditor from 'src/components/ContentEditor.vue'
+import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
+import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
 const homeworkApi = new HomeworkAPI()
 

@@ -1,7 +1,7 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
 
-export type DevScriptActionType = 'fix-student-passwords'
+export type DevScriptActionType = 'fix-student-passwords' | 'migrate-exam-files'
 
 export interface DevScriptRunResultType {
   message: string
@@ -16,6 +16,35 @@ export interface DevScriptRunErrorType {
   action?: string
   error?: string
 }
+
+export interface DevScriptParams {
+  limit?: number
+  schools?: number[]
+  [key: string]: unknown
+}
+
+export interface ExamFileMigrationFailureType {
+  url: string
+  status?: number
+  reason: string
+}
+
+export interface ExamFilesMigrationResultType {
+  message: string
+  total_matched_records: number
+  updated_records: number
+  downloaded_files: number
+  failed_count: number
+  failed_urls: ExamFileMigrationFailureType[]
+  // برای سازگاری با اسکریپت پسورد قبلی در صورت نیاز
+  fixed?: number
+  skipped_already_bcrypt?: number
+  skipped_empty_password?: number
+}
+
+
+
+
 
 /**
  * ⚠️ موقت: ریپازیتوری اجرای اسکریپت‌های توسعه‌ای (فقط ادمین)
@@ -32,23 +61,19 @@ export default class DevAdminAPI extends BaseAPI<null> {
 
   async runDevScript (
     action: DevScriptActionType,
-    schoolIds?: number[]
-  ): Promise<DevScriptRunResultType> {
+    params?: DevScriptParams | number[]
+  ): Promise<ExamFilesMigrationResultType> {
     try {
-      const response: AxiosResponse<DevScriptRunResultType | DevScriptRunErrorType> =
+      // نرمال‌سازی payload: اگر آرایه پاس داده شد تبدیل به { schools } بشه، اگر آبجکت بود مستقیم spread بشه
+      const payload = Array.isArray(params)
+        ? { action, schools: params }
+        : { action, ...(params || {}) }
+
+      const response: AxiosResponse<ExamFilesMigrationResultType> =
         await this.getAxiosInstanceWithToken()
-          .post(this.endpoints.run, {
-            action,
-            ...(schoolIds ? { schools: schoolIds } : {})
-          })
+          .post(this.endpoints.run, payload)
 
-      const data = response.data as DevScriptRunResultType
-      if (typeof data.message === 'string' && data.fixed !== undefined) {
-        return data
-      }
-
-      // اگر سرور خطای منطقی برگرداند
-      throw new Error((response.data as DevScriptRunErrorType).message || 'Unknown dev script error')
+      return response.data
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message)
@@ -57,6 +82,8 @@ export default class DevAdminAPI extends BaseAPI<null> {
       }
     }
   }
+
+
 }
 
 export const devAdmin = new DevAdminAPI()

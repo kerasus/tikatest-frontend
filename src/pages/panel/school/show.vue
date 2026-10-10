@@ -1,5 +1,4 @@
 <template>
-  {{ userManager.isAdmin }}
   <entity-show
     :key="entityShowKey"
     v-model:value="inputs"

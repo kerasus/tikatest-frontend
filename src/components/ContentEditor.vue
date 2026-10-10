@@ -213,10 +213,10 @@
               color="grey" />
           </div>
         </q-card-section>
-        <q-card-section class="col q-pa-none overflow-hidden">
-          <iframe
-            :src="pdfPreviewSrc"
-            style="width: 100%; height: 100%; border: none" />
+        <q-card-section class="col q-pa-sm scroll">
+          <vue-pdf-embed
+            :source="pdfPreviewSrc"
+            class="shadow-2 rounded-borders" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -224,6 +224,7 @@
 </template>
 
 <script setup lang="ts">
+import VuePdfEmbed from 'src/components/VuePdfEmbed.vue'
 import { ref, watch, computed } from 'vue'
 import type { ContentType } from 'src/repositories/exam'
 
@@ -284,7 +285,7 @@ const previewSrc = computed(() => {
   }
 
   if (item.path) {
-    return `storage/${item.path}`
+    return item.path
   }
 
   return ''
@@ -327,7 +328,7 @@ function openTextPreview () {
 function openPdfPreview () {
   const path = modelValue.value?.path || currentItem.value?.path
   if (path) {
-    pdfPreviewSrc.value = `storage/${path}`
+    pdfPreviewSrc.value = path
     pdfPreviewDialog.value = true
   }
 }

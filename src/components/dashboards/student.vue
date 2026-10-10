@@ -832,13 +832,19 @@
 import { computed, onMounted, ref } from 'vue'
 
 import { useDate } from 'src/composables/Date'
+import SchoolClassAPI from 'src/repositories/schoolClass'
 import {
-  student,
+  dashboard,
   type StudentDashboardData,
   type UpcomingExam
-} from 'src/repositories/student'
+} from 'src/repositories/dashboard'
+import { useUser } from 'stores/user'
+import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const dateManager = useDate()
+const userStoreManager = useUser()
+const schoolClassAPI = new SchoolClassAPI()
+const currentSchoolManager = useCurrentSchool()
 
 const stats = ref<StudentDashboardData>(getDefaultStats())
 const loading = ref(false)
@@ -849,7 +855,6 @@ const liveOnlineClasses = computed(() => activeOnlineClasses.value.filter((c) =>
 const upcomingExams = computed(() => stats.value.upcoming_exams || [])
 const pendingHomeworks = computed(() => stats.value.pending_homeworks || [])
 const upcomingEvents = computed(() => stats.value.upcoming_events || [])
-
 const studyProgress = computed(() => {
   const minutes = stats.value.total_study_minutes_this_month || 0
   const goal = 600
@@ -932,7 +937,7 @@ function examDate (exam: UpcomingExam) {
 async function loadDashboard () {
   loading.value = true
   try {
-    stats.value = await student.dashboard()
+    stats.value = await dashboard.studentDashboard()
   } catch (e) {
     stats.value = getDefaultStats()
   } finally {
@@ -940,8 +945,16 @@ async function loadDashboard () {
   }
 }
 
+async function getClassesFiles () {
+  await schoolClassAPI.getClassesFilesTree({
+    school_id: currentSchoolManager.currentSchool.value.id,
+    class_ids: userStoreManager.me.term_enrollments.map((te) => te.class_id)
+  })
+}
+
 onMounted(async () => {
   await loadDashboard()
+  // await getClassesFiles()
 })
 </script>
 
