@@ -3,6 +3,7 @@
     class="main-layout"
     :class="appLayoutStore.layoutCustomClass"
     :view="appLayoutStore.layoutView">
+
     <q-header
       v-if="appLayoutStore.layoutHeader"
       :reveal="appLayoutStore.layoutHeaderReveal"

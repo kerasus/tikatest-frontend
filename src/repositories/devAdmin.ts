@@ -42,10 +42,6 @@ export interface ExamFilesMigrationResultType {
   skipped_empty_password?: number
 }
 
-
-
-
-
 /**
  * ⚠️ موقت: ریپازیتوری اجرای اسکریپت‌های توسعه‌ای (فقط ادمین)
  * بعداً کامنت یا حذف شود!
@@ -55,6 +51,7 @@ export default class DevAdminAPI extends BaseAPI<null> {
     super('/users') // آدرس پایه مهم نیست، endpoint کامل را خودمان می‌دهیم
     this.endpoints = {
       ...this.endpoints,
+      runOptimize: '/admin/dev/run/optimize',
       run: '/admin/dev/run'
     }
   }
@@ -81,6 +78,14 @@ export default class DevAdminAPI extends BaseAPI<null> {
         throw new Error('An unknown error occurred on runDevScript')
       }
     }
+  }
+
+  async runOptimize (): Promise<any> {
+    const response: AxiosResponse<ExamFilesMigrationResultType> =
+        await this.getAxiosInstanceWithToken()
+          .post(this.endpoints.runOptimize)
+
+    return response.data
   }
 
 

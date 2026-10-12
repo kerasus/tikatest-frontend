@@ -3,5 +3,5 @@
 </template>
 
 <script setup lang="ts">
-import StudentDashboard from 'src/components/dashboards/student.vue'
+import StudentDashboard from 'components/dashboards/student/student.vue'
 </script>

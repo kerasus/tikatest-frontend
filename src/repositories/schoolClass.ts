@@ -15,45 +15,71 @@ export type SchoolClassType = {
   deleted_at: string | null
 }
 
-// ----------------------------------------------------
-// تایپ‌های مربوط به سرویس فایل‌های FTP مدرسه
-// ----------------------------------------------------
+/**
+ * مشخصات هر فایل دریافت شده از سرور FTP
+ */
 export interface FtpFileItem {
   name: string
   path: string
-  size?: number
-  extension?: string
-  last_modified?: string
-  url?: string
-  [key: string]: unknown
+  url  : string
+  size: number
+  timestamp: number
+  type: 'file' | 'directory'
 }
 
-export interface ClassFilesResponse {
-  success: boolean
-  message?: string
+/**
+ * دایرکتوری در صورت وجود زیرپوشه
+ */
+export interface FtpDirectoryItem {
+  name: string
+  path: string
+  type: 'directory'
+}
+
+/**
+ * گره نهایی برگ (Leaf Node) در درخت فایل‌ها متناظر با یک پایه مشخص
+ */
+export interface ClassFilesLeafNode {
+  permissions: string[]
+  class_ids: number[]
+  path: string
+  directories: FtpDirectoryItem[]
   files: FtpFileItem[]
 }
 
-export interface FtpFileTreeNode {
-  id?: string | number
-  label: string
-  path?: string
-  type?: 'folder' | 'file'
-  children?: FtpFileTreeNode[]
-  files?: FtpFileItem[]
-  [key: string]: unknown
-}
+/**
+ * ساختار چند سطحی درخت:
+ * Level 1 (Season / Term): کلید دوره/فصل (مثلاً "1404-10")
+ * Level 2 (Lesson): کلید عنوان درس (مثلاً "علوم")
+ * Level 3 (Grade): کلید پایه/کلاس (مثلاً "6") -> حاوی داده‌های نهایی
+ */
+export type SeasonKey = string
+export type LessonKey = string
+export type GradeKey = string
 
-export interface ClassesFilesTreeResponse {
-  success: boolean
-  message?: string
-  tree: Record<string | number, FtpFileTreeNode> | FtpFileTreeNode[]
-}
+export type LessonFilesTree = Record<GradeKey, ClassFilesLeafNode>
+export type SeasonFilesTree = Record<LessonKey, LessonFilesTree>
+export type ClassesFilesTreeMap = Record<SeasonKey, SeasonFilesTree>
 
+/**
+ * تایپ ورودی (Payload) متد
+ */
 export interface ClassesFilesTreePayload {
-  school_id: number
+  school_id?: number
   class_ids: number[]
 }
+
+/**
+ * ریسپانس کلی بازگشتی از API سرور
+ */
+export interface ClassesFilesTreeResponse {
+  success: boolean
+  tree: ClassesFilesTreeMap
+  message?: string
+}
+
+
+
 
 export default class SchoolClassAPI extends BaseAPI<SchoolClassType> {
   constructor () {
@@ -87,9 +113,9 @@ export default class SchoolClassAPI extends BaseAPI<SchoolClassType> {
    * دریافت لیست فایل‌های یک کلاس خاص
    * GET /api/classes/{classId}/files?school_id=...
    */
-  async getClassFiles (classId: number | string, schoolId: number): Promise<ClassFilesResponse> {
+  async getClassFiles (classId: number | string, schoolId: number): Promise<ClassesFilesTreeResponse> {
     const endpoint = (this.endpoints as any).classFiles(classId)
-    const response = await this.getAxiosInstanceWithToken().get<ClassFilesResponse>(endpoint, {
+    const response = await this.getAxiosInstanceWithToken().get<ClassesFilesTreeResponse>(endpoint, {
       params: { school_id: schoolId }
     })
     return response.data

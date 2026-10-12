@@ -92,14 +92,105 @@ export interface SchoolDashboardData {
 // ----------------------------------------------------
 export type HealthCheckStatus = 'ok' | 'warning' | 'failed' | 'crashed'
 
-export interface StoredCheckResult {
-  name: string
-  label: string
-  notificationMessage: string
-  shortSummary: string
-  status: HealthCheckStatus
-  meta: Record<string, unknown>
+// تایپ تک‌تک متادیتاها بر اساس چک‌های فعال در لاگ و پکیج
+export interface UsedDiskSpaceMeta {
+  disk_space_used_percentage: number
 }
+
+export interface DatabaseMeta {
+  connection_name: string
+}
+
+export interface DebugModeMeta {
+  actual: boolean
+  expected: boolean
+}
+
+export interface OpcacheMeta {
+  enabled: boolean
+  hit_rate: number
+  cached_scripts: number
+  memory_used_mb: number
+}
+
+export interface DatabasePingMeta {
+  latency_ms: number
+}
+
+export interface SslCertificateMeta {
+  domain: string
+}
+
+// برای مواردی مثل OptimizedApp که در صورت خالی بودن آرایه برمی‌گرداند یا متای عمومی
+export type HealthCheckGenericMeta = Record<string, unknown> | unknown[]
+
+// استفاده از Discriminated Union برای Autocomplete بی‌نقص بر اساس فیلد `name`
+export type StoredCheckResult =
+  | {
+      name: 'UsedDiskSpace'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: UsedDiskSpaceMeta
+    }
+  | {
+      name: 'Database'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: DatabaseMeta
+    }
+  | {
+      name: 'DebugMode'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: DebugModeMeta
+    }
+  | {
+      name: 'OptimizedApp'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: HealthCheckGenericMeta
+    }
+  | {
+      name: 'Opcache'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: OpcacheMeta
+    }
+  | {
+      name: 'DatabasePing'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: DatabasePingMeta
+    }
+  | {
+      name: 'SslCertificate'
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: SslCertificateMeta
+    }
+  | {
+      // فال‌بک برای چک‌های احتمالی آینده تا سیستم داینامیک بمونه
+      name: string
+      label: string
+      notificationMessage: string
+      shortSummary: string
+      status: HealthCheckStatus
+      meta: HealthCheckGenericMeta
+    }
 
 export interface HealthCheckResponse {
   finishedAt: string

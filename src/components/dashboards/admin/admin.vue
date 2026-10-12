@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-page q-pa-md">
+  <div class="dashboard-page">
 
     <!-- پس‌زمینه متحرک -->
     <div class="dreamy-background">

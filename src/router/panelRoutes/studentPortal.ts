@@ -93,6 +93,20 @@ export const index = [
     component: () => import('pages/panel/student/myGrades.vue')
   },
   {
+    path: 'my-films',
+    name: 'Student.Film.List',
+    meta: {
+      pageCategory: 'فیلم‌های آموزشی',
+      breadCrumbs: [
+        {
+          label: 'فیلم‌های آموزشی',
+          to: { name: 'Student.Film.List' }
+        }
+      ]
+    },
+    component: () => import('pages/panel/student/myFilms.vue')
+  },
+  {
     path: 'report-card',
     name: 'Student.ReportCard',
     meta: {

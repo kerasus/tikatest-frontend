@@ -19,7 +19,7 @@ export const index: RouteRecordRaw[] = [
     //   // we return a redirect path/location here.
     //   return { name: 'Auth.Login' }
     // }
-    component: () => import('src/pages/IndexPage.vue')
+    component: () => import('pages/indexPage/IndexPage.vue')
   },
   ...authRoutes
 ]
