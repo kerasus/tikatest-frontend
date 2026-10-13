@@ -329,7 +329,7 @@
     </div>
 
     <!-- ۲. پاسخنامه کلیدی آزمون -->
-    <q-card>
+    <q-card class="q-mb-md">
       <q-card-section class="bg-blue-grey-1 q-py-sm">
         <div class="row items-center justify-between">
           <div class="row items-center">

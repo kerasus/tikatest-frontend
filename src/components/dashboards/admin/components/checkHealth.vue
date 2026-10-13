@@ -32,7 +32,6 @@
           </q-tooltip>
         </q-btn>
 
-
         <!-- دکمه بروزرسانی وضعیت -->
         <q-btn
           flat
@@ -164,24 +163,41 @@
               </q-badge>
             </div>
 
-            <!-- بدنه کارت: گیج و اطلاعات -->
+            <!-- بدنه کارت: گیج درصدی یا آیکون ۸۸ پیکسلی متناسب با سرویس -->
             <div class="command-body">
+              <!-- حالت اول: سرویس‌های دارای درصد یا حجم (OPcache و Disk) -->
               <q-circular-progress
-                :value="statusProgress(check.status)"
+                v-if="isGaugeMetric(check.name)"
+                :value="getMetricProgress(check)"
                 size="88px"
                 :thickness="0.12"
                 :color="statusColor(check.status)"
                 track-color="blue-grey-10"
                 class="command-gauge">
                 <div class="gauge-inner">
-                  <q-icon
-                    :name="statusIcon(check.status)"
-                    size="24px"
-                    :color="statusColor(check.status)" />
+                  <span class="gauge-percentage-value ltr-num">{{ Math.round(getMetricProgress(check)) }}%</span>
                   <span class="gauge-status-label">{{ statusLabel(check.status) }}</span>
                 </div>
               </q-circular-progress>
 
+              <!-- حالت دوم: سرویس‌های منطقی/وضعیتی (مانند OptimizedApp, DebugMode, DB, Ping, SSL) -->
+              <div
+                v-else
+                class="command-icon-display"
+                :class="`icon-display-${check.status}`">
+                <div class="icon-ring-pulse" />
+                <q-icon
+                  :name="serviceIcon(check.name)"
+                  size="40px"
+                  :color="statusColor(check.status)" />
+                <span
+                  class="icon-status-sub"
+                  :class="`text-${statusColor(check.status)}`">
+                  {{ statusLabel(check.status) }}
+                </span>
+              </div>
+
+              <!-- مشخصات و مقادیر متنی -->
               <div class="command-legend">
                 <div class="legend-title">
                   <q-icon
@@ -299,7 +315,33 @@ const metaLabels: Record<string, string> = {
   latency_ms: 'تاخیر پینگ',
   domain: 'دامنه بررسی‌شده',
   actual: 'مقدار فعلی',
-  expected: 'مقدار مورد انتظار'
+  expected: 'مقدار مورد انتظار',
+  free_gb: 'فضای آزاد (GB)',
+  used_gb: 'مصرف‌شده (GB)',
+  total_gb: 'سهمیه کل (GB)',
+  size_mb: 'حجم دیتابیس',
+  version: 'نسخه سرویس'
+}
+
+/**
+ * تعیین اینکه آیا متریک ماهیت درصد/پیشرفت دایره‌ای دارد یا خیر
+ */
+function isGaugeMetric (name: string): boolean {
+  return name === 'UsedDiskSpace' || name === 'Opcache'
+}
+
+/**
+ * محاسبه مقدار واقعی درصد برای سرویس‌های گیج‌دار
+ */
+function getMetricProgress (check: StoredCheckResult): number {
+  const meta = (check.meta || {}) as Record<string, any>
+  if (check.name === 'UsedDiskSpace') {
+    return Number(meta.disk_space_used_percentage ?? 0)
+  }
+  if (check.name === 'Opcache') {
+    return Number(meta.hit_rate ?? 0)
+  }
+  return check.status === 'ok' ? 100 : (check.status === 'warning' ? 50 : 15)
 }
 
 async function loadHealth () {
@@ -316,7 +358,6 @@ async function loadHealth () {
     loading.value = false
   }
 }
-
 
 const handleOptimize = () => {
   $q.dialog({
@@ -336,7 +377,6 @@ const handleOptimize = () => {
   }).onOk(async () => {
     optimizing.value = true
     try {
-      // صدا زدن ریپوزیتوری که به اون متد لاراول وصل میشه:
       const res = await devAdminAPI.runOptimize()
 
       $q.notify({
@@ -347,7 +387,6 @@ const handleOptimize = () => {
         position: 'top'
       })
 
-      // بعد از بهینه‌سازی، چک هلث رو دوباره رفرش می‌کنیم تا وضعیت آپدیت بشه
       await loadHealth()
     } catch (err: any) {
       $q.notify({
@@ -362,7 +401,6 @@ const handleOptimize = () => {
     }
   })
 }
-
 
 function checkThemeClass (status: HealthCheckStatus, name: string) {
   if (status === 'failed' || status === 'crashed') return 'card-alert-failed'
@@ -406,18 +444,6 @@ function statusColor (status: HealthCheckStatus) {
   if (status === 'ok') return 'teal-4'
   if (status === 'warning') return 'amber-5'
   return 'red-5'
-}
-
-function statusProgress (status: HealthCheckStatus) {
-  if (status === 'ok') return 100
-  if (status === 'warning') return 55
-  return 15
-}
-
-function statusIcon (status: HealthCheckStatus) {
-  if (status === 'ok') return 'check_circle'
-  if (status === 'warning') return 'warning_amber'
-  return 'error'
 }
 
 function metaItems (meta: unknown): MetaItem[] {
@@ -518,7 +544,6 @@ $success-color: #10b981;
   }
 }
 
-
 /* کارت‌های مانیتورینگ پایه */
 .command-card {
   position: relative;
@@ -557,7 +582,7 @@ $success-color: #10b981;
 .card-disk { --neon: #38bdf8; &::before { background: linear-gradient(90deg, #38bdf8, #0284c7); } }
 .card-default { --neon: #818cf8; &::before { background: linear-gradient(90deg, #818cf8, #4f46e5); } }
 
-/* تم کارت‌های دارای خطا (بسیار شاخص) */
+/* تم کارت‌های دارای خطا */
 .card-alert-failed {
   --neon: #ef4444;
   border: 1.5px solid rgba(239, 68, 68, 0.45);
@@ -637,6 +662,7 @@ $success-color: #10b981;
   padding: 14px 20px 10px;
 }
 
+/* گیج مدور */
 .command-gauge {
   flex-shrink: 0;
   filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
@@ -646,12 +672,72 @@ $success-color: #10b981;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 1px;
+
+  .gauge-percentage-value {
+    color: #f8fafc;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1;
+  }
 
   .gauge-status-label {
     color: rgba(226, 232, 240, 0.6);
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 700;
+    margin-top: 2px;
+  }
+}
+
+/* نماد آیکون ۸۸ پیکسلی هم‌اندازه گیج */
+.command-icon-display {
+  position: relative;
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 2px dashed rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.35), inset 0 0 15px rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+
+  .icon-ring-pulse {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+  }
+
+  .icon-status-sub {
+    font-size: 8px;
+    font-weight: 800;
+    margin-top: 3px;
+    opacity: 0.9;
+  }
+
+  &.icon-display-ok {
+    border-color: rgba(45, 212, 191, 0.35);
+    background: radial-gradient(circle at center, rgba(45, 212, 191, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+    box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
+  }
+
+  &.icon-display-warning {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
+  }
+
+  &.icon-display-failed,
+  &.icon-display-crashed {
+    border-color: rgba(239, 68, 68, 0.55);
+    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.18) 0%, rgba(15, 23, 42, 0.7) 100%);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
   }
 }
 

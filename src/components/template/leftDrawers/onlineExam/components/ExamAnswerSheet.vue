@@ -97,7 +97,9 @@
               </q-td>
             </template>
           </q-table>
-          <div class="exam-legend-card q-pa-sm q-mb-md bg-grey-1 rounded-borders border">
+          <div
+            v-if="readonly && showAnswersLegend"
+            class="exam-legend-card q-pa-sm q-mb-md bg-grey-1 rounded-borders border">
             <div class="row items-center q-col-gutter-y-sm q-col-gutter-x-lg text-caption text-weight-medium">
 
               <!-- ۱. پاسخ صحیح انتخاب شده -->
@@ -208,7 +210,9 @@
       </q-table>
 
 
-      <div class="exam-legend-card q-pa-sm q-mb-md bg-grey-1 rounded-borders border">
+      <div
+        v-if="readonly && showAnswersLegend"
+        class="exam-legend-card q-pa-sm q-mb-md bg-grey-1 rounded-borders border">
         <div class="row items-center q-col-gutter-y-sm q-col-gutter-x-lg text-caption text-weight-medium">
 
           <!-- ۱. پاسخ صحیح انتخاب شده -->
@@ -265,6 +269,8 @@ const props = defineProps<{
   answerKeys: OnlineExamAnswerKeyType[] | null;
   sessionResponses: OnlineExamSessionResponseItemType[] | null;
   readonly: boolean;
+  confirmMode: boolean;
+  showAnswersLegend: boolean;
 }>()
 
 const emit = defineEmits<{
@@ -406,7 +412,12 @@ function choiceIcon (row: LocalOnlineExamAnswerKeyType, option: string) {
   const isCorrect = row.correct_option === option
 
   if (isSelected && isCorrect) return 'check_circle'
-  if (isSelected) return 'cancel'
+  if (isSelected)
+    if (props.confirmMode) {
+      return 'radio_button_checked'
+    } else {
+      return 'cancel'
+    }
   if (isCorrect) return 'check_circle_outline'
   return 'radio_button_unchecked'
 }
@@ -418,7 +429,12 @@ function choiceColor (row: LocalOnlineExamAnswerKeyType, option: string) {
 
   const sessionResponse = getSessionResponsesByQuestionNumber(row.question_number)
   if (row.correct_option === option) return 'positive'
-  if (sessionResponse?.submitted_option === option) return 'negative'
+  if (sessionResponse?.submitted_option === option)
+    if (props.confirmMode) {
+      return 'info'
+    } else {
+      return 'negative'
+    }
   return 'grey-4'
 }
 

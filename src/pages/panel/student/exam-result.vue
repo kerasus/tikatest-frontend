@@ -92,7 +92,7 @@
           </template>
           <template v-else-if="solutionContent.type === 'image'">
             <q-img
-              :src="solutionContent.path ? `storage/${solutionContent.path}` : ''"
+              :src="solutionContent?.path ?? ''"
               alt="پاسخنامه آزمون"
               style="max-width: 100%; display: block" />
           </template>

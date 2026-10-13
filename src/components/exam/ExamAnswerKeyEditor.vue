@@ -36,6 +36,28 @@
       dense
       separator="cell"
       hide-pagination>
+      <!-- اسلات هدر اختصاصی برای ستون نمره منفی -->
+      <template #header-cell-has_negative_mark="headerProps">
+        <q-th :props="headerProps">
+          <div class="row items-center justify-center no-wrap q-gutter-xs">
+            <span>{{ headerProps.col.label }}</span>
+            <q-checkbox
+              v-if="!readonly && answerKeys.length > 0"
+              :model-value="allNegativeMarksState"
+              dense
+              color="primary"
+              size="xs"
+              @update:model-value="toggleAllNegativeMarks">
+              <q-tooltip
+                anchor="top middle"
+                self="bottom middle">
+                تغییر وضعیت نمره منفی همه سوالات
+              </q-tooltip>
+            </q-checkbox>
+          </div>
+        </q-th>
+      </template>
+
       <template #body-cell="cellProps">
         <q-td
           v-if="cellProps.col.name === 'question_number'"
@@ -238,6 +260,32 @@ const tableColumns = computed(() => {
   )
   return cols
 })
+
+// وضعیت سه‌حالته چک‌باکس هدر: true (همه فعال)، false (همه غیرفعال)، null (ترکیبی/indeterminate)
+const allNegativeMarksState = computed<boolean | null>(() => {
+  if (!answerKeys.value.length) return false
+
+  const trueCount = answerKeys.value.filter((k) => !!k.has_negative_mark).length
+
+  if (trueCount === answerKeys.value.length) return true
+  if (trueCount === 0) return false
+  return null // Quasar در مقدار null به صورت خودکار حالت indeterminate (خط تیره) رو نشون میده
+})
+
+// با کلیک، اگر همه فعال باشند غیرفعال میشن، در غیر این صورت (چه خالی و چه بینابینی) همه فعال میشن
+function toggleAllNegativeMarks (newVal: boolean | null) {
+  if (props.readonly || !answerKeys.value.length) return
+
+  // اگر قبلاً همه انتخاب بودن، هدف ما False کردنه، وگرنه True
+  const targetState = allNegativeMarksState.value === true ? false : true
+
+  answerKeys.value.forEach((row) => {
+    row.has_negative_mark = targetState
+  })
+
+  // تریگر برای watch عمیق و به‌روزرسانی v-model/emit
+  answerKeys.value = [...answerKeys.value]
+}
 
 function regenerateAnswerKeys () {
   if (questionCount.value <= 0) {

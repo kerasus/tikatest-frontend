@@ -5,6 +5,8 @@
       :readonly="isReadonly"
       :answer-keys="answerKeys"
       :session-responses="sessionResponses"
+      :show-answers-legend="true"
+      :confirm-mode="false"
       @answer-changed="submitAnswer" />
 
     <q-separator />
@@ -62,6 +64,8 @@
         <exam-answer-sheet
           :booklets="booklets"
           :readonly="true"
+          :show-answers-legend="false"
+          :confirm-mode="true"
           :answer-keys="answerKeys"
           :session-responses="sessionResponses" />
       </q-card-section>
