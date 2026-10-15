@@ -164,8 +164,10 @@
               v-ripple
               clickable
               :to="{ name: 'Student.Exam.Show', params: { id: e.id } }"
-              class="q-py-md hover-scale">
-              <q-item-section avatar>
+              class="q-py-md hover-scale items-center">
+              <q-item-section
+                avatar
+                top>
                 <q-avatar
                   :color="e.delivery_mode === 'online' ? 'purple-1' : 'blue-grey-1'"
                   :text-color="e.delivery_mode === 'online' ? 'purple-9' : 'blue-grey-9'"
@@ -173,43 +175,53 @@
                   size="42px" />
               </q-item-section>
 
-              <q-item-section>
-                <div class="row items-center q-gutter-x-sm no-wrap">
-                  <span class="text-subtitle2 text-weight-bolder ellipsis text-grey-9">
+              <!-- با افزودن overflow-hidden و min-width صفر، ellipsis دقیقاً کار می‌کند -->
+              <q-item-section
+                class="overflow-hidden col"
+                style="min-width: 0;">
+                <div class="row items-center q-gutter-x-sm no-wrap full-width">
+                  <span
+                    class="text-subtitle2 text-weight-bolder ellipsis text-grey-9 col-shrink"
+                    :title="e.name">
                     {{ e.name || 'بدون عنوان' }}
                   </span>
                   <q-badge
                     v-if="e.category?.title"
                     color="purple-1"
                     text-color="purple-9"
-                    class="q-px-xs text-weight-medium">
+                    class="q-px-xs text-weight-medium flex-shrink-0">
                     {{ e.category.title }}
                   </q-badge>
                 </div>
 
-                <div class="row items-center text-caption text-grey-7 q-gutter-x-sm q-mt-xs">
-                  <span>{{ formatDateTime(examDate(e)) }}</span>
-                  <span v-if="e.online_exam_detail?.time_limit_minutes">
+                <div class="row items-center text-caption text-grey-7 q-gutter-x-sm q-mt-xs no-wrap ellipsis">
+                  <span class="ellipsis">{{ formatDateTime(examDate(e)) }}</span>
+                  <span
+                    v-if="e.online_exam_detail?.time_limit_minutes"
+                    class="flex-shrink-0">
                     • {{ e.online_exam_detail.time_limit_minutes }} دقیقه
                   </span>
                 </div>
               </q-item-section>
 
+              <!-- ساید سکشن با قفل کردن عرض و جلوگیری از فشرده‌شدن یا همپوشانی -->
               <q-item-section
                 side
-                class="column items-end">
+                class="column items-end justify-center q-pl-sm"
+                style="min-width: fit-content; flex-shrink: 0;">
                 <q-chip
                   dense
                   size="11px"
                   text-color="white"
                   :color="getExamStatus(e).color"
                   :icon="getExamStatus(e).icon"
-                  class="q-ma-none text-weight-bold">
+                  class="q-ma-none text-weight-bold no-wrap">
                   {{ getExamStatus(e).label }}
                 </q-chip>
               </q-item-section>
             </q-item>
           </q-list>
+
         </dashboard-card>
       </div>
 

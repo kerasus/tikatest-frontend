@@ -162,13 +162,13 @@ const dateManager = useDate()
 const heldAtFormatted = computed(() => {
   const raw = exam.value.in_person_exam_detail?.held_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const resultsVisibleAtFormatted = computed(() => {
   const raw = exam.value.in_person_exam_detail?.results_visible_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const classIds = computed({

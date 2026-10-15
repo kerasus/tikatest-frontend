@@ -143,7 +143,7 @@ const entityIndexRef = ref()
 
 const formatDate = (value: string | null | undefined): string => {
   if (!value) return '-'
-  return dateManager.miladiToShamsi(value, 'YYYY-MM-DD', 'jYYYY/jMM/jDD') || value
+  return dateManager.isoToLocalShamsiDate(value) || value
 }
 
 const getOwner = (

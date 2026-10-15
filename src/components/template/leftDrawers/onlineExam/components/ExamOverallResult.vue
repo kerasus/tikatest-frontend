@@ -65,13 +65,20 @@ const props = defineProps<{
 
 const dateManager = useDate()
 
-const overallResult = computed(() => ({
-  totalQuestions: props.answerKeys?.length ?? null,
-  answeredQuestions: props.sessionResponses?.length ?? null,
-  correctAnswers: props.sessionResponses?.filter((key) => key.is_correct).length ?? null,
-  incorrectAnswers: props.sessionResponses?.filter((key) => !key.is_correct && key.submitted_option).length ?? null,
-  unansweredQuestions: props.sessionResponses?.filter((key) => !key.submitted_option).length ?? null
-}))
+const overallResult = computed(() => {
+  const totalQuestions = props.answerKeys?.length ?? null
+  const correctAnswers = props.sessionResponses?.filter((key) => key.is_correct).length ?? null
+  const incorrectAnswers = props.sessionResponses?.filter((key) => !key.is_correct && key.submitted_option).length ?? null
+  const answeredQuestions = (correctAnswers ?? 0) + (incorrectAnswers ?? 0)
+  const unansweredQuestions = (totalQuestions ?? 0) - answeredQuestions
+  return {
+    totalQuestions,
+    answeredQuestions,
+    correctAnswers,
+    incorrectAnswers,
+    unansweredQuestions
+  }
+})
 
 const resultStats = computed(() => [
   // { label: 'نمره کل', value: resultValue(props.session.t_score, '۰') },

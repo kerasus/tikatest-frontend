@@ -354,7 +354,7 @@ const dateManager = useDate()
 const dueDateFormatted = computed(() => {
   const raw = homework.value.due_date
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DD', 'jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const levelIds = computed<number[]>({

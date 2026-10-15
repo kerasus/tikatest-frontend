@@ -185,30 +185,29 @@
       v-model="showDevModal"
       :persistent="executingScript"
       backdrop-filter="blur(12px) brightness(95%)">
-
       <q-card class="light-dev-modal">
         <div class="modal-top-accent" />
 
         <q-card-section class="row items-center q-pa-md modal-head">
           <div class="modal-badge-icon q-mr-md">
             <q-icon
-              name="sync"
+              :name="devActionMeta.icon"
               size="24px" />
+
           </div>
 
           <div>
             <div class="text-h6 text-weight-bolder text-neutral-dark-20 row items-center">
-              انتقال فایل‌های خارجی آزمون
+              {{ devActionMeta.title }}
               <q-badge
-                color="warning"
+                :color="devActionMeta.badgeColor"
                 text-color="white"
                 class="q-ml-sm text-bold pulse-tag">
-                MIGRATION
+                {{ devActionMeta.badge }}
               </q-badge>
             </div>
-
             <div class="text-caption text-neutral">
-              انتقال فایل‌های content و solution به استوریج محلی
+              {{ devActionMeta.description }}
             </div>
           </div>
 
@@ -227,6 +226,38 @@
         <q-separator color="primary-95" />
 
         <q-card-section class="q-pa-md">
+          <div class="q-mb-md">
+            <label class="text-caption text-weight-bold text-neutral-dark-20 q-mb-xs block">
+              نوع عملیات:
+            </label>
+
+            <q-select
+              v-model="selectedDevAction"
+              dense
+              outlined
+              emit-value
+              map-options
+              class="soft-input"
+              :disable="executingScript"
+              :options="[
+                {
+                  label: 'انتقال فایل‌های خارجی آزمون',
+                  value: 'migrate-exam-files'
+                },
+                {
+                  label: 'بازشماری نتایج آزمون',
+                  value: 'recalculate-exam-results'
+                }
+              ]">
+              <template #prepend>
+                <q-icon
+                  name="settings_suggest"
+                  color="primary" />
+              </template>
+            </q-select>
+          </div>
+
+
           <div class="warning-soft-box q-pa-sm q-mb-md">
             <div class="row items-start no-wrap">
               <q-icon
@@ -237,22 +268,21 @@
 
               <div>
                 <div class="text-subtitle2 text-weight-bold text-neutral-dark-20">
-                  قبل از اجرای کامل، ابتدا با تعداد کم تست کن
+                  {{ devActionMeta.introTitle }}
                 </div>
 
                 <div
                   class="text-caption text-neutral-dark"
                   style="line-height: 1.8;">
-                  مقدار <strong>۵</strong> حداکثر پنج رکورد را بررسی می‌کند.
-                  مقدار <strong>۰</strong> یعنی همه‌ی رکوردهای منطبق بررسی شوند.
-                  فایل‌های دانلودشده در پوشه‌ی <code class="highlight-code">exam-files</code>
-                  دیسک public ذخیره می‌شوند.
+                  {{ devActionMeta.introText }}
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="q-mb-md">
+          <div
+            v-if="selectedDevAction === 'migrate-exam-files'"
+            class="q-mb-md">
             <label class="text-caption text-weight-bold text-neutral-dark-20 q-mb-xs block">
               حداکثر تعداد رکورد برای بررسی:
             </label>
@@ -273,6 +303,35 @@
               </template>
             </q-input>
           </div>
+
+          <div
+            v-if="selectedDevAction === 'recalculate-exam-results'"
+            class="q-mb-md">
+            <label class="text-caption text-weight-bold text-neutral-dark-20 q-mb-xs block">
+              شناسه آزمون برای بازشماری:
+            </label>
+
+            <q-input
+              v-model.number="recalculateExamId"
+              type="number"
+              min="1"
+              dense
+              outlined
+              placeholder="مثلاً 5 - اگر خالی بماند، همه آزمون‌ها بررسی می‌شوند"
+              class="soft-input"
+              :disable="executingScript">
+              <template #prepend>
+                <q-icon
+                  name="tag"
+                  color="secondary" />
+              </template>
+            </q-input>
+
+            <div class="text-caption text-neutral q-mt-xs">
+              خالی بگذار تا همه‌ی آزمون‌های قابل‌بررسی بازشماری شوند.
+            </div>
+          </div>
+
 
           <div class="q-mb-md">
             <label class="text-caption text-weight-bold text-neutral-dark-20 q-mb-xs block">
@@ -317,56 +376,80 @@
                 v-if="scriptResult"
                 class="result-pill-box q-mt-sm q-pa-sm">
 
-                <div
-                  class="text-weight-bold"
-                  :class="scriptResult.failed_count > 0 ? 'text-warning-dark' : 'text-success-dark'">
-                  {{ scriptResult.failed_count > 0 ? '⚠ عملیات با موارد ناموفق تمام شد' : '✔ عملیات موفق' }}
-                </div>
+                <template v-if="selectedDevAction === 'migrate-exam-files'">
+                  <div
+                    class="text-weight-bold"
+                    :class="scriptResult.failed_count > 0 ? 'text-warning-dark' : 'text-success-dark'">
+                    {{ scriptResult.failed_count > 0 ? '⚠ عملیات با موارد ناموفق تمام شد' : '✔ عملیات موفق' }}
+                  </div>
 
-                <div>
-                  رکوردهای منطبق:
-                  <strong>{{ scriptResult.total_matched_records }}</strong>
-                </div>
+                  <div>
+                    رکوردهای منطبق:
+                    <strong>{{ scriptResult.total_matched_records }}</strong>
+                  </div>
 
-                <div>
-                  رکوردهای به‌روزشده:
-                  <strong>{{ scriptResult.updated_records }}</strong>
-                </div>
+                  <div>
+                    رکوردهای به‌روزشده:
+                    <strong>{{ scriptResult.updated_records }}</strong>
+                  </div>
 
-                <div>
-                  فایل‌های دانلودشده:
-                  <strong>{{ scriptResult.downloaded_files }}</strong>
-                </div>
+                  <div>
+                    فایل‌های دانلودشده:
+                    <strong>{{ scriptResult.downloaded_files }}</strong>
+                  </div>
 
-                <div>
-                  دانلودهای ناموفق:
-                  <strong>{{ scriptResult.failed_count }}</strong>
-                </div>
-
-                <div
-                  v-if="scriptResult.failed_urls.length > 0"
-                  class="failed-url-list q-mt-sm">
-                  <div class="text-weight-bold q-mb-xs">
-                    فایل‌های ناموفق:
+                  <div>
+                    دانلودهای ناموفق:
+                    <strong>{{ scriptResult.failed_count }}</strong>
                   </div>
 
                   <div
-                    v-for="(failure, index) in scriptResult.failed_urls"
-                    :key="`${failure.url}-${index}`"
-                    class="failed-url-item">
-                    <div class="failed-url">
-                      {{ failure.url }}
+                    v-if="scriptResult.failed_urls?.length > 0"
+                    class="failed-url-list q-mt-sm">
+                    <div class="text-weight-bold q-mb-xs">
+                      فایل‌های ناموفق:
                     </div>
 
-                    <div class="text-caption">
-                      {{ failure.reason }}
-                      <span v-if="failure.status">
-                        (HTTP {{ failure.status }})
-                      </span>
+                    <div
+                      v-for="(failure, index) in scriptResult.failed_urls"
+                      :key="`${failure.url}-${index}`"
+                      class="failed-url-item">
+                      <div class="failed-url">
+                        {{ failure.url }}
+                      </div>
+
+                      <div class="text-caption">
+                        {{ failure.reason }}
+                        <span v-if="failure.status">
+                          (HTTP {{ failure.status }})
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </template>
+
+                <template v-else-if="selectedDevAction === 'recalculate-exam-results'">
+                  <div class="text-weight-bold text-success-dark">
+                    ✔ بازشماری نتایج با موفقیت انجام شد
+                  </div>
+
+                  <div v-if="'sessions_processed' in scriptResult">
+                    سشن‌های پردازش‌شده:
+                    <strong>{{ scriptResult.sessions_processed }}</strong>
+                  </div>
+
+                  <div v-if="'responses_updated' in scriptResult">
+                    پاسخ‌های به‌روزشده:
+                    <strong>{{ scriptResult.responses_updated }}</strong>
+                  </div>
+
+                  <div v-if="scriptResult.message">
+                    پیام:
+                    <strong>{{ scriptResult.message }}</strong>
+                  </div>
+                </template>
               </div>
+
             </div>
           </div>
         </q-card-section>
@@ -385,15 +468,12 @@
           <q-btn
             unelevated
             class="run-action-btn"
-            icon="cloud_download"
-            label="شروع انتقال فایل‌ها"
+            :icon="devActionMeta.buttonIcon"
+            :label="devActionMeta.buttonLabel"
             :loading="executingScript"
-            :disable="
-              confirmationWord.trim() !== 'تایید' ||
-                migrationLimit === null ||
-                Number(migrationLimit) < 0
-            "
-            @click="handleMigrateExamFiles" />
+            :disable="!canRunDevAction"
+            @click="handleRunDevAction" />
+
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -407,6 +487,8 @@ import DashboardAPI from 'src/repositories/dashboard'
 import { devAdmin, type ExamFilesMigrationResultType } from 'src/repositories/devAdmin'
 import CheckHealth from './components/checkHealth.vue'
 import AdminStats from './components/adminStats.vue'
+
+type DevActionType = 'migrate-exam-files' | 'recalculate-exam-results'
 
 const $q = useQuasar()
 const dashboardAPI = new DashboardAPI()
@@ -429,6 +511,69 @@ const floatingParticles = Array.from({ length: 22 }, (_, index) => ({
   duration: `${5 + (index % 6)}s`,
   size: `${4 + (index % 4) * 2}px`
 }))
+
+const showDevModal = ref(false)
+const confirmationWord = ref('')
+const migrationLimit = ref<number | null>(5)
+const scriptResult = ref<Record<string, any> | null>(null)
+const executingScript = ref(false)
+const logs = ref<string[]>([])
+const selectedDevAction = ref<DevActionType>('migrate-exam-files')
+const recalculateExamId = ref<number | null>(null)
+
+const devActionMeta = computed(() => {
+  if (selectedDevAction.value === 'recalculate-exam-results') {
+    return {
+      title: 'بازشماری نتایج آزمون',
+      badge: 'RECALCULATE',
+      badgeColor: 'secondary',
+      description: 'بازسازی شمارش پاسخ‌های درست، غلط، بی‌پاسخ و نمره نهایی جلسات آزمون',
+      icon: 'calculate',
+      buttonLabel: 'شروع بازشماری نتایج',
+      buttonIcon: 'restart_alt',
+      introTitle: 'قبل از اجرای نهایی، بهتر است روی یک آزمون تست بگیری',
+      introText:
+        'اگر شناسه آزمون را وارد کنی، فقط همان آزمون بازشماری می‌شود. اگر خالی بگذاری، همه‌ی جلسات آزمون‌های منطبق بررسی و بازسازی می‌شوند.'
+    }
+  }
+
+  return {
+    title: 'انتقال فایل‌های خارجی آزمون',
+    badge: 'MIGRATION',
+    badgeColor: 'warning',
+    description: 'انتقال فایل‌های content و solution به استوریج محلی',
+    icon: 'sync',
+    buttonLabel: 'شروع انتقال فایل‌ها',
+    buttonIcon: 'cloud_download',
+    introTitle: 'قبل از اجرای کامل، ابتدا با تعداد کم تست کن',
+    introText:
+      'مقدار ۵ حداکثر پنج رکورد را بررسی می‌کند. مقدار ۰ یعنی همه‌ی رکوردهای منطبق بررسی شوند. فایل‌های دانلودشده در پوشه‌ی exam-files دیسک public ذخیره می‌شوند.'
+  }
+})
+
+const canRunDevAction = computed(() => {
+  if (confirmationWord.value.trim() !== 'تایید') return false
+
+  if (selectedDevAction.value === 'migrate-exam-files') {
+    return (
+      migrationLimit.value !== null &&
+      Number.isInteger(Number(migrationLimit.value)) &&
+      Number(migrationLimit.value) >= 0
+    )
+  }
+
+  if (selectedDevAction.value === 'recalculate-exam-results') {
+    return (
+      recalculateExamId.value === null ||
+      (
+        Number.isInteger(Number(recalculateExamId.value)) &&
+        Number(recalculateExamId.value) > 0
+      )
+    )
+  }
+
+  return false
+})
 
 const serverHealth = computed(() => {
   if (responseTime.value === null) {
@@ -466,77 +611,137 @@ const serverHealth = computed(() => {
   }
 })
 
-const showDevModal = ref(false)
-const confirmationWord = ref('')
-const migrationLimit = ref<number | null>(5)
-const scriptResult = ref<ExamFilesMigrationResultType | null>(null)
-const executingScript = ref(false)
-const logs = ref<string[]>([])
-
 function openDevModal () {
+  selectedDevAction.value = 'migrate-exam-files'
   confirmationWord.value = ''
+  migrationLimit.value = 5
+  recalculateExamId.value = null
   scriptResult.value = null
   logs.value = []
   showDevModal.value = true
 }
 
-async function handleMigrateExamFiles () {
+async function handleRunDevAction () {
   if (confirmationWord.value.trim() !== 'تایید') return
-
-  if (
-    migrationLimit.value === null ||
-    !Number.isInteger(Number(migrationLimit.value)) ||
-    Number(migrationLimit.value) < 0
-  ) {
-    $q.notify({
-      type: 'warning',
-      icon: 'warning',
-      message: 'تعداد رکورد باید عدد صحیح صفر یا بزرگ‌تر باشد.',
-      position: 'top'
-    })
-    return
-  }
-
-  const limit = Number(migrationLimit.value)
 
   executingScript.value = true
   scriptResult.value = null
-
-  logs.value = [
-    'اتصال امن به Sanctum API...',
-    limit === 0
-      ? 'محدودیتی ثبت نشده؛ همه رکوردهای منطبق بررسی می‌شوند...'
-      : `حداکثر ${limit} رکورد بررسی می‌شود...`,
-    'جست‌وجوی فایل‌های خارجی در content و solution...'
-  ]
+  logs.value = []
 
   try {
-    const result = await devAdmin.runDevScript(
-      'migrate-exam-files',
-      { limit }
-    )
+    if (selectedDevAction.value === 'migrate-exam-files') {
+      if (
+        migrationLimit.value === null ||
+        !Number.isInteger(Number(migrationLimit.value)) ||
+        Number(migrationLimit.value) < 0
+      ) {
+        $q.notify({
+          type: 'warning',
+          icon: 'warning',
+          message: 'تعداد رکورد باید عدد صحیح صفر یا بزرگ‌تر باشد.',
+          position: 'top'
+        })
+        executingScript.value = false
+        return
+      }
 
-    scriptResult.value = result
+      const limit = Number(migrationLimit.value)
 
-    logs.value.push(`پاسخ سرور: ${result.message}`)
-    logs.value.push(`رکوردهای منطبق: ${result.total_matched_records}`)
-    logs.value.push(`رکوردهای به‌روزشده: ${result.updated_records}`)
-    logs.value.push(`فایل‌های دانلودشده: ${result.downloaded_files}`)
-    logs.value.push(`دانلودهای ناموفق: ${result.failed_count}`)
+      logs.value = [
+        'اتصال امن به Sanctum API...',
+        limit === 0
+          ? 'محدودیتی ثبت نشده؛ همه رکوردهای منطبق بررسی می‌شوند...'
+          : `حداکثر ${limit} رکورد بررسی می‌شود...`,
+        'جست‌وجوی فایل‌های خارجی در content و solution...'
+      ]
 
-    if (result.failed_count > 0) {
-      $q.notify({
-        type: 'warning',
-        icon: 'warning',
-        message: `${result.downloaded_files} فایل دانلود شد؛ ${result.failed_count} مورد ناموفق بود.`,
-        position: 'top',
-        timeout: 6000
-      })
-    } else {
+      const result = await devAdmin.runDevScript(
+        'migrate-exam-files',
+        { limit }
+      )
+
+      scriptResult.value = result
+
+      logs.value.push(`پاسخ سرور: ${result.message}`)
+      logs.value.push(`رکوردهای منطبق: ${result.total_matched_records}`)
+      logs.value.push(`رکوردهای به‌روزشده: ${result.updated_records}`)
+      logs.value.push(`فایل‌های دانلودشده: ${result.downloaded_files}`)
+      logs.value.push(`دانلودهای ناموفق: ${result.failed_count}`)
+
+      if (result.failed_count > 0) {
+        $q.notify({
+          type: 'warning',
+          icon: 'warning',
+          message: `${result.downloaded_files} فایل دانلود شد؛ ${result.failed_count} مورد ناموفق بود.`,
+          position: 'top',
+          timeout: 6000
+        })
+      } else {
+        $q.notify({
+          type: 'positive',
+          icon: 'check_circle',
+          message: `${result.downloaded_files} فایل با موفقیت منتقل شد.`,
+          position: 'top',
+          timeout: 5000
+        })
+      }
+
+      return
+    }
+
+    if (selectedDevAction.value === 'recalculate-exam-results') {
+      if (
+        recalculateExamId.value !== null &&
+        (
+          !Number.isInteger(Number(recalculateExamId.value)) ||
+          Number(recalculateExamId.value) <= 0
+        )
+      ) {
+        $q.notify({
+          type: 'warning',
+          icon: 'warning',
+          message: 'شناسه آزمون باید یک عدد صحیح بزرگ‌تر از صفر باشد یا خالی بماند.',
+          position: 'top'
+        })
+        executingScript.value = false
+        return
+      }
+
+      logs.value = [
+        'اتصال امن به Sanctum API...',
+        recalculateExamId.value
+          ? `بازشماری فقط برای آزمون #${recalculateExamId.value} آغاز شد...`
+          : 'بازشماری برای همه آزمون‌های قابل‌بررسی آغاز شد...',
+        'در حال بازسازی شمارش پاسخ‌ها و نتایج جلسات...'
+      ]
+
+      const payload = recalculateExamId.value
+        ? { exam_id: Number(recalculateExamId.value) }
+        : {}
+
+      const result = await devAdmin.runDevScript(
+        'recalculate-exam-results',
+        payload
+      )
+
+      scriptResult.value = result
+
+      logs.value.push(`پاسخ سرور: ${result.message}`)
+
+      if ('sessions_processed' in result) {
+        logs.value.push(`تعداد سشن‌های پردازش‌شده: ${result.sessions_processed}`)
+      }
+
+      if ('responses_updated' in result) {
+        logs.value.push(`تعداد پاسخ‌های به‌روزشده: ${result.responses_updated}`)
+      }
+
       $q.notify({
         type: 'positive',
         icon: 'check_circle',
-        message: `${result.downloaded_files} فایل با موفقیت منتقل شد.`,
+        message: recalculateExamId.value
+          ? `بازشماری آزمون #${recalculateExamId.value} با موفقیت انجام شد.`
+          : 'بازشماری نتایج آزمون‌ها با موفقیت انجام شد.',
         position: 'top',
         timeout: 5000
       })
@@ -559,6 +764,7 @@ async function handleMigrateExamFiles () {
     executingScript.value = false
   }
 }
+
 
 onMounted(async () => {
   loading.value = true

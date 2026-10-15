@@ -9,5 +9,5 @@ export const dateTimeStrategy = (input: FormTableInputType) => (row: Row) => {
     return '-'
   }
 
-  return dateManager.miladiToShamsi(inputValue, 'YYYY-MM-DDTHH:mm:ss', 'jYYYY/jMM/jDD HH:mm')
+  return dateManager.isoToLocalShamsi(inputValue)
 }

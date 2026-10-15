@@ -31,12 +31,7 @@
     <template #entity-index-table-cell="{ inputData }">
       <!-- ستون دانش‌آموز -->
       <template v-if="inputData.col.name === 'student'">
-        {{
-          inputData.props.row.student?.full_name ||
-            inputData.props.row.student?.first_name ||
-            inputData.props.row.student?.last_name ||
-            '-'
-        }}
+        {{ `${inputData.props.row.student?.first_name} ${inputData.props.row.student?.last_name}` }}
       </template>
 
       <!-- ستون وضعیت -->
@@ -172,11 +167,7 @@ const table = ref({
       align: 'center' as const,
       field: (row: OnlineExamSessionType) =>
         row.started_at
-          ? dateManager.miladiToShamsi(
-            row.started_at,
-            'YYYY-MM-DDThh:mm:ss',
-            'hh:mm:ss jYYYY/jMM/jDD'
-          )
+          ? dateManager.isoToLocalShamsi(row.started_at)
           : '-'
     },
     {
@@ -185,11 +176,7 @@ const table = ref({
       align: 'center' as const,
       field: (row: OnlineExamSessionType) =>
         row.submitted_at
-          ? dateManager.miladiToShamsi(
-            row.submitted_at,
-            'YYYY-MM-DDThh:mm:ss',
-            'hh:mm:ss jYYYY/jMM/jDD'
-          )
+          ? dateManager.isoToLocalShamsi(row.submitted_at)
           : '-'
     },
     {

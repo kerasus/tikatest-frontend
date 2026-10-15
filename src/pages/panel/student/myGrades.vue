@@ -306,7 +306,7 @@ const selectedExam = ref<ExamType | null>(null)
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return '-'
-  return dateManager.miladiToShamsi(dateString, 'YYYY-MM-DD', 'jYYYY/jMM/jDD') || dateString
+  return dateManager.isoToLocalShamsi(dateString) || dateString
 }
 
 function getScoreObject (row: ExamType): ScoreObjectType {

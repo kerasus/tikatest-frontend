@@ -582,25 +582,25 @@ const dateManager = useDate()
 const startsAtFormatted = computed(() => {
   const raw = exam.value.online_exam_detail?.starts_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const endsAtFormatted = computed(() => {
   const raw = exam.value.online_exam_detail?.ends_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const visibleAtFormatted = computed(() => {
   const raw = exam.value.online_exam_detail?.visible_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const answersVisibleAtFormatted = computed(() => {
   const raw = exam.value.online_exam_detail?.answers_visible_at
   if (!raw) return '-'
-  return dateManager.miladiToShamsi(raw, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || raw
+  return dateManager.isoToLocalShamsi(raw) || raw
 })
 
 const hasAnyBookletLesson = computed(() =>

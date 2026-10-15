@@ -265,7 +265,7 @@ watch(
       return
     }
     value.value = dateManager.getDateTimeFromIso8601DateString(newValue).date
-    displayDateTime.value = dateManager.miladiToShamsi(newValue.toString())
+    displayDateTime.value = dateManager.isoToLocalShamsi(newValue.toString())
   },
   { immediate: true }
 )

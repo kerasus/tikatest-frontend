@@ -125,11 +125,7 @@ const table = ref({
       align: 'left',
       field: (row: UserType) =>
         row.created_at
-          ? dateManager.miladiToShamsi(
-            row.created_at,
-            'YYYY-MM-DDThh:mm:ss',
-            'hh:mm:ss jYYYY/jMM/jDD'
-          )
+          ? dateManager.isoToLocalShamsi(row.created_at)
           : '-'
     },
     {

@@ -428,7 +428,7 @@ const submissionContentForEditor = computed(() => {
 const formatDateTime = (value: string | null | undefined): string => {
   if (!value) return '-'
   return (
-    dateManager.miladiToShamsi(value, 'YYYY-MM-DDThh:mm:ss', 'hh:mm:ss jYYYY/jMM/jDD') || value
+    dateManager.isoToLocalShamsi(value) || value
   )
 }
 

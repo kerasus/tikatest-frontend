@@ -1,7 +1,7 @@
 import BaseAPI from './BaseAPI'
 import type { AxiosResponse } from 'axios'
 
-export type DevScriptActionType = 'fix-student-passwords' | 'migrate-exam-files'
+export type DevScriptActionType = 'fix-student-passwords' | 'migrate-exam-files' | 'recalculate-exam-results'
 
 export interface DevScriptRunResultType {
   message: string
