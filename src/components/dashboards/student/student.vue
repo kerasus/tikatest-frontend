@@ -494,7 +494,6 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .dash {
   min-height: calc(100vh - 120px);
-  background: radial-gradient(circle at 10% 10%, #ede9fe 0%, #fef2f2 45%, #fefce8 100%);
   padding-bottom: 40px;
 }
 

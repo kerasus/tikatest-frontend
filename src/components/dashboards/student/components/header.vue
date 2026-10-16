@@ -2,14 +2,8 @@
   <q-card
     flat
     class="student-header-compact q-mb-md">
-    <!-- افکت‌های شیشه‌ای و نورهای امبینت پاستلی پشت صحنه -->
-    <div class="header-aurora header-aurora--one" />
-    <div class="header-aurora header-aurora--two" />
-    <div class="header-aurora header-aurora--three" />
-    <div class="header-specular" />
-
-    <div class="sparkle sparkle--1">✨</div>
-    <div class="sparkle sparkle--2">⚡</div>
+    <!-- لایه تاریک شیشه‌ای تقویتی برای خوانایی حداکثری متون -->
+    <div class="header-overlay" />
 
     <q-card-section class="header-main-row q-pa-none">
       <!-- بخش برند و پیام خوش‌آمد فشرده -->
@@ -38,7 +32,7 @@
             <span class="logo-name text-weight-bolder ellipsis">{{ schoolName }}</span>
           </div>
 
-          <!-- بج وضعیت فعال و پرانرژی -->
+          <!-- بج وضعیت فعال -->
           <div class="status-pill">
             <span class="status-dot" />
             <span>آماده یادگیری 🚀</span>
@@ -59,10 +53,10 @@
       <!-- پنل دسترسی سریع فشرده و افقی -->
       <div class="quick-nav-panel">
         <div class="quick-nav-header row items-center justify-between">
-          <div class="row items-center q-gutter-x-xs text-caption text-weight-bolder text-deep-fantasy">
+          <div class="row items-center q-gutter-x-xs text-caption text-weight-bolder text-white">
             <q-icon
               name="local_fire_department"
-              color="orange-8"
+              color="amber-4"
               size="18px" />
             <span>دسترسی سریع</span>
           </div>
@@ -110,14 +104,14 @@
       </div>
     </q-card-section>
 
-    <!-- فوتر خطی فوق‌العاده باریک -->
+    <!-- فوتر خطی -->
     <div class="header-strip-footer row items-center justify-between no-wrap">
       <div class="row items-center q-gutter-x-sm">
         <div class="strip-item">
           <q-icon
             name="school"
             size="15px"
-            class="text-indigo-6" />
+            class="text-amber-3" />
           <span class="ellipsis">{{ schoolName }}</span>
         </div>
         <span class="strip-bullet">•</span>
@@ -125,7 +119,7 @@
           <q-icon
             name="verified"
             size="15px"
-            class="text-teal-6" />
+            class="text-teal-3" />
           <span>یادگیری هوشمند و پویا</span>
         </div>
       </div>
@@ -212,93 +206,32 @@ function handleSchoolLogoError (event: Event) {
   isolation: isolate;
   overflow: hidden;
   direction: rtl;
-  border-radius: 26px !important;
+  border-radius: 24px !important;
 
-  /* استفاده از عکس پس‌زمینه جدید با پوشش گرادیانتی نوری شیشه‌ای */
+  /* تصویر پس‌زمینه با گرادیان تیره هماهنگ */
   background:
-    linear-gradient(135deg, rgba(20, 10, 45, 0.45) 0%, rgba(45, 20, 80, 0.35) 100%),
-    url('/images/background/header-bg-1.png') center/cover no-repeat !important;
+  /* rtl:ignore */
+    linear-gradient(135deg, rgba(59, 91, 219, 0.05) 0%, rgba(139, 127, 212, 0.45) 100%),
+    url('/images/background/bg-2.png') center/cover no-repeat !important;
 
-  backdrop-filter: blur(28px) saturate(210%);
-  -webkit-backdrop-filter: blur(28px) saturate(210%);
-
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 20px 45px -10px rgba(76, 29, 149, 0.3),
-    0 8px 20px -6px rgba(14, 165, 233, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.7),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    0 16px 36px -8px rgba(30, 10, 60, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
-
-/* نورهای فانتزی و امبینت پشت زمینه */
-.header-aurora {
+/* لایه ملایم برای بهبود کنتراست متن */
+.header-overlay {
   position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(36px);
-  opacity: 0.6;
-  z-index: 0;
-}
-
-.header-aurora--one {
-  top: -40px;
-  right: 15%;
-  width: 170px;
-  height: 170px;
-  background: radial-gradient(circle, #fbcfe8 0%, #e9d5ff 70%, transparent 80%);
-}
-
-.header-aurora--two {
-  bottom: -45px;
-  left: 20%;
-  width: 190px;
-  height: 190px;
-  background: radial-gradient(circle, #fed7aa 0%, #fef08a 60%, transparent 80%);
-}
-
-.header-aurora--three {
-  top: 10%;
-  left: -20px;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, #bae6fd 0%, #c7d2fe 70%, transparent 80%);
-}
-
-/* افکت شیشه‌ای داخلی روی عکس */
-.header-specular {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.02) 100%);
+  inset: 0;
+  display: none;
+  /* rtl:ignore */
+  background: radial-gradient(circle at 15% 50%, rgb(48 155 53 / 11%) 0%, rgb(44 155 53 / 20%) 70%, transparent 100%);
   pointer-events: none;
   z-index: 0;
 }
 
-.sparkle {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.75;
-  animation: sparkle-glow 3s ease-in-out infinite alternate;
-}
-
-.sparkle--1 {
-  top: 14px;
-  right: 38%;
-  font-size: 17px;
-}
-
-.sparkle--2 {
-  bottom: 34px;
-  left: 36%;
-  font-size: 15px;
-  animation-delay: -1.5s;
-}
-
-/* ساختار گرید چگال هدر */
+/* ساختار گرید هدر */
 .header-main-row {
   position: relative;
   z-index: 2;
@@ -306,15 +239,15 @@ function handleSchoolLogoError (event: Event) {
   grid-template-columns: minmax(0, 1.35fr) minmax(310px, 0.95fr);
   align-items: center;
   gap: 18px;
-  padding: 16px 20px !important; /* پدینگ کامپکت برای حذف اسکرول */
+  padding: 18px 24px !important;
 }
 
-/* استایل باکس خوش‌آمد */
+/* باکس خوش‌آمد */
 .welcome-box {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .brand-bar {
@@ -326,135 +259,132 @@ function handleSchoolLogoError (event: Event) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 9px 3px 5px;
+  padding: 4px 10px 4px 6px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
   .logo-img {
     width: 24px;
     height: 24px;
     object-fit: contain;
-    border-radius: 7px;
+    border-radius: 6px;
+    background: #ffffff;
+    padding: 2px;
   }
 
   .logo-name {
     font-size: 12px;
-    color: #1e1b4b;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     max-width: 130px;
   }
 }
 
-.compact-logo-badge--app {
-  border-color: rgba(168, 85, 247, 0.35);
-}
-
-.compact-logo-badge--school {
-  border-color: rgba(251, 146, 60, 0.4);
-}
-
 .divider-lightning {
-  color: #f59e0b;
-  font-size: 15px;
+  color: #fbbf24;
+  font-size: 16px;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7));
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(240, 253, 250, 0.85);
-  border: 1px solid rgba(45, 212, 191, 0.5);
-  color: #0f766e;
-  font-size: 10.5px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #6ee7b7;
+  font-size: 11px;
   font-weight: 700;
+  backdrop-filter: blur(8px);
 
   .status-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #14b8a6;
-    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
   }
 }
 
 .welcome-titles {
   .hero-title {
     margin: 0;
-    font-size: clamp(19px, 2.2vw, 24px);
+    font-size: clamp(20px, 2.3vw, 25px);
     font-weight: 900;
-    line-height: 1.25;
-    color: #1e1b4b;
+    line-height: 1.3;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
     letter-spacing: -0.4px;
 
     .gradient-text {
-      background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+      background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 6px rgba(192, 132, 252, 0.4));
     }
   }
 
   .hero-subtitle {
-    margin: 3px 0 0;
-    font-size: 12px;
-    color: #6b21a8;
-    opacity: 0.88;
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(243, 232, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     line-height: 1.5;
   }
 }
 
-/* پنل دسترسی سریع (فوق‌العاده کامپکت) */
+/* پنل دسترسی سریع */
 .quick-nav-panel {
   border-radius: 18px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 8px 20px -6px rgba(118, 75, 162, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-}
-
-.text-deep-fantasy {
-  color: #1e1b4b;
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .quick-nav-hint {
-  font-size: 10px;
-  color: #7c3aed;
-  opacity: 0.75;
+  font-size: 10.5px;
+  color: rgba(233, 213, 255, 0.85);
 }
 
 .quick-nav-buttons {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .nav-btn {
   min-height: 38px;
-  padding: 0 10px;
+  padding: 0 12px;
   border-radius: 12px !important;
   color: #ffffff !important;
   font-weight: 800;
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
 
   :deep(.q-btn__content) {
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
   }
 
   :deep(.q-icon) {
-    font-size: 17px;
+    font-size: 18px;
   }
 
   &:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
   }
 }
 
@@ -474,16 +404,16 @@ function handleSchoolLogoError (event: Event) {
   background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important;
 }
 
-/* فوتر باریک چسبیده */
+/* فوتر خطی */
 .header-strip-footer {
   position: relative;
   z-index: 2;
   min-height: 32px;
-  padding: 0 20px;
-  border-top: 1px solid rgba(226, 232, 240, 0.7);
-  background: rgba(255, 255, 255, 0.35);
-  font-size: 11px;
-  color: #475569;
+  padding: 0 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 4, 22, 0.35);
+  font-size: 11.5px;
+  color: rgba(241, 245, 249, 0.85);
 }
 
 .strip-item {
@@ -494,29 +424,24 @@ function handleSchoolLogoError (event: Event) {
 }
 
 .strip-bullet {
-  color: #cbd5e1;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .strip-indicator {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: #0d9488;
+  color: #5eead4;
 
   .indicator-glow {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #14b8a6;
-    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+    background: #2dd4bf;
+    box-shadow: 0 0 6px #2dd4bf;
   }
 }
 
-@keyframes sparkle-glow {
-  0% { transform: scale(0.85); opacity: 0.5; }
-  100% { transform: scale(1.15) rotate(10deg); opacity: 1; }
-}
-
-/* ریسپانسیو و حفظ فشردگی */
+/* ریسپانسیو */
 @media (max-width: 960px) {
   .header-main-row {
     grid-template-columns: 1fr;
