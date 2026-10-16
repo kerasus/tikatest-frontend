@@ -34,7 +34,7 @@
           </template>
           <template v-else-if="examContent.type === 'image'">
             <q-img
-              :src="examContent.path ? `storage/${examContent.path}` : ''"
+              :src="examContent.path ?? ''"
               alt="تصویر آزمون"
               style="max-width: 100%; display: block" />
           </template>

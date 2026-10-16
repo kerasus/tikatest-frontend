@@ -65,7 +65,7 @@
               v-else-if="
                 inputData.props.row.content?.type === 'image' && inputData.props.row.content?.path
               "
-              :src="`storage/${inputData.props.row.content.path}`"
+              :src="inputData.props.row.content.path"
               alt="پیش‌نمایش"
               style="max-width: 80px; max-height: 60px; display: block">
             <q-btn
@@ -433,7 +433,7 @@ const formatDateTime = (value: string | null | undefined): string => {
 }
 
 function openPdfPreview (path: string) {
-  pdfPreviewSrc.value = `storage/${path}`
+  pdfPreviewSrc.value = path
   pdfDialog.value = true
 }
 

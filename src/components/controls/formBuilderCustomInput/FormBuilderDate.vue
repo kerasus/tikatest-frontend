@@ -9,8 +9,11 @@
       :loading="loading"
       :filled="filled"
       :mask="mask"
-      :disable="disable"
+      :dense="dense"
       :fill-mask="fillMask"
+      :disable="disable"
+      :readonly="readonly"
+      :rounded="rounded"
       :reverse-fill-mask="reverseFillMask"
       dir="ltr"
       :label="label"
@@ -26,7 +29,6 @@
         localErrorData ? $t(localErrorData.message, localErrorData.namedValue) : undefined
       "
       @clear="onClear"
-      @update:model-value="onChangeInputDate"
       @keydown="onKeydown">
       <template #append>
         <q-icon
@@ -36,11 +38,12 @@
           class="cursor-pointer"
           @click="onClear" />
         <q-icon
-          name="calendar_month"
+          :name="calendarIcon"
           class="cursor-pointer"
-          @click="toggleMenu" />
+          @click="toggleDate" />
       </template>
     </q-input>
+
     <q-menu
       v-model="popupDate"
       :persistent="persistentMenu"
@@ -49,24 +52,31 @@
       self="top left"
       transition-show="jump-down"
       transition-hide="jump-up">
-      <q-date
-        v-model="displayDateTime"
-        :calendar="calendar"
-        :range="range"
-        :multiple="multiple"
-        :disable="disable"
-        :today-btn="todayBtn"
-        :options="daysOptions"
-        minimal
-        @update:model-value="onChangeDate">
-        <div class="row items-center justify-end">
+      <div class="column bg-white shadow-2 rounded-borders overflow-hidden">
+        <!-- بخش تقویم کوآزار -->
+        <q-date
+          v-model="displayDate"
+          :calendar="calendar"
+          flat
+          square
+          mask="YYYY/MM/DD"
+          :range="range"
+          :multiple="multiple"
+          :disable="disable"
+          :title="title || label || undefined"
+          :today-btn="todayBtn"
+          :options="daysOptions"
+          @update:model-value="onChangeDate" />
+
+        <div class="row items-center justify-end q-pa-sm bg-grey-1 border-top">
           <q-btn
             v-close-popup
-            label="بستن"
+            label="تأیید و بستن"
             :color="closeColorBtn"
-            flat />
+            flat
+            dense />
         </div>
-      </q-date>
+      </div>
     </q-menu>
   </div>
 </template>
@@ -76,7 +86,13 @@ import { useI18n } from 'vue-i18n'
 import type { ValidationRule } from 'quasar'
 import { useDate } from 'src/composables/Date'
 import type { PropType, ComputedRef } from 'vue'
-import { ref, watch, type Ref, computed, type ModelRef } from 'vue'
+import {
+  ref,
+  watch,
+  type Ref,
+  computed,
+  type ModelRef
+} from 'vue'
 
 export interface LocalErrorDataType {
   message: string;
@@ -102,11 +118,7 @@ const props = defineProps({
   },
   calendarIcon: {
     type: String,
-    default: 'oms:calendar'
-  },
-  clockIcon: {
-    type: String,
-    default: 'oms:clock'
+    default: 'calendar_month'
   },
   title: {
     type: String,
@@ -134,7 +146,7 @@ const props = defineProps({
   },
   todayBtn: {
     type: Boolean,
-    default: false
+    default: true
   },
   fillMask: {
     type: String,
@@ -186,7 +198,7 @@ const props = defineProps({
   },
   outlined: {
     default: false,
-    type: [Boolean]
+    type: Boolean
   },
   rules: {
     default: () => [] as ValidationRule[],
@@ -194,7 +206,7 @@ const props = defineProps({
   },
   lazyRules: {
     default: false,
-    type: [Boolean]
+    type: Boolean
   },
   loading: {
     default: false,
@@ -202,25 +214,28 @@ const props = defineProps({
   },
   limitFuture: {
     default: false,
-    type: Boolean || String
+    type: [Boolean, String]
   }
 })
+
 const value: ModelRef<string | null> = defineModel('value', {
   type: String,
   default: null
 })
-const dateManager = useDate()
+
 const i18n = useI18n()
+const dateManager = useDate()
 
 const displayDateTime: Ref<string> = ref('')
+const displayDate: Ref<string | undefined> = ref('')
+
 const popupDate = ref(false)
-// const popupTime = ref(false)
 const persistentMenu = ref(false)
 const input = ref<HTMLInputElement | null>(null)
 const localErrorMessage: Ref<string | null> = ref(null)
 
 const customClass = computed(() => props.class)
-const showClearAble = computed(() => displayDateTime.value !== '____/__/__')
+const showClearAble = computed(() => displayDateTime.value && displayDateTime.value !== '____/__/__')
 
 const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() => {
   if (!localErrorMessage.value) {
@@ -240,7 +255,7 @@ const localRules = computed(() =>
       const ruleName = rule.ruleName
       const ruleParams = rule.ruleParams
       rule = (): boolean | string => {
-        if (displayDateTime.value === '____/__/__') {
+        if (!displayDateTime.value || displayDateTime.value === '____/__/__') {
           return i18n.t('error.validation.required', { field: props.label })
         } else if (localErrorMessage.value) {
           return false
@@ -257,61 +272,67 @@ const localRules = computed(() =>
   })
 )
 
-watch(
-  () => value.value,
-  (newValue) => {
-    if (!newValue) {
-      displayDateTime.value = '____/__/__'
-      return
-    }
-    value.value = dateManager.getDateTimeFromIso8601DateString(newValue).date
-    displayDateTime.value = dateManager.isoToLocalShamsi(newValue.toString())
-  },
-  { immediate: true }
-)
-
-watch(
-  () => props.errorMessage,
-  () => {
-    localErrorMessage.value = props.errorMessage
-  },
-  { immediate: true }
-)
-
 function onChangeInputDate () {
-  const dateManager = useDate()
-  const analysedShamsiDate = dateManager.validationShamsiDate(displayDateTime.value)
-
-  if (analysedShamsiDate.isValid) {
-    localErrorMessage.value = null
-    if (analysedShamsiDate.shamsiDate) {
-      onChangeDate(analysedShamsiDate.shamsiDate)
-    }
-  } else {
-    localErrorMessage.value = analysedShamsiDate.message
+  if (!displayDateTime.value || displayDateTime.value.includes('_')) {
+    return
   }
+
+  const rawDate = displayDateTime.value.trim()
+  const analysedShamsiDate = dateManager.validationShamsiDate(rawDate)
+
+  if (!analysedShamsiDate.isValid) {
+    localErrorMessage.value = analysedShamsiDate.message
+    return
+  }
+
+  localErrorMessage.value = null
+  const validShamsi = analysedShamsiDate.shamsiDate || rawDate
+
+  const gregorianDate = props.calendar === 'persian'
+    ? dateManager.shamsiToMiladi(validShamsi)
+    : validShamsi
+
+  updateDate(gregorianDate, validShamsi)
 }
 
-// newValue can be miladi or shamsi
-function onChangeDate (newValue: string) {
+function onChangeDate (newValue: string | null) {
   if (!newValue) {
     onClear()
     return
   }
-  let gregorianDate = newValue
-  if (props.calendar === 'persian') {
-    gregorianDate = dateManager.shamsiToMiladi(newValue.toString())
+
+  const gregorianDate = props.calendar === 'persian'
+    ? dateManager.shamsiToMiladi(newValue)
+    : newValue
+
+  updateDate(gregorianDate, newValue)
+}
+
+function updateDate (gregorianDate: string, shamsiOrDisplayDate: string) {
+  displayDate.value = shamsiOrDisplayDate
+  displayDateTime.value = shamsiOrDisplayDate
+
+  emitValue(gregorianDate)
+}
+
+function emitValue (gregorianDate: string) {
+  if (props.iso8601) {
+    // تبدیل تاریخ میلادی YYYY-MM-DD به فرمت کامل شروع روز ISO 8601 UTC
+    const [year, month, day] = gregorianDate.split('-').map(Number)
+    value.value = new Date(Date.UTC(year, month - 1, day, 0, 0, 0)).toISOString()
+  } else {
+    value.value = gregorianDate
   }
-  displayDateTime.value = newValue.toString()
-  value.value = gregorianDate
 }
 
 function onClear () {
   displayDateTime.value = '____/__/__'
+  displayDate.value = ''
   value.value = null
+  localErrorMessage.value = null
 }
 
-function toggleMenu () {
+function toggleDate () {
   popupDate.value = !popupDate.value
 }
 
@@ -353,7 +374,6 @@ function onKeydown (e: KeyboardEvent) {
     Number.isNaN(Number(e.key)) &&
     !e.ctrlKey &&
     !e.altKey &&
-    !e.metaKey &&
     !isModifierCombination &&
     !allowedKeys.includes(e.key)
   ) {
@@ -367,13 +387,62 @@ function daysOptions (date: string) {
   }
   const limitFutureDate =
     typeof props.limitFuture === 'boolean' ? new Date() : new Date(props.limitFuture)
-  const dateDate = new Date(dateManager.shamsiToMiladi(date))
+  const dateMiladi = props.calendar === 'persian'
+    ? dateManager.shamsiToMiladi(date)
+    : date
 
-  if (typeof props.limitFuture === 'string') {
-    return dateDate <= limitFutureDate
-  }
+  const dateDate = new Date(dateMiladi)
+
   return dateDate <= limitFutureDate
 }
 
-watch(displayDateTime, onChangeInputDate)
+function extractGregorianDate (val: string): string {
+  let normalized = val.trim()
+  if (normalized.includes('T')) {
+    normalized = normalized.split('T')[0]
+  } else if (normalized.includes(' ')) {
+    normalized = normalized.split(' ')[0]
+  }
+  return normalized
+}
+
+watch(
+  () => value.value,
+  (newValue) => {
+    if (!newValue) {
+      displayDateTime.value = '____/__/__'
+      displayDate.value = ''
+      return
+    }
+
+    const gregorianDate = extractGregorianDate(newValue)
+
+    const displayDateValue = props.calendar === 'persian'
+      ? dateManager.miladiToShamsi(gregorianDate)
+      : gregorianDate
+
+    displayDate.value = displayDateValue
+    displayDateTime.value = displayDateValue
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.errorMessage,
+  () => {
+    localErrorMessage.value = props.errorMessage
+  },
+  { immediate: true }
+)
+
+watch(displayDateTime, () => {
+  if (!input.value) return
+  onChangeInputDate()
+})
 </script>
+
+<style scoped>
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+</style>
