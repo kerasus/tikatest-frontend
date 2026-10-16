@@ -11,6 +11,29 @@
     :after-load-input-data="afterLoadInputData" />
 
   <q-separator class="q-my-md" />
+  <div class="row q-col-gutter-md">
+    <div class="col-md-6 col-12">
+      <entity-create
+        ref="entityCreateRef"
+        v-model:value="resetPasswordInputs"
+        :title="resetPasswordLabel"
+        :api="resetPasswordApi"
+        :show-save-button="false"
+        :show-close-button="false"
+        :show-expand-button="false">
+        <template #after-form-builder>
+          <q-btn
+            color="primary"
+            label="تغییر کلمه عبور"
+            :loading="resetPasswordLoading"
+            class="q-mt-md"
+            @click="resetPassword" />
+        </template>
+      </entity-create>
+    </div>
+  </div>
+
+  <q-separator class="q-my-md" />
 
   <student-class-assignment
     :student-id="Number(studentId)"
@@ -28,16 +51,18 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { EntityEdit } from 'quasar-crud'
+import { EntityEdit, EntityCreate } from 'quasar-crud'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, reactive, onMounted, computed } from 'vue'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import StudentAPI, { type StudentType } from 'src/repositories/student'
+import UserAPI from 'src/repositories/user'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 import StudentClassAssignment from 'src/components/StudentClassAssignment.vue'
 import StudentGuardianManager from 'src/components/StudentGuardianManager.vue'
 
 const studentApi = new StudentAPI()
+const userApi = new UserAPI()
 const schoolClassApi = new SchoolClassAPI()
 const currentSchoolManager = useCurrentSchool()
 
@@ -48,6 +73,8 @@ const router = useRouter()
 const studentId = computed(() => route.params.id)
 
 const studentData = ref<StudentType | null>(null)
+const entityCreateRef = ref()
+const resetPasswordLoading = ref(false)
 const entityIdKey = ref('id')
 const entityParamKey = ref('id')
 const indexRouteName = ref('Panel.Student.List')
@@ -133,6 +160,37 @@ const inputs = ref([
 ])
 const api = ref(studentApi.endpoints.byId(Number(studentId.value)))
 const label = ref('اطلاعات دانش آموز')
+const resetPasswordApi = ref(userApi.endpoints.resetPassword(Number(studentId.value)))
+const resetPasswordLabel = ref('تغییر کلمه عبور')
+const resetPasswordInputs = ref([
+  {
+    type: 'input',
+    name: 'new_password',
+    label: 'کلمه عبور جدید',
+    placeholder: ' ',
+    col: 'col-md-6 col-12'
+  },
+  {
+    type: 'input',
+    name: 'new_password_confirmation',
+    label: 'تکرار کلمه عبور جدید',
+    placeholder: ' ',
+    col: 'col-md-6 col-12'
+  }
+])
+
+async function resetPassword () {
+  resetPasswordLoading.value = true
+  try {
+    const result = await entityCreateRef.value.createEntity(false)
+    $q.notify({
+      message: result.data.message,
+      type: 'positive'
+    })
+  } finally {
+    resetPasswordLoading.value = false
+  }
+}
 
 const form = reactive<{
   first_name: string | null;
