@@ -43,6 +43,7 @@
           @click="toggleDate" />
       </template>
     </q-input>
+
     <q-menu
       v-model="popupDate"
       :persistent="persistentMenu"
@@ -51,59 +52,43 @@
       self="top left"
       transition-show="jump-down"
       transition-hide="jump-up">
-      <q-date
-        v-model="displayDate"
-        :calendar="calendar"
-        minimal
-        mask="YYYY/MM/DD"
-        :range="range"
-        :multiple="multiple"
-        :title="title ? title : label"
-        :today-btn="todayBtn"
-        @update:model-value="onChangeDate">
-        <q-form class="time-picker">
-          <q-input
-            ref="inputSecond"
-            v-model="dateTime.seconds"
-            mask="##"
-            label="ثانیه"
-            :fill-mask="fillMask"
-            :reverse-fill-mask="reverseFillMask"
-            dir="ltr"
-            @keydown="onKeydownSecond"
-            @update:model-value="onMenuSecondInputUpdate" />
-          <div class="time-separator">:</div>
-          <q-input
-            ref="inputMinute"
-            v-model="dateTime.minutes"
-            mask="##"
-            label="دقیقه"
-            :fill-mask="fillMask"
-            :reverse-fill-mask="reverseFillMask"
-            dir="ltr"
-            @keydown="onKeydownMinute"
-            @update:model-value="onMenuMinuteInputUpdate" />
-          <div class="time-separator">:</div>
-          <q-input
-            ref="inputHour"
-            v-model="dateTime.hours"
-            mask="##"
-            label="ساعت"
-            :fill-mask="fillMask"
-            :reverse-fill-mask="reverseFillMask"
-            dir="ltr"
-            @keydown="onKeydownHour"
-            @update:model-value="onMenuHourInputUpdate" />
-        </q-form>
-        <div class="row items-center justify-end">
-          <q-btn
-            ref="closeBtnRef"
-            v-close-popup
-            label="بستن"
-            :color="closeColorBtn"
-            flat />
+      <div class="row no-wrap items-stretch bg-white shadow-2 rounded-borders overflow-hidden">
+        <!-- بخش تقویم -->
+        <q-date
+          v-model="displayDate"
+          :calendar="calendar"
+          flat
+          square
+          mask="YYYY/MM/DD"
+          :range="range"
+          :multiple="multiple"
+          :title="title || label || undefined"
+          :today-btn="todayBtn"
+          @update:model-value="onChangeDate" />
+
+        <q-separator vertical />
+
+        <!-- بخش ساعت استاندارد کوازار -->
+        <div class="column justify-between bg-grey-1">
+          <q-time
+            v-model="displayTimeHoursMinutes"
+            flat
+            square
+            format24h
+            mask="HH:mm"
+            @update:model-value="onChangeTime" />
+
+          <div class="row items-center justify-end q-pa-sm bg-white border-top">
+            <q-btn
+              v-close-popup
+              label="تأیید و بستن"
+              :color="closeColorBtn"
+              flat
+              dense />
+          </div>
         </div>
-      </q-date>
+
+      </div>
     </q-menu>
   </div>
 </template>
@@ -118,12 +103,10 @@ import {
   ref,
   watch,
   type Ref,
-  reactive,
   computed,
-  nextTick,
-  type ModelRef,
-  type ComponentPublicInstance
+  type ModelRef
 } from 'vue'
+
 
 defineOptions({
   name: 'FormBuilderDateTime'
@@ -172,7 +155,7 @@ const props = defineProps({
   },
   todayBtn: {
     type: Boolean,
-    default: false
+    default: true
   },
   fillMask: {
     type: String,
@@ -184,8 +167,6 @@ const props = defineProps({
   },
   mask: {
     type: String,
-    // 1405/05/31 10:30:00
-    // ####/##/## ##:##:##
     default: '####/##/## ##:##:##'
   },
   label: {
@@ -230,7 +211,7 @@ const props = defineProps({
   },
   outlined: {
     default: false,
-    type: [Boolean]
+    type: Boolean
   },
   rules: {
     default: () => [] as ValidationRule[],
@@ -238,50 +219,47 @@ const props = defineProps({
   },
   lazyRules: {
     default: false,
-    type: [Boolean]
+    type: Boolean
   },
   loading: {
     default: false,
     type: Boolean
   }
 })
+
 const value: ModelRef<string | null> = defineModel('value', {
   type: String,
   default: null
 })
+
 const i18n = useI18n()
 const dateManager = useDate()
 
-interface DateTimeObject {
-  date: string;
-  time: string;
-  hours: string;
-  minutes: string;
-  seconds: string;
-}
-
 const displayDateTime: Ref<string> = ref('')
 const displayDate: Ref<string | undefined> = ref('')
+
+/**
+ * زمان کامل داخلی:
+ * HH:mm:ss
+ *
+ * ثانیه در این مقدار نگهداری می‌شود،
+ * اما در q-time فقط ساعت و دقیقه نمایش داده می‌شود.
+ */
+const displayTime: Ref<string> = ref('00:00:00')
+
+/**
+ * مدل مخصوص q-time:
+ * فقط HH:mm
+ */
+const displayTimeHoursMinutes: Ref<string> = ref('00:00')
+
 const popupDate = ref(false)
-// const popupTime = ref(false)
 const persistentMenu = ref(false)
 const input = ref<HTMLInputElement | null>(null)
-const inputHour = ref<any>(null)
-const inputMinute = ref<HTMLInputElement | null>(null)
-const inputSecond = ref<HTMLInputElement | null>(null)
-const closeBtnRef = ref<ComponentPublicInstance | null>(null)
 const localErrorMessage: Ref<string | null> = ref(null)
 
-const dateTime = reactive<DateTimeObject>({
-  date: '',
-  time: '',
-  hours: '__',
-  minutes: '__',
-  seconds: '__'
-})
-
 const customClass = computed(() => props.class)
-const showClearAble = computed(() => displayDateTime.value !== '____/__/__ __:__:__')
+const showClearAble = computed(() => displayDateTime.value && displayDateTime.value !== '____/__/__ __:__:__')
 
 const localErrorData: ComputedRef<LocalErrorDataType | undefined> = computed(() => {
   if (!localErrorMessage.value) {
@@ -301,7 +279,7 @@ const localRules = computed(() =>
       const ruleName = rule.ruleName
       const ruleParams = rule.ruleParams
       rule = (): boolean | string => {
-        if (displayDateTime.value === '____/__/__ __:__:__') {
+        if (!displayDateTime.value || displayDateTime.value === '____/__/__ __:__:__') {
           return i18n.t('error.validation.required', { field: props.label })
         } else if (localErrorMessage.value) {
           return false
@@ -319,110 +297,127 @@ const localRules = computed(() =>
 )
 
 function onChangeInputDateTime () {
-  const [date, time] = displayDateTime.value.split(' ')
-  if (date) {
-    dateTime.date = date
+  if (!displayDateTime.value || displayDateTime.value.includes('_')) {
+    return
   }
-  if (time) {
-    dateTime.time = time
-  }
+
+  const [date, rawTime = '00:00:00'] = displayDateTime.value.split(' ')
+
+  /**
+   * اگر کاربر یا مقدار ورودی ثانیه نداشت،
+   * آن را صفر در نظر می‌گیریم.
+   */
+  const time = rawTime.split(':').length === 2
+    ? `${rawTime}:00`
+    : rawTime
 
   const analysedShamsiDate = dateManager.validationShamsiDate(date)
   const analysedTime = dateManager.validationTime(time)
 
-  if (analysedShamsiDate.isValid && analysedTime.isValid) {
-    localErrorMessage.value = null
-    if (analysedShamsiDate.shamsiDate) {
-      onChangeDate(analysedShamsiDate.shamsiDate)
-    }
+  if (!analysedShamsiDate.isValid || !analysedTime.isValid) {
+    localErrorMessage.value =
+      analysedShamsiDate.message || analysedTime.message
 
-    if (analysedTime.validTime) {
-      onChangeTime(analysedTime.validTime)
-    }
-  } else {
-    localErrorMessage.value = analysedShamsiDate.message || analysedTime.message
+    return
   }
+
+  localErrorMessage.value = null
+
+  const validDate = analysedShamsiDate.shamsiDate || date
+  const validTime = normalizeTime(analysedTime.validTime || time)
+
+  const gregorianDate = props.calendar === 'persian'
+    ? dateManager.shamsiToMiladi(validDate)
+    : validDate
+
+  updateDateTime(gregorianDate, validTime)
 }
 
-// newValue can be miladi or shamsi
-function onChangeDate (newValue: string) {
+function onChangeDate (newValue: string | null) {
   if (!newValue) {
     onClear()
     return
   }
-  let gregorianDate = newValue
-  if (props.calendar === 'persian') {
-    gregorianDate = dateManager.shamsiToMiladi(newValue.toString())
-  }
-  updateDateTime(gregorianDate, 'date')
+
+  const gregorianDate = props.calendar === 'persian'
+    ? dateManager.shamsiToMiladi(newValue)
+    : newValue
+
+  /**
+   * با تغییر تاریخ، ثانیه‌ی قبلی حفظ می‌شود.
+   */
+  const currentTime = normalizeTime(displayTime.value)
+
+  updateDateTime(gregorianDate, currentTime)
 }
 
-function onChangeTime (newTime: string) {
-  dateTime.time = newTime
-  updateDateTime(newTime, 'time')
+function onChangeTime (newTime: string | null) {
+  const hoursMinutes = newTime || '00:00'
+
+  /**
+   * ثانیه‌ی ورودی قبلی حفظ می‌شود.
+   * اگر ورودی نداشته باشیم، مقدار آن 00 است.
+   */
+  const seconds = getCurrentSeconds()
+  const fullTime = `${hoursMinutes}:${seconds}`
+
+  const gregorianDate = getCurrentGregorianDate()
+
+  updateDateTime(gregorianDate, fullTime)
 }
 
-// newValue should be miladi
-// newValue should be gregorian date (YYYY-MM-DD) or time (HH:mm:ss)
-function updateDateTime (newValue: string, type: 'date' | 'time') {
-  const systemDate = dateManager.now('YYYY-MM-DD')
-  const systemTime = dateManager.now('HH:mm:ss')
+function updateDateTime (
+  gregorianDate: string,
+  time: string
+) {
+  const parsedTime = dateManager.parseTime(time)
 
-  // ۱. تاریخ و زمان محلی جاری از روی وضعیت فعلی کامپوننت
-  let localGregorianDate = systemDate
-  if (displayDate.value) {
-    localGregorianDate = props.calendar === 'persian'
-      ? dateManager.shamsiToMiladi(displayDate.value)
-      : displayDate.value
-  }
+  const localTime = parsedTime
+    ? normalizeTime(
+      `${parsedTime.formattedHour}:` +
+        `${parsedTime.formattedMinute}:` +
+        `${parsedTime.formattedSecond || '00'}`
+    )
+    : normalizeTime(time)
 
-  const h = dateTime.hours.replace(/_/g, '0').padStart(2, '0')
-  const m = dateTime.minutes.replace(/_/g, '0').padStart(2, '0')
-  const s = dateTime.seconds.replace(/_/g, '0').padStart(2, '0')
-  let localTime = `${h}:${m}:${s}`
-
-  if (type === 'date') {
-    localGregorianDate = newValue || systemDate
-  } else if (type === 'time') {
-    localTime = newValue || systemTime
-  }
-
-  // ۲. یکدست‌سازی زمان محلی
-  const parsedTime = dateManager.parseTime(localTime)
-  if (parsedTime) {
-    localTime = `${parsedTime.formattedHour}:${parsedTime.formattedMinute}:${parsedTime.formattedSecond}`
-    dateTime.hours = parsedTime.formattedHour
-    dateTime.minutes = parsedTime.formattedMinute
-    dateTime.seconds = parsedTime.formattedSecond
-  }
-
-  // ۳. نمایش به کاربر (شمسی یا میلادی طبق تقویم)
   const displayDateValue = props.calendar === 'persian'
-    ? dateManager.miladiToShamsi(localGregorianDate)
-    : localGregorianDate
+    ? dateManager.miladiToShamsi(gregorianDate)
+    : gregorianDate
+
+  /**
+   * زمان کامل داخلی با ثانیه حفظ می‌شود.
+   */
+  displayTime.value = localTime
+
+  /**
+   * q-time فقط ساعت و دقیقه را دریافت می‌کند.
+   */
+  displayTimeHoursMinutes.value = toHoursMinutes(localTime)
 
   displayDate.value = displayDateValue
   displayDateTime.value = `${displayDateValue} ${localTime}`
 
-  // ۴. انتشار به بیرون: اگر iso8601 فعال باشد قطعا تبدیل به UTC واقعی می‌شود
-  if (props.iso8601) {
-    value.value = localGregorianDateTimeToUtcIso(localGregorianDate, localTime)
-  } else {
-    value.value = `${localGregorianDate} ${localTime}`
-  }
+  emitValue(gregorianDate, localTime)
 }
 
-// اصلاح به‌روزرسانی تایم از پاپ‌آپ تقویم
-function onMenuTimeInputUpdate () {
-  const h = (dateTime.hours || '00').replaceAll('_', '0').padStart(2, '0')
-  const m = (dateTime.minutes || '00').replaceAll('_', '0').padStart(2, '0')
-  const s = (dateTime.seconds || '00').replaceAll('_', '0').padStart(2, '0')
-
-  updateDateTime(`${h}:${m}:${s}`, 'time')
+function emitValue (gregorianDate: string, localTime: string) {
+  if (props.iso8601) {
+    value.value = localGregorianDateTimeToUtcIso(gregorianDate, localTime)
+  } else {
+    value.value = `${gregorianDate} ${localTime}`
+  }
 }
 
 function onClear () {
   displayDateTime.value = '____/__/__ __:__:__'
+  displayDate.value = ''
+
+  /**
+   * مقدار پیش‌فرض ثانیه صفر است.
+   */
+  displayTime.value = '00:00:00'
+  displayTimeHoursMinutes.value = '00:00'
+
   value.value = null
 }
 
@@ -475,114 +470,122 @@ function onKeydown (e: KeyboardEvent) {
   }
 }
 
-function onKeydownHour (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    inputMinute.value?.focus()
+function localGregorianDateTimeToUtcIso (gregorianDate: string, time: string): string {
+  const [year, month, day] = gregorianDate.split('-').map(Number)
+  const [hour = 0, minute = 0, second = 0] = time.split(':').map(Number)
+  return new Date(year, month - 1, day, hour, minute, second).toISOString()
+}
+
+function utcIsoToLocalGregorianDateTime (isoDateTime: string): {
+  date: string;
+  time: string;
+} {
+  let normalized = isoDateTime.trim()
+
+  if (!normalized.includes('T') && normalized.includes(' ')) {
+    normalized = normalized.replace(' ', 'T')
   }
-  nextTick(() => {
-    if (!dateTime.hours.includes('_') && e.key !== 'Backspace' && e.key !== 'Delete') {
-      inputMinute.value?.focus()
-    }
-  })
-}
 
-function onKeydownMinute (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    inputSecond.value?.focus()
+  /**
+   * اگر timezone مشخص نشده باشد،
+   * مقدار ورودی را UTC فرض می‌کنیم.
+   */
+  if (
+    !normalized.endsWith('Z') &&
+    !normalized.includes('+') &&
+    !/[+-]\d{2}:\d{2}$/.test(normalized)
+  ) {
+    normalized += 'Z'
   }
-  nextTick(() => {
-    if (!dateTime.minutes.includes('_') && e.key !== 'Backspace' && e.key !== 'Delete') {
-      inputSecond.value?.focus()
-    }
-    if (dateTime.minutes === '__' && e.key === 'Backspace') {
-      inputHour.value?.focus()
-    }
-  })
-}
 
-function onKeydownSecond (e: KeyboardEvent) {
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    closeBtnRef.value?.$el.focus()
+  const date = new Date(normalized)
+
+  if (Number.isNaN(date.getTime())) {
+    return {
+      date: dateManager.now('YYYY-MM-DD'),
+      time: '00:00:00'
+    }
   }
-  nextTick(() => {
-    if (dateTime.seconds === '__' && e.key === 'Backspace') {
-      inputMinute.value?.focus()
-    }
-  })
-}
 
-function onMenuHourInputUpdate () {
-  onMenuTimeInputUpdate()
-}
+  return {
+    date: [
+      date.getFullYear(),
+      pad2(date.getMonth() + 1),
+      pad2(date.getDate())
+    ].join('-'),
 
-function onMenuMinuteInputUpdate () {
-  dateTime.hours = dateTime.hours.replaceAll('_', '0')
-  onMenuTimeInputUpdate()
-}
-
-function onMenuSecondInputUpdate () {
-  dateTime.hours = dateTime.hours.replaceAll('_', '0')
-  dateTime.minutes = dateTime.minutes.replaceAll('_', '0')
-
-  onMenuTimeInputUpdate()
+    time: [
+      pad2(date.getHours()),
+      pad2(date.getMinutes()),
+      pad2(date.getSeconds())
+    ].join(':')
+  }
 }
 
 function pad2 (value: number): string {
   return String(value).padStart(2, '0')
 }
 
-/**
- * دریافت تاریخ و ساعت محلی میلادی و تولید مقدار واقعی UTC/Zulu
- *
- * 2026-08-27 + 19:45:00 (local)
- * => 2026-08-27T16:15:00.000Z (UTC)
- */
-function localGregorianDateTimeToUtcIso (gregorianDate: string, time: string): string {
-  const [year, month, day] = gregorianDate.split('-').map(Number)
-  const [hour = 0, minute = 0, second = 0] = time.split(':').map(Number)
+function toSafeNumber (value: string | undefined, fallback = 0): number {
+  const numberValue = Number(value)
 
-  /*
-   * new Date(year, month - 1, ...) تاریخ را به عنوان زمان محلی سیستم می‌سازد.
-   * سپس toISOString آن را به UTC تبدیل می‌کند.
-   */
-  return new Date(year, month - 1, day, hour, minute, second).toISOString()
+  return Number.isFinite(numberValue)
+    ? numberValue
+    : fallback
 }
 
 /**
- * تبدیل UTC ISO به تاریخ و ساعت محلی مرورگر.
+ * تبدیل هر زمان ممکن به فرمت کامل HH:mm:ss
  *
- * 2026-08-27T16:15:00.000Z
- * => 2026-08-27 / 19:45:00  (برای timezone ایران)
+ * 10:20     => 10:20:00
+ * 10:20:35  => 10:20:35
+ * خالی       => 00:00:00
  */
-function utcIsoToLocalGregorianDateTime (isoDateTime: string): {
-  date: string;
-  time: string;
-} {
-  // پشتیبانی از فرمت‌های با فاصله یا بدون Z
-  let normalized = isoDateTime.trim()
-  if (!normalized.includes('T') && normalized.includes(' ')) {
-    normalized = normalized.replace(' ', 'T')
-  }
-  if (!normalized.endsWith('Z') && !normalized.includes('+')) {
-    normalized += 'Z' // فرض بر این است که رشته دریافتی از سرور UTC است
+function normalizeTime (time?: string | null): string {
+  if (!time || time.includes('_')) {
+    return '00:00:00'
   }
 
-  const date = new Date(normalized)
+  const [hour, minute, second] = time
+    .trim()
+    .split(':')
+    .map((value) => value.trim())
 
-  if (isNaN(date.getTime())) {
-    return {
-      date: dateManager.now('YYYY-MM-DD'),
-      time: dateManager.now('HH:mm:ss')
-    }
+  return [
+    pad2(toSafeNumber(hour)),
+    pad2(toSafeNumber(minute)),
+    pad2(toSafeNumber(second))
+  ].join(':')
+}
+
+/**
+ * تبدیل زمان کامل به مدل مورد نیاز q-time
+ */
+function toHoursMinutes (time?: string | null): string {
+  const normalizedTime = normalizeTime(time)
+  return normalizedTime.substring(0, 5)
+}
+
+/**
+ * دریافت ثانیه‌ی فعلی.
+ *
+ * این مقدار از زمان ورودی یا زمان فعلی داخلی حفظ می‌شود.
+ */
+function getCurrentSeconds (): string {
+  return normalizeTime(displayTime.value).split(':')[2] || '00'
+}
+
+/**
+ * تاریخ میلادی محلی فعلی کامپوننت
+ */
+function getCurrentGregorianDate (): string {
+  if (displayDate.value) {
+    return props.calendar === 'persian'
+      ? dateManager.shamsiToMiladi(displayDate.value)
+      : displayDate.value
   }
 
-  return {
-    date: `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`,
-    time: `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`
-  }
+  return dateManager.now('YYYY-MM-DD')
 }
 
 watch(
@@ -591,9 +594,13 @@ watch(
     if (!newValue) {
       displayDateTime.value = '____/__/__ __:__:__'
       displayDate.value = ''
-      dateTime.hours = '__'
-      dateTime.minutes = '__'
-      dateTime.seconds = '__'
+
+      /**
+       * وقتی ورودی نداریم، ثانیه صفر است.
+       */
+      displayTime.value = '00:00:00'
+      displayTimeHoursMinutes.value = '00:00'
+
       return
     }
 
@@ -601,37 +608,42 @@ watch(
     let timeValue: string
 
     if (props.iso8601) {
-      /*
-       * مقدار API UTC است؛ باید برای نمایش به ساعت محلی مرورگر تبدیل شود.
+      /**
+       * ورودی API:
+       * UTC Gregorian
+       *
+       * خروجی این تابع:
+       * زمان محلی مرورگر به‌صورت Gregorian
        */
       const localDateTime = utcIsoToLocalGregorianDateTime(newValue)
 
       gregorianDate = localDateTime.date
-      timeValue = localDateTime.time
+      timeValue = normalizeTime(localDateTime.time)
     } else {
-      const [date, time = '00:00:00'] = newValue.trim().replace('T', ' ').split(/\s+/)
+      const [
+        date,
+        time = '00:00:00'
+      ] = newValue
+        .trim()
+        .replace('T', ' ')
+        .split(/\s+/)
 
       gregorianDate = date
-      timeValue = time
+      timeValue = normalizeTime(time)
     }
 
-    const parsedTime = dateManager.parseTime(timeValue)
-
-    if (parsedTime) {
-      timeValue =
-        `${parsedTime.formattedHour}:` +
-        `${parsedTime.formattedMinute}:` +
-        `${parsedTime.formattedSecond}`
-
-      dateTime.hours = parsedTime.formattedHour
-      dateTime.minutes = parsedTime.formattedMinute
-      dateTime.seconds = parsedTime.formattedSecond
-    }
-
-    const displayDateValue =
-      props.calendar === 'persian' ? dateManager.miladiToShamsi(gregorianDate) : gregorianDate
+    const displayDateValue = props.calendar === 'persian'
+      ? dateManager.miladiToShamsi(gregorianDate)
+      : gregorianDate
 
     displayDate.value = displayDateValue
+
+    /**
+     * ثانیه‌ی ورودی حفظ می‌شود.
+     */
+    displayTime.value = timeValue
+    displayTimeHoursMinutes.value = toHoursMinutes(timeValue)
+
     displayDateTime.value = `${displayDateValue} ${timeValue}`
   },
   { immediate: true }
@@ -650,3 +662,9 @@ watch(displayDateTime, () => {
   onChangeInputDateTime()
 })
 </script>
+
+<style scoped>
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+</style>
