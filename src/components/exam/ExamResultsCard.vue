@@ -15,12 +15,12 @@
             class="q-mr-sm shadow-1" />
           <div>
             <div class="text-subtitle1 text-weight-bold text-blue-grey-10">
-              {{ exam.delivery_mode === 'in_person' ? 'ثبت و مدیریت نمرات حضوری' : 'جلسات و نتایج آزمون آنلاین' }}
+              {{ exam.delivery_mode === 'in_person' ? 'ثبت و مدیریت نمرات حضوری' : 'تحلیل سوالات و جلسات آزمون آنلاین' }}
             </div>
             <div class="text-caption text-grey-7">
               {{ exam.delivery_mode === 'in_person'
                 ? 'ثبت، بازبینی و ویرایش نمرات آزمون تشریحی یا کتبی دانش‌آموزان'
-                : 'مشاهده لاگ‌های شرکت در آزمون، نشست‌ها و پاسخنامه‌های ثبت‌شده' }}
+                : 'نمودار تحلیل پاسخ‌گویی سوالات، مانیتورینگ نشست‌ها و نتایج ثبت‌شده' }}
             </div>
           </div>
         </div>
@@ -52,6 +52,19 @@
             نمرات ثبت‌شده: {{ exam.in_person_exam_results?.length || 0 }}
           </q-chip>
         </div>
+
+        <!-- دکمه هدایت سریع به جلسات آنلاین در هدر -->
+        <div v-else-if="exam.delivery_mode === 'online' && exam.id">
+          <q-btn
+            unelevated
+            dense
+            size="sm"
+            color="deep-purple"
+            icon="open_in_new"
+            label="مشاهده ریز جلسات"
+            class="q-px-sm"
+            :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam.id } }" />
+        </div>
       </div>
     </q-card-section>
 
@@ -81,7 +94,6 @@
             :key="row.student.id"
             class="q-py-md items-center transition-all hover-bg-grey-1"
             :class="{ 'bg-teal-0': editingId === row.result?.id }">
-
             <!-- ستون مشخصات دانش‌آموز -->
             <q-item-section avatar>
               <q-avatar
@@ -280,36 +292,42 @@
       <!-- ب) در صورتی که آزمون آنلاین باشد -->
       <div
         v-else
-        class="q-pa-lg text-center">
+        class="q-pa-md">
+        <!-- بنر راهنما و اکشن سریع به همراه استایل مدرن‌تر -->
         <q-banner
           rounded
-          class="bg-deep-purple-1 text-deep-purple-9 q-pa-md text-right">
+          class="bg-deep-purple-1 text-deep-purple-10 q-pa-md q-mb-md">
           <template #avatar>
             <q-icon
-              name="hub"
+              name="analytics"
               color="deep-purple"
-              size="36px" />
+              size="32px" />
           </template>
-          <div class="text-subtitle1 text-weight-bold">
-            مدیریت جلسات و مانیتورینگ آزمون آنلاین
+          <div class="text-subtitle2 text-weight-bold">
+            نمودارها و تحلیل جامع عملکرد دانش‌آموزان
           </div>
           <div class="text-caption text-grey-8 q-mt-xs">
-            برای آزمون‌های آنلاین، نمرات، زمان‌های ورود/خروج و پاسخنامه‌ها از طریق صفحه اختصاصی «جلسات آزمون» کنترل و مشاهده می‌شوند.
+            در نمودارهای زیر، تحلیل پاسخ‌گویی به تفکیک سوالات (درست، غلط و بی‌پاسخ) و میزان انتخاب هر گزینه به صورت خودکار محاسبه شده است.
           </div>
           <template #action>
             <q-btn
-              unelevated
+              flat
+              dense
               color="deep-purple"
               icon="open_in_new"
-              label="مشاهده جلسات آزمون آنلاین"
+              label="مدیریت و مشاهده تمام جلسات"
               :to="{ name: 'Panel.Exam.Online.Sessions', params: { id: exam.id } }" />
           </template>
         </q-banner>
+
+        <!-- کامپوننت نمودارهای تحلیلی ECharts -->
+        <exam-questions-analytics-chart
+          v-if="exam.id"
+          :exam-id="exam.id" />
       </div>
     </q-card-section>
   </q-card>
 </template>
-
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
@@ -317,9 +335,10 @@ import type { ExamType } from 'src/repositories/exam'
 import { exam as examApi } from 'src/repositories/exam'
 import { inPersonExamResult } from 'src/repositories/inPersonExamResult'
 import { useQuasar } from 'quasar'
+import ExamQuestionsAnalyticsChart from 'src/components/exam/ExamQuestionsAnalyticsChart.vue'
 
 const props = defineProps<{
-  exam: ExamType;
+  exam: ExamType
 }>()
 
 const emit = defineEmits(['result-updated'])
@@ -445,3 +464,12 @@ async function addResult (student: any) {
   }
 }
 </script>
+
+<style scoped>
+.hover-bg-grey-1:hover {
+  background-color: #fafafa;
+}
+.bg-teal-0 {
+  background-color: #e0f2f1;
+}
+</style>

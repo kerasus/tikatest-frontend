@@ -89,6 +89,24 @@ export type StartExamResponseType = {
   status?: number | string | null
 }
 
+export type QuestionAnalyticsItemType = {
+  question_number: number
+  correct_option: string
+  number_of_choices: number
+  total_participants: number
+  correct_count: number
+  wrong_count: number
+  unanswered_count: number
+  correct_percentage: number
+  options_breakdown: Record<string, number> // مثال: {"1": 12, "2": 5, "3": 28, "4": 1}
+}
+
+export type ExamQuestionsAnalyticsResponseType = {
+  total_participants: number
+  total_questions: number
+  questions: QuestionAnalyticsItemType[]
+}
+
 export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType> {
   constructor () {
     super('/online-exam-sessions')
@@ -191,4 +209,15 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
     )
     return response.data
   }
+
+  /**
+   * دریافت آمار و تحلیل تفکیکی سوالات آزمون آنلاین برای رسم در نمودارها
+   */
+  async getExamQuestionsAnalytics (examId: number | string): Promise<ExamQuestionsAnalyticsResponseType> {
+    const response = await this.getAxiosInstanceWithToken().get(
+      `/online-exams/${examId}/questions-analytics`
+    )
+    return response.data
+  }
+
 }
