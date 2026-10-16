@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
 import { boot } from 'quasar/wrappers'
 import { useUser } from 'src/stores/user'
 import type { AxiosInstance } from 'axios'
@@ -25,6 +25,7 @@ export interface ErrorResponse {
   errors: ValidationError;
 }
 
+let appRouter: Router | null = null
 const apiServer = process.env.FRONTEND_API_BASE || '/api'
 export const ServerMessagesPrefix = 'dynamicI18nMessages'
 export const tokenDataKeyInLocalstorage = 'tokenData'
@@ -154,12 +155,18 @@ function getAxiosInstanceManager (apiServer: string) {
   }
 
   function goToLoginPage (): void {
-    const router = useRouter()
     const appConfigManager = useAppConfig()
     appConfigManager.setCurrentRouteToRedirectAfterLogin()
     const userManager = useUser()
     userManager.logout()
-    router.push({ name: 'PublicAuth.Login' })
+
+
+    if (appRouter) {
+      appRouter.push({ name: 'PublicAuth.Login' })
+    } else if (typeof window !== 'undefined') {
+      const origin = window.location.origin
+      window.location.href = `${origin}/#/auth/login`
+    }
   }
 
   function notifyError (message: string) {
@@ -293,9 +300,11 @@ function getAxiosInstanceManager (apiServer: string) {
 // for each client)
 const axiosInstanceManager = getAxiosInstanceManager(apiServer)
 const appApi = axiosInstanceManager.axiosInstance
-export default boot(({ app }) => {
+export default boot(({ app, router }) => {
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
+
+  appRouter = router
 
   app.config.globalProperties.$axios = appApi
 })

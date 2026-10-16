@@ -36,6 +36,7 @@
             :type="passwordVisibility ? 'text' : 'password'"
             outlined
             dense
+            autocomplete
             placeholder="********"
             class="ultra-glass-input"
             @keyup.enter="onClickLoginBtn">

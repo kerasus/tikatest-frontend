@@ -212,7 +212,7 @@ function handleSchoolLogoError (event: Event) {
   background:
   /* rtl:ignore */
     linear-gradient(135deg, rgba(59, 91, 219, 0.05) 0%, rgba(139, 127, 212, 0.45) 100%),
-    url('/images/background/bg-2.png') center/cover no-repeat !important;
+    url('/images/background/bg-2.jpeg') center/cover no-repeat !important;
 
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:

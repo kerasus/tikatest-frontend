@@ -57,14 +57,16 @@
           <!-- کارت‌های آمار فلوتینگ شناور -->
           <div class="floating-card card-top">
             <q-icon
-              name="check_circle"
-              color="positive"
+              name="trending_up"
+              color="teal-6"
               size="24px" />
             <div>
-              <div class="text-bold text-dark">۹۸.۵٪</div>
-              <div class="text-caption text-grey-7">دقت تحلیل داده‌ها</div>
+              <div class="text-bold text-dark">گزارش‌های پیشرفت</div>
+              <div class="text-caption text-grey-7">مسیر اختصاصی یادگیری</div>
             </div>
           </div>
+
+
 
           <div class="floating-card card-bottom">
             <q-icon
