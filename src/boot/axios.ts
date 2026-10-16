@@ -159,7 +159,7 @@ function getAxiosInstanceManager (apiServer: string) {
     appConfigManager.setCurrentRouteToRedirectAfterLogin()
     const userManager = useUser()
     userManager.logout()
-    router.push({ name: 'Auth.Login' })
+    router.push({ name: 'PublicAuth.Login' })
   }
 
   function notifyError (message: string) {

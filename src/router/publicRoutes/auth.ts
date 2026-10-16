@@ -16,6 +16,15 @@ const authRoutes: RouteRecordRaw[] = [
       {
         path: 'login',
         name: 'PublicAuth.Login',
+        meta: {
+          layoutConfig: {
+            layoutHeader: false,
+            layoutLeftDrawer: false,
+            layoutRightDrawer: false,
+            layoutFooter: false,
+            pageCustomClass: ''
+          }
+        },
         component: () => import('src/pages/Auth.vue')
       }
     ]
@@ -27,7 +36,8 @@ const authRoutes: RouteRecordRaw[] = [
         layoutHeader: false,
         layoutLeftDrawer: false,
         layoutRightDrawer: false,
-        layoutFooter: false
+        layoutFooter: false,
+        pageCustomClass: ''
       }
     },
     component: () => import('src/layouts/BareLayout.vue'),
