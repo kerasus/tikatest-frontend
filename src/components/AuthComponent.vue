@@ -3,10 +3,8 @@
     <q-form
       class="q-gutter-y-lg"
       @submit.prevent="onClickLoginBtn">
-
       <!-- محفظه شیشه‌ای برای اینپوت‌ها -->
       <div class="glass-form-container">
-
         <!-- فیلد نام کاربری -->
         <div class="auth-component__username">
           <label class="custom-label">نام کاربری</label>
@@ -72,7 +70,6 @@
           </template>
         </q-btn>
       </div>
-
     </q-form>
   </div>
 </template>
@@ -81,10 +78,11 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
-import { useRouter } from 'vue-router'
+import { type RouteLocationRaw, useRouter } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import { useAppConfig } from 'src/stores/appConfig'
 import { axiosInstanceManager } from 'src/boot/axios'
+import { isLoginRoute } from 'src/router/publicRoutes/auth'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
 
 const $q = useQuasar()
@@ -135,14 +133,20 @@ function onClickLoginBtn () {
 }
 
 async function redirectAfterLogin () {
-  let routeName = 'Panel.Dashboard'
-  let routeParamSchool = currentSchoolManager.currentSchoolSlug.value
-  let routeParamRole = userStoreManager.mainRoleForPath
+  const targetRedirect = appConfigManager.redirectAfterLogin
+  const hasValidRedirect = Boolean(targetRedirect) && !isLoginRoute(targetRedirect)
 
-  const redirectLocation = appConfigManager.redirectAfterLogin
-    || { name: routeName, params: { school: routeParamSchool, role: routeParamRole } }
+  const defaultDashboardRoute: RouteLocationRaw = {
+    name: 'Panel.Dashboard',
+    params: {
+      school: currentSchoolManager.currentSchoolSlug.value,
+      role: userStoreManager.mainRoleForPath
+    }
+  }
 
-  await router.push(redirectLocation)
+  const destination: RouteLocationRaw = hasValidRedirect ? targetRedirect : defaultDashboardRoute
+
+  await router.push(destination)
 }
 
 function focusNext (refName: string) {
@@ -174,12 +178,17 @@ function focusNext (refName: string) {
       -webkit-backdrop-filter: blur(12px);
       border-radius: 14px !important;
       border: 1.5px solid rgba(124, 58, 237, 0.3);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4),
-                  0 8px 20px rgba(0, 0, 0, 0.03);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.4),
+        0 8px 20px rgba(0, 0, 0, 0.03);
       transition: all 0.4s ease;
 
-      &:before { border: none !important; }
-      &:after { border: none !important; }
+      &:before {
+        border: none !important;
+      }
+      &:after {
+        border: none !important;
+      }
 
       &:hover {
         background: rgba(255, 255, 255, 0.45) !important;
@@ -191,8 +200,9 @@ function focusNext (refName: string) {
     :deep(.q-field__control--focused) {
       background: rgba(255, 255, 255, 0.6) !important;
       border-color: #7c3aed !important;
-      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1),
-                  0 12px 24px rgba(124, 58, 237, 0.05) !important;
+      box-shadow:
+        0 0 0 4px rgba(124, 58, 237, 0.1),
+        0 12px 24px rgba(124, 58, 237, 0.05) !important;
     }
 
     .glass-icon {
@@ -211,8 +221,9 @@ function focusNext (refName: string) {
     height: 52px;
     border-radius: 14px;
     background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow:
+      0 10px 25px -5px rgba(99, 102, 241, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
     color: white;
     font-size: 1.05rem;
     font-weight: 700;
@@ -231,7 +242,9 @@ function focusNext (refName: string) {
 
   .glass-visibility-btn {
     color: #94a3b8;
-    &:hover { color: #7c3aed; }
+    &:hover {
+      color: #7c3aed;
+    }
   }
 }
 </style>

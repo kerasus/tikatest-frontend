@@ -1,4 +1,11 @@
-import type { RouteRecordRaw } from 'vue-router'
+import type {
+  RouteLocationAsPathGeneric,
+  RouteLocationAsRelativeGeneric,
+  RouteRecordRaw
+} from 'vue-router'
+
+export const PublicLoginRouteName = 'PublicAuth.Login'
+export const SchoolLoginRouteName = 'Auth.Login'
 
 const authRoutes: RouteRecordRaw[] = [
   {
@@ -15,7 +22,7 @@ const authRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: 'login',
-        name: 'PublicAuth.Login',
+        name: PublicLoginRouteName,
         meta: {
           layoutConfig: {
             layoutHeader: false,
@@ -44,7 +51,7 @@ const authRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: 'login',
-        name: 'Auth.Login',
+        name: SchoolLoginRouteName,
         component: () => import('src/pages/Auth.vue')
       }
     ]
@@ -52,3 +59,43 @@ const authRoutes: RouteRecordRaw[] = [
 ]
 
 export default authRoutes
+
+export function isPublicLoginRoute (
+  route: string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric | RouteRecordRaw
+): boolean {
+  if (typeof route === 'string') {
+    return route.startsWith(PublicLoginRouteName)
+  }
+
+  if ('name' in route && route.name !== undefined) {
+    return route.name === PublicLoginRouteName
+  }
+
+  if ('path' in route && route.path !== undefined) {
+    return route.path.startsWith(PublicLoginRouteName)
+  }
+
+  return false
+}
+
+export function isSchoolLoginRoute (
+  route: string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric | RouteRecordRaw
+): boolean {
+  if (typeof route === 'string') {
+    return route.startsWith(SchoolLoginRouteName)
+  }
+
+  if ('name' in route && route.name !== undefined) {
+    return route.name === SchoolLoginRouteName
+  }
+
+  if ('path' in route && route.path !== undefined) {
+    return route.path.startsWith(SchoolLoginRouteName)
+  }
+
+  return false
+}
+
+export function isLoginRoute (route: string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric) {
+  return isSchoolLoginRoute(route) || isPublicLoginRoute(route)
+}

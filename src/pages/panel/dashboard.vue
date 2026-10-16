@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { useUser } from 'src/stores/user'
 import AdminDashboard from 'components/dashboards/admin/admin.vue'
-import SchoolDashboard from 'src/components/dashboards/school.vue'
+import SchoolDashboard from 'components/dashboards/school/school.vue'
 import StudentDashboard from 'components/dashboards/student/student.vue'
 import TeacherDashboard from 'src/components/dashboards/teacher.vue'
 

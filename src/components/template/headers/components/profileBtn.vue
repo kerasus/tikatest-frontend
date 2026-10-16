@@ -1,41 +1,46 @@
 <template>
   <q-btn
     v-if="userManager.me"
-    color="primary"
     flat
-    class="icon-button">
-    <q-avatar
-      size="32px"
-      class="trigger-avatar">
-      <img
-        :src="userManager.me?.picture || '/images/blankProfile.png'"
-        alt="avatar">
-      <span class="online-indicator" />
-    </q-avatar>
+    dense
+    round
+    class="profile-trigger-btn">
+    <div class="avatar-aura-wrapper">
+      <div class="avatar-aura-pulse" />
+      <q-avatar
+        size="38px"
+        class="trigger-avatar">
+        <img
+          :src="userManager.me?.picture || '/images/blankProfile.png'"
+          alt="avatar">
+        <span class="online-indicator" />
+      </q-avatar>
+    </div>
 
     <q-menu
       anchor="bottom left"
       self="top left"
-      :offset="[0, 12]"
+      :offset="[0, 14]"
       transition-show="jump-down"
       transition-hide="jump-up"
-      class="cyber-profile-menu shadow-14">
+      class="aurora-glass-menu shadow-20">
 
-      <!-- جلوه شیشه‌ای و نور پس‌زمینه ایزوله -->
-      <div class="glass-canvas">
-        <div class="ambient-glow" />
-        <div class="ambient-pulse" />
+      <!-- موتور جلوه شیشه‌ای و هاله‌های گرادیان شناور -->
+      <div class="liquid-mesh-canvas">
+        <div class="aurora-orb orb-1" />
+        <div class="aurora-orb orb-2" />
+        <div class="aurora-orb orb-3" />
+        <div class="glass-surface-highlight" />
       </div>
 
-
       <div class="menu-content">
-        <!-- بخش هدر پروفایل و آواتار متحرک -->
+        <!-- بخش هدر پروفایل و آواتار هولوگرافیک -->
         <div class="user-hero-card">
           <div class="quantum-avatar-wrapper">
             <div class="quantum-ring ring-outer" />
             <div class="quantum-ring ring-inner" />
             <q-avatar
-              size="56px"
+              size="58px"
               class="quantum-avatar">
               <img
                 :src="userManager.me?.picture || '/images/blankProfile.png'"
@@ -85,11 +90,11 @@
             </div>
             <q-icon
               name="chevron_left"
-              size="16px"
+              size="17px"
               class="chevron-arrow" />
           </div>
 
-          <!-- دکمه خروج -->
+          <!-- دکمه خروج با استایل گلس ملایم قرمز -->
           <div
             class="action-card logout-card"
             @click="logout">
@@ -122,7 +127,7 @@ const menuItems = [
     title: 'پنل کاربری',
     caption: 'تنظیمات و مشخصات پروفایل',
     icon: 'manage_accounts',
-    color: '#06b6d4',
+    color: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
     action: () => {
       router.push({ name: userManager.isStudent ? 'Student.Profile' : 'Panel.Profile' })
     }
@@ -141,94 +146,153 @@ function logout () {
 </script>
 
 <style scoped lang="scss">
-.trigger-avatar {
-  position: relative;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+/* دکمه تریگر هدر */
+.profile-trigger-btn {
+  padding: 2px;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  .online-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
+  &:hover {
+    transform: scale(1.05);
   }
 }
 
-:global(.cyber-profile-menu) {
-  width: 275px;
-  min-width: 275px;
-  border-radius: 20px !important;
+.avatar-aura-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .avatar-aura-pulse {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(6, 182, 212, 0.4));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: blur(4px);
+  }
+
+  &:hover .avatar-aura-pulse {
+    opacity: 1;
+  }
+}
+
+.trigger-avatar {
+  position: relative;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+
+  .online-indicator {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 9px;
+    height: 9px;
+    background: #10b981;
+    border: 1.5px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+}
+
+/* ساختار شیشه‌ای منو پاپ‌آپ */
+:global(.aurora-glass-menu) {
+  width: 285px;
+  min-width: 285px;
+  border-radius: 24px !important;
   overflow: hidden !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  background: rgba(255, 255, 255, 0.72) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  box-shadow: 0 20px 48px -10px rgba(79, 70, 229, 0.16),
+              0 1px 2px rgba(255, 255, 255, 0.8) inset !important;
   contain: paint;
 }
 
-.glass-canvas {
+/* بوم نورهای متحرک مایع در پس‌زمینه شیشه */
+.liquid-mesh-canvas {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
 
-  .ambient-glow {
+  .glass-surface-highlight {
     position: absolute;
-    top: -50px;
-    right: -30px;
-    width: 160px;
-    height: 160px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(6, 182, 212, 0.12) 60%, transparent 80%);
-    border-radius: 50%;
-    animation: ambient-drift 6s ease-in-out infinite alternate;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
   }
 
-  /* لایه‌ی پالس ظریف روی همون هاله */
-  .ambient-pulse {
+  .aurora-orb {
     position: absolute;
-    top: -50px;
-    right: -30px;
+    border-radius: 50%;
+    filter: blur(35px);
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+  }
+
+  .orb-1 {
+    top: -40px;
+    right: -20px;
+    width: 170px;
+    height: 170px;
+    background: radial-gradient(circle, #818cf8 0%, #c084fc 60%, transparent 80%);
+    animation: drift-orb-1 2s ease-in-out infinite alternate;
+  }
+
+  .orb-2 {
+    bottom: -30px;
+    left: -20px;
     width: 160px;
     height: 160px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%);
-    animation: ambient-pulse 2.2s ease-out infinite;
+    background: radial-gradient(circle, #38bdf8 0%, #818cf8 60%, transparent 80%);
+    animation: drift-orb-2 2s ease-in-out infinite alternate;
+  }
+
+  .orb-3 {
+    top: 40%;
+    left: 20%;
+    width: 130px;
+    height: 130px;
+    background: radial-gradient(circle, #f472b6 0%, #fb923c 60%, transparent 80%);
+    opacity: 0.35;
+    animation: drift-orb-3 2s ease-in-out infinite alternate;
   }
 }
 
-@keyframes ambient-drift {
-  0% { transform: scale(1) translate(0, 0); }
-  100% { transform: scale(1.15) translate(-20px, 15px); }
+@keyframes drift-orb-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 25px) scale(1.15); }
+  100% { transform: translate(15px, 10px) scale(0.95); }
 }
 
-@keyframes ambient-pulse {
-  0% {
-    transform: scale(0.85);
-    opacity: 0.7;
-  }
-  60% {
-    transform: scale(1.25);
-    opacity: 0.15;
-  }
-  100% {
-    transform: scale(1.35);
-    opacity: 0;
-  }
+@keyframes drift-orb-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, -20px) scale(1.1); }
+  100% { transform: translate(-10px, 15px) scale(0.9); }
+}
+
+@keyframes drift-orb-3 {
+  0% { transform: translate(0, 0) scale(0.9); opacity: 0.25; }
+  50% { transform: translate(20px, 20px) scale(1.2); opacity: 0.45; }
+  100% { transform: translate(-15px, -15px) scale(1); opacity: 0.3; }
 }
 
 .menu-content {
   position: relative;
   z-index: 1;
-  padding: 16px 14px;
+  padding: 18px 14px 14px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* کارت معرفی کاربر */
+/* کارت هدر کاربر */
 .user-hero-card {
   display: flex;
   flex-direction: column;
@@ -238,8 +302,8 @@ function logout () {
 
   .quantum-avatar-wrapper {
     position: relative;
-    width: 68px;
-    height: 68px;
+    width: 72px;
+    height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -251,21 +315,21 @@ function logout () {
       pointer-events: none;
 
       &.ring-outer {
-        border: 2px dashed rgba(99, 102, 241, 0.45);
-        animation: spin-clockwise 10s linear infinite;
+        border: 2px dashed rgba(99, 102, 241, 0.4);
+        animation: spin-clockwise 14s linear infinite;
       }
 
       &.ring-inner {
-        inset: 3px;
+        inset: 4px;
         border: 1.5px solid transparent;
         border-top-color: #06b6d4;
         border-bottom-color: #a855f7;
-        animation: spin-counter 4s linear infinite;
+        animation: spin-counter 6s linear infinite;
       }
     }
 
     .quantum-avatar {
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
     }
   }
 
@@ -273,35 +337,37 @@ function logout () {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 
     .user-fullname {
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 800;
       color: #0f172a;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
     }
 
     .roles-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
 
       .role-pill {
         display: inline-flex;
         align-items: center;
-        gap: 3px;
-        padding: 2px 8px;
-        border-radius: 12px;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 14px;
         font-size: 11px;
         font-weight: 700;
-        background: rgba(99, 102, 241, 0.08);
-        border: 1px solid rgba(99, 102, 241, 0.16);
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(99, 102, 241, 0.22);
         color: #4f46e5;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
 
         .role-icon {
-          color: #818cf8;
+          color: #6366f1;
         }
       }
     }
@@ -310,53 +376,54 @@ function logout () {
 
 .menu-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8), transparent);
-  margin: 0 4px;
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.35), transparent);
+  margin: 2px 6px;
 }
 
-/* لیست اکشن‌ها */
+/* لیست آیتم‌ها و دکمه‌ها */
 .actions-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 
   .action-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 12px;
+    gap: 12px;
+    padding: 9px 11px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.75);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.85);
-      border-color: rgba(99, 102, 241, 0.3);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      background: rgba(255, 255, 255, 0.88);
+      border-color: rgba(99, 102, 241, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(79, 70, 229, 0.1);
 
       .chevron-arrow {
-        transform: translateX(-3px);
+        transform: translateX(-4px);
         color: #4f46e5;
       }
     }
 
     .card-icon {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 9px;
-      background: var(--accent-glow, #6366f1);
+      border-radius: 10px;
+      background: var(--accent-glow, linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%));
       color: #ffffff;
-      box-shadow: 0 3px 8px rgba(6, 182, 212, 0.25);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
 
       &.danger {
-        background: #ef4444;
-        box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
+        background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
       }
     }
 
@@ -364,9 +431,10 @@ function logout () {
       flex: 1;
       display: flex;
       flex-direction: column;
+      gap: 1px;
 
       .card-title {
-        font-size: 12px;
+        font-size: 12.5px;
         font-weight: 700;
         color: #1e293b;
       }
@@ -379,15 +447,19 @@ function logout () {
 
     .chevron-arrow {
       color: #94a3b8;
-      transition: transform 0.2s ease, color 0.2s ease;
+      transition: transform 0.25s ease, color 0.25s ease;
     }
 
     &.logout-card {
       &:hover {
-        background: rgba(254, 242, 242, 0.85);
-        border-color: rgba(239, 68, 68, 0.2);
+        background: rgba(254, 242, 242, 0.9);
+        border-color: rgba(239, 68, 68, 0.28);
 
         .card-details .card-title {
+          color: #dc2626;
+        }
+
+        .chevron-arrow {
           color: #dc2626;
         }
       }

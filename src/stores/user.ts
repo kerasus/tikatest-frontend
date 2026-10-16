@@ -96,7 +96,7 @@ export const useUser = defineStore('user', () => {
     state.refresh = null
     state.user = null
 
-    await router.push({ name: 'Auth.Login' })
+    await router.push({ name: 'PublicAuth.Login' })
   }
 
   function setUser (data: UserType | null) {
