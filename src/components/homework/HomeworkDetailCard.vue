@@ -354,7 +354,7 @@ const dateManager = useDate()
 const dueDateFormatted = computed(() => {
   const raw = homework.value.due_date
   if (!raw) return '-'
-  return dateManager.isoToLocalShamsi(raw) || raw
+  return dateManager.isoToLocalShamsiDate(raw) || raw
 })
 
 const levelIds = computed<number[]>({
