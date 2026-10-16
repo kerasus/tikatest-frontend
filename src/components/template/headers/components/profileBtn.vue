@@ -143,7 +143,6 @@ function logout () {
 <style scoped lang="scss">
 .trigger-avatar {
   position: relative;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 
   .online-indicator {
@@ -153,7 +152,6 @@ function logout () {
     width: 8px;
     height: 8px;
     background: #10b981;
-    border: 1.5px solid #ffffff;
     border-radius: 50%;
   }
 }
