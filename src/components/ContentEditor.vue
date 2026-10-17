@@ -247,7 +247,7 @@
     <q-dialog v-model="previewDialog">
       <q-card
         class="glass-dialog"
-        style="max-width: 95vw; min-width: 80vw; max-height: 95vh">
+        style="width: 95vw; max-width: 95vw; min-width: 80vw; max-height: 95vh">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle1 text-weight-bold flex items-center q-gutter-x-xs">
@@ -279,7 +279,7 @@
             :src="previewSrc"
             alt="پیش‌نمایش تصویر"
             class="rounded-borders shadow-10"
-            style="max-width: 100%; max-height: 80vh; object-fit: contain">
+            style="width: 100%; max-width: 100%;">
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -288,13 +288,7 @@
     <q-dialog v-model="textPreviewDialog">
       <q-card
         class="glass-dialog"
-        style="
-          max-width: 90vw;
-          min-width: 75vw;
-          height: 85vh;
-          display: flex;
-          flex-direction: column;
-        ">
+        style="width: 95vw; max-width: 95vw; min-width: 80vw; max-height: 95vh; display: flex; flex-direction: column;">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle1 text-weight-bold flex items-center q-gutter-x-xs">
@@ -328,13 +322,7 @@
     <q-dialog v-model="pdfPreviewDialog">
       <q-card
         class="glass-dialog"
-        style="
-          max-width: 95vw;
-          min-width: 85vw;
-          height: 92vh;
-          display: flex;
-          flex-direction: column;
-        ">
+        style="width: 95vw; max-width: 95vw; min-width: 80vw; max-height: 95vh; display: flex; flex-direction: column;">
         <q-card-section class="row items-center q-pb-none">
           <div class="col">
             <div class="text-subtitle1 text-weight-bold flex items-center q-gutter-x-xs">
