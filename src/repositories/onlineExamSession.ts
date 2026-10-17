@@ -69,6 +69,45 @@ export type OnlineExamSessionType = {
   results?: OnlineExamSessionResultType[] | null
 }
 
+export type GroupedExamSessionType = {
+  id: number
+  status: ParticipationStatus
+  attempt_number: number | null
+  started_at: string | null
+  submitted_at: string | null
+  time_used_seconds: number | null
+  percent: number | null
+  t_score: number | null
+  is_locked: boolean
+}
+
+export type ExamClassStudentType = {
+  student: { id: number; name: string; national_code: string | null; mobile: string | null }
+  enrollment_id: number
+  has_participated: boolean
+  session: GroupedExamSessionType | null
+}
+
+export type ExamClassSessionsType = {
+  class_id: number
+  class_name: string
+  total_students: number
+  participated_count: number
+  students: ExamClassStudentType[]
+}
+
+export type ExamLevelSessionsType = {
+  academic_level_id: number
+  academic_level_name: string
+  classes: ExamClassSessionsType[]
+}
+
+export type GroupedExamSessionsResponseType = {
+  exam_id: number
+  exam_title: string | null
+  levels: ExamLevelSessionsType[]
+}
+
 export type StudentAnswerKeyType = {
   id: number | null
   exam_id: number | null
@@ -152,6 +191,13 @@ export default class OnlineExamSessionAPI extends BaseAPI<OnlineExamSessionType>
   async getExamSessions (examId: number): Promise<OnlineExamSessionType[]> {
     const response = await this.getAxiosInstanceWithToken().get(
       `${this.baseEndpoint}/${examId}/sessions`
+    )
+    return response.data
+  }
+
+  async getExamSessionsGroupedByClass (examId: number): Promise<GroupedExamSessionsResponseType> {
+    const response = await this.getAxiosInstanceWithToken().get(
+      `${this.baseEndpoint}/${examId}/sessions/grouped-by-class`
     )
     return response.data
   }

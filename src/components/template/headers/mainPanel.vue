@@ -57,6 +57,9 @@
 
       <!-- بخش چپ: تاریخ، ساعت و پروفایل کاربری -->
       <div class="actions-cluster">
+        <!-- وضعیت اتصال مستقیم به هاست -->
+        <server-status-indicator class="connection-pill" />
+
         <!-- ویجت زمان فشرده و متناسب با ارتفاع ۶۴ -->
         <div class="compact-time-pill">
           <q-icon
@@ -94,6 +97,7 @@ import { useUser } from 'src/stores/user'
 import { useAppLayout } from 'stores/appLayout'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useHeaderBreadCrumbs } from 'src/stores/headerBreadCrumbs'
+import ServerStatusIndicator from 'src/components/ServerStatusIndicator.vue'
 import ProfileBtn from 'src/components/template/headers/components/profileBtn.vue'
 
 withDefaults(defineProps<{ floated?: boolean }>(), {

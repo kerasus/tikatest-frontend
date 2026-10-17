@@ -44,7 +44,7 @@
         :row-key="itemIdentifyKey">
         <template #entity-index-table-cell="{ inputData }">
           <template v-if="inputData.col.name === 'student_name'">
-            {{ inputData.props.row.student?.full_name || inputData.props.row.student_id || '-' }}
+            {{ `${inputData.props.row.student?.first_name} ${inputData.props.row.student?.last_name}` }}
           </template>
           <template v-else-if="inputData.col.name === 'submitted_at'">
             {{ formatDateTime(inputData.props.row.submitted_at) }}
@@ -370,7 +370,7 @@ const tableKeys = ref({
 
 const submissionsTable = ref({
   columns: [
-    { name: 'student_name', label: 'دانش‌آموز', align: 'right' as const, field: 'student_name' },
+    { name: 'student_name', label: 'دانش‌آموز', align: 'left' as const, field: 'student_name' },
     {
       name: 'submitted_at',
       label: 'زمان ارسال',

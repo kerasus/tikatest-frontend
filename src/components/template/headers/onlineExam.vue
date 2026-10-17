@@ -50,15 +50,20 @@
             </div>
           </div>
         </div>
+
+        <!-- بخش چپ اصلاح‌شده با عرض کافی و چینش مرتب بدون تداخل -->
         <div class="main-dashboard__left-section">
           <q-btn
             v-if="onlineExamStore.isActive || onlineExamStore.isResultMode"
             icon="assignment"
             color="primary"
             flat
-            class="icon-button"
+            class="icon-button q-px-sm"
             label="لیست آزمون‌ها"
             @click="goToExamList" />
+
+          <server-status-indicator />
+
           <profile-btn />
         </div>
       </q-toolbar-title>
@@ -71,6 +76,7 @@ import { useRouter } from 'vue-router'
 import { onUnmounted, computed } from 'vue'
 import { useAppLayout } from 'stores/appLayout'
 import { useOnlineExamSession } from 'src/stores/onlineExamSession'
+import ServerStatusIndicator from 'src/components/ServerStatusIndicator.vue'
 import ProfileBtn from 'src/components/template/headers/components/profileBtn.vue'
 
 withDefaults(defineProps<{ floated?: boolean }>(), {
@@ -106,6 +112,7 @@ const remainingTimeText = computed(() => {
   }
   return `${mins}:${secs.toString().padStart(2, '0')}`
 })
+
 const progressPercent = computed(() => {
   const total = onlineExamStore.durationLimit
   const remaining = onlineExamStore.remainingTime
@@ -124,7 +131,6 @@ function goToExamList () {
 <style scoped lang="scss">
 .main-dashboard-wrapper {
   $header-height: 50px;
-  //background: $gray-100;
   background: transparent;
   min-height: $header-height;
   padding: $space-2;
@@ -171,7 +177,10 @@ function goToExamList () {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      $left-section-width: 200px;
+
+      /* افزایش عرض بخش چپ برای جلوگیری از تداخل عناصر */
+      $left-section-width: 325px;
+
       .main-dashboard__right-section {
         width: calc(100% - #{$left-section-width});
         display: flex;
@@ -183,16 +192,12 @@ function goToExamList () {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: $space-2;
+        flex-wrap: nowrap;
+        gap: 8px; /* فاصله منظم و هندسی بین دکمه‌ها و چراغ */
+
         .q-btn {
           color: $neutral-30;
           background: $neutral-95;
-        }
-        .time {
-          color: $color-text2;
-          margin-right: $space-2;
-          direction: rtl;
-          @include typo-body-3;
         }
       }
     }
@@ -205,32 +210,6 @@ function goToExamList () {
       backdrop-filter: saturate(200%) blur(30px);
       background-color: rgba(255, 255, 255, 0.4) !important;
     }
-  }
-}
-:global(.search-in-menu__input) {
-  position: sticky;
-  top: $spacing-none;
-  padding-top: $space-3;
-  background: $neutral-100;
-  z-index: 1;
-}
-.search-input {
-  margin: 10px;
-}
-
-.profile-menu {
-  min-width: 260px;
-  .q-avatar {
-    margin: 0 auto;
-  }
-  .profile-menu-user-info {
-    .profile-menu-user-fullname {
-    }
-    .profile-menu-user-roles {
-    }
-  }
-  .logout-btn {
-    width: 100%;
   }
 }
 </style>
