@@ -120,12 +120,12 @@ function onClickLoginBtn () {
     .then(async () => {
       await redirectAfterLogin()
     })
-    .catch((error) => {
-      $q.notify({
-        message: i18nManager.t(error.message || 'خطا در ورود'),
-        color: 'negative',
-        icon: 'report_problem'
-      })
+    .catch(() => {
+      // $q.notify({
+      //   message: 'خطا در ورود',
+      //   color: 'negative',
+      //   icon: 'report_problem'
+      // })
     })
     .finally(() => {
       loginLoading.value = false

@@ -103,6 +103,15 @@ function getAxiosInstanceManager (apiServer: string) {
       saveTokenData(newToken)
       setAuthenticatedUserData(user)
     } catch (error) {
+      const { status, data } = error.response
+
+      // Handle 422 Unprocessable Entity (validation errors)
+      if ((status === 422 || status === 400) && (data as ErrorResponse).errors) {
+        const validationErrors = Object.entries((data as ErrorResponse).errors).flatMap(([_, messages]) => {
+          return messages // Only include the error messages, not the field names
+        })
+        notifyError(validationErrors.join('<br/>')) // Join all error messages with a semicolon
+      }
       console.error('Error obtaining main token:', error)
       throw new Error('Failed to obtain main token')
     }
