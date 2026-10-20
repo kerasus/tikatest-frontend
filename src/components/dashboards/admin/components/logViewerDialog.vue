@@ -314,6 +314,7 @@
                 dense-toggle
                 expand-separator
                 dark
+                expand-icon-class="text-grey-5"
                 header-class="trace-expansion-bar"
                 class="rounded-borders">
                 <template #header>
@@ -726,10 +727,16 @@ function getLevelBorderClass (lvl: string) {
 }
 
 /* استک تریس در دارک مود */
-.trace-expansion-bar {
-  padding: 2px 6px;
-  background: #111827;
+:deep(.trace-expansion-bar) {
+  padding: 2px 8px;
+  background: #111827 !important; /* قفل کردن پس‌زمینه دارک */
   border-radius: 4px;
+  color: #e2e8f0 !important; /* قفل کردن رنگ متن */
+
+  /* بازنویسی رنگ آیکون‌ها و فلش اکسپنشن در حالت دارک */
+  .q-item__section--side {
+    color: #94a3b8;
+  }
 }
 
 .trace-terminal-box {
@@ -742,7 +749,8 @@ function getLevelBorderClass (lvl: string) {
   .trace-copy-btn {
     position: absolute;
     top: 6px;
-    right: 6px;
+    /* rtl:ignore */
+    right: 24px;
     color: #94a3b8;
     background: rgba(255, 255, 255, 0.08);
     &:hover {

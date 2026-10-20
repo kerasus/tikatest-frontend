@@ -207,6 +207,7 @@
               <div :class="{ 'opacity-70 cursor-not-allowed': !canSubmit }">
                 <content-editor
                   v-model:value="submissionContent"
+                  multiple-images
                   :editable="canSubmit" />
               </div>
             </div>

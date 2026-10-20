@@ -31,7 +31,23 @@
         <div class="col-xs-12 col-sm">
           <!-- انتخاب تصویر -->
           <template v-if="currentType === 'image'">
-            <div class="row q-col-gutter-sm items-center">
+            <div v-if="multipleImages">
+              <image-stacker
+                multiple
+                @file-change="onStackedImageChange" />
+              <div
+                v-if="!currentFile && modelValue?.path"
+                class="file-chip-badge q-mt-sm">
+                <q-icon
+                  name="cloud_done"
+                  size="18px"
+                  class="q-mr-xs text-secondary" />
+                <span>{{ modelValue.path }}</span>
+              </div>
+            </div>
+            <div
+              v-else
+              class="row q-col-gutter-sm items-center">
               <div class="col-auto">
                 <q-btn
                   label="انتخاب تصویر"
@@ -246,9 +262,13 @@
     <!-- مودال پیش‌نمایش تصویر -->
     <q-dialog v-model="previewDialog">
       <q-card
-        class="glass-dialog"
-        style="width: 95vw; max-width: 95vw; min-width: 80vw; max-height: 95vh">
-        <q-card-section class="row items-center q-pb-none">
+        class="glass-dialog column"
+        style="width: 95vw; max-width: 95vw; min-width: 80vw; height: 90vh; max-height: 90vh;">
+
+        <!-- هدر ثابت (Sticky Header) -->
+        <q-card-section
+          class="col-auto row items-center q-pb-md bg-glass shadow-2"
+          style="z-index: 1;">
           <div class="col">
             <div class="text-subtitle1 text-weight-bold flex items-center q-gutter-x-xs">
               <q-icon
@@ -274,15 +294,19 @@
               color="grey-4" />
           </div>
         </q-card-section>
-        <q-card-section class="flex flex-center q-pa-md">
-          <img
+
+        <!-- بخش محتوا با قابلیت اسکرول (Scrollable Body) -->
+        <q-card-section class="col scroll flex flex-center q-pa-md">
+          <q-img
             :src="previewSrc"
             alt="پیش‌نمایش تصویر"
-            class="rounded-borders shadow-10"
-            style="width: 100%; max-width: 100%;">
+            class="rounded-borders shadow-10 full-width"
+            style="max-width: 100%; height: auto; object-fit: contain;" />
         </q-card-section>
+
       </q-card>
     </q-dialog>
+
 
     <!-- مودال نمایش متن -->
     <q-dialog v-model="textPreviewDialog">
@@ -361,12 +385,14 @@
 
 <script setup lang="ts">
 import VuePdfEmbed from 'src/components/VuePdfEmbed.vue'
+import ImageStacker from 'src/components/controls/ImageStacker.vue'
 import { ref, watch, computed, onUnmounted } from 'vue'
 import type { ContentType } from 'src/repositories/exam'
 
-defineProps<{
+withDefaults(defineProps<{
   editable?: boolean;
-}>()
+  multipleImages?: boolean;
+}>(), { multipleImages: false })
 
 const modelValue = defineModel<ContentType | null>('value')
 
@@ -460,6 +486,16 @@ function onFileChange (event: Event) {
     currentFile.value = file
     setObjectUrl(file)
     emitChange()
+  }
+}
+
+function onStackedImageChange (file: File | null) {
+  currentFile.value = file
+  setObjectUrl(file)
+  modelValue.value = {
+    type: 'image',
+    path: modelValue.value?.type === 'image' ? modelValue.value.path : undefined,
+    file: file || undefined
   }
 }
 
