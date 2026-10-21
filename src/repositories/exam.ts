@@ -112,6 +112,13 @@ export type ExamScoreType = {
   status?: string | null;
 }
 
+export type ExamTimingStatus = {
+  state: string;
+  is_open: boolean;
+  is_expired: boolean;
+  ends_in_seconds?: number;
+}
+
 export type ExamType = {
   id: number | null;
   name: string | null;
@@ -147,6 +154,7 @@ export type ExamType = {
   sensitive_data_available?: boolean;
   term_id?: number | null;
   occurrence?: number | null;
+  timing_status?: ExamTimingStatus;
 };
 
 export default class ExamAPI extends BaseAPI<ExamType> {

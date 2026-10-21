@@ -272,6 +272,15 @@ interface ExamTimingStatus {
   icon: string;
 }
 
+// 🎯 ترجمه وضعیت زمانی سرور به لیبل/رنگ/آیکون — بدون هیچ محاسبه‌ی ساعتی سمت کلاینت
+const TIMING_STATUS_MAP: Record<string, ExamTimingStatus> = {
+  upcoming: { label: 'شروع نشده', color: 'blue-7', icon: 'schedule' },
+  running: { label: 'در حال برگزاری', color: 'positive', icon: 'play_circle' },
+  expired: { label: 'پایان یافته', color: 'grey-7', icon: 'event_busy' },
+  open: { label: 'آزاد', color: 'teal-7', icon: 'all_inclusive' },
+  no_detail: { label: 'بدون جزئیات', color: 'grey-6', icon: 'help_outline' }
+}
+
 const router = useRouter()
 const entityIndexRef = ref()
 const dateManager = useDate()
@@ -354,19 +363,12 @@ const getLatestSession = (examItem: ExamType): OnlineExamSessionType | null => {
 }
 
 const isExamWindowOpen = (examItem: ExamType) => {
-  if (!examItem.online_exam_detail) return false
-  const detail = examItem.online_exam_detail
-  if (detail.visible_at && new Date(detail.visible_at) > new Date()) return false
-  if (detail.starts_at && new Date(detail.starts_at) > new Date()) return false
-  if (detail.ends_at && new Date(detail.ends_at) < new Date()) return false
-  return true
+  return examItem?.timing_status?.is_open ?? false
 }
 
 // آیا زمان کلی پنجره آزمون تمام شده است؟
 const isExamWindowExpired = (examItem: ExamType) => {
-  const endsAt = examItem.online_exam_detail?.ends_at
-  if (!endsAt) return false
-  return new Date(endsAt).getTime() < Date.now()
+  return examItem?.timing_status?.is_expired ?? false
 }
 
 // آیا دانش‌آموز می‌تواند آزمون را شروع یا ادامه دهد؟
@@ -475,48 +477,8 @@ const viewExam = (examItem: ExamType) => {
 }
 
 const getExamTimingStatus = (row: any): ExamTimingStatus => {
-  const detail = row?.online_exam_detail
-  if (!detail) {
-    return { label: 'نامشخص', color: 'grey-6', icon: 'help_outline' }
-  }
-
-  const now = Date.now()
-  const startsAt = detail.starts_at ? new Date(detail.starts_at).getTime() : null
-  const endsAt = detail.ends_at ? new Date(detail.ends_at).getTime() : null
-
-  // آزمون هنوز نرسیده
-  if (startsAt && now < startsAt) {
-    return {
-      label: 'شروع نشده',
-      color: 'blue-7',
-      icon: 'schedule'
-    }
-  }
-
-  // آزمون تموم شده
-  if (endsAt && now > endsAt) {
-    return {
-      label: 'پایان یافته',
-      color: 'grey-7',
-      icon: 'event_busy'
-    }
-  }
-
-  // در حال حاضر فعاله و میشه شرکت کرد
-  if (startsAt && now >= startsAt && (!endsAt || now <= endsAt)) {
-    return {
-      label: 'در حال برگزاری',
-      color: 'positive',
-      icon: 'play_circle'
-    }
-  }
-
-  // آزمون بدون تاریخ مشخص (آزاد)
-  return {
-    label: 'آزاد',
-    color: 'teal-7',
-    icon: 'all_inclusive'
-  }
+  return TIMING_STATUS_MAP[row?.timing_status?.state] ??
+    { label: 'نامشخص', color: 'grey-6', icon: 'help_outline' }
 }
 
 interface StatusBadgeInfo {
@@ -529,28 +491,8 @@ interface StatusBadgeInfo {
 
 // 🎯 محاسبه وضعیت کلی آزمون (پنجره زمانی آزمون)
 const getExamStatusInfo = (examItem: ExamType): StatusBadgeInfo => {
-  const detail = examItem.online_exam_detail
-  if (!detail) {
-    return { label: 'بدون جزئیات', color: 'grey-6', icon: 'help_outline' }
-  }
-
-  const now = Date.now()
-  const startsAt = detail.starts_at ? new Date(detail.starts_at).getTime() : null
-  const endsAt = detail.ends_at ? new Date(detail.ends_at).getTime() : null
-
-  if (startsAt && now < startsAt) {
-    return { label: 'شروع نشده', color: 'blue-7', icon: 'schedule' }
-  }
-
-  if (endsAt && now > endsAt) {
-    return { label: 'پایان یافته', color: 'grey-7', icon: 'event_busy' }
-  }
-
-  if (startsAt && now >= startsAt && (!endsAt || now <= endsAt)) {
-    return { label: 'در حال برگزاری', color: 'positive', icon: 'sensors' }
-  }
-
-  return { label: 'آزاد', color: 'teal-7', icon: 'all_inclusive' }
+  return TIMING_STATUS_MAP[examItem?.timing_status?.state] ??
+    { label: 'بدون جزئیات', color: 'grey-6', icon: 'help_outline' }
 }
 
 // 🎯 محاسبه وضعیت حضور و مشارکت دانش‌آموز در آزمون

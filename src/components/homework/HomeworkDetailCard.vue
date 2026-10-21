@@ -92,7 +92,7 @@
 
           <!-- موعد تحویل -->
           <div class="col-12 col-md-3">
-            <form-builder-date
+            <form-builder-date-time
               v-if="editable"
               v-model:value="homework.due_date"
               label="موعد تحویل *"
@@ -338,23 +338,25 @@ import { computed } from 'vue'
 import { useDate } from 'src/composables/Date'
 import ContentEditor from 'src/components/ContentEditor.vue'
 import type { HomeworkType, HomeworkAttachmentType } from 'src/repositories/homework'
-import FormBuilderDate from 'src/components/controls/formBuilderCustomInput/FormBuilderDate.vue'
+import FormBuilderDateTime from 'src/components/controls/formBuilderCustomInput/FormBuilderDateTime.vue'
+import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchoolClass from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchoolClass.vue'
 import FormBuilderSelectAcademicLevel from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectAcademicLevel.vue'
-import FormBuilderSelectTerm from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectTerm.vue'
 
 defineProps<{
   editable?: boolean;
   schoolId?: number;
 }>()
+
 const homework = defineModel<Partial<HomeworkType>>('homework')
+
 const dateManager = useDate()
 
 const dueDateFormatted = computed(() => {
   const raw = homework.value.due_date
   if (!raw) return '-'
-  return dateManager.isoToLocalShamsiDate(raw) || raw
+  return dateManager.isoToLocalShamsiDateTime(raw) || raw
 })
 
 const levelIds = computed<number[]>({
