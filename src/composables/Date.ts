@@ -1,6 +1,34 @@
 import jalaliMoment, { from as jalaliFrom } from 'jalali-moment'
 
+let serverClockOffset: number | null = null
+
+export function syncServerTime (serverTime: string | undefined) {
+  if (typeof window === 'undefined' || !serverTime) return
+
+  const timestamp = Date.parse(serverTime)
+  if (Number.isFinite(timestamp)) {
+    serverClockOffset = timestamp - Date.now()
+  }
+}
+
 export const useDate = () => {
+  function getTehranNow (): string {
+    const currentTime = new Date(Date.now() + (serverClockOffset ?? 0))
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Tehran',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23'
+    }).formatToParts(currentTime)
+    const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]))
+
+    return `${values.year}-${values.month}-${values.day} ${values.hour}:${values.minute}:${values.second}`
+  }
+
   function shamsiToMiladi (
     date: string | undefined,
     shamsiFormat: string = 'jYYYY/jMM/jDD',
@@ -26,7 +54,7 @@ export const useDate = () => {
   }
 
   function now (format: string = 'YYYY-MM-DD') {
-    return jalaliFrom(new Date().toISOString(), 'en').format(format)
+    return jalaliFrom(getTehranNow(), 'en', 'YYYY-MM-DD HH:mm:ss').format(format)
   }
 
   function validationShamsiDate (date: string | undefined) {
@@ -269,6 +297,7 @@ export const useDate = () => {
 
   return {
     now,
+    getTehranNow,
     parseTime,
     formatSeconds,
     shamsiToMiladi,

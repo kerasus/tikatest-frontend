@@ -3,8 +3,9 @@ import { ref } from 'vue'
 import type { Router } from 'vue-router'
 import { boot } from 'quasar/wrappers'
 import { useUser } from 'src/stores/user'
-import type { AxiosInstance } from 'axios'
+import type { AxiosInstance, AxiosResponse } from 'axios'
 import { useAppConfig } from 'src/stores/appConfig'
+import { syncServerTime } from 'src/composables/Date'
 
 interface TokenData {
   accessToken: string | null;
@@ -34,9 +35,6 @@ function getAxiosInstanceManager (apiServer: string) {
   // const envStore = useEnvStore()
   // const frontendApiBase: string = envStore.frontendApiBase
   const frontendApiBase: string = apiServer
-  const getMainTokenAddress: string = `${frontendApiBase}/auth/login`
-  const getRefreshTokenAddress: string = `${frontendApiBase}/auth/refresh-token`
-
   const token = ref<TokenData>({
     accessToken: null,
     refreshToken: null
@@ -88,7 +86,7 @@ function getAxiosInstanceManager (apiServer: string) {
     }
 
     try {
-      const response = await axios.post(getMainTokenAddress, {
+      const response = await axiosInstanceWithoutToken.post('/auth/login', {
         username: credentials.value.username,
         password: credentials.value.password
       })
@@ -123,7 +121,7 @@ function getAxiosInstanceManager (apiServer: string) {
     }
 
     try {
-      const response = await axios.put(getRefreshTokenAddress, {
+      const response = await axiosInstanceWithoutToken.put('/auth/refresh-token', {
         refreshToken: token.value.refreshToken
       })
 
@@ -193,6 +191,24 @@ function getAxiosInstanceManager (apiServer: string) {
     baseURL: frontendApiBase
   })
 
+  function updateServerClock (response: AxiosResponse) {
+    const serverTime = response.headers['x-server-time']
+    if (typeof serverTime === 'string') {
+      syncServerTime(serverTime)
+    }
+  }
+
+  axiosInstanceWithoutToken.interceptors.response.use(
+    (response) => {
+      updateServerClock(response)
+      return response
+    },
+    (error) => {
+      if (error.response) updateServerClock(error.response)
+      return Promise.reject(error)
+    }
+  )
+
   axiosInstance.interceptors.request.use(
     async (config) => {
       try {
@@ -225,8 +241,12 @@ function getAxiosInstanceManager (apiServer: string) {
   )
 
   axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      updateServerClock(response)
+      return response
+    },
     async (error) => {
+      if (error.response) updateServerClock(error.response)
       let originalRequest = error.config
 
       // Handle 401 Unauthorized errors (token refresh logic)
