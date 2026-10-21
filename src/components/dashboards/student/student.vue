@@ -403,7 +403,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useDate } from 'src/composables/Date'
 import StudentHeader from './components/header.vue'
 import DashboardCard from './components/dashboardCard.vue'
@@ -414,6 +414,15 @@ import {
 } from 'src/repositories/dashboard'
 
 const dateManager = useDate()
+const examTimingStatusMap: Record<string, { label: string; color: string; icon: string }> = {
+  upcoming: { label: 'شروع نشده', color: 'blue-7', icon: 'schedule' },
+  running: { label: 'در حال برگزاری', color: 'positive', icon: 'play_circle' },
+  expired: { label: 'پایان یافته', color: 'grey-7', icon: 'event_busy' },
+  open: { label: 'آزاد', color: 'teal-7', icon: 'all_inclusive' },
+  no_detail: { label: 'بدون جزئیات', color: 'grey-6', icon: 'help_outline' }
+}
+let examRefreshTimer: ReturnType<typeof setTimeout> | null = null
+let isMounted = false
 
 const stats = ref<StudentDashboardData>(getDefaultStats())
 const loading = ref(false)
@@ -442,26 +451,32 @@ function getExamStatus (e: UpcomingExam) {
     return { label: 'حضوری', color: 'blue-grey-6', icon: 'apartment' }
   }
 
-  const detail = e.online_exam_detail
-  if (!detail) {
-    return { label: 'آنلاین', color: 'purple-7', icon: 'devices' }
-  }
+  return examTimingStatusMap[e.timing_status?.state ?? 'no_detail'] ?? examTimingStatusMap.no_detail
+}
 
-  const now = Date.now()
-  const startsAt = detail.starts_at ? new Date(detail.starts_at).getTime() : null
-  const endsAt = detail.ends_at ? new Date(detail.ends_at).getTime() : null
+function scheduleExamRefresh () {
+  if (examRefreshTimer) clearTimeout(examRefreshTimer)
 
-  if (startsAt && now < startsAt) {
-    return { label: 'شروع نشده', color: 'blue-7', icon: 'schedule' }
-  }
-  if (endsAt && now > endsAt) {
-    return { label: 'پایان یافته', color: 'grey-7', icon: 'event_busy' }
-  }
-  if (startsAt && now >= startsAt && (!endsAt || now <= endsAt)) {
-    return { label: 'در حال برگزاری', color: 'positive', icon: 'sensors' }
-  }
+  const currentTime = dateManager.now()
+  const nextTransition = upcomingExams.value.reduce((next: number | null, examItem) => {
+    const state = examItem.timing_status?.state
+    const boundary = state === 'upcoming'
+      ? examItem.online_exam_detail?.starts_at
+      : state === 'running' || state === 'open'
+        ? examItem.online_exam_detail?.ends_at
+        : null
+    if (!boundary) return next
 
-  return { label: 'آزاد', color: 'teal-7', icon: 'all_inclusive' }
+    const timestamp = new Date(boundary).getTime()
+    if (!Number.isFinite(timestamp) || timestamp < currentTime) return next
+    return next === null ? timestamp : Math.min(next, timestamp)
+  }, null)
+
+  if (nextTransition !== null) {
+    examRefreshTimer = setTimeout(() => {
+      void loadDashboard()
+    }, Math.min(Math.max(nextTransition - dateManager.now() + 1000, 1000), 2147483647))
+  }
 }
 
 function formatDateTime (value?: string | null) {
@@ -479,6 +494,7 @@ async function loadDashboard () {
   loading.value = true
   try {
     stats.value = await dashboard.studentDashboard()
+    if (isMounted) scheduleExamRefresh()
   } catch (e) {
     stats.value = getDefaultStats()
   } finally {
@@ -487,7 +503,13 @@ async function loadDashboard () {
 }
 
 onMounted(async () => {
+  isMounted = true
   await loadDashboard()
+})
+
+onUnmounted(() => {
+  isMounted = false
+  if (examRefreshTimer) clearTimeout(examRefreshTimer)
 })
 </script>
 

@@ -1,4 +1,5 @@
 import BaseAPI from './BaseAPI'
+import type { ExamTimingStatus } from './exam'
 
 export interface ActiveOnlineClass {
   schedule_id: number
@@ -17,6 +18,7 @@ export interface UpcomingExam {
   id: number
   name: string
   delivery_mode: 'online' | 'in_person'
+  timing_status?: ExamTimingStatus | null
   category?: {
     id: number
     title: string
