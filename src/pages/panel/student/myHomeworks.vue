@@ -143,51 +143,38 @@ const entityIndexRef = ref()
 
 const formatDate = (value: string | null | undefined): string => {
   if (!value) return '-'
-  return dateManager.isoToLocalShamsiDate(value) || value
+  return dateManager.isoToLocalShamsiDateTime(value) || value
 }
 
-const getOwner = (
-  homework: HomeworkType & { submissions?: HomeworkSubmissionType[] }
-): HomeworkSubmissionType | undefined => {
-  return homework.submissions?.[0]
+// 🎯 مپ جامع ترجمه استاتوس‌های سرور به رنگ و لیبل UI
+const HOMEWORK_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  reviewed: { label: 'بررسی شده', color: 'positive' },
+  submitted: { label: 'ارسال شده', color: 'teal' },
+  overdue: { label: 'مهلت پایان یافته', color: 'negative' },
+  pending: { label: 'در انتظار ارسال', color: 'warning' }
 }
 
-
-const getStatusColor = (homework: HomeworkType): string => {
-  const sub = homework.submission
-
-  // حالت اول: دانش‌آموز ارسال کرده
-  if (sub?.submitted_at) {
-    // اگر فیدبک یا تصحیحی از سمت معلم ثبت شده باشد، رنگ اختصاصی (مثلا primary یا positive)
-    return sub.feedback ? 'positive' : 'teal'
+const getStatusColor = (homework: any): string => {
+  const state = homework?.student_status?.state
+  if (state && HOMEWORK_STATUS_MAP[state]) {
+    return HOMEWORK_STATUS_MAP[state].color
   }
 
-  // حالت دوم: هنوز ارسال نکرده، چک کنیم ددلاین گذشته یا نه؟
-  if (homework.due_date) {
-    const isPastDue = new Date(homework.due_date).getTime() < Date.now()
-    if (isPastDue) {
-      return 'negative' // مهلت تمام شده و ارسال نکرده
-    }
-  }
-
-  // در انتظار ارسال (هنوز مهلت دارد)
+  // فال‌بک تمیز در صورتی که ساختار داده هنوز کش یا قدیمی باشد
+  const sub = homework?.submission
+  if (sub?.submitted_at) return sub.feedback ? 'positive' : 'teal'
   return 'warning'
 }
 
-const getStatusLabel = (homework: HomeworkType): string => {
-  const sub = homework.submission
-
-  if (sub?.submitted_at) {
-    return sub.feedback ? 'بررسی شده' : 'ارسال شده'
+const getStatusLabel = (homework: any): string => {
+  const state = homework?.student_status?.state
+  if (state && HOMEWORK_STATUS_MAP[state]) {
+    return HOMEWORK_STATUS_MAP[state].label
   }
 
-  if (homework.due_date) {
-    const isPastDue = new Date(homework.due_date).getTime() < Date.now()
-    if (isPastDue) {
-      return 'مهلت پایان یافته'
-    }
-  }
-
+  // فال‌بک تمیز در صورتی که ساختار داده هنوز کش یا قدیمی باشد
+  const sub = homework?.submission
+  if (sub?.submitted_at) return sub.feedback ? 'بررسی شده' : 'ارسال شده'
   return 'در انتظار ارسال'
 }
 </script>
