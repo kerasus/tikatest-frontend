@@ -542,12 +542,14 @@ import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import HomeworkAPI from 'src/repositories/homework'
+import HomeworkSubmissionAPI from 'src/repositories/homeworkSubmission'
 import ContentEditor from 'src/components/ContentEditor.vue'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
 const $q = useQuasar()
 const route = useRoute()
 const homeworkApi = new HomeworkAPI()
+const homeworkSubmissionApi = new HomeworkSubmissionAPI()
 
 const homeworkData = ref<Partial<HomeworkType>>({})
 const submission = ref<Partial<HomeworkSubmissionType> | null>(null)
@@ -633,7 +635,7 @@ async function sendFeedback () {
   if (!selectedSubmission.value?.id) return
   submitting.value = true
   try {
-    await homeworkApi.sendFeedback(selectedSubmission.value.id, feedbackForm.value.feedback)
+    await homeworkSubmissionApi.sendFeedback(selectedSubmission.value.id, feedbackForm.value.feedback)
     $q.notify({ type: 'positive', message: 'پیام شما ارسال شد.' })
     submissionDetailDialog.value = false
     feedbackForm.value.feedback = null

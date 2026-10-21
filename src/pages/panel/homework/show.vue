@@ -30,72 +30,10 @@
         v-model:homework="homeworkData"
         :editable="false" />
 
-      <entity-index
+      <homework-submissions-card
         ref="submissionsIndexRef"
-        :value="inputs"
-        title="لیست ارسال‌ها"
-        :api="submissionsApi"
-        :table="submissionsTable"
-        :table-keys="tableKeys"
-        :show-close-button="false"
-        :show-expand-button="false"
-        :show-reload-button="true"
-        :show-search-button="false"
-        :row-key="itemIdentifyKey">
-        <template #entity-index-table-cell="{ inputData }">
-          <template v-if="inputData.col.name === 'student_name'">
-            {{ `${inputData.props.row.student?.first_name} ${inputData.props.row.student?.last_name}` }}
-          </template>
-          <template v-else-if="inputData.col.name === 'submitted_at'">
-            {{ formatDateTime(inputData.props.row.submitted_at) }}
-          </template>
-          <template v-else-if="inputData.col.name === 'student_seen_at'">
-            {{ formatDateTime(inputData.props.row.student_seen_at) }}
-          </template>
-          <template v-else-if="inputData.col.name === 'operator_seen_at'">
-            {{ formatDateTime(inputData.props.row.operator_seen_at) }}
-          </template>
-          <template v-else-if="inputData.col.name === 'content'">
-            <div
-              v-if="inputData.props.row.content?.type === 'text'"
-              class="text-body2">
-              {{ inputData.props.row.content.body?.substring(0, 80) || '-' }}
-            </div>
-            <img
-              v-else-if="
-                inputData.props.row.content?.type === 'image' && inputData.props.row.content?.path
-              "
-              :src="inputData.props.row.content.path"
-              alt="پیش‌نمایش"
-              style="max-width: 80px; max-height: 60px; display: block">
-            <q-btn
-              v-else-if="
-                inputData.props.row.content?.type === 'pdf' && inputData.props.row.content?.path
-              "
-              flat
-              dense
-              color="primary"
-              icon="picture_as_pdf"
-              label="مشاهده"
-              @click.stop="openPdfPreview(inputData.props.row.content.path)" />
-            <span v-else>-</span>
-          </template>
-          <template v-else-if="inputData.col.name === 'feedback'">
-            {{ inputData.props.row.feedback || '-' }}
-          </template>
-          <template v-else-if="inputData.col.name === 'actions'">
-            <q-btn
-              flat
-              dense
-              color="primary"
-              icon="visibility"
-              @click.stop="openSubmissionDetailDialog(inputData.props.row)" />
-          </template>
-          <template v-else>
-            {{ inputData.col.value }}
-          </template>
-        </template>
-      </entity-index>
+        :homework-id="Number(route.params.id)"
+        @select="openSubmissionDetailDialog" />
     </template>
     <!-- دیالوگ بررسی و مشاهده جزئیات ارسال دانش‌آموز -->
     <q-dialog
@@ -166,7 +104,7 @@
                     دانش‌آموز
                   </div>
                   <div class="text-subtitle2 text-weight-bold text-blue-grey-10 q-mt-xs ellipsis">
-                    {{ (selectedSubmission.student?.first_name ? `${selectedSubmission.student.first_name} ${selectedSubmission.student.last_name || ''}` : null) || selectedSubmission.student_id || '-' }}
+                    {{ selectedStudentName || selectedSubmission.student_id || '-' }}
                   </div>
                 </div>
               </div>
@@ -306,7 +244,6 @@
       </q-card>
     </q-dialog>
 
-
     <q-dialog v-model="pdfDialog">
       <q-card style="width: 90vw; height: 90vh; display: flex; flex-direction: column">
         <q-card-section class="row items-center q-pb-none">
@@ -336,16 +273,18 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
-import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import { ref, computed, onMounted } from 'vue'
 import HomeworkAPI from 'src/repositories/homework'
+import HomeworkSubmissionAPI from 'src/repositories/homeworkSubmission'
 import VuePdfEmbed from 'src/components/VuePdfEmbed.vue'
 import ContentEditor from 'src/components/ContentEditor.vue'
 import HomeworkDetailCard from 'src/components/homework/HomeworkDetailCard.vue'
+import HomeworkSubmissionsCard from 'src/components/homework/HomeworkSubmissionsCard.vue'
 import type { HomeworkType, HomeworkSubmissionType } from 'src/repositories/homework'
 
 const homeworkApi = new HomeworkAPI()
+const homeworkSubmissionApi = new HomeworkSubmissionAPI()
 
 const route = useRoute()
 const $q = useQuasar()
@@ -358,58 +297,8 @@ const submissionDetailDialog = ref(false)
 const pdfDialog = ref(false)
 const pdfPreviewSrc = ref('')
 
-const submissionsApi = ref('/homework-submissions')
-const itemIdentifyKey = ref('id')
-const tableKeys = ref({
-  data: 'data',
-  total: 'total',
-  currentPage: 'current_page',
-  perPage: 'per_page',
-  pageKey: 'page'
-})
-
-const submissionsTable = ref({
-  columns: [
-    { name: 'student_name', label: 'دانش‌آموز', align: 'left' as const, field: 'student_name' },
-    {
-      name: 'submitted_at',
-      label: 'زمان ارسال',
-      align: 'center' as const,
-      field: 'submitted_at',
-      sortable: true
-    },
-    {
-      name: 'student_seen_at',
-      label: 'مشاهده توسط دانش‌آموز',
-      align: 'center' as const,
-      field: 'student_seen_at'
-    },
-    {
-      name: 'operator_seen_at',
-      label: 'مشاهده توسط معلم',
-      align: 'center' as const,
-      field: 'operator_seen_at'
-    },
-    { name: 'content', label: 'محتوای ارسالی', align: 'center' as const, field: 'content' },
-    { name: 'feedback', label: 'بازخورد', align: 'center' as const, field: 'feedback' },
-    {
-      name: 'actions',
-      required: true,
-      label: 'عملیات',
-      align: 'left',
-      field: () => ''
-    }
-  ]
-})
-
-const inputs = ref([
-  { type: 'hidden', name: 'homework_id', value: Number(route.params.id) },
-  { type: 'hidden', name: 'sortation_field', value: 'submitted_at' },
-  { type: 'hidden', name: 'sortation_order', value: 'desc' },
-  { type: 'hidden', name: 'length', value: 10 }
-])
-
-const submissionsIndexRef = ref()
+const submissionsIndexRef = ref<InstanceType<typeof HomeworkSubmissionsCard> | null>(null)
+const selectedStudentName = ref('')
 
 const feedbackForm = ref({
   feedback: null as string | null
@@ -437,19 +326,24 @@ function openPdfPreview (path: string) {
   pdfDialog.value = true
 }
 
-function openSubmissionDetailDialog (submission: HomeworkSubmissionType) {
+function openSubmissionDetailDialog (submission: HomeworkSubmissionType, studentName: string) {
   selectedSubmission.value = submission
+  selectedStudentName.value = studentName
   currentFeedbackSubmissionId.value = submission.id
   feedbackForm.value.feedback = submission.feedback
   submissionDetailDialog.value = true
-  homeworkApi.markAsSeen(submission.id).catch(() => {})
+  if (submission.id) {
+    void homeworkSubmissionApi.markAsSeen(submission.id).then(() => {
+      void submissionsIndexRef.value?.reload()
+    }).catch(() => {})
+  }
 }
 
 async function saveFeedback () {
   if (!currentFeedbackSubmissionId.value) return
   saving.value = true
   try {
-    await homeworkApi.sendFeedback(currentFeedbackSubmissionId.value, feedbackForm.value.feedback)
+    await homeworkSubmissionApi.sendFeedback(currentFeedbackSubmissionId.value, feedbackForm.value.feedback)
     $q.notify({ type: 'positive', message: 'بازخورد ثبت شد' })
     submissionDetailDialog.value = false
     currentFeedbackSubmissionId.value = null
