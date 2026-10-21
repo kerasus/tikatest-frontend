@@ -12,8 +12,12 @@ export function syncServerTime (serverTime: string | undefined) {
 }
 
 export const useDate = () => {
+  function now (): number {
+    return Date.now() + (serverClockOffset ?? 0)
+  }
+
   function getTehranNow (): string {
-    const currentTime = new Date(Date.now() + (serverClockOffset ?? 0))
+    const currentTime = new Date(now())
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone: 'Asia/Tehran',
       year: 'numeric',
@@ -53,7 +57,7 @@ export const useDate = () => {
     return jalaliFrom(date, 'en', miladiFormat).format(shamsiFormat)
   }
 
-  function now (format: string = 'YYYY-MM-DD') {
+  function formatTehranNow (format: string = 'YYYY-MM-DD') {
     return jalaliFrom(getTehranNow(), 'en', 'YYYY-MM-DD HH:mm:ss').format(format)
   }
 
@@ -297,6 +301,7 @@ export const useDate = () => {
 
   return {
     now,
+    formatTehranNow,
     getTehranNow,
     parseTime,
     formatSeconds,

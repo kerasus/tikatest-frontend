@@ -286,7 +286,7 @@ const entityIndexRef = ref()
 const dateManager = useDate()
 
 // ساعت لحظه‌ای برای آپدیت ۱ ثانیه‌ای کامپیوتدها و تایمرها
-const currentTimestamp = ref(Date.now())
+const currentTimestamp = ref(dateManager.now())
 let timerInterval: ReturnType<typeof setInterval> | null = null
 const api = ref(exam.endpoints.studentOnlineExams)
 const label = ref('آزمون‌های آنلاین')
@@ -611,7 +611,7 @@ const getRemainingTime = (session: OnlineExamSessionType | null) => {
 
 onMounted(() => {
   timerInterval = setInterval(() => {
-    currentTimestamp.value = Date.now()
+    currentTimestamp.value = dateManager.now()
   }, 1000)
 })
 

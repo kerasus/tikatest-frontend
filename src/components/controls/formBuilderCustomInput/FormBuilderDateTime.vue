@@ -502,7 +502,7 @@ function utcIsoToLocalGregorianDateTime (isoDateTime: string): {
 
   if (Number.isNaN(date.getTime())) {
     return {
-      date: dateManager.now('YYYY-MM-DD'),
+      date: dateManager.formatTehranNow('YYYY-MM-DD'),
       time: '00:00:00'
     }
   }
@@ -585,7 +585,7 @@ function getCurrentGregorianDate (): string {
       : displayDate.value
   }
 
-  return dateManager.now('YYYY-MM-DD')
+  return dateManager.formatTehranNow('YYYY-MM-DD')
 }
 
 watch(

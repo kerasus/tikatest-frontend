@@ -484,7 +484,7 @@ const dateManager = useDate()
 
 const loading = ref(true)
 const examData = ref<ExamType | null>(null)
-const currentTimestamp = ref(Date.now())
+const currentTimestamp = ref(dateManager.now())
 
 let timerInterval: ReturnType<typeof setInterval> | null = null
 
@@ -817,7 +817,7 @@ const loadExam = async () => {
   try {
     const response = await exam.showStudentOnlineExam(Number(route.params.id))
     examData.value = response
-    currentTimestamp.value = Date.now()
+    currentTimestamp.value = dateManager.now()
   } catch (error: any) {
     $q.notify({
       type: 'negative',
@@ -852,7 +852,7 @@ const goBack = () => {
 onMounted(() => {
   loadExam()
   timerInterval = setInterval(() => {
-    currentTimestamp.value = Date.now()
+    currentTimestamp.value = dateManager.now()
   }, 1000)
 })
 

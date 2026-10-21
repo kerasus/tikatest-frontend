@@ -1,6 +1,5 @@
 <template>
   <entity-show
-    :key="entityShowKey"
     v-model:value="inputs"
     :title="label"
     :api="api"
@@ -47,7 +46,6 @@ const editRouteName = computed(() => {
   return null
 })
 
-const entityShowKey = ref(Date.now())
 const schoolData = ref<SchoolType | null>(null)
 
 const api = ref(schoolApi.endpoints.byId(schoolId.value))
