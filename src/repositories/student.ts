@@ -51,6 +51,8 @@ export default class StudentAPI extends BaseAPI<StudentType> {
       email: null,
       username: null,
       mobile: null,
+      bale_chat_id: null,
+      bale_username: null,
       national_id: null,
       birth_date: null,
       address: null,

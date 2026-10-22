@@ -1,6 +1,6 @@
 export const index = [
   {
-    path: 'profile11',
+    path: 'profile',
     name: 'Student.Profile',
     meta: {
       pageCategory: 'پروفایل'

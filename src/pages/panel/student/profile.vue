@@ -251,6 +251,7 @@
         </q-card>
       </div>
     </div>
+    <bale-connection-card />
   </div>
 </template>
 
@@ -260,6 +261,7 @@ import { useUser } from 'src/stores/user'
 import type { UserType } from 'src/repositories/user'
 import type { SchoolType } from 'src/repositories/school'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import BaleConnectionCard from 'src/components/bale/BaleConnectionCard.vue'
 
 const userManager = useUser()
 const currentSchoolManager = useCurrentSchool()

@@ -173,7 +173,7 @@ const inputs = ref([
     name: 'title',
     label: 'عنوان تکلیف',
     placeholder: ' ',
-    col: 'col-md-3 col-12'
+    col: 'col-md-4 col-12'
   }
 ])
 

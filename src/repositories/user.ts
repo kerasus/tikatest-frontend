@@ -61,6 +61,8 @@ export interface UserType {
   email: string | null;
   username: string | null;
   mobile: string | null;
+  bale_chat_id: string | null;
+  bale_username: string | null;
   national_id: string | null;
   schools: UserSchoolPivoteType[];
   term_enrollments: TermEnrollmentType[];
@@ -97,6 +99,8 @@ export default class UserAPI extends BaseAPI<UserType> {
       username: null,
       national_id: null,
       mobile: null,
+      bale_chat_id: null,
+      bale_username: null,
       roles: [],
       roles_list: [],
       permissions_list: [],

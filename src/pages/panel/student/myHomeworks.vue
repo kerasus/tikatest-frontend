@@ -122,7 +122,7 @@ const inputs = ref([
   {
     type: 'hidden',
     name: 'school_id',
-    value: currentSchoolManager.currentSchool.value.id
+    value: currentSchoolManager.currentSchool.value?.id
   },
   {
     type: FormBuilderInputComponent,

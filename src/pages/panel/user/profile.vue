@@ -285,6 +285,7 @@
         </div>
       </div>
     </div>
+    <bale-connection-card />
   </div>
 </template>
 
@@ -293,6 +294,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUser } from 'src/stores/user'
 import UserAPI, { type UserType, getUserRoleLabel } from 'src/repositories/user'
+import BaleConnectionCard from 'src/components/bale/BaleConnectionCard.vue'
 
 const $q = useQuasar()
 const userManager = useUser()

@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-page">
-
     <!-- پس‌زمینه متحرک -->
     <div class="dreamy-background">
       <div class="aurora aurora-one" />
@@ -18,7 +17,7 @@
             width: particle.size,
             height: particle.size,
             animationDelay: particle.delay,
-            animationDuration: particle.duration
+            animationDuration: particle.duration,
           }" />
       </div>
 
@@ -52,7 +51,6 @@
             <q-icon
               :name="devActionMeta.icon"
               size="24px" />
-
           </div>
 
           <div>
@@ -91,6 +89,7 @@
             </label>
 
             <!-- در بخش نوع عملیات q-select -->
+            <!-- در بخش نوع عملیات q-select -->
             <q-select
               v-model="selectedDevAction"
               dense
@@ -101,17 +100,21 @@
               :disable="executingScript"
               :options="[
                 {
+                  label: 'تنظیم وب‌هوک بازوی بله (Set Webhook)',
+                  value: 'set-bale-webhook',
+                },
+                {
                   label: 'اصلاح رمز عبور دانش‌آموزان (Bcrypt)',
-                  value: 'fix-student-passwords'
+                  value: 'fix-student-passwords',
                 },
                 {
                   label: 'انتقال فایل‌های خارجی آزمون',
-                  value: 'migrate-exam-files'
+                  value: 'migrate-exam-files',
                 },
                 {
                   label: 'بازشماری نتایج آزمون',
-                  value: 'recalculate-exam-results'
-                }
+                  value: 'recalculate-exam-results',
+                },
               ]">
               <template #prepend>
                 <q-icon
@@ -119,9 +122,7 @@
                   color="primary" />
               </template>
             </q-select>
-
           </div>
-
 
           <div class="warning-soft-box q-pa-sm q-mb-md">
             <div class="row items-start no-wrap">
@@ -138,7 +139,7 @@
 
                 <div
                   class="text-caption text-neutral-dark"
-                  style="line-height: 1.8;">
+                  style="line-height: 1.8">
                   {{ devActionMeta.introText }}
                 </div>
               </div>
@@ -224,7 +225,6 @@
             </div>
           </div>
 
-
           <div class="q-mb-md">
             <label class="text-caption text-weight-bold text-neutral-dark-20 q-mb-xs block">
               برای آغاز، کلمه <strong class="text-error">«تایید»</strong> را بنویسید:
@@ -242,11 +242,8 @@
           <div
             v-if="logs.length > 0 || scriptResult"
             class="light-terminal-window q-pa-sm q-mt-md">
-
             <div class="terminal-bar row items-center justify-between q-mb-xs">
-              <span class="text-caption font-mono text-neutral-dark-40">
-                Migration Logs
-              </span>
+              <span class="text-caption font-mono text-neutral-dark-40"> Migration Logs </span>
 
               <div class="row q-gutter-x-xs">
                 <span class="dot d-red" />
@@ -267,12 +264,17 @@
               <div
                 v-if="scriptResult"
                 class="result-pill-box q-mt-sm q-pa-sm">
-
                 <template v-if="selectedDevAction === 'migrate-exam-files'">
                   <div
                     class="text-weight-bold"
-                    :class="scriptResult.failed_count > 0 ? 'text-warning-dark' : 'text-success-dark'">
-                    {{ scriptResult.failed_count > 0 ? '⚠ عملیات با موارد ناموفق تمام شد' : '✔ عملیات موفق' }}
+                    :class="
+                      scriptResult.failed_count > 0 ? 'text-warning-dark' : 'text-success-dark'
+                    ">
+                    {{
+                      scriptResult.failed_count > 0
+                        ? '⚠ عملیات با موارد ناموفق تمام شد'
+                        : '✔ عملیات موفق'
+                    }}
                   </div>
 
                   <div>
@@ -298,9 +300,7 @@
                   <div
                     v-if="scriptResult.failed_urls?.length > 0"
                     class="failed-url-list q-mt-sm">
-                    <div class="text-weight-bold q-mb-xs">
-                      فایل‌های ناموفق:
-                    </div>
+                    <div class="text-weight-bold q-mb-xs">فایل‌های ناموفق:</div>
 
                     <div
                       v-for="(failure, index) in scriptResult.failed_urls"
@@ -312,9 +312,7 @@
 
                       <div class="text-caption">
                         {{ failure.reason }}
-                        <span v-if="failure.status">
-                          (HTTP {{ failure.status }})
-                        </span>
+                        <span v-if="failure.status"> (HTTP {{ failure.status }}) </span>
                       </div>
                     </div>
                   </div>
@@ -379,8 +377,35 @@
                   </div>
                 </template>
 
-              </div>
+                <!-- نمایش خروجی وب‌هوک بله در پنجره ترمینال -->
+                <template v-else-if="selectedDevAction === 'set-bale-webhook'">
+                  <div
+                    class="text-weight-bold"
+                    :class="scriptResult.success ? 'text-success-dark' : 'text-negative'">
+                    {{
+                      scriptResult.success
+                        ? '✔ وب‌هوک بله با موفقیت ثبت شد'
+                        : '✖ خطا در تنظیم وب‌هوک بله'
+                    }}
+                  </div>
 
+                  <div class="q-mt-xs">
+                    کد خروجی:
+                    <strong>{{ scriptResult.exit_code }}</strong>
+                  </div>
+
+                  <div
+                    v-if="scriptResult.output"
+                    class="q-mt-xs">
+                    <div class="text-caption text-neutral-dark q-mb-xs">خروجی کنسول آرتیسان:</div>
+                    <div
+                      class="q-pa-xs bg-grey-2 rounded-borders font-mono text-caption"
+                      style="white-space: pre-wrap; word-break: break-all">
+                      {{ scriptResult.output }}
+                    </div>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -388,7 +413,6 @@
         <q-card-actions
           align="right"
           class="q-px-md q-pb-md">
-
           <q-btn
             v-close-popup
             flat
@@ -404,7 +428,6 @@
             :loading="executingScript"
             :disable="!canRunDevAction"
             @click="handleRunDevAction" />
-
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -415,13 +438,20 @@
 import { useQuasar } from 'quasar'
 import { computed, onMounted, ref } from 'vue'
 import DashboardAPI from 'src/repositories/dashboard'
-import { devAdmin, type ExamFilesMigrationResultType } from 'src/repositories/devAdmin'
+import {
+  type BaleWebhookResultType,
+  devAdmin
+} from 'src/repositories/devAdmin'
 import CheckHealth from './components/checkHealth.vue'
 import AdminStats from './components/adminStats.vue'
 import AdminWelcomeBanner from './components/adminWelcomeBanner.vue'
 import LogViewerDialog from './components/logViewerDialog.vue'
 
-type DevActionType = 'migrate-exam-files' | 'recalculate-exam-results' | 'fix-student-passwords'
+type DevActionType =
+  | 'set-bale-webhook'
+  | 'migrate-exam-files'
+  | 'recalculate-exam-results'
+  | 'fix-student-passwords';
 
 const $q = useQuasar()
 const dashboardAPI = new DashboardAPI()
@@ -453,16 +483,32 @@ const scriptResult = ref<Record<string, any> | null>(null)
 const executingScript = ref(false)
 const logs = ref<string[]>([])
 const targetSchoolIdsInput = ref('1, 2')
-const selectedDevAction = ref<DevActionType>('fix-student-passwords')
+const selectedDevAction = ref<DevActionType>('set-bale-webhook')
 const recalculateExamId = ref<number | null>(null)
 
 const devActionMeta = computed(() => {
+  if (selectedDevAction.value === 'set-bale-webhook') {
+    return {
+      title: 'تنظیم وب‌هوک بازوی بله',
+      badge: 'BALE BOT',
+      badgeColor: 'positive',
+      description: 'ثبت خودکار URL وب‌هوک و سکرت در سرور پیام‌رسان بله از طریق Artisan',
+      icon: 'smart_toy',
+      buttonLabel: 'ثبت وب‌هوک در بله',
+      buttonIcon: 'link',
+      introTitle: 'اتصال رویدادهای بله به سرور تیکاتست',
+      introText:
+        'این دستور دستور bale:set-webhook را در پس‌زمینه اجرا کرده و آدرس سرور شما را همراه با سکرت توکن به API بله معرفی می‌کند تا پیام‌های /start به سرور فوروارد شوند.'
+    }
+  }
+
   if (selectedDevAction.value === 'fix-student-passwords') {
     return {
       title: 'اصلاح رمز عبور دانش‌آموزان',
       badge: 'BCRYPT FIX',
       badgeColor: 'accent',
-      description: 'تبدیل کدهای ملی خام به هش Bcrypt استاندارد جهت فعال‌سازی امکان لاگین دانش‌آموزان',
+      description:
+        'تبدیل کدهای ملی خام به هش Bcrypt استاندارد جهت فعال‌سازی امکان لاگین دانش‌آموزان',
       icon: 'lock_reset',
       buttonLabel: 'شروع هش‌گذاری امن',
       buttonIcon: 'security',
@@ -504,6 +550,10 @@ const devActionMeta = computed(() => {
 const canRunDevAction = computed(() => {
   if (confirmationWord.value.trim() !== 'تایید') return false
 
+  if (selectedDevAction.value === 'set-bale-webhook') {
+    return true
+  }
+
   if (selectedDevAction.value === 'fix-student-passwords') {
     const ids = targetSchoolIdsInput.value
       .split(',')
@@ -523,10 +573,7 @@ const canRunDevAction = computed(() => {
   if (selectedDevAction.value === 'recalculate-exam-results') {
     return (
       recalculateExamId.value === null ||
-      (
-        Number.isInteger(Number(recalculateExamId.value)) &&
-        Number(recalculateExamId.value) > 0
-      )
+      (Number.isInteger(Number(recalculateExamId.value)) && Number(recalculateExamId.value) > 0)
     )
   }
 
@@ -552,6 +599,45 @@ async function handleRunDevAction () {
   logs.value = []
 
   try {
+    if (selectedDevAction.value === 'set-bale-webhook') {
+      logs.value = [
+        'اتصال امن به Sanctum API...',
+        'در حال ارسال درخواست اجرای دستور bale:set-webhook به Artisan...'
+      ]
+
+      const result = await devAdmin.runDevScript<BaleWebhookResultType>('set-bale-webhook')
+      scriptResult.value = result
+
+      if (result.success) {
+        logs.value.push('✔ پاسخ بله با موفقیت دریافت شد.')
+        if (result.output) {
+          logs.value.push(result.output)
+        }
+
+        $q.notify({
+          type: 'positive',
+          icon: 'check_circle',
+          message: 'وب‌هوک بله با موفقیت در سرور ثبت شد!',
+          position: 'top',
+          timeout: 5000
+        })
+      } else {
+        logs.value.push(`[ERROR]: ثبت وب‌هوک با کد ${result.exit_code} شکست خورد.`)
+        if (result.output) {
+          logs.value.push(result.output)
+        }
+
+        $q.notify({
+          type: 'negative',
+          icon: 'error',
+          message: 'خطا در ثبت وب‌هوک بله. خروجی کنسول را بررسی کنید.',
+          position: 'top',
+          timeout: 6000
+        })
+      }
+      return
+    }
+
     if (selectedDevAction.value === 'fix-student-passwords') {
       const parsedSchoolIds = targetSchoolIdsInput.value
         .split(',')
@@ -575,10 +661,9 @@ async function handleRunDevAction () {
         'در حال جست‌وجوی دانش‌آموزان با رمز عبور غیرهش و تبدیل به Bcrypt...'
       ]
 
-      const result = await devAdmin.runDevScript(
-        'fix-student-passwords',
-        { school_ids: parsedSchoolIds }
-      )
+      const result = await devAdmin.runDevScript('fix-student-passwords', {
+        school_ids: parsedSchoolIds
+      })
 
       scriptResult.value = result
 
@@ -611,9 +696,7 @@ async function handleRunDevAction () {
       // ... کد قبلی recalculate ...
     }
   } catch (err: unknown) {
-    const errorMessage = err instanceof Error
-      ? err.message
-      : 'خطای نامشخص'
+    const errorMessage = err instanceof Error ? err.message : 'خطای نامشخص'
 
     logs.value.push(`[ERROR]: ${errorMessage}`)
 
@@ -646,10 +729,7 @@ onMounted(async () => {
     console.error('Error loading dashboard stats:', error)
   } finally {
     // زمان کامل رفت‌وبرگشت درخواست از مرورگر تا پاسخ
-    responseTime.value = Math.max(
-      1,
-      Math.round(performance.now() - requestStartedAt)
-    )
+    responseTime.value = Math.max(1, Math.round(performance.now() - requestStartedAt))
 
     loading.value = false
   }
@@ -835,8 +915,6 @@ $ink: #16152d;
   }
 }
 
-
-
 .failed-url-list {
   max-height: 180px;
   overflow-y: auto;
@@ -854,5 +932,4 @@ $ink: #16152d;
   color: #b4234d;
   font-size: 11px;
 }
-
 </style>

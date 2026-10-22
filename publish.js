@@ -112,6 +112,12 @@ async function uploadFile(client, localFilePath, remoteFilePath) {
     progressBar.tick(info.bytes);
   });
 
+  // 🛡️ ترفند نجات: فعال‌سازی TCP Keep-Alive روی سوکت کنترل basic-ftp
+  if (client.ftp.socket) {
+      client.ftp.socket.setKeepAlive(true, 10000); // ارسال پاکت keep-alive هر ۱۰ ثانیه
+      client.ftp.socket.setTimeout(300000); // ۵ دقیقه
+  }
+
   try {
     await client.uploadFrom(localFilePath, remoteFilePath);
 
@@ -142,7 +148,8 @@ async function triggerDeployment() {
 
 // Main process
 async function main() {
-  const client = new Client();
+  // timeout = 300000 -> 5 minutes
+  const client = new Client(300000);
 
   const appTag = chalk.bgHex('#FFD700').black.bold(`  ${(APP_NAME || 'GitiSam').toUpperCase()}  `);
   const title = chalk.hex('#FF0080').bold('DEPLOYMENT PIPELINE');
@@ -176,7 +183,9 @@ async function main() {
       port: parseInt(FTP_PORT, 10),
       user: FTP_USERNAME,
       password: FTP_PASSWORD,
+      secure: false,
     });
+    client.ftp.ipFamily = 4;
     logDone('Connected successfully.');
 
     // Step 4: Ensure the remote directory exists
