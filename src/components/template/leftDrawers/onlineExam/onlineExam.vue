@@ -15,6 +15,7 @@
       <exam-overall-result
         v-if="session"
         :session="session"
+        :rankings="rankings"
         :answer-keys="answerKeys"
         :session-responses="sessionResponses"
         :status-label="onlineExamStore.statusLabel"
@@ -111,6 +112,7 @@ const isConfirmDialogOpen = ref(false)
 
 const booklets = computed(() => onlineExamStore.booklets)
 const session = computed(() => onlineExamStore.sessionData)
+const rankings = computed(() => onlineExamStore.rankings)
 const answerKeys = computed(() => onlineExamStore.answerKeys ?? null)
 const sessionResponses = computed(() => onlineExamStore.sessionResponses ?? null)
 const isReadonly = computed(() => route.name === 'Student.Exam.Result' || !onlineExamStore.isActive)

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type {
+  ExamSessionRankingsResponse,
   OnlineExamSessionResponseItemType,
   OnlineExamSessionType,
   StartExamResponseType
@@ -22,6 +23,7 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
   const error = ref<string | null>(null)
 
   const sessionData = computed<OnlineExamSessionType | null>(() => session.value?.session ?? null)
+  const rankings = computed<ExamSessionRankingsResponse | null>(() => session.value?.rankings ?? null)
   const student = computed<UserType | null>(() => sessionData.value?.student ?? null)
   const booklets = computed<BookletType[]>(() => sessionData.value?.exam?.online_exam_detail?.booklets ?? [])
   const sessionResponses = computed<OnlineExamSessionResponseItemType[]>(() => sessionData.value?.responses ?? [])
@@ -96,6 +98,7 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
     answerKeys,
     sessionResponses,
     booklets,
+    rankings,
     onlineDetail,
     isActive,
     isResultMode,

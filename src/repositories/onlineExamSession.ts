@@ -120,11 +120,38 @@ export type StudentAnswerKeyType = {
   is_active: boolean | null
 }
 
+export interface ClassRankingItem {
+  class_id: number;
+  class_name: string;
+  academic_level_id: number;
+  academic_level_name: string;
+  rank: number | null; // در صورتی که دانش‌آموز هنوز رتبه‌بندی نشده باشه ممکنه null باشه
+  total_participants: number;
+}
+
+export interface LevelRankingItem {
+  academic_level_id: number;
+  academic_level_name: string;
+  rank: number | null;
+  total_participants: number;
+}
+
+export type RankingMetric = 'percent' | 't_score' | 'raw_score';
+export type RankingAttemptPolicy = 'latest_graded' | 'highest_score' | 'first_attempt';
+
+export interface ExamSessionRankingsResponse {
+  metric: RankingMetric | string;
+  attempt_policy: RankingAttemptPolicy | string;
+  classes: ClassRankingItem[];
+  levels: LevelRankingItem[];
+}
+
 export type StartExamResponseType = {
   session: OnlineExamSessionType
   remaining_time: number | null
   answer_keys: StudentAnswerKeyType[] | null
   error?: string | null
+  rankings?: ExamSessionRankingsResponse | null
   status?: number | string | null
 }
 
