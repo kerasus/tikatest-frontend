@@ -150,7 +150,7 @@ async function submitSession () {
 }
 
 function checkLayoutLeftDrawerOverlay () {
-  appLayoutStore.layoutLeftDrawerOverlay = !$q.screen.gt.md
+  appLayoutStore.layoutLeftDrawerOverlay = !$q.screen.gt.sm
 }
 
 async function confirmSubmit () {
@@ -215,7 +215,7 @@ const syncAnswerKeysFromSession = (freshSession: any) => {
 watch(
   () => route.name,
   () => {
-    if ($q.screen.lt.md) {
+    if ($q.screen.lt.sm) {
       appLayoutStore.layoutLeftDrawerVisible = false
     }
   },
@@ -223,7 +223,7 @@ watch(
 )
 
 watch(
-  () => $q.screen.gt.md,
+  () => $q.screen.gt.sm,
   () => {
     requestAnimationFrame(checkLayoutLeftDrawerOverlay)
   },
@@ -235,3 +235,11 @@ onMounted(async () => {
   requestAnimationFrame(checkLayoutLeftDrawerOverlay)
 })
 </script>
+
+<style lang="scss" scoped>
+:global(.q-drawer.q-drawer--left) {
+  @media (max-width: $breakpoint-sm-max) {
+    background: white;
+  }
+}
+</style>
