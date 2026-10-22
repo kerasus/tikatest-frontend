@@ -29,6 +29,7 @@ export const index = [
     meta: {
       pageCategory: 'شرکت در آزمون',
       layoutConfig: {
+        pageCustomClass: '',
         layoutHeaderType: 'onlineExam',
         layoutLeftDrawerType: 'onlineExam',
         layoutLeftDrawerWidth: 360,
@@ -44,6 +45,7 @@ export const index = [
     meta: {
       pageCategory: 'نتیجه آزمون',
       layoutConfig: {
+        pageCustomClass: '',
         layoutHeaderType: 'onlineExam',
         layoutLeftDrawerType: 'onlineExam',
         layoutLeftDrawerWidth: 360,

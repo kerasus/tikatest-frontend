@@ -95,6 +95,7 @@ export const index = [
               pageCategory: 'نتیجه آزمون',
               layoutConfig: {
                 layoutHeaderType: 'sessionResultAdminView',
+                pageCustomClass: '',
                 layoutLeftDrawerType: 'onlineExam',
                 layoutLeftDrawerWidth: 360,
                 layoutLeftDrawerBehavior: 'default',
