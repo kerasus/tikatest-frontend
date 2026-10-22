@@ -1,9 +1,5 @@
 <template>
   <div class="profile-page q-pa-md q-pa-lg-lg">
-    <!-- پس‌زمینه تزئینی امبینت نوری -->
-    <div class="ambient-glow glow-top-right" />
-    <div class="ambient-glow glow-bottom-left" />
-
     <!-- هدر کریستالی فانتزی با کاور آرورا و آواتار شناور -->
     <div class="glass-card profile-header-card q-mb-lg">
       <div class="aurora-cover">
@@ -404,30 +400,6 @@ async function refreshProfile () {
 <style scoped lang="scss">
 .profile-page {
   position: relative;
-}
-
-/* هاله‌های نوری محیطی در پس‌زمینه */
-.ambient-glow {
-  position: absolute;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.45;
-}
-
-.glow-top-right {
-  top: -40px;
-  right: -40px;
-  background: radial-gradient(circle, rgba($secondary, 0.5) 0%, transparent 70%);
-}
-
-.glow-bottom-left {
-  bottom: 20px;
-  left: -40px;
-  background: radial-gradient(circle, rgba($primary, 0.4) 0%, transparent 70%);
 }
 
 /* کارت شیشه‌ای اصلی */
