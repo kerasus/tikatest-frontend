@@ -6,7 +6,7 @@ import type {
   OnlineExamSessionType,
   StartExamResponseType
 } from 'src/repositories/onlineExamSession'
-import type { BookletType, OnlineExamDetailType } from 'src/repositories/exam'
+import type { BookletType, ExamType, OnlineExamDetailType } from 'src/repositories/exam'
 import type { UserType } from 'src/repositories/user'
 
 const SESSION_STATUS_LABELS: Record<string, string> = {
@@ -25,6 +25,7 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
   const sessionData = computed<OnlineExamSessionType | null>(() => session.value?.session ?? null)
   const rankings = computed<ExamSessionRankingsResponse | null>(() => session.value?.rankings ?? null)
   const student = computed<UserType | null>(() => sessionData.value?.student ?? null)
+  const exam = computed<ExamType | null>(() => session.value?.exam ?? null)
   const booklets = computed<BookletType[]>(() => sessionData.value?.exam?.online_exam_detail?.booklets ?? [])
   const sessionResponses = computed<OnlineExamSessionResponseItemType[]>(() => sessionData.value?.responses ?? [])
   const examTitle = computed(() => sessionData.value?.exam?.name ?? 'آزمون آنلاین')
@@ -89,6 +90,7 @@ export const useOnlineExamSession = defineStore('onlineExamSession', () => {
 
   return {
     session,
+    exam,
     student,
     sessionData,
     loading,

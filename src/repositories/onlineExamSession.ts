@@ -152,6 +152,7 @@ export type StartExamResponseType = {
   answer_keys: StudentAnswerKeyType[] | null
   error?: string | null
   rankings?: ExamSessionRankingsResponse | null
+  exam?: ExamType | null
   status?: number | string | null
 }
 

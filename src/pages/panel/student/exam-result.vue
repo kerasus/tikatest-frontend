@@ -158,8 +158,10 @@ const error = computed({
     onlineExamStore.error = value
   }
 })
-const examContent = computed(() => onlineExamStore.onlineDetail?.content || null)
-const solutionContent = computed(() => onlineExamStore.onlineDetail?.solution || null)
+const exam = computed(() => onlineExamStore.exam)
+const onlineExamDetail = computed(() => exam.value?.online_exam_detail)
+const examContent = computed(() => onlineExamDetail.value?.content || null)
+const solutionContent = computed(() => onlineExamDetail.value?.solution || null)
 
 const loadResult = async () => {
   loading.value = true

@@ -98,8 +98,8 @@
       </template>
       <template v-else-if="inputData.col.name === 'percent'">
         {{
-          inputData.props.row.latest_session?.percent
-            ? inputData.props.row.latest_session.percent + '%'
+          inputData.props.row.online_exam_sessions[0]?.percent
+            ? inputData.props.row.online_exam_sessions[0].percent + '%'
             : '-'
         }}
       </template>
