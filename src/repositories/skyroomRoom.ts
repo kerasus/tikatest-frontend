@@ -64,6 +64,13 @@ export default class SkyroomRoomAPI extends BaseAPI<SkyroomRoomType> {
     const response = await this.getAxiosInstanceWithToken().post(endpoint, payload)
     return response.data
   }
+
+  async getStudentLoginUrl (roomId: number): Promise<string> {
+    const response = await this.getAxiosInstanceWithToken().post<{ join_url: string }>(
+      `${this.baseEndpoint}/${roomId}/student-login-url`
+    )
+    return response.data.join_url
+  }
 }
 
 export const skyroomRoom = new SkyroomRoomAPI()

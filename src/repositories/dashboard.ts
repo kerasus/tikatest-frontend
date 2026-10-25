@@ -11,7 +11,6 @@ export interface ActiveOnlineClass {
   end_time: string
   is_live_now: boolean
   status: 'live' | 'upcoming'
-  join_url: string
 }
 
 export interface UpcomingExam {

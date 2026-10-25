@@ -47,8 +47,8 @@
               class="btn-enter-live text-weight-bolder q-px-md"
               icon-right="rocket_launch"
               label="ورود به اتاق"
-              target="_blank"
-              :href="liveClass.join_url" />
+              :loading="joiningRoomId === liveClass.room_id"
+              @click="enterSkyroom(liveClass.room_id)" />
           </div>
         </div>
       </div>
@@ -130,8 +130,8 @@
                   :icon-right="c.is_live_now ? 'login' : 'link'"
                   :label="c.is_live_now ? 'ورود سریع' : 'دریافت لینک'"
                   dense
-                  target="_blank"
-                  :href="c.join_url" />
+                  :loading="joiningRoomId === c.room_id"
+                  @click="enterSkyroom(c.room_id)" />
               </q-item-section>
             </q-item>
           </q-list>
@@ -403,8 +403,10 @@
 </template>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useDate } from 'src/composables/Date'
+import { skyroomRoom } from 'src/repositories/skyroomRoom'
 import StudentHeader from './components/header.vue'
 import DashboardCard from './components/dashboardCard.vue'
 import {
@@ -414,6 +416,7 @@ import {
 } from 'src/repositories/dashboard'
 
 const dateManager = useDate()
+const $q = useQuasar()
 const examTimingStatusMap: Record<string, { label: string; color: string; icon: string }> = {
   upcoming: { label: 'شروع نشده', color: 'blue-7', icon: 'schedule' },
   running: { label: 'در حال برگزاری', color: 'positive', icon: 'play_circle' },
@@ -426,6 +429,34 @@ let isMounted = false
 
 const stats = ref<StudentDashboardData>(getDefaultStats())
 const loading = ref(false)
+const joiningRoomId = ref<number | null>(null)
+
+async function enterSkyroom (roomId: number) {
+  if (joiningRoomId.value !== null) return
+
+  const newTab = window.open('about:blank', '_blank')
+  if (!newTab) {
+    $q.notify({ type: 'negative', message: 'برای ورود به کلاس، باز شدن پنجره جدید را در مرورگر مجاز کنید.' })
+    return
+  }
+
+  newTab.opener = null
+  joiningRoomId.value = roomId
+
+  try {
+    const url = await skyroomRoom.getStudentLoginUrl(roomId)
+    if (!url) throw new Error('لینک ورود به کلاس دریافت نشد.')
+    newTab.location.replace(url)
+  } catch (error) {
+    newTab.close()
+    $q.notify({
+      type: 'negative',
+      message: error instanceof Error ? error.message : 'دریافت لینک ورود به کلاس ناموفق بود.'
+    })
+  } finally {
+    joiningRoomId.value = null
+  }
+}
 
 const activeOnlineClasses = computed(() => stats.value.active_online_classes || [])
 const liveOnlineClasses = computed(() => activeOnlineClasses.value.filter((c) => c.is_live_now))
