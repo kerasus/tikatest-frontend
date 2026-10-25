@@ -43,7 +43,7 @@ export const index: RouteRecordRaw[] = [
         name: 'Panel.Profile',
         meta: {
           pageCategory: 'پروفایل',
-          middleware: [hasOneOfThisRoles(['Admin', 'Manager', 'Staff', 'Teacher'])]
+          middleware: [hasOneOfThisRoles(['Admin', 'Manager', 'Staff', 'Teacher', 'Student'])]
         },
         component: () => import('src/pages/panel/user/profile.vue')
       },

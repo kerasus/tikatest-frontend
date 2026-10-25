@@ -1,13 +1,5 @@
 export const index = [
   {
-    path: 'profile',
-    name: 'Student.Profile',
-    meta: {
-      pageCategory: 'پروفایل'
-    },
-    component: () => import('src/pages/panel/student/profile.vue')
-  },
-  {
     path: 'online-exams',
     name: 'Student.Exam.List',
     meta: {

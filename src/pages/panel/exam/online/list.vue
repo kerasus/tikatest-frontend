@@ -22,16 +22,27 @@
       </template>
       <template v-else-if="inputData.col.name === 'actions'">
         <div class="action-column-entity-index">
+          <q-btn
+            class="icon-button"
+            color="secondary"
+            flat
+            icon="notifications_active"
+            :loading="notifyingExamId === inputData.props.row.id"
+            :disable="notifyingExamId !== null"
+            @click="confirmNotification(inputData.props.row)">
+            <q-tooltip>اطلاع‌رسانی به دانش‌آموزان شرکت‌نکرده</q-tooltip>
+          </q-btn>
+          <q-btn
+            class="icon-button"
+            color="primary"
+            flat
+            icon="visibility"
+            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
           <delete-btn
             :row="inputData.props.row"
             :api="examApi"
             :use-flag="false"
             @change="afterRemove" />
-          <q-btn
-            color="primary"
-            flat
-            icon="visibility"
-            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
         </div>
       </template>
       <template v-else>
@@ -182,6 +193,33 @@ const inputs = ref([
 ])
 
 const entityIndexRef = ref()
+const notifyingExamId = ref<number | null>(null)
+
+function confirmNotification (item: ExamType) {
+  if (item.id === null) return
+
+  $q.dialog({
+    title: 'تأیید اطلاع‌رسانی',
+    message: `به دانش‌آموزانی که در آزمون «${item.name || ''}» شرکت نکرده‌اند، از طریق بله اطلاع‌رسانی شود؟`,
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    if (notifyingExamId.value !== null || item.id === null) return
+
+    notifyingExamId.value = item.id
+    try {
+      const stats = await examApi.notifyUnparticipatedStudents(item.id)
+      $q.notify({
+        type: stats.failed ? 'warning' : 'positive',
+        message: `ارسال: ${stats.sent}، بدون اتصال بله: ${stats.skipped}، ناموفق: ${stats.failed}`
+      })
+    } catch (error: any) {
+      $q.notify({ type: 'negative', message: error.response?.data?.message || 'خطا در ارسال اطلاع‌رسانی' })
+    } finally {
+      notifyingExamId.value = null
+    }
+  })
+}
 
 const afterRemove = () => {
   entityIndexRef.value.reload()

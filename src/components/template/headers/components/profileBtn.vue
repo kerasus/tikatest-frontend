@@ -129,7 +129,7 @@ const menuItems = [
     icon: 'manage_accounts',
     color: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
     action: () => {
-      router.push({ name: userManager.isStudent ? 'Student.Profile' : 'Panel.Profile' })
+      router.push({ name: 'Panel.Profile' })
     }
   }
 ]

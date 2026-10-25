@@ -581,7 +581,7 @@ const canRunDevAction = computed(() => {
 })
 
 function openDevModal () {
-  selectedDevAction.value = 'fix-student-passwords'
+  selectedDevAction.value = 'set-bale-webhook'
   targetSchoolIdsInput.value = '1, 2'
   confirmationWord.value = ''
   migrationLimit.value = 5

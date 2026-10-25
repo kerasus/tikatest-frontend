@@ -20,7 +20,6 @@
     color="red"
     :loading="loading"
     flat
-    dense
     @click="onClickDeleteBtn(row)" />
 </template>
 
@@ -182,3 +181,4 @@ function afterChangeStatus () {
   emits('change')
 }
 </script>
+0251893405

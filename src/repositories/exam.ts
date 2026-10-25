@@ -119,6 +119,14 @@ export type ExamTimingStatus = {
   ends_in_seconds?: number;
 }
 
+export type ExamNotificationStats = {
+  total: number;
+  sent: number;
+  skipped: number;
+  failed: number;
+  results?: { user_id: number; status: string; reason?: string; error?: string }[];
+}
+
 export type ExamType = {
   id: number | null;
   name: string | null;
@@ -238,6 +246,11 @@ export default class ExamAPI extends BaseAPI<ExamType> {
 
   async examStudents (examId: number, params?: { length?: number }): Promise<ListType<UserType>> {
     const response = await this.getAxiosInstanceWithToken().get(`exams/${examId}/students`, { params })
+    return response.data
+  }
+
+  async notifyUnparticipatedStudents (examId: number): Promise<ExamNotificationStats> {
+    const response = await this.getAxiosInstanceWithToken().post(`${this.baseEndpoint}/${examId}/notify-unparticipated-students`)
     return response.data
   }
 

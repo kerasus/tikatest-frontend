@@ -85,10 +85,12 @@ const error = computed({
     onlineExamStore.error = val
   }
 })
+const exam = computed(() => onlineExamStore.exam)
+const onlineExamDetail = computed(() => exam.value?.online_exam_detail)
 const session = computed(() => onlineExamStore.session?.session ?? null)
-const answerKeys = computed(() => onlineExamStore.answerKeys ?? null)
+const answerKeys = computed(() => onlineExamDetail.value.answer_keys ?? null)
 const examContent = computed(() => {
-  return onlineExamStore.onlineDetail?.content || null
+  return onlineExamDetail.value?.content || null
 })
 
 const startSession = async () => {

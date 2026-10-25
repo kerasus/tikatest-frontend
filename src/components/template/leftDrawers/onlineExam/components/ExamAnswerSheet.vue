@@ -154,7 +154,7 @@
       <q-table
         v-if="answerKeys"
         :columns="answerColumns"
-        :rows="filteredAnswerKeys"
+        :rows="localOnlineExamAnswerKeys"
         row-key="question_number"
         :rows-per-page-options="[0]"
         dense
