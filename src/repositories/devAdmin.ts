@@ -7,6 +7,7 @@ export type DevScriptActionType =
   | 'migrate-exam-files'
   | 'recalculate-exam-results'
   | 'fix-student-passwords'
+  | 'flush-school-ftp-cache'
 
 // ۱. تایپ ریسپانس وب‌هوک بله
 export interface BaleWebhookResultType {
