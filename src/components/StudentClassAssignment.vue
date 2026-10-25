@@ -419,6 +419,7 @@ function loadRegistrations () {
 }
 
 watch(() => props.termEnrollments, () => {
+  selectedSchoolId.value = props.schoolId
   loadRegistrations()
 }, {
   immediate: true

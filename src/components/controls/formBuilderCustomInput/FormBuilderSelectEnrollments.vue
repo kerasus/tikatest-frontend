@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import SchoolClassAPI from 'src/repositories/schoolClass'
 import type { SchoolClassType } from 'src/repositories/schoolClass'
 import { useEntitySelector } from 'src/composables/useEntitySelector'
@@ -128,7 +128,8 @@ const selectedEnrollments = ref<{ schoolClass: SchoolClassType; term_id: number 
 
 const selectedClass = ref<SchoolClassType | null>(null)
 
-const selectedClasses = ref<SchoolClassType[]>([])
+// const selectedClasses = ref<SchoolClassType[]>([])
+const selectedClasses = computed(() => selectedEnrollments.value.map( (i) => i.schoolClass))
 
 const schoolClassAPI = new SchoolClassAPI()
 
@@ -234,7 +235,7 @@ watch(
 
     // کلاس‌ها رو بکش
     const res = await schoolClassAPI.index({
-      ids: classIds, // اگر API شما ids را اینطوری می‌گیرد
+      id_in: classIds, // اگر API شما ids را اینطوری می‌گیرد
       sortation_field: 'created_at',
       sortation_order: 'desc'
     })
