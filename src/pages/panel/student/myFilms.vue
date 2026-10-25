@@ -199,17 +199,36 @@
               {{ selectedFilm?.label || 'پخش ویدیو' }}
             </div>
           </div>
+
           <q-space />
-          <q-btn
-            v-close-popup
-            flat
-            round
-            dense
-            color="grey-4"
-            icon="close"
-            class="cinema-close-btn"
-            aria-label="بستن" />
+
+          <div class="row items-center q-gutter-x-sm">
+            <!-- دکمه دانلود فیلم -->
+            <q-btn
+              flat
+              round
+              dense
+              color="grey-4"
+              icon="download"
+              class="cinema-action-btn"
+              aria-label="دانلود ویدیو"
+              @click="downloadCurrentFilm">
+              <q-tooltip class="bg-grey-9 text-caption">دانلود ویدیو</q-tooltip>
+            </q-btn>
+
+            <!-- دکمه بستن -->
+            <q-btn
+              v-close-popup
+              flat
+              round
+              dense
+              color="grey-4"
+              icon="close"
+              class="cinema-close-btn"
+              aria-label="بستن" />
+          </div>
         </q-toolbar>
+
 
         <div class="cinema-body">
           <video
@@ -546,6 +565,24 @@ function resolveFileUrl (path: string): string {
   return new URL(path, `${window.location.origin}/`).href
 }
 
+function downloadCurrentFilm () {
+  if (!selectedFilm.value?.file) return
+
+  const file = selectedFilm.value.file
+  const fileUrl = resolveFileUrl(file.url || file.path)
+  if (!fileUrl) return
+
+  // ایجاد تگ a موقت برای تریگر دانلود مستقیم با حفظ نام فایل
+  const link = document.createElement('a')
+  link.href = fileUrl
+  link.download = file.name || selectedFilm.value.label || 'video.mp4'
+  link.target = '_blank'
+  link.rel = 'noopener noreferrer'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 onMounted(loadFilms)
 </script>
 
@@ -809,6 +846,24 @@ onMounted(loadFilms)
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   outline: none;
   background: #000;
+}
+
+.cinema-action-btn,
+.cinema-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(124, 77, 255, 0.3);
+    border-color: rgba(124, 77, 255, 0.5);
+    color: #ffffff !important;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 599px) {
