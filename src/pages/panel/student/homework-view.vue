@@ -232,7 +232,7 @@
               icon="cloud_upload"
               :label="submission ? 'بروزرسانی پاسخ' : 'ثبت نهایی تکلیف'"
               :loading="submitting"
-              :disable="!canSubmit"
+              :disable="!canSubmit || !hasSubmissionContent"
               class="text-weight-bold q-px-md">
               <template #loading>
                 <q-spinner-dots class="on-left" />
@@ -572,6 +572,15 @@ const canSubmit = computed(() => {
   const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
   const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
   return todayOnly <= dueDateOnly
+})
+
+const hasSubmissionContent = computed(() => {
+  const content = submissionContent.value
+  if (!content) return false
+  if (content.file) return true
+  if (typeof content.path === 'string' && content.path.trim() !== '') return true
+  if (typeof content.body === 'string' && content.body.trim() !== '') return true
+  return false
 })
 const submissionContentDisplay = computed(() => {
   const sub = submission.value as any
