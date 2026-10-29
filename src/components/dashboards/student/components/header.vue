@@ -2,47 +2,48 @@
   <q-card
     flat
     class="student-header-compact q-mb-md">
-    <!-- لایه تاریک شیشه‌ای تقویتی برای خوانایی حداکثری متون -->
+    <!-- لایه گرادیان شیشه‌ای و الگوی مدرن هدر -->
     <div class="header-overlay" />
 
     <q-card-section class="header-main-row q-pa-none">
-      <!-- بخش برند و پیام خوش‌آمد فشرده -->
+      <!-- بخش برند، وضعیت و پیام خوش‌آمد -->
       <div class="welcome-box">
-        <div class="brand-bar row items-center no-wrap q-gutter-x-sm">
-          <!-- لوگوی اپلیکیشن -->
-          <div class="compact-logo-badge compact-logo-badge--app">
-            <img
-              :src="appLogo"
-              alt="سنجاد"
-              class="logo-img">
-            <span class="logo-name text-weight-bolder">سنجاد</span>
+        <div class="brand-bar row items-center justify-between no-wrap">
+          <div class="row items-center q-gutter-x-sm no-wrap">
+            <!-- لوگوی پلتفرم سنجاد -->
+            <div class="compact-logo-badge compact-logo-badge--app">
+              <img
+                :src="appLogo"
+                alt="سنجاد"
+                class="logo-img">
+              <span class="logo-name text-weight-bolder">سنجاد</span>
+            </div>
+
+            <q-icon
+              name="bolt"
+              class="divider-lightning" />
+
+            <!-- لوگوی مدرسه دانش‌آموز -->
+            <div class="compact-logo-badge compact-logo-badge--school">
+              <img
+                :src="currentSchoolLogo"
+                :alt="schoolName"
+                class="logo-img"
+                @error="handleSchoolLogoError">
+              <span class="logo-name text-weight-bolder ellipsis">{{ schoolName }}</span>
+            </div>
           </div>
 
-          <q-icon
-            name="bolt"
-            class="divider-lightning" />
-
-          <!-- لوگوی مدرسه -->
-          <div class="compact-logo-badge compact-logo-badge--school">
-            <img
-              :src="currentSchoolLogo"
-              :alt="schoolName"
-              class="logo-img"
-              @error="handleSchoolLogoError">
-            <span class="logo-name text-weight-bolder ellipsis">{{ schoolName }}</span>
-          </div>
-
-          <!-- بج وضعیت فعال -->
-          <div class="status-pill">
-            <span class="status-dot" />
-            <span>آماده یادگیری 🚀</span>
+          <!-- بج مدرن وضعیت پیام‌رسان بله (مدال افتخار یا دکمه فراخوان پرانرژی) -->
+          <div class="bale-badge-slot">
+            <student-bale-badge />
           </div>
         </div>
 
-        <div class="welcome-titles">
-          <h1 class="hero-title">
-            داشبورد دانش‌آموزی
-            <span class="gradient-text">سنجاد</span>
+        <div class="welcome-titles q-mt-xs">
+          <h1 class="hero-title row items-center no-wrap">
+            <span>داشبورد دانش‌آموزی</span>
+            <span class="gradient-text q-mr-xs">سنجاد</span>
           </h1>
           <p class="hero-subtitle">
             امروز هم یک قدم پرانرژی‌تر به سمت هدفت بردار! ✨
@@ -60,7 +61,7 @@
               size="18px" />
             <span>دسترسی سریع</span>
           </div>
-          <span class="quick-nav-hint">انتخاب کن</span>
+          <span class="quick-nav-hint">میانبرها</span>
         </div>
 
         <div class="quick-nav-buttons">
@@ -120,7 +121,7 @@
             name="verified"
             size="15px"
             class="text-teal-3" />
-          <span>یادگیری هوشمند و پویا</span>
+          <span>یادگیری هوشمند و پیوسته</span>
         </div>
       </div>
 
@@ -136,25 +137,17 @@
 import { computed } from 'vue'
 import { SchoolFeatureKey } from 'src/repositories/schoolFeature'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import StudentBaleBadge from './StudentBaleBadge.vue'
 
 const currentSchoolManager = useCurrentSchool()
 const appLogo = '/images/logo.png'
 
-const currentSchool = computed(() => {
-  return currentSchoolManager.currentSchool.value as any
-})
-
 const schoolName = computed(() => {
-  return (
-    currentSchool.value?.name ||
-    currentSchool.value?.title ||
-    currentSchool.value?.school_name ||
-    'مدرسه شما'
-  )
+  return currentSchoolManager.currentSchool.value?.name || 'مدرسه شما'
 })
 
 const currentSchoolLogo = computed(() => {
-  const logo = currentSchool.value?.logo
+  const logo = currentSchoolManager.currentSchool.value?.logo
 
   if (!logo) {
     return appLogo
@@ -176,7 +169,7 @@ const currentSchoolLogo = computed(() => {
 })
 
 const hasFtpPanelFeature = computed(() => {
-  const features = currentSchool.value?.features || []
+  const features = currentSchoolManager.currentSchool.value?.features || []
 
   return features.some((feature: any) =>
     feature?.feature_key === SchoolFeatureKey.FtpPanel &&
@@ -205,28 +198,23 @@ function handleSchoolLogoError (event: Event) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  direction: rtl;
   border-radius: 24px !important;
 
   /* تصویر پس‌زمینه با گرادیان تیره هماهنگ */
   background:
-  /* rtl:ignore */
-    linear-gradient(135deg, rgba(59, 91, 219, 0.05) 0%, rgba(139, 127, 212, 0.45) 100%),
+    linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(88, 28, 135, 0.65) 100%),
     url('/images/background/bg-2.jpeg') center/cover no-repeat !important;
 
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 16px 36px -8px rgba(30, 10, 60, 0.45),
+    0 16px 36px -8px rgba(20, 10, 45, 0.5),
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
-/* لایه ملایم برای بهبود کنتراست متن */
 .header-overlay {
   position: absolute;
   inset: 0;
-  display: none;
-  /* rtl:ignore */
-  background: radial-gradient(circle at 15% 50%, rgb(48 155 53 / 11%) 0%, rgb(44 155 53 / 20%) 70%, transparent 100%);
+  background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.2) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -236,7 +224,7 @@ function handleSchoolLogoError (event: Event) {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(310px, 0.95fr);
+  grid-template-columns: minmax(0, 1.4fr) minmax(310px, 0.9fr);
   align-items: center;
   gap: 18px;
   padding: 18px 24px !important;
@@ -251,8 +239,7 @@ function handleSchoolLogoError (event: Event) {
 }
 
 .brand-bar {
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .compact-logo-badge {
@@ -289,32 +276,10 @@ function handleSchoolLogoError (event: Event) {
   filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7));
 }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.2);
-  border: 1px solid rgba(52, 211, 153, 0.45);
-  color: #6ee7b7;
-  font-size: 11px;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #34d399;
-    box-shadow: 0 0 8px #34d399;
-  }
-}
-
 .welcome-titles {
   .hero-title {
     margin: 0;
-    font-size: clamp(20px, 2.3vw, 25px);
+    font-size: clamp(20px, 2.2vw, 24px);
     font-weight: 900;
     line-height: 1.3;
     color: #ffffff;
@@ -331,7 +296,7 @@ function handleSchoolLogoError (event: Event) {
 
   .hero-subtitle {
     margin: 4px 0 0;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 500;
     color: rgba(243, 232, 255, 0.9);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
@@ -346,7 +311,7 @@ function handleSchoolLogoError (event: Event) {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.2),
+    0 12px 28px rgba(0, 0, 0, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -411,7 +376,7 @@ function handleSchoolLogoError (event: Event) {
   min-height: 32px;
   padding: 0 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(10, 4, 22, 0.35);
+  background: rgba(10, 4, 22, 0.45);
   font-size: 11.5px;
   color: rgba(241, 245, 249, 0.85);
 }
@@ -445,8 +410,13 @@ function handleSchoolLogoError (event: Event) {
 @media (max-width: 960px) {
   .header-main-row {
     grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 14px 16px !important;
+    gap: 16px;
+    padding: 16px !important;
+  }
+
+  .brand-bar {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 
@@ -460,11 +430,18 @@ function handleSchoolLogoError (event: Event) {
   }
 
   .compact-logo-badge .logo-name {
-    max-width: 90px;
+    max-width: 80px;
   }
 
   .welcome-titles .hero-title {
     font-size: 18px;
+  }
+
+  .bale-badge-slot {
+    width: 100%;
+    margin-top: 4px;
+    display: flex;
+    justify-content: flex-start;
   }
 
   .nav-btn {

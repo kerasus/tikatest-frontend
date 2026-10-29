@@ -14,7 +14,7 @@ export const useCurrentSchool = () => {
   function getUserSchool (): SchoolType[] {
     const mySchools = userStoreManager.me?.schools ?? []
     const enrollmentSchools = (userStoreManager.me?.term_enrollments ?? [])
-      .map((te) => te.school)
+      .map((te) => te.school_class?.academic_level?.academic_field?.school)
       .filter(Boolean) as SchoolType[]
 
     return Object.values(
