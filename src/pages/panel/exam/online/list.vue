@@ -1,65 +1,216 @@
 <template>
-  <entity-index
-    ref="entityIndexRef"
-    :value="inputs"
-    :title="label"
-    :api="api"
-    :table="table"
-    :table-keys="tableKeys"
-    :create-route-name="createRouteName"
-    :show-route-name="showRouteName"
-    :show-close-button="false"
-    :show-expand-button="false"
-    :show-reload-button="false"
-    :show-search-button="true"
-    :row-key="itemIdentifyKey">
-    <template #entity-index-table-cell="{ inputData }">
-      <template v-if="inputData.col.name === 'lesson'">
-        {{ inputData.props.row.lesson?.name || '-' }}
-      </template>
-      <template v-else-if="inputData.col.name === 'category'">
-        {{ inputData.props.row.category?.title || '-' }}
-      </template>
-      <template v-else-if="inputData.col.name === 'actions'">
-        <div class="action-column-entity-index">
-          <q-btn
-            class="icon-button"
-            color="secondary"
-            flat
-            icon="notifications_active"
-            :loading="notifyingExamId === inputData.props.row.id"
-            :disable="notifyingExamId !== null"
-            @click="confirmNotification(inputData.props.row)">
-            <q-tooltip>اطلاع‌رسانی به دانش‌آموزان شرکت‌نکرده</q-tooltip>
-          </q-btn>
-          <q-btn
-            class="icon-button"
-            color="primary"
-            flat
-            icon="visibility"
-            :to="{ name: showRouteName, params: { id: inputData.props.row.id } }" />
-          <delete-btn
-            :row="inputData.props.row"
-            :api="examApi"
-            :use-flag="false"
-            @change="afterRemove" />
+  <div class="online-exam-list-page">
+    <crud-index
+      ref="crudIndexRef"
+      title="آزمون‌ها"
+      icon="quiz"
+      :create-button="{tooltip: 'افزودن آزمون جدید', to: { name: createRouteName }}"
+      :request="onRequest"
+      :get-filters="getFilters"
+      @reset="resetFiltersHandler">
+
+      <!-- ۲. اسلات فیلترها -->
+      <template #filters="{ search }">
+        <div class="row q-col-gutter-md">
+          <div
+            v-if="!currentSchoolId"
+            class="col-12 col-md-4">
+            <form-builder-select-school
+              v-model:value="filters.school_id"
+              label="مدرسه"
+              outlined
+              dense
+              bg-color="white"
+              @update:value="() => onSchoolChange(search)" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-select-academic-field
+              :key="effectiveSchoolId ?? 'all-fields'"
+              v-model:value="filters.field_id"
+              label="رشته"
+              outlined
+              dense
+              bg-color="white"
+              :school-id="effectiveSchoolId"
+              @update:value="() => onFieldChange(search)"
+              @keyup.enter="() => search()" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-select-academic-level
+              :key="`${effectiveSchoolId ?? 'all'}-${filters.field_id ?? 'all'}`"
+              v-model:value="filters.academic_level_id"
+              label="پایه"
+              outlined
+              dense
+              bg-color="white"
+              :school-id="effectiveSchoolId"
+              :field-id="filters.field_id"
+              @update:value="() => onLevelChange(search)"
+              @keyup.enter="() => search()" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-select-school-class
+              :key="`${effectiveSchoolId ?? 'all'}-${filters.field_id ?? 'all'}-${filters.academic_level_id ?? 'all'}`"
+              v-model:value="filters.class_id"
+              label="کلاس"
+              outlined
+              dense
+              bg-color="white"
+              :school-id="effectiveSchoolId"
+              :field-id="filters.field_id"
+              :level-id="filters.academic_level_id"
+              @update:value="() => search()"
+              @keyup.enter="() => search()" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-input
+              v-model:value="filters.name"
+              label="نام آزمون"
+              placeholder=" "
+              outlined
+              dense
+              bg-color="white"
+              @keyup.enter="() => search()" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-select-lesson
+              :key="effectiveSchoolId ?? 'all-lessons'"
+              v-model:value="filters.lesson_id"
+              label="درس"
+              outlined
+              dense
+              bg-color="white"
+              :school-id="effectiveSchoolId"
+              @update:value="() => search()"
+              @keyup.enter="() => search()" />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <form-builder-select-exam-category
+              v-model:value="filters.exam_category_id"
+              label="دسته‌بندی آزمون"
+              outlined
+              dense
+              bg-color="white"
+              @update:value="() => search()"
+              @keyup.enter="() => search()" />
+          </div>
         </div>
       </template>
-      <template v-else>
-        {{ inputData.col.value }}
+
+      <!-- ۳. اسلات جدول -->
+      <template #table="{ rows, loading, pagination, onRequest }">
+        <q-table
+          :pagination="pagination"
+          class="online-exam-table"
+          :rows="rows"
+          :columns="columns"
+          row-key="id"
+          :loading="loading"
+          flat
+          @request="onRequest">
+
+          <template #loading>
+            <q-inner-loading
+              showing
+              color="primary">
+              <q-spinner-dots
+                size="45px"
+                color="primary" />
+              <div class="text-caption text-primary q-mt-xs">در حال دریافت آزمون‌ها...</div>
+            </q-inner-loading>
+          </template>
+
+          <template #body-cell-name="props">
+            <q-td :props="props">
+              <span class="text-weight-bold text-dark">{{ props.row.name || '-' }}</span>
+            </q-td>
+          </template>
+
+          <template #body-cell-lesson="props">
+            <q-td :props="props">
+              {{ props.row.lesson?.name || '-' }}
+            </q-td>
+          </template>
+
+          <template #body-cell-category="props">
+            <q-td :props="props">
+              {{ props.row.category?.title || '-' }}
+            </q-td>
+          </template>
+
+          <template #body-cell-created_at="props">
+            <q-td :props="props">
+              {{ props.row.created_at ? dateManager.isoToLocalShamsi(props.row.created_at) : '-' }}
+            </q-td>
+          </template>
+
+          <template #body-cell-actions="props">
+            <q-td :props="props">
+              <div class="action-column-entity-index">
+                <q-btn
+                  class="icon-button"
+                  color="secondary"
+                  flat
+                  round
+                  dense
+                  icon="notifications_active"
+                  :loading="notifyingExamId === props.row.id"
+                  :disable="notifyingExamId !== null"
+                  @click="confirmNotification(props.row)">
+                  <q-tooltip>اطلاع‌رسانی به دانش‌آموزان شرکت‌نکرده</q-tooltip>
+                </q-btn>
+
+                <q-btn
+                  class="icon-button"
+                  color="primary"
+                  flat
+                  round
+                  dense
+                  icon="visibility"
+                  :to="{ name: showRouteName, params: { id: props.row.id } }">
+                  <q-tooltip>مشاهده جزئیات</q-tooltip>
+                </q-btn>
+
+                <delete-btn
+                  :row="props.row"
+                  :api="examApi"
+                  :use-flag="false"
+                  @change="afterRemove" />
+              </div>
+            </q-td>
+          </template>
+
+          <template #no-data>
+            <div class="full-width column flex-center q-pa-xl text-grey-6">
+              <q-icon
+                name="sentiment_dissatisfied"
+                size="48px"
+                color="grey-4" />
+              <div class="text-subtitle2 q-mt-sm">هیچ آزمونی یافت نشد!</div>
+            </div>
+          </template>
+        </q-table>
       </template>
-    </template>
-  </entity-index>
+
+    </crud-index>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import { EntityIndex } from 'quasar-crud'
 import { useDate } from 'src/composables/Date'
 import { exam, type ExamType } from 'src/repositories/exam'
 import DeleteBtn from 'src/components/controls/deleteBtn.vue'
+import CrudIndex from 'src/components/CrudIndex/CrudIndex.vue'
 import { useCurrentSchool } from 'src/composables/useCurrentSchool'
+import type { CrudPaginationState } from 'src/components/CrudIndex/CrudIndex.vue'
 import FormBuilderInput from 'src/components/controls/formBuilderCustomInput/FormBuilderInput.vue'
 import FormBuilderSelectLesson from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectLesson.vue'
 import FormBuilderSelectSchool from 'src/components/controls/formBuilderCustomInput/FormBuilderSelectSchool.vue'
@@ -72,128 +223,112 @@ const $q = useQuasar()
 const dateManager = useDate()
 const currentSchoolManager = useCurrentSchool()
 
-const FormBuilderInputComponent = shallowRef(FormBuilderInput)
-const FormBuilderSelectLessonComponent = shallowRef(FormBuilderSelectLesson)
-const FormBuilderSelectSchoolComponent = shallowRef(FormBuilderSelectSchool)
-const FormBuilderSelectSchoolClassComponent = shallowRef(FormBuilderSelectSchoolClass)
-const FormBuilderSelectExamCategoryComponent = shallowRef(FormBuilderSelectExamCategory)
-const FormBuilderSelectAcademicFieldComponent = shallowRef(FormBuilderSelectAcademicField)
-const FormBuilderSelectAcademicLevelComponent = shallowRef(FormBuilderSelectAcademicLevel)
-
+const crudIndexRef = ref()
 const examApi = exam
 
-const api = ref(exam.endpoints.base)
-const label = ref('آزمون‌ها')
-const createRouteName = ref('Panel.Exam.Online.Create')
-const showRouteName = ref('Panel.Exam.Online.Show')
-const itemIdentifyKey = ref('id')
-const tableKeys = ref({
-  data: 'data',
-  total: 'total',
-  currentPage: 'current_page',
-  perPage: 'per_page',
-  pageKey: 'page'
-})
+const createRouteName = 'Panel.Exam.Online.Create'
+const showRouteName = 'Panel.Exam.Online.Show'
 
-const table = ref({
-  columns: [
-    {
-      name: 'name',
-      required: true,
-      label: 'نام آزمون',
-      align: 'center' as const,
-      field: 'name',
-      sortable: true
-    },
-    { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
-    { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
-    {
-      name: 'created_at',
-      required: true,
-      label: 'تاریخ ثبت',
-      align: 'left',
-      field: (row: ExamType) =>
-        row.created_at
-          ? dateManager.isoToLocalShamsi(row.created_at)
-          : '-'
-    },
-    {
-      name: 'actions',
-      required: true,
-      label: 'عملیات',
-      align: 'left',
-      field: () => ''
-    }
-  ]
-})
+const currentSchoolId = computed(() => currentSchoolManager.currentSchool.value?.id ?? null)
+const effectiveSchoolId = computed(() => filters.school_id || currentSchoolId.value)
 
-const inputs = ref([
-  {
-    type: 'hidden',
-    name: 'sortation_field',
-    value: 'created_at'
-  },
-  {
-    type: 'hidden',
-    name: 'sortation_order',
-    value: 'desc'
-  },
-  {
-    type: 'hidden',
-    name: 'length',
-    value: 10
-  },
-  {
-    type: 'hidden',
-    name: 'delivery_mode',
-    value: 'online'
-  },
-  {
-    type: FormBuilderSelectSchoolComponent,
-    name: 'inSchool',
-    label: 'مدرسه',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderSelectAcademicFieldComponent,
-    name: 'field_id',
-    label: 'رشته',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderSelectAcademicLevelComponent,
-    name: 'academic_level_id',
-    label: 'پایه',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderSelectSchoolClassComponent,
-    name: 'class_id',
-    label: 'کلاس',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderInputComponent,
-    name: 'name',
-    label: 'نام آزمون',
-    placeholder: ' ',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderSelectLessonComponent,
-    name: 'lesson_id',
-    label: 'درس',
-    col: 'col-md-4 col-12'
-  },
-  {
-    type: FormBuilderSelectExamCategoryComponent,
-    name: 'exam_category_id',
-    col: 'col-md-4 col-12'
-  }
-])
-
-const entityIndexRef = ref()
 const notifyingExamId = ref<number | null>(null)
+
+const filters = reactive({
+  school_id: null as number | null,
+  field_id: null as number | null,
+  academic_level_id: null as number | null,
+  class_id: null as number | null,
+  lesson_id: null as number | null,
+  exam_category_id: null as number | null,
+  name: ''
+})
+
+const columns = [
+  { name: 'name', label: 'نام آزمون', align: 'left' as const, field: 'name' },
+  { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
+  { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
+  { name: 'created_at', label: 'تاریخ ثبت', align: 'center' as const, field: 'created_at' },
+  { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'id' }
+]
+
+const fetchExams = (params: Record<string, any>) => {
+  return exam.index(params)
+}
+
+function getFilters (): Record<string, any> {
+  const result: Record<string, any> = {
+    delivery_mode: 'online'
+  }
+
+  const school = effectiveSchoolId.value
+  if (school) result.inSchool = school
+  if (filters.field_id) result.field_id = filters.field_id
+  if (filters.academic_level_id) result.academic_level_id = filters.academic_level_id
+  if (filters.class_id) result.class_id = filters.class_id
+  if (filters.lesson_id) result.lesson_id = filters.lesson_id
+  if (filters.exam_category_id) result.exam_category_id = filters.exam_category_id
+  if (filters.name?.trim()) result.name = filters.name.trim()
+
+  return result
+}
+
+function onSchoolChange (search: () => void) {
+  filters.field_id = null
+  filters.academic_level_id = null
+  filters.class_id = null
+  filters.lesson_id = null
+  search()
+}
+
+function onFieldChange (search: () => void) {
+  filters.academic_level_id = null
+  filters.class_id = null
+  search()
+}
+
+function onLevelChange (search: () => void) {
+  filters.class_id = null
+  search()
+}
+
+const onRequest = async (
+  _crudFilters: Record<string, unknown>,
+  pagination: CrudPaginationState
+) => {
+  // فیلترهای فعال فرم + دلیوری مود آنلاین
+  const queryParams: Record<string, any> = {
+    delivery_mode: 'online',
+    page: pagination.page,
+    length: pagination.rowsPerPage,
+    sort_by: pagination.sortBy,
+    descending: pagination.descending ? 1 : 0
+  }
+
+  const school = effectiveSchoolId.value
+  if (school) queryParams.inSchool = school
+  if (filters.field_id) queryParams.field_id = filters.field_id
+  if (filters.academic_level_id) queryParams.academic_level_id = filters.academic_level_id
+  if (filters.class_id) queryParams.class_id = filters.class_id
+  if (filters.lesson_id) queryParams.lesson_id = filters.lesson_id
+  if (filters.exam_category_id) queryParams.exam_category_id = filters.exam_category_id
+  if (filters.name?.trim()) queryParams.name = filters.name.trim()
+
+  return await exam.index(queryParams)
+}
+
+function resetFiltersHandler () {
+  filters.name = ''
+  filters.lesson_id = null
+  filters.exam_category_id = null
+  filters.class_id = null
+  filters.academic_level_id = null
+  filters.field_id = null
+  if (!currentSchoolId.value) {
+    filters.school_id = null
+  }
+  crudIndexRef.value?.search()
+}
 
 function confirmNotification (item: ExamType) {
   if (item.id === null) return
@@ -214,53 +349,40 @@ function confirmNotification (item: ExamType) {
         message: `ارسال: ${stats.sent}، بدون اتصال بله: ${stats.skipped}، ناموفق: ${stats.failed}`
       })
     } catch (error: any) {
-      $q.notify({ type: 'negative', message: error.response?.data?.message || 'خطا در ارسال اطلاع‌رسانی' })
+      $q.notify({
+        type: 'negative',
+        message: error.response?.data?.message || 'خطا در ارسال اطلاع‌رسانی'
+      })
     } finally {
       notifyingExamId.value = null
     }
   })
 }
 
-const afterRemove = () => {
-  entityIndexRef.value.reload()
+function afterRemove () {
+  crudIndexRef.value?.refresh()
   $q.notify({
     message: 'حذف با موفقیت انجام شد.',
     type: 'positive'
   })
 }
 
-function loadInputsForCurrentSchool () {
-  const currentSchoolId = currentSchoolManager?.currentSchool.value?.id
-  if (!currentSchoolId) {
-    return
-  }
-  inputs.value.forEach((item) => {
-    if (item.name === 'inSchool') {
-      item.type = 'hidden'
-      item.value = currentSchoolId
-    } else if (item.name === 'field_id') {
-      // @ts-ignore
-      item.schoolId = currentSchoolId
-    } else if (item.name === 'academic_level_id') {
-      // @ts-ignore
-      item.schoolId = currentSchoolId
-    } else if (item.name === 'class_id') {
-      // @ts-ignore
-      item.schoolId = currentSchoolId
-    } else if (item.name === 'lesson_id') {
-      // @ts-ignore
-      item.schoolId = currentSchoolId
+watch(
+  currentSchoolId,
+  (schoolId) => {
+    if (schoolId) {
+      filters.school_id = schoolId
     }
-  })
-}
-
-loadInputsForCurrentSchool()
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="scss" scoped>
 .action-column-entity-index {
-  display: flex;
-  gap: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   justify-content: center;
 }
 </style>
