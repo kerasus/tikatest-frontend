@@ -217,7 +217,8 @@ const topLinks = ref<ListItemType[]>([
     child: [
       { icon: '', title: 'ارسال پیام', route: { name: 'Panel.Message.Create' } },
       { icon: '', title: 'مشاهده پیام های ارسالی', route: { name: 'Panel.Message.Sent' } },
-      { icon: '', title: 'مشاهده پیام های دریافتی', route: { name: 'Panel.Message.Received' } }
+      { icon: '', title: 'مشاهده پیام های دریافتی', route: { name: 'Panel.Message.Received' } },
+      { icon: '', title: 'ارسال پیام بله', route: { name: 'Panel.Message.Bale' } }
     ]
   },
   {

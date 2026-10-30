@@ -75,7 +75,8 @@ export default class MessageAPI extends BaseAPI<MessageType> {
       sent: '/messages/sent',
       received: '/messages/received',
       sendToStudent: '/messages/send-to-student',
-      sendToClass: '/messages/send-to-class'
+      sendToClass: '/messages/send-to-class',
+      sendToStudents: '/messages/send-to-students'
     }
   }
 
@@ -96,6 +97,11 @@ export default class MessageAPI extends BaseAPI<MessageType> {
 
   async sendToClass (data: any): Promise<any> {
     const response = await this.getAxiosInstanceWithToken().post(this.endpoints.sendToClass, data)
+    return response.data
+  }
+
+  async sendToStudents (data: any): Promise<any> {
+    const response = await this.getAxiosInstanceWithToken().post(this.endpoints.sendToStudents, data)
     return response.data
   }
 

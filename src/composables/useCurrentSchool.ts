@@ -11,6 +11,8 @@ export const useCurrentSchool = () => {
   const route = useRoute()
   const userStoreManager = useUser()
 
+  const localSchoolFromApiBySlug = ref<UserSchoolPivoteType | undefined>(undefined)
+
   function getUserSchool (): SchoolType[] {
     const mySchools = userStoreManager.me?.schools ?? []
     const enrollmentSchools = (userStoreManager.me?.term_enrollments ?? [])
@@ -34,7 +36,6 @@ export const useCurrentSchool = () => {
     return firstSchool?.slug ?? null
   }
 
-  const localSchoolFromApiBySlug = ref<UserSchoolPivoteType | undefined>(undefined)
   const currentSchoolSlug = computed<string>(()=>{
     const paramSchoolSlug = route.params.school as string
     if (paramSchoolSlug) {

@@ -15,8 +15,8 @@
         label="رشته تحصیلی"
         name="field_id"
         clearable
-        :schoolId="schoolId"
-        :disable="!schoolId" />
+        :schoolId="selectedSchoolId"
+        :disable="!selectedSchoolId" />
     </div>
     <div class="col-md-3 col-xs-12">
       <form-builder-select-academic-level
@@ -24,9 +24,9 @@
         label="پایه"
         name="level_id"
         clearable
-        :schoolId="schoolId"
+        :schoolId="selectedSchoolId"
         :fieldId="fieldId"
-        :disable="!schoolId || !fieldId" />
+        :disable="!selectedSchoolId || !fieldId" />
     </div>
     <div class="col-md-3 col-xs-12">
       <form-builder-select-school-class
@@ -36,10 +36,10 @@
         clearable
         :emit-value="false"
         :map-options="false"
-        :schoolId="schoolId"
+        :schoolId="selectedSchoolId"
         :fieldId="fieldId"
         :levelId="levelId"
-        :disable="!schoolId || !fieldId || !levelId" />
+        :disable="!selectedSchoolId || !fieldId || !levelId" />
     </div>
     <div class="col-md-3 col-xs-12">
       <form-builder-select-term
@@ -47,8 +47,8 @@
         label="ترم"
         name="term_id"
         clearable
-        :schoolId="schoolId"
-        :disable="!schoolId" />
+        :schoolId="selectedSchoolId"
+        :disable="!selectedSchoolId" />
     </div>
 
     <div class="col-12">
@@ -129,13 +129,14 @@ const selectedEnrollments = ref<{ schoolClass: SchoolClassType; term_id: number 
 const selectedClass = ref<SchoolClassType | null>(null)
 
 // const selectedClasses = ref<SchoolClassType[]>([])
+const selectedSchoolId = computed(() => props.schoolId || localSchoolId.value)
 const selectedClasses = computed(() => selectedEnrollments.value.map( (i) => i.schoolClass))
 
 const schoolClassAPI = new SchoolClassAPI()
 
 useEntitySelector<SchoolClassType>({
   value: () => props.value,
-  schoolId: () => props.schoolId,
+  schoolId: () => selectedSchoolId.value,
   filteredOptions: selectedClasses,
   entityName: 'classes',
   fetchByIds: (params) => schoolClassAPI.index({
@@ -253,5 +254,4 @@ watch(
   },
   { deep: true, immediate: true }
 )
-
 </script>
