@@ -169,7 +169,7 @@ const currentSchoolLogo = computed(() => {
 })
 
 const hasFtpPanelFeature = computed(() => {
-  const features = currentSchoolManager.currentSchool.value?.features || []
+  const features = currentSchoolManager.currentSchoolFeatures.value
 
   return features.some((feature: any) =>
     feature?.feature_key === SchoolFeatureKey.FtpPanel &&

@@ -66,7 +66,7 @@ export const useUser = defineStore('user', () => {
   const mySchools = computed(() => {
     if (isStudent.value) {
       const rawSchools = me.value?.term_enrollments
-        ?.map((te) => te.school)
+        ?.map((te) => te.school_class?.academic_level?.academic_field?.school)
         ?.filter(Boolean) || []
 
       return Array.from(new Map(rawSchools.map((school) => [school.id, school])).values())
@@ -80,8 +80,8 @@ export const useUser = defineStore('user', () => {
       return false
     }
 
-    return user.roles_list
-      .map((item) => item.toLowerCase())
+    return user.roles
+      .map((item) => item.name.toLowerCase())
       .includes(role.toLowerCase())
   }
 

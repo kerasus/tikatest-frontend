@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router'
 import { useUser } from 'src/stores/user'
 import SchoolAPI, { type SchoolType } from 'src/repositories/school'
 import type { UserSchoolPivoteType } from 'src/repositories/user'
+import type { SchoolFeatureType } from 'src/repositories/schoolFeature'
 
 export const SYSTEM_SCHOOL_SLUG = 'system'
 
@@ -13,24 +14,8 @@ export const useCurrentSchool = () => {
 
   const localSchoolFromApiBySlug = ref<UserSchoolPivoteType | undefined>(undefined)
 
-  function getUserSchool (): SchoolType[] {
-    const mySchools = userStoreManager.me?.schools ?? []
-    const enrollmentSchools = (userStoreManager.me?.term_enrollments ?? [])
-      .map((te) => te.school_class?.academic_level?.academic_field?.school)
-      .filter(Boolean) as SchoolType[]
-
-    return Object.values(
-      [...enrollmentSchools, ...mySchools].reduce<Record<number, SchoolType>>((acc, school) => {
-        if (school?.id != null) {
-          acc[school.id] = school
-        }
-        return acc
-      }, {})
-    )
-  }
-
   function getFirstUserSchoolSlug (): string | null {
-    const userSchools = getUserSchool()
+    const userSchools = mySchools.value
     const firstSchool = userSchools[0] ?? null
 
     return firstSchool?.slug ?? null
@@ -39,7 +24,7 @@ export const useCurrentSchool = () => {
   const currentSchoolSlug = computed<string>(()=>{
     const paramSchoolSlug = route.params.school as string
     if (paramSchoolSlug) {
-      const userSchools = getUserSchool()
+      const userSchools = mySchools.value
       const paramSchoolInMySchools = userSchools.find((ms) => ms.slug === paramSchoolSlug)
       if (paramSchoolInMySchools) {
         return paramSchoolSlug
@@ -61,6 +46,14 @@ export const useCurrentSchool = () => {
     }
     return mySchools.value.find((school) => school.slug === currentSchoolSlug.value)
   })
+  const currentSchoolFeatures = computed<SchoolFeatureType[]>(()=> {
+    const currentSchool = mySchools.value.find((school) => school.slug === currentSchoolSlug.value)
+    if (!currentSchool) {
+      return []
+    }
+
+    return currentSchool.features
+  })
 
   onMounted(async () => {
     if (!currentSchool.value && currentSchoolSlug.value !== SYSTEM_SCHOOL_SLUG) {
@@ -71,6 +64,7 @@ export const useCurrentSchool = () => {
   return {
     mySchools,
     currentSchool,
-    currentSchoolSlug
+    currentSchoolSlug,
+    currentSchoolFeatures
   }
 }
