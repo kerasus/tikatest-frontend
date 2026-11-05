@@ -139,7 +139,15 @@ async function load () {
   const requestNumber = ++latestRequest
   loading.value = true
   try {
-    const response = await props.request(props.getFilters ? props.getFilters() : {}, { ...pagination.value })
+    const response = await props.request(
+      {
+        ...(props.getFilters ? props.getFilters() : {}),
+        sortation_field: 'created_at',
+        sortation_order: 'desc'
+      },
+      {
+        ...pagination.value
+      })
     if (requestNumber !== latestRequest) return
     const result = normalizeResponse(response)
     if (pagination.value.page > result.lastPage && result.total > 0) {

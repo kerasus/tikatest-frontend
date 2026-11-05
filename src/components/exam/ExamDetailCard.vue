@@ -248,13 +248,9 @@
                       :level-id="levelIds"
                       :class-id="classIds"
                       :disable="!!hasAnyBookletLesson"
-                      :placeholder="hasAnyBookletLesson ? 'قفل به دلیل دفترچه‌ها' : 'انتخاب درس...'"
+                      :placeholder="hasAnyBookletLesson ? 'قفل به دلیل دفترچه‌ها' : ''"
                       label="درس آزمون"
-                      outlined
-                      dense
-                      clearable
-                      multiple
-                      use-chips />
+                      clearable />
                     <div
                       v-else
                       class="field-display-card">
