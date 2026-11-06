@@ -54,7 +54,6 @@
         <!-- بخش چپ اصلاح‌شده با عرض کافی و چینش مرتب بدون تداخل -->
         <div class="main-dashboard__left-section">
           <q-btn
-            v-if="onlineExamStore.isActive || onlineExamStore.isResultMode"
             icon="assignment"
             color="primary"
             flat

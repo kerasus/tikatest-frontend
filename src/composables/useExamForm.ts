@@ -50,6 +50,9 @@ export const useExamForm = (isUpdate = false) => {
       answers_visible_at: null,
       content: null,
       solution: null,
+      show_content_to_absentees_after_end: false,
+      show_solution_to_absentees_after_end: false,
+      show_answer_key_to_absentees_after_end: false,
       created_by: null,
       created_at: null,
       updated_at: null,
@@ -147,6 +150,9 @@ export const useExamForm = (isUpdate = false) => {
       fd.append('time_limit_minutes', String(form.online_exam_detail.time_limit_minutes ?? ''))
       fd.append('visible_at', form.online_exam_detail.visible_at || '')
       fd.append('answers_visible_at', form.online_exam_detail.answers_visible_at || '')
+      fd.append('show_content_to_absentees_after_end', form.online_exam_detail.show_content_to_absentees_after_end ? '1' : '0')
+      fd.append('show_solution_to_absentees_after_end', form.online_exam_detail.show_solution_to_absentees_after_end ? '1' : '0')
+      fd.append('show_answer_key_to_absentees_after_end', form.online_exam_detail.show_answer_key_to_absentees_after_end ? '1' : '0')
 
       if (form.online_exam_detail.content) {
         const contentMeta = { ...form.online_exam_detail.content }
@@ -208,6 +214,9 @@ export const useExamForm = (isUpdate = false) => {
       answers_visible_at: null,
       content: null,
       solution: null,
+      show_content_to_absentees_after_end: false,
+      show_solution_to_absentees_after_end: false,
+      show_answer_key_to_absentees_after_end: false,
       created_by: null,
       created_at: null,
       updated_at: null,

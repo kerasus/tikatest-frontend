@@ -66,6 +66,9 @@ export type OnlineExamDetailType = {
   answers_visible_at: string | null;
   content: OnlineExamContentType | null;
   solution: OnlineExamContentType | null;
+  show_content_to_absentees_after_end: boolean;
+  show_solution_to_absentees_after_end: boolean;
+  show_answer_key_to_absentees_after_end: boolean;
   created_by: number | null;
   created_at: string | null;
   updated_at: string | null;
@@ -266,6 +269,15 @@ export default class ExamAPI extends BaseAPI<ExamType> {
     }
     if (item?.online_exam_detail?.answer_keys) {
       item.answer_keys = item.online_exam_detail.answer_keys
+    }
+    if (item?.online_exam_detail?.show_content_to_absentees_after_end === undefined) {
+      item.online_exam_detail.show_content_to_absentees_after_end = false
+    }
+    if (item?.online_exam_detail?.show_solution_to_absentees_after_end === undefined) {
+      item.online_exam_detail.show_solution_to_absentees_after_end = false
+    }
+    if (item?.online_exam_detail?.show_answer_key_to_absentees_after_end === undefined) {
+      item.online_exam_detail.show_answer_key_to_absentees_after_end = false
     }
     return item
   }

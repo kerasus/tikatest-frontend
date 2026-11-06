@@ -188,6 +188,97 @@
           </div>
         </div>
 
+        <!-- تنظیمات دسترسی غایبان پس از پایان آزمون -->
+        <div class="col-12 col-lg-12">
+          <div class="candy-panel candy-panel--indigo">
+            <div class="candy-panel__header">
+              <div class="row items-center">
+                <span class="candy-panel__dot bg-indigo-7" />
+                <q-icon
+                  name="person_off"
+                  color="indigo-8"
+                  size="19px"
+                  class="q-mr-xs" />
+                <span class="candy-panel__title">دسترسی غایبان پس از پایان آزمون</span>
+              </div>
+              <span class="candy-panel__badge candy-panel__badge--indigo">مشاهده محتوا و پاسخ</span>
+            </div>
+
+            <div class="candy-panel__body">
+              <div class="row q-col-gutter-sm">
+                <!-- نمایش محتوای سوالات -->
+                <div class="col-12 col-sm-4">
+                  <div class="crystal-box">
+                    <q-toggle
+                      v-if="editable"
+                      v-model="exam.online_exam_detail.show_content_to_absentees_after_end"
+                      label="نمایش محتوای سوالات برای غایبان"
+                      color="indigo" />
+                    <div
+                      v-else
+                      class="crystal-info">
+                      <div class="crystal-info__top">
+                        <q-icon
+                          name="article"
+                          size="16px"
+                          class="text-indigo-8" />
+                        <span>نمایش محتوای سوالات:</span>
+                      </div>
+                      <div class="crystal-info__val ltr">{{ exam.online_exam_detail.show_content_to_absentees_after_end ? 'فعال' : 'غیرفعال' }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- نمایش پاسخ تشریحی -->
+                <div class="col-12 col-sm-4">
+                  <div class="crystal-box">
+                    <q-toggle
+                      v-if="editable"
+                      v-model="exam.online_exam_detail.show_solution_to_absentees_after_end"
+                      label="نمایش پاسخ تشریحی برای غایبان"
+                      color="indigo" />
+                    <div
+                      v-else
+                      class="crystal-info">
+                      <div class="crystal-info__top">
+                        <q-icon
+                          name="menu_book"
+                          size="16px"
+                          class="text-indigo-8" />
+                        <span>نمایش پاسخ تشریحی:</span>
+                      </div>
+                      <div class="crystal-info__val ltr">{{ exam.online_exam_detail.show_solution_to_absentees_after_end ? 'فعال' : 'غیرفعال' }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- نمایش پاسخ‌نامه کلیدی -->
+                <div class="col-12 col-sm-4">
+                  <div class="crystal-box">
+                    <q-toggle
+                      v-if="editable"
+                      v-model="exam.online_exam_detail.show_answer_key_to_absentees_after_end"
+                      label="نمایش پاسخ‌نامه کلیدی برای غایبان"
+                      color="indigo" />
+                    <div
+                      v-else
+                      class="crystal-info">
+                      <div class="crystal-info__top">
+                        <q-icon
+                          name="checklist"
+                          size="16px"
+                          class="text-indigo-8" />
+                        <span>نمایش پاسخ‌نامه کلیدی:</span>
+                      </div>
+                      <div class="crystal-info__val ltr">{{ exam.online_exam_detail.show_answer_key_to_absentees_after_end ? 'فعال' : 'غیرفعال' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ۳. محدودیت مدت زمان پاسخگویی (تم کهربایی/بنفش جذاب) -->
         <div class="col-12">
           <div class="candy-panel candy-panel--amber">
@@ -827,6 +918,18 @@ watch(
     .candy-panel__header {
       background: rgba(254, 243, 199, 0.75);
       border-bottom: 1px solid rgba(253, 230, 138, 0.8);
+    }
+  }
+
+  /* تم نیلی برای دسترسی غایبان */
+  &--indigo {
+    background: linear-gradient(135deg, rgba(241, 245, 255, 0.9) 0%, rgba(232, 238, 255, 0.6) 100%);
+    border: 1.5px solid #c7d2fe;
+    box-shadow: 0 6px 20px -8px rgba(99, 102, 241, 0.2);
+
+    .candy-panel__header {
+      background: rgba(232, 238, 255, 0.7);
+      border-bottom: 1px solid rgba(199, 210, 254, 0.7);
     }
   }
 }
