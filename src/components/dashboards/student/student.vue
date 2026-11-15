@@ -331,13 +331,19 @@
                   class="text-grey-7">
                   {{ g.type === 'online' ? 'آنلاین' : 'حضوری' }}
                   <span v-if="g.lesson_name"> • درس: {{ g.lesson_name }}</span>
-                  <span v-if="g.percent !== null"> • درصد: <b>{{ g.percent }}٪</b></span>
                 </q-item-label>
               </q-item-section>
 
               <q-item-section side>
-                <div class="text-weight-bolder text-primary text-subtitle2">
-                  {{ g.score ?? '-' }}
+                <div
+                  v-if="g.type === 'online'"
+                  class="text-weight-bolder text-primary text-subtitle2">
+                  درصد: <b>{{ g.percent }}٪</b>
+                </div>
+                <div
+                  v-else
+                  class="text-weight-bolder text-primary text-subtitle2">
+                  نمره: <b>{{ g.score }}٪</b>
                 </div>
               </q-item-section>
             </q-item>
