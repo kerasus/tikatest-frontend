@@ -146,7 +146,51 @@
 
           <template #body-cell-created_at="props">
             <q-td :props="props">
-              {{ props.row.created_at ? dateManager.isoToLocalShamsi(props.row.created_at) : '-' }}
+              {{ formatDateTime(props.row.created_at) }}
+            </q-td>
+          </template>
+
+          <template #body-cell-exam_timing="props">
+            <q-td :props="props">
+              <div
+                v-if="props.row.online_exam_detail"
+                class="column items-start q-gutter-y-xs">
+                <!-- نمایش فقط جزئیات زمان‌بندی -->
+                <div
+                  class="text-caption text-grey-8 column q-gutter-y-xs"
+                  style="font-size: 11px; line-height: 1.3">
+                  <div class="row items-center no-wrap">
+                    <q-icon
+                      name="schedule"
+                      size="14px"
+                      class="q-mr-xs text-primary" />
+                    <span>شروع: {{ formatDateTime(props.row.online_exam_detail.starts_at) }}</span>
+                  </div>
+
+                  <div
+                    v-if="props.row.online_exam_detail.ends_at"
+                    class="row items-center no-wrap">
+                    <q-icon
+                      name="event_busy"
+                      size="14px"
+                      class="q-mr-xs text-negative" />
+                    <span>پایان: {{ formatDateTime(props.row.online_exam_detail.ends_at) }}</span>
+                  </div>
+
+                  <div
+                    v-if="props.row.online_exam_detail.time_limit_minutes"
+                    class="row items-center no-wrap text-weight-medium text-blue-grey-9">
+                    <q-icon
+                      name="timer"
+                      size="14px"
+                      class="q-mr-xs text-amber-9" />
+                    <span>مدت: {{ props.row.online_exam_detail.time_limit_minutes }} دقیقه</span>
+                  </div>
+                </div>
+              </div>
+              <span
+                v-else
+                class="text-grey-5">-</span>
             </q-td>
           </template>
 
@@ -249,6 +293,7 @@ const columns = [
   { name: 'lesson', label: 'درس', align: 'center' as const, field: 'lesson' },
   { name: 'category', label: 'دسته‌بندی', align: 'center' as const, field: 'category' },
   { name: 'created_at', label: 'تاریخ ثبت', align: 'center' as const, field: 'created_at' },
+  { name: 'exam_timing', label: 'برنامه زمانی', align: 'center' as const, field: 'exam_timing' },
   { name: 'actions', label: 'عملیات', align: 'center' as const, field: 'id' }
 ]
 
@@ -301,8 +346,8 @@ const onRequest = async (
     delivery_mode: 'online',
     page: pagination.page,
     length: pagination.rowsPerPage,
-    sort_by: pagination.sortBy,
-    descending: pagination.descending ? 1 : 0
+    sortation_field: pagination.sortBy || 'created_at',
+    sortation_order: pagination.descending ? 'desc' : 'asc'
   }
 
   const school = effectiveSchoolId.value
@@ -365,6 +410,11 @@ function afterRemove () {
     message: 'حذف با موفقیت انجام شد.',
     type: 'positive'
   })
+}
+
+const formatDateTime = (value: string | null) => {
+  if (!value) return '-'
+  return dateManager.isoToLocalShamsiDateTime(value)
 }
 
 watch(

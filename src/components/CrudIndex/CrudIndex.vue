@@ -120,7 +120,7 @@ const pagination = ref<CrudPaginationState>({
   rowsPerPage: props.initialPagination.rowsPerPage ?? 10,
   rowsNumber: props.initialPagination.rowsNumber ?? 0,
   sortBy: props.initialPagination.sortBy ?? null,
-  descending: props.initialPagination.descending ?? false
+  descending: props.initialPagination.descending ?? true
 })
 let latestRequest = 0
 
